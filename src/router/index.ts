@@ -1,6 +1,7 @@
 import {createRouter, createWebHistory, NavigationGuardNext, RouteLocationNormalized, RouteRecordRaw} from 'vue-router'
 import {AppRoutes} from "@/router/app.routes";
 import {AuthRoutes} from "@/router/auth.routes";
+import {OnboardRoutes} from "@/router/onboarding.routes";
 import {loadRouteComponent} from "@/utils/route-helper.util";
 import {RouteGuard} from "@/models/route-guard";
 import {AuthGuard} from "@/router/guards/auth.guard";
@@ -9,6 +10,7 @@ import store from '@/store';
 const routes: Array<RouteRecordRaw> = [
   ...AppRoutes,
   ...AuthRoutes,
+  ...OnboardRoutes,
   {
     path: '/:pathMatch(.*)*',
     name: 'PageNotFound',
