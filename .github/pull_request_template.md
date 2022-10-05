@@ -3,8 +3,8 @@
 
 # Proposed Changes
 - List out changes done e.g
-- Create onboarding process routes
-- Create onboarding header component
+- Change 1
+- Change 2
 
 
 # Additional Information
