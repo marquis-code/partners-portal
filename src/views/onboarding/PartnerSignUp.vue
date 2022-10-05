@@ -1,16 +1,20 @@
 <template>
-  <div>Partner Sign Up</div>
+  <Header
+    :title="'Create a partner account'"
+    :description="'Select a category to sign up as'"
+  />
 </template>
 
 <script lang="ts">
-
-import { defineComponent } from 'vue';
+import { defineComponent } from "vue";
+import Header from "../../components/Header.vue";
 
 export default defineComponent({
-  name: 'PartnerSignUp'
+  name: "PartnerSignUp",
+  components: {
+    Header,
+  },
 });
 </script>
 
-<style lang="scss" scoped>
-
-</style>
+<style lang="scss" scoped></style>
