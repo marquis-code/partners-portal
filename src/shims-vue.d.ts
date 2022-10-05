@@ -1,6 +1,6 @@
 /* eslint-disable */
 import{AxiosInstance} from "axios";
-// Works correctly
+
 export {}
 
 declare module '*.vue' {
