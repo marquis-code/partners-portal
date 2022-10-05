@@ -30,7 +30,6 @@ router.beforeEach((to: RouteLocationNormalized, from: RouteLocationNormalized, n
   routeGuards.forEach(guard => {
     guard.handle(to, from, next);
   });
-  // next();
 });
 
 export default router
