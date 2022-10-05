@@ -13,7 +13,23 @@ module.exports = {
   },
   rules: {
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
-    'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off'
+    'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+    semi: 'off',
+    'vue/multi-word-component-names': 'off',
+    quotes: "off",
+    'object-curly-spacing': "off",
+    'no-useless-constructor': 'off',
+    '@typescript-eslint/no-explicit-any': 'off',
+    'comma-dangle': 'off',
+    'space-before-function-paren': 'warn',
+    'keyword-spacing': 'warn',
+    '@typescript-eslint/no-this-alias': [
+      "error",
+      {
+        allowDestructuring: true, // Allow `const { props, state } = this`; false by default
+        allowedNames: ["vm"] // Allow `const vm = this`; `[]` by default
+      }
+    ]
   },
   overrides: [
     {

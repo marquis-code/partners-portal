@@ -1,4 +1,4 @@
-# vehicle-partner-portal
+# Shuttlers Vehicle Partner Portal
 
 ## Project setup
 ```

@@ -1,25 +1,34 @@
-import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import {createRouter, createWebHistory, NavigationGuardNext, RouteLocationNormalized, RouteRecordRaw} from 'vue-router'
+import {AppRoutes} from "@/router/app.routes";
+import {AuthRoutes} from "@/router/auth.routes";
+import {loadRouteComponent} from "@/utils/route-helper.util";
+import {RouteGuard} from "@/models/route-guard";
+import {AuthGuard} from "@/router/guards/auth.guard";
+import store from '@/store';
 
 const routes: Array<RouteRecordRaw> = [
+  ...AppRoutes,
+  ...AuthRoutes,
   {
-    path: '/',
-    name: 'home',
-    component: HomeView
-  },
-  {
-    path: '/about',
-    name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
+    path: '/:pathMatch(.*)*',
+    name: 'PageNotFound',
+    component: loadRouteComponent('PageNotFound')
   }
 ]
 
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes
-})
+});
+
+const routeGuards: Array<RouteGuard> = [
+  new AuthGuard(store),
+]
+router.beforeEach((to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
+  routeGuards.forEach(guard => {
+    guard.handle(to, from, next);
+  });
+  // next();
+});
 
 export default router
