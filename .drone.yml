@@ -28,7 +28,7 @@ steps:
       region: us-east-2
       source: ./dist
       target: /
-      cloudfront_distribution: E1IA15GXYITKQ9aaa
+      cloudfront_distribution: E22QKP0U8Z4Q07
       metadata:
         "*.js":
           Cache-Control: "dist, max-age: 0"
@@ -51,7 +51,7 @@ steps:
       region: us-east-2
       source: ./dist
       target: /
-      cloudfront_distribution: E1IA15GXYITKQ9aaa
+      cloudfront_distribution: E711MH3W5RKHU
       metadata:
         "*.js":
           Cache-Control: "dist, max-age: 0"
@@ -74,7 +74,7 @@ steps:
       region: us-east-2
       source: ./dist
       target: /
-      cloudfront_distribution: E1IA15GXYITKQ9aaa
+      cloudfront_distribution: E11FUPUV4XSRCN
       metadata:
         "*.js":
           Cache-Control: "dist, max-age: 0"
@@ -97,7 +97,7 @@ steps:
       region: us-east-2
       source: ./dist
       target: /
-      cloudfront_distribution: E1IA15GXYITKQ9aaa
+      cloudfront_distribution: E15B0EOZREF1L5
       metadata:
         "*.js":
           Cache-Control: "dist, max-age: 0"
