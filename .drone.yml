@@ -1,0 +1,150 @@
+kind: pipeline
+name: default
+type: kubernetes
+
+trigger:
+  branch:
+    - develop
+    - test
+    - staging
+    - main
+
+steps:
+  - name: build
+    image: node:14.18-alpine
+    commands:
+      - npm install
+#      - npm test
+      - unset CI
+      - npm run build:${DRONE_BRANCH}
+  - name: deploy-to-develop
+    image: plugins/s3-sync:1
+    settings:
+      bucket: partner-portal.shuttlers-develop
+      access_key:
+        from_secret: AWS_ACCESS_KEY_ID
+      secret_key:
+        from_secret: AWS_SECRET_ACCESS_KEY
+      region: us-east-2
+      source: ./dist
+      target: /
+      cloudfront_distribution: E1IA15GXYITKQ9aaa
+      metadata:
+        "*.js":
+          Cache-Control: "dist, max-age: 0"
+        "*.html":
+          Cache-Control: "dist, max-age: 0"
+    when:
+      branch:
+        - develop
+      event:
+        exclude:
+          - pull_request
+  - name: deploy-to-test
+    image: plugins/s3-sync:1
+    settings:
+      bucket: partner-portal.shuttlers-test
+      access_key:
+        from_secret: AWS_ACCESS_KEY_ID
+      secret_key:
+        from_secret: AWS_SECRET_ACCESS_KEY
+      region: us-east-2
+      source: ./dist
+      target: /
+      cloudfront_distribution: E1IA15GXYITKQ9aaa
+      metadata:
+        "*.js":
+          Cache-Control: "dist, max-age: 0"
+        "*.html":
+          Cache-Control: "dist, max-age: 0"
+    when:
+      branch:
+        - test
+      event:
+        exclude:
+          - pull_request
+  - name: deploy-to-staging
+    image: plugins/s3-sync:1
+    settings:
+      bucket: partner-portal.shuttlers-staging
+      access_key:
+        from_secret: AWS_ACCESS_KEY_ID
+      secret_key:
+        from_secret: AWS_SECRET_ACCESS_KEY
+      region: us-east-2
+      source: ./dist
+      target: /
+      cloudfront_distribution: E1IA15GXYITKQ9aaa
+      metadata:
+        "*.js":
+          Cache-Control: "dist, max-age: 0"
+        "*.html":
+          Cache-Control: "dist, max-age: 0"
+    when:
+      branch:
+        - staging
+      event:
+        exclude:
+          - pull_request
+  - name: deploy-to-prodution
+    image: plugins/s3-sync:1
+    settings:
+      bucket: partner-portal.shuttlers
+      access_key:
+        from_secret: AWS_ACCESS_KEY_ID
+      secret_key:
+        from_secret: AWS_SECRET_ACCESS_KEY
+      region: us-east-2
+      source: ./dist
+      target: /
+      cloudfront_distribution: E1IA15GXYITKQ9aaa
+      metadata:
+        "*.js":
+          Cache-Control: "dist, max-age: 0"
+        "*.html":
+          Cache-Control: "dist, max-age: 0"
+    when:
+      branch:
+        - main
+      event:
+        exclude:
+          - pull_request
+  - name: email-notification
+    image: drillster/drone-email
+    settings:
+      host: smtp.sendgrid.net
+      port: 587
+      skip_verify: true
+      username:
+        from_secret: SMTP_USERNAME
+      password:
+        from_secret: SMTP_PASSWORD
+      from: david.jaiyeola@shuttlers.ng
+      subject: >
+        [DRONE CI]: {{ build.status }}: {{ repo.owner }}/{{ repo.name }}
+        ({{ build.branch }} - {{ truncate build.commit 8 }})
+      recipients: [ david.jaiyeola@shuttlers.ng ]
+      recipients_only: false
+    when:
+      status: [ changed, failure, success ]
+  - name: slack-notification
+    image: plugins/slack
+    settings:
+      webhook: https://hooks.slack.com/services/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
+      channel: builds
+      link_names: true
+      template: >
+        {{#success build.status}}
+          build {{build.number}} status: *{{build.status}}*
+          build link: {{build.link}}
+          build author: {{build.author}}
+          build ref: {{build.ref}}
+          build event: {{build.event}}
+          build commit: {{build.commit}}
+          build branch: {{build.branch}}
+          build deploy: {{build.deployTo}}
+        {{else}}
+          build {{build.number}} failed. Fix me please.
+        {{/success}}
+    when:
+      status: [ changed, failure, success ]
