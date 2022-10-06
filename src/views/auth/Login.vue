@@ -1,19 +1,18 @@
 <template>
   <main
     class="
-      h-screen
-      w-screen
       flex
       justify-center
       items-center
       flex-col
-      space-y-8
       relative
       container
       mx-auto
+      h-screen
+      space-y-5
     "
   >
-    <div class="space-y-3 flex justify-between items-center flex-col">
+    <div class="space-y-1 flex justify-between items-center flex-col">
       <img src="@/assets/logo.png" class="h-10" />
       <h1 class="text-sh-grey-900 font-bold text-lg lg:text-2xl text-center">
         Log into your account
@@ -47,7 +46,9 @@
       </button>
     </div>
     <component :is="activeForm" />
-    <!-- <img src="@/assets/images/backgroundGraphics.svg" class="pb-0 absolute bottom-0" /> -->
+   <div class="absolute bottom-0 hidden lg:flex">
+    <img src="@/assets/images/backgroundGraphics.svg" class="h-32 w-screen" />
+   </div>
   </main>
 </template>
 

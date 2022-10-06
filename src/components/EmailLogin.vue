@@ -67,7 +67,7 @@
         >
       </div>
       <div class="flex justify-end">
-        <small class="text-grays-black-3 text-end text-sm font-medium"
+        <small class="text-grays-black-3 text-end text-xs font-medium"
           >Forgot Password?</small
         >
       </div>
