@@ -24,9 +24,14 @@
                     </option>
                 </select>
                 </div>
-                <span v-for="city in selectedCities" :key="city.city">
-                  <SelectedCityBadge :value="city.city" ></SelectedCityBadge>
+                <span class="flex flex-row flex-wrap mt-6">
+                <span v-for="city in selectedCities" :key="city.city" class="mr-4">
+                  <SelectedCityBadge
+                    @removeSelectedCity="removeThisCity(city.city)"
+                    :value="city.city" >
+                  </SelectedCityBadge>
                 </span>
+              </span>
                 <button
                     type="button"
                     class="bg-sh-green-500 border-none outline-none py-3 rounded-md text-sm flex justify-center items-center w-full mt-11">
@@ -55,7 +60,13 @@ export default {
         },
         {
           city: 'Ogun'
-        }
+        },
+        {
+          city: 'Abuja'
+        },
+        {
+          city: 'Ibadan'
+        },
       ]
     }
   },
@@ -67,9 +78,29 @@ export default {
   },
   methods: {
     selectThisCity(event) {
-      const newAddition = this.cities[event.target.value]
-      console.log(newAddition)
-      this.selectedCities.push(newAddition)
+      if (this.selectedCities.length > 0) {
+        if (!this.selectedThisCityBefore(event.target.value)) {
+          const newAddition = this.cities[event.target.value];
+          this.selectedCities.push(newAddition);
+        } else this.$toast.warning('You cannot select a city twice');
+      } else {
+        const newAddition = this.cities[event.target.value];
+        this.selectedCities.push(newAddition);
+      }
+    },
+    removeThisCity(cityName) {
+      const index = this.selectedCities.findIndex(city => city.city === `${cityName}`);
+      this.selectedCities.splice(index, 1);
+    },
+    selectedThisCityBefore(cityIndex) {
+      const cityName = this.getSelectedCityName(cityIndex);
+      const index = this.selectedCities.findIndex(city => city.city === `${cityName}`);
+      if (index !== -1) {
+        return true;
+      } else return false;
+    },
+    getSelectedCityName(cityIndex) {
+      return this.cities[cityIndex].city;
     }
   }
 }
