@@ -11,6 +11,12 @@
   color: #2c3e50;
 }
 
+#sh-vp-portal {
+  max-width: 1980px;
+  margin: 0 auto;
+  min-height: 100vh;
+}
+
 nav {
   padding: 30px;
 }

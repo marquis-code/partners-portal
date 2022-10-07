@@ -1,4 +1,5 @@
 <template>
+  <div class="text-sh-green-500">Dashboard Content Area...coming soon</div>
   <div class="p-10">
     <ImageUpload :field="'nin'"/>
   </div>

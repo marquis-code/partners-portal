@@ -1,6 +1,6 @@
 import {StoreOptions} from "vuex";
 import {UserSessionModel} from "@/models/user-session.model";
-import {setAuthorization} from "@/plugins/axios";
+import {removeAuthorization, setAuthorization} from "@/plugins/axios";
 import {LoginResponse} from "@/models/login-response.model";
 
 export const USER_SESSION_KEY = 'USER_SESSION';
@@ -42,12 +42,16 @@ export default <StoreOptions<AuthState>>{
     },
     clearSessionData ({commit}) {
       commit('setSession', null);
+      removeAuthorization();
       localStorage.removeItem(USER_SESSION_KEY);
     }
   },
   getters: {
     userSessionData: (state) => {
       return state.sessionData
+    },
+    user: (state) => {
+      return state.sessionData?.user
     },
     startedOnboarding: (/* state */) => {
       return true;
@@ -59,9 +63,7 @@ export default <StoreOptions<AuthState>>{
   },
   mutations: {
     setSession (state: AuthState, session: UserSessionModel) {
-      if (session) {
-        state.isLoggedIn = false
-      }
+      state.isLoggedIn = !!session;
       state.sessionData = session;
     }
   }

@@ -9,6 +9,7 @@ export class AuthGuard implements RouteGuard {
   handle (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext): NavigationGuardReturn | Promise<NavigationGuardReturn> {
     const requiresAuth = to.matched.some(route => route.meta.requiresAuth);
     const isLoggedIn = this.store.getters["auth/isLoggedIn"];
+    console.log({requiresAuth, isLoggedIn});
     if (!isLoggedIn && requiresAuth) {
       this.store.dispatch('auth/clearSessionData');
       return next({
@@ -18,7 +19,7 @@ export class AuthGuard implements RouteGuard {
     } else if (isLoggedIn && !requiresAuth) {
       return next({
         name: "dashboard",
-        query: { redirect: to.fullPath }
+        // query: { redirect: to.fullPath }
       });
     }
     next();

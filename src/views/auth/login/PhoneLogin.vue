@@ -116,15 +116,15 @@ export default defineComponent({
     },
     canProceed () {
       return this.loginStep === 1
-        ? this.v$.form.phone.$error || !this.isPhoneValid
+        ? !this.v$.form.phone.$error && this.isPhoneValid
         : this.form.otpValue;
     }
   },
-  created() {
+  created () {
     this.setDefaultCountry();
   },
   methods: {
-    setDefaultCountry() {
+    setDefaultCountry () {
       const code = this.countries && this.countries.length ? (this.countries[0] as any).code : null;
       if (code) {
         this.form.country = code;

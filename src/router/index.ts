@@ -7,8 +7,18 @@ import {RouteGuard} from "@/models/route-guard";
 import {AuthGuard} from "@/router/guards/auth.guard";
 import store from '@/store';
 import {OnboardingGuard} from "@/router/guards/onboarding.guard";
+import LandingPage from "@/views/LandingPage.vue";
 
 const routes: Array<RouteRecordRaw> = [
+  {
+    path: '/',
+    name: 'splash',
+    component: LandingPage,
+    meta: {
+      requiresAuth: false,
+      openPage: true
+    }
+  },
   ...AppRoutes,
   ...AuthRoutes,
   ...OnboardRoutes,
