@@ -6,6 +6,7 @@ import {loadRouteComponent} from "@/utils/route-helper.util";
 import {RouteGuard} from "@/models/route-guard";
 import {AuthGuard} from "@/router/guards/auth.guard";
 import store from '@/store';
+import {OnboardingGuard} from "@/router/guards/onboarding.guard";
 
 const routes: Array<RouteRecordRaw> = [
   ...AppRoutes,
@@ -24,7 +25,7 @@ const router = createRouter({
 });
 
 const routeGuards: Array<RouteGuard> = [
-  new AuthGuard(store),
+  new AuthGuard(store), new OnboardingGuard(store)
 ]
 router.beforeEach((to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
   routeGuards.forEach(guard => {
