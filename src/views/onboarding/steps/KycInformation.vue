@@ -101,7 +101,25 @@
       <section class="flex justify-start space-x-10 items-start">
         <div class="space-y-2 w-full lg:w-6/12">
           <label class="text-xs font-medium text-grays-black-5">D.O.B</label>
-          <input
+          <datepicker
+          class="
+            text-xs
+            border-none
+            outline-none
+            w-full
+            rounded-md
+            p-3
+            placeholder-gray-500 placeholder-opacity-25
+            ring-1 ring-gray-300
+          "
+          placeholder="Choose a date"
+          v-model="picked"
+          :locale="locale"
+          :upperLimit="to"
+          :lowerLimit="from"
+          :clearable="false"
+        />
+          <!-- <input
             class="
               text-xs
               border-none
@@ -113,7 +131,7 @@
               ring-1 ring-gray-300
             "
             placeholder="Choose date"
-          />
+          /> -->
         </div>
       </section>
     </template>
@@ -250,11 +268,14 @@
 <script>
 import { defineComponent } from 'vue';
 import { mapActions } from 'vuex';
+import Datepicker from 'vue3-datepicker';
 export default defineComponent({
   name: 'KycInformation',
+  components: {Datepicker},
   data() {
     return {
       activeView: 0,
+      picked: '',
       file: '',
       selected: '',
       identificationOptions: ['NIN', 'Drivers License', 'BVN', 'Passport']

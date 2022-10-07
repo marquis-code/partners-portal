@@ -98,7 +98,7 @@
     </section>
 
     <section class="flex justify-start space-x-10 items-start">
-      <div class="space-y-2 w-full lg:w-6/12">
+      <div class="space-y-2 w-full lg:w-6/12 pr-5">
         <label class="text-xs font-medium text-grays-black-5"
           >Business start date</label
         >
@@ -135,7 +135,7 @@ export default defineComponent({
   },
   data() {
     return {
-      picked: new Date(),
+      picked: '',
       businessOptions: [
         'Incorporated Trustee',
         'Limited Partnership',
@@ -144,12 +144,6 @@ export default defineComponent({
       ]
     };
   }
-  // props: {
-  //   partnersFormData: {
-  //     email: String,
-  //     phone: Number
-  //   }
-  // }
 });
 </script>
 
