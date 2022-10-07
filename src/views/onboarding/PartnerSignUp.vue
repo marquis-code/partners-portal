@@ -1,17 +1,5 @@
 <template>
-  <main
-    class="
-      container
-      mx-auto
-      h-screen
-      w-screen
-      flex
-      justify-center
-      items-center
-      flex-col
-      space-y-9
-    "
-  >
+  <OnboardingLayout>
     <CenteredPageHeader :title="headerTitle" :description="headerDescription" />
     <section class="md:flex items-center justify-center space-y-5 md:space-y-0 md:space-x-5 w-7/12 mx-auto md:w-10/12">
       <div
@@ -49,17 +37,19 @@
       Proceed
       <img class="ml-1" src="@/assets/images/arrow.svg" />
     </button>
-  </main>
+  </OnboardingLayout>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
 import CenteredPageHeader from '../../components/CenteredPageHeader.vue';
+import OnboardingLayout from '../layouts/OnboardingLayout.vue';
 
 export default defineComponent({
   name: 'PartnerSignUp',
   components: {
-    CenteredPageHeader
+    CenteredPageHeader,
+    OnboardingLayout
   },
   data() {
     return {

@@ -1,31 +1,7 @@
 <template>
-  <main
-    class="
-      h-screen
-      w-screen
-      flex
-      justify-center
-      items-center
-      flex-col
-      space-y-6
-    "
-  >
+  <OnboardingLayout>
     <CenteredPageHeader :title="title" :description="description" />
-    <div
-      class="
-        w-11/12
-        lg:w-9/12
-        ring-1 ring-gray-300
-        rounded-md
-        py-8
-        mx-auto
-        flex
-        justify-center
-        items-center
-        flex-col
-        space-y-8
-      "
-    >
+    <FormContainer :hasRing="true">
       <div class="flex space-x-2 lg:space-x-3 items-center">
         <div
           class="flex items-center space-x-1"
@@ -64,6 +40,7 @@
         <keep-alive>
           <component
             @goBack="goBack()"
+            @kycCompleted="redirectToCitySelection"
             :is="steps[currentStep].component"
             :partnersFormData="partnersFormData[steps[currentStep].label]"
           />
@@ -89,8 +66,8 @@
           </button>
         </div>
       </main>
-    </div>
-  </main>
+    </FormContainer>
+  </OnboardingLayout>
 </template>
 
 <script lang="ts">
@@ -98,12 +75,16 @@ import { defineComponent } from 'vue';
 import CompanyInformation from '../onboarding/steps/CompanyInformation.vue';
 import KycInformation from '../onboarding/steps/KycInformation.vue';
 import CenteredPageHeader from '../../components/CenteredPageHeader.vue';
+import OnboardingLayout from '../layouts/OnboardingLayout.vue';
+import FormContainer from '../layouts/FormContainer.vue';
 export default defineComponent({
   name: 'GetStarted',
   components: {
     CompanyInformation,
     KycInformation,
-    CenteredPageHeader
+    CenteredPageHeader,
+    OnboardingLayout,
+    FormContainer
   },
   data() {
     return {
@@ -138,6 +119,9 @@ export default defineComponent({
     },
     goBack (): void {
       this.currentStep = 0 as number
+    },
+    redirectToCitySelection() {
+      this.$router.push('/city-selection');
     }
   }
 })

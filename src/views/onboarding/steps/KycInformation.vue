@@ -257,6 +257,7 @@
             bg-grays-black-10
             font-medium
           "
+          @click="$emit('kycCompleted')"
         >
           Submit
         </button>
