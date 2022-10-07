@@ -2,10 +2,11 @@ import {PageTitleService} from "@/services/page-title.service";
 import {Router} from "vue-router";
 import {Store} from "vuex";
 import {AxiosInstance} from "axios";
-import {removeAuthorization} from "@/plugins/axios";
+import {removeAuthorization, setAuthorization} from "@/plugins/axios";
 import {UnAuthorizedAccessError} from "@/models/errors/unauthorised-error";
 import {UserSessionModel} from "@/models/user-session.model";
 import {USER_SESSION_KEY} from "@/store/modules/auth";
+import {LoginResponse} from "@/models/login-response.model";
 
 export class AppInitializerService {
   constructor (private router: Router, private store: Store<any>, private axios: AxiosInstance) {
@@ -55,7 +56,20 @@ export class AppInitializerService {
     if (sessionDataString) {
       console.info('Session initialized');
       const sessionData: UserSessionModel = JSON.parse(sessionDataString);
-      await this.store.dispatch('auth/initializeSession', sessionData);
+      if(sessionData.token) {
+        setAuthorization(sessionData.token);
+        try {
+          const userResponse: LoginResponse = await this.axios.get(`v1/users/profile`).then(res => res.data);
+          if(userResponse && userResponse.id) {
+            userResponse.token = sessionData.token;
+            await this.store.dispatch('auth/authSuccess', sessionData);
+          } else {
+            await this.store.dispatch('auth/clearSessionData', sessionData);
+          }
+        } catch (e) {
+          await this.store.dispatch('auth/clearSessionData', sessionData);
+        }
+      }
     }
   }
 }
