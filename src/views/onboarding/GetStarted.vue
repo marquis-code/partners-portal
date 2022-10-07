@@ -63,6 +63,7 @@
       <main class="w-full px-7">
         <keep-alive>
           <component
+            @goBack="goBack()"
             :is="steps[currentStep].component"
             :partnersFormData="partnersFormData[steps[currentStep].label]"
           />
@@ -93,10 +94,11 @@
 </template>
 
 <script lang="ts">
-import CompanyInformation from '../../components/steps/CompanyInformation.vue';
-import KycInformation from '../../components/steps/KycInformation.vue';
+import { defineComponent } from 'vue';
+import CompanyInformation from '../onboarding/steps/CompanyInformation.vue';
+import KycInformation from '../onboarding/steps/KycInformation.vue';
 import CenteredPageHeader from '../../components/CenteredPageHeader.vue';
-export default {
+export default defineComponent({
   name: 'GetStarted',
   components: {
     CompanyInformation,
@@ -105,7 +107,7 @@ export default {
   },
   data() {
     return {
-      currentStep: 0,
+      currentStep: 0 as number,
       title: 'Create a partner account',
       description: 'Select a category to sign up as',
       steps: [
@@ -132,10 +134,13 @@ export default {
   },
   methods: {
     next() {
-      this.currentStep += 1;
+      this.currentStep += 1 as number;
     },
+    goBack (): void {
+      this.currentStep = 0 as number
+    }
   }
-};
+})
 </script>
 
 <style>

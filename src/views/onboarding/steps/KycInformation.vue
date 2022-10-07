@@ -34,28 +34,52 @@
     </div>
 
     <template v-if="activeView === 0">
-      <section class="lg:flex justify-between space-y-3 lg:space-y-0 lg:space-x-10 items-center">
+      <section
+        class="
+          lg:flex
+          justify-between
+          space-y-3
+          lg:space-y-0 lg:space-x-10
+          items-center
+        "
+      >
         <div class="space-y-2 w-full">
           <label class="text-xs font-medium text-grays-black-5"
             >Means of Identification</label
           >
-          <v-select
+          <select
+            class="
+              text-xs
+              border-none
+              outline-none
+              w-full
+              rounded-md
+              p-3
+              placeholder-gray-500 placeholder-opacity-25
+              ring-1 ring-gray-300
+            "
+            @change="handleIdentity"
             v-model="selected"
-            :reduce="(option) => option.id"
-            placeholder="Select a document type"
-            class="w-full placeholder-red-100"
-            :options="identificationOptions"
-          ></v-select>
+          >
+            <option value="" hidden>Select a document type</option>
+            <option
+              v-for="(identity, index) in identificationOptions"
+              :value="index"
+              :key="index"
+            >
+              {{ identity }}
+            </option>
+          </select>
         </div>
         <div class="space-y-2 w-full">
           <label class="text-xs font-medium text-grays-black-5">{{
-            selected === 1
+            selected === 0
               ? 'NIN'
-              : selected == 2
+              : selected === 1
               ? 'Drivers License'
-              : selected == 3
+              : selected === 2
               ? 'BVN'
-              : selected == 4
+              : selected === 3
               ? 'Passport'
               : 'Document Name'
           }}</label>
@@ -96,7 +120,7 @@
 
     <template v-if="activeView === 1">
       <section class="flex justify-start flex-col space-y-5 items-start">
-        <div class="space-y-2  w-full lg:w-6/12">
+        <div class="space-y-2 w-full lg:w-6/12">
           <label class="text-xs font-medium text-grays-black-5">Address</label>
           <input
             class="
@@ -146,8 +170,8 @@
       </section>
     </template>
     <div class="flex justify-end">
-       <div class="flex items-center space-x-5">
-      <button
+      <div class="flex items-center space-x-5">
+        <button
           class="
             rounded-md
             w-32
@@ -160,30 +184,30 @@
             ring-1 ring-gray-400
             font-medium
           "
-        v-if="activeView === 0"
-        @click="next()"
-      >
-        Go back
-      </button>
-      <button
-        class="
-          rounded-md
-          w-32
-          flex
-          justify-center
-          items-center
-          p-3
-          px-5
-          text-sm text-grays-black-5
-          bg-grays-black-10
-        "
-        v-if="activeView === 0"
-        @click="next()"
-      >
-        Next
-        <img class="ml-2" src="@/assets/images/arrow.svg" />
-      </button>
-       </div>
+          v-if="activeView === 0"
+          @click="$emit('goBack')"
+        >
+          Go back
+        </button>
+        <button
+          class="
+            rounded-md
+            w-32
+            flex
+            justify-center
+            items-center
+            p-3
+            px-5
+            text-sm text-grays-black-5
+            bg-grays-black-10
+          "
+          v-if="activeView === 0"
+          @click="next()"
+        >
+          Next
+          <img class="ml-2" src="@/assets/images/arrow.svg" />
+        </button>
+      </div>
       <div class="flex space-x-5" v-if="activeView === 1">
         <button
           class="
@@ -226,8 +250,6 @@
 <script>
 import { defineComponent } from 'vue';
 import { mapActions } from 'vuex';
-import vSelect from 'vue-select';
-import 'vue-select/dist/vue-select.css';
 export default defineComponent({
   name: 'KycInformation',
   data() {
@@ -235,30 +257,21 @@ export default defineComponent({
       activeView: 0,
       file: '',
       selected: '',
-      identificationOptions: [
-        { label: 'NIN', id: 1 },
-        { label: 'Drivers License', id: 2 },
-        { label: 'BVN', id: 3 },
-        { label: 'Passport', id: 4 }
-      ]
+      identificationOptions: ['NIN', 'Drivers License', 'BVN', 'Passport']
     };
-  },
-  components: { 'v-select': vSelect },
-  mounted() {
-    this.setupInterfaceData();
   },
   methods: {
     ...mapActions('auth', ['setSessionData']),
-    setupInterfaceData() {
+    setupInterfaceData () {
       this.activeView = 0;
     },
-    next() {
+    next () {
       this.activeView += 1;
     },
-    previous() {
+    previous () {
       this.activeView -= 1;
     },
-    uploadFile() {
+    uploadFile () {
       this.file = this.$refs.avatar.files[0];
 
       const reader = new FileReader();

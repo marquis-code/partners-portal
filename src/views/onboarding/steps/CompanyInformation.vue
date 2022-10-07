@@ -1,6 +1,14 @@
 <template>
   <main class="space-y-3 lg:space-y-7">
-    <section class="lg:flex justify-between space-y-3 lg:space-y-0 lg:space-x-10 items-center">
+    <section
+      class="
+        lg:flex
+        justify-between
+        space-y-3
+        lg:space-y-0 lg:space-x-10
+        items-center
+      "
+    >
       <div class="space-y-2 w-full">
         <label class="text-xs font-medium text-grays-black-5"
           >Company name</label
@@ -38,7 +46,15 @@
         />
       </div>
     </section>
-    <section class="lg:flex justify-between space-y-3 lg:space-y-0 lg:space-x-10 items-center">
+    <section
+      class="
+        lg:flex
+        justify-between
+        space-y-3
+        lg:space-y-0 lg:space-x-10
+        items-center
+      "
+    >
       <div class="space-y-2 w-full">
         <label class="text-xs font-medium text-grays-black-5"
           >Company address</label
@@ -61,18 +77,23 @@
         <label class="text-xs font-medium text-grays-black-5"
           >Type of Incorporated Businesses</label
         >
-        <v-select
+        <select
           class="
-            text-sm
+            text-xs
             border-none
             outline-none
             w-full
             rounded-md
+            p-3
             placeholder-gray-500 placeholder-opacity-25
+            ring-1 ring-gray-300
           "
-          placeholder="Select your business type"
-          :options="businessOptions"
-        ></v-select>
+        >
+          <option hidden>Select your business type</option>
+          <option v-for="(option, index) in businessOptions" :key="index">
+            {{ option }}
+          </option>
+        </select>
       </div>
     </section>
 
@@ -106,13 +127,10 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import vSelect from 'vue-select';
-import 'vue-select/dist/vue-select.css';
 import Datepicker from 'vue3-datepicker';
 export default defineComponent({
   name: 'companyInformation',
   components: {
-    'v-select': vSelect,
     Datepicker
   },
   data() {
