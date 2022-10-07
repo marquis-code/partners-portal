@@ -13,7 +13,7 @@ export const AuthRoutes: Array<any> = [
       requiresAuth: false
     }
   },
-  {
+  /*  {
     path: '/password-reset',
     name: 'password-reset',
     component: PasswordReset,
@@ -30,13 +30,6 @@ export const AuthRoutes: Array<any> = [
       title: 'Forgot Password',
       requiresAuth: false
     }
-  },
-  {
-    path: '/about',
-    name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: loadRouteComponent('AboutView.vue')
-  }
+  }, */
+
 ]

@@ -9190,6 +9190,11 @@ vue-toast-notification@^3.0:
   resolved "https://registry.yarnpkg.com/vue-toast-notification/-/vue-toast-notification-3.0.4.tgz#dfd6ff37daa99be18f13c3e56dc0074fe3f3cdbe"
   integrity sha512-rEhLtcKg8SVdBpdN7PrNst5nmY8dw0j3NkNImqurhlGurqR/QDKoou0t2PuCReEOCTKqHvfLCle2I3kwQWDWDQ==
 
+vue3-carousel@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/vue3-carousel/-/vue3-carousel-0.2.0.tgz#3277d578b7505666004efdf865f96e2d68d31d22"
+  integrity sha512-nHfWRdDHzuwO42vq1ks3H6Vw/3IAIh8o3nscjWVZC2++16nN03yGIOVhGH7IXeOEYouo7xs2K82j8HYkSRuYyA==
+
 vue3-otp-input@^0.3.6:
   version "0.3.6"
   resolved "https://registry.yarnpkg.com/vue3-otp-input/-/vue3-otp-input-0.3.6.tgz#49c71be7083f78b7dce44663426b5cc66643f48a"

@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve --mode development",
+    "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
@@ -26,6 +26,7 @@
     "vue": "^3.2.13",
     "vue-router": "^4.0.3",
     "vue-toast-notification": "^3.0",
+    "vue3-carousel": "^0.2.0",
     "vue3-otp-input": "^0.3.6",
     "vuelidate": "^0.7.7",
     "vuex": "^4.0.0"

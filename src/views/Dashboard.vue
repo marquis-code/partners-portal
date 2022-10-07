@@ -1,5 +1,5 @@
 <template>
-  <div class="text-sh-green-500">Dashboard</div>
+  <div class="text-sh-green-500">Dashboard Content Area...coming soon</div>
 </template>
 
 <script lang="ts">
