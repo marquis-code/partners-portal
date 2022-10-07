@@ -1,6 +1,6 @@
 <template>
-  <main class="space-y-7">
-    <section class="flex justify-between space-x-10 items-center">
+  <main class="space-y-3 lg:space-y-7">
+    <section class="lg:flex justify-between space-y-3 lg:space-y-0 lg:space-x-10 items-center">
       <div class="space-y-2 w-full">
         <label class="text-xs font-medium text-grays-black-5"
           >Company name</label
@@ -38,7 +38,7 @@
         />
       </div>
     </section>
-    <section class="flex justify-between space-x-10 items-center">
+    <section class="lg:flex justify-between space-y-3 lg:space-y-0 lg:space-x-10 items-center">
       <div class="space-y-2 w-full">
         <label class="text-xs font-medium text-grays-black-5"
           >Company address</label
@@ -77,7 +77,7 @@
     </section>
 
     <section class="flex justify-start space-x-10 items-start">
-      <div class="space-y-2 w-6/12">
+      <div class="space-y-2 w-full lg:w-6/12">
         <label class="text-xs font-medium text-grays-black-5"
           >Business start date</label
         >

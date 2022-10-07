@@ -34,7 +34,7 @@
     </div>
 
     <template v-if="activeView === 0">
-      <section class="flex justify-between space-x-10 items-center">
+      <section class="lg:flex justify-between space-y-3 lg:space-y-0 lg:space-x-10 items-center">
         <div class="space-y-2 w-full">
           <label class="text-xs font-medium text-grays-black-5"
             >Means of Identification</label
@@ -46,19 +46,6 @@
             class="w-full placeholder-red-100"
             :options="identificationOptions"
           ></v-select>
-          <!-- <input
-            class="
-              text-xs
-              border-none
-              outline-none
-              w-full
-              rounded-md
-              p-3
-              placeholder-gray-500 placeholder-opacity-25
-              ring-1 ring-gray-300
-            "
-            placeholder="Select a document type"
-          /> -->
         </div>
         <div class="space-y-2 w-full">
           <label class="text-xs font-medium text-grays-black-5">{{
@@ -88,7 +75,7 @@
         </div>
       </section>
       <section class="flex justify-start space-x-10 items-start">
-        <div class="space-y-2 w-6/12">
+        <div class="space-y-2 w-full lg:w-6/12">
           <label class="text-xs font-medium text-grays-black-5">D.O.B</label>
           <input
             class="
@@ -109,7 +96,7 @@
 
     <template v-if="activeView === 1">
       <section class="flex justify-start flex-col space-y-5 items-start">
-        <div class="space-y-2 w-6/12">
+        <div class="space-y-2  w-full lg:w-6/12">
           <label class="text-xs font-medium text-grays-black-5">Address</label>
           <input
             class="

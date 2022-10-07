@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col text-center mx-auto space-y-3">
+  <div class="flex flex-col text-center mx-auto space-y-3 mt-10">
     <img class="mx-auto h-10" src="@/assets/logo.png" alt="shuttlers banner" />
     <h2 class="text-sh-grey-900 font-bold text-2xl">{{ title }}</h2>
     <p class="text-grays-black-5 font-light">{{ description }}</p>

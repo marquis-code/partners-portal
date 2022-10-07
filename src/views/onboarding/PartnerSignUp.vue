@@ -13,7 +13,7 @@
     "
   >
     <CenteredPageHeader :title="headerTitle" :description="headerDescription" />
-    <section class="flex items-center space-x-5 w-7/12">
+    <section class="md:flex items-center space-y-5 md:space-y-0 md:space-x-5 w-7/12 md:w-10/12">
       <div
         @click="selected(index)"
         v-for="({ title, description }, index) in signupOptions"

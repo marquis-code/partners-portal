@@ -13,7 +13,8 @@
     <CenteredPageHeader :title="title" :description="description" />
     <div
       class="
-        w-9/12
+        w-11/12
+        lg:w-9/12
         ring-1 ring-gray-300
         rounded-md
         py-8
@@ -25,7 +26,7 @@
         space-y-8
       "
     >
-      <div class="flex space-x-3 items-center">
+      <div class="flex space-x-2 lg:space-x-3 items-center">
         <div
           class="flex items-center space-x-1"
           :class="[
@@ -39,9 +40,9 @@
             ]"
             >1</span
           >
-          <p class="text-sm">Company information</p>
+          <p class="lg:text-sm text-xs">Company information</p>
         </div>
-        <p class="h-0.5 w-20 bg-gray-500"></p>
+        <p class="h-0.5 w-6 lg:w-20 bg-gray-500"></p>
         <div
           class="flex items-center space-x-1"
           :class="[
@@ -55,7 +56,7 @@
             ]"
             >2</span
           >
-          <p class="text-sm">Kyc verification</p>
+          <p class="lg:text-sm text-xs">Kyc verification</p>
         </div>
       </div>
 
@@ -66,7 +67,7 @@
             :partnersFormData="partnersFormData[steps[currentStep].label]"
           />
         </keep-alive>
-        <div class="flex justify-end">
+        <div class="flex justify-end mt-10 lg:mt-0">
           <button
             v-show="currentStep === 0"
             class="
@@ -133,9 +134,6 @@ export default {
     next() {
       this.currentStep += 1;
     },
-    // revert() {
-    //   this.currentStep -= 1;
-    // }
   }
 };
 </script>
