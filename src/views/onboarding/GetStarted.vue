@@ -86,7 +86,7 @@ export default defineComponent({
     OnboardingLayout,
     FormContainer
   },
-  data() {
+  data () {
     return {
       currentStep: 0 as number,
       title: 'Create a partner account',
@@ -114,13 +114,13 @@ export default defineComponent({
     };
   },
   methods: {
-    next() {
+    next () {
       this.currentStep += 1 as number;
     },
     goBack (): void {
       this.currentStep = 0 as number
     },
-    redirectToCitySelection() {
+    redirectToCitySelection () {
       this.$router.push('/city-selection');
     }
   }

@@ -66,7 +66,7 @@ export default {
     SelectedCityBadge
   },
   methods: {
-    selectThisCity(event) {
+    selectThisCity (event) {
       const newAddition = this.cities[event.target.value]
       console.log(newAddition)
       this.selectedCities.push(newAddition)

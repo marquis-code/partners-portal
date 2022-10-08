@@ -11,7 +11,7 @@ import {defineComponent} from "vue";
 export default defineComponent({
   name: 'Home',
   methods: {
-    async logout() {
+    async logout () {
       // TODO: block UI with overlay while logout api is called
       try {
         await this.$axios.delete('/logout');

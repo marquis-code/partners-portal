@@ -273,7 +273,7 @@ import Datepicker from 'vue3-datepicker';
 export default defineComponent({
   name: 'KycInformation',
   components: {Datepicker},
-  data() {
+  data () {
     return {
       activeView: 0,
       picked: '',

@@ -49,7 +49,7 @@ export default defineComponent({
     Slide,
     Pagination,
   },
-  data() {
+  data () {
     return {
       highlights: [
         {
@@ -64,7 +64,7 @@ export default defineComponent({
     }
   },
   computed: {
-    registrationLink() {
+    registrationLink () {
       return `${process.env.VUE_APP_WEB_APP_BASE_URL}/register?ref=partner`;
     }
   }

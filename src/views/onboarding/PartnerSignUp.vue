@@ -51,7 +51,7 @@ export default defineComponent({
     CenteredPageHeader,
     OnboardingLayout
   },
-  data() {
+  data () {
     return {
       activeIndex: null,
       headerTitle: 'Create a partner account',
@@ -71,10 +71,10 @@ export default defineComponent({
     };
   },
   methods: {
-    selected(index: any) {
+    selected (index: any) {
       this.activeIndex = index;
     },
-    handleRedirection() {
+    handleRedirection () {
       if (this.activeIndex === 0) {
         this.$router.push('/get-started');
       }

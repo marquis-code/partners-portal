@@ -78,7 +78,7 @@ export default defineComponent({
     }
   },
   methods: {
-    uploadFile(event : any) {
+    uploadFile (event : any) {
       console.log(event.target.files[0])
       if (this.isFileSizeOk(event.target.files[0].size)) {
         this.selectedFile = event.target.files[0];
@@ -87,12 +87,12 @@ export default defineComponent({
         this.fileName = event.target.files[0].name;
       } else this.$toast.warning('file must be less than 10 MB')
     },
-    isFileSizeOk(fileSizeInBytes : number) : boolean {
+    isFileSizeOk (fileSizeInBytes : number) : boolean {
       if (fileSizeInBytes > 10000000) {
         return false;
       } else return true;
     },
-    removeFile() {
+    removeFile () {
       this.selectedFile = {};
       this.fileUploaded = false;
       this.fileName = '';

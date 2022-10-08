@@ -133,7 +133,7 @@ export default defineComponent({
   components: {
     Datepicker
   },
-  data() {
+  data () {
     return {
       picked: '',
       businessOptions: [
