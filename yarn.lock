@@ -278,7 +278,7 @@
     chalk "^2.0.0"
     js-tokens "^4.0.0"
 
-"@babel/parser@^7.1.0", "@babel/parser@^7.14.7", "@babel/parser@^7.16.4", "@babel/parser@^7.18.10", "@babel/parser@^7.19.3":
+"@babel/parser@^7.1.0", "@babel/parser@^7.14.7", "@babel/parser@^7.16.4", "@babel/parser@^7.18.10", "@babel/parser@^7.18.4", "@babel/parser@^7.19.3":
   version "7.19.3"
   resolved "https://registry.yarnpkg.com/@babel/parser/-/parser-7.19.3.tgz#8dd36d17c53ff347f9e55c328710321b49479a9a"
   integrity sha512-pJ9xOlNWHiy9+FuFP09DEAFbAn4JskgRsVcc169w2xRBC3FRGuQEwjeIMMND9L2zc0iEhO/tGv4Zq+km+hxNpQ==
@@ -1663,6 +1663,13 @@
   resolved "https://registry.yarnpkg.com/@types/strip-json-comments/-/strip-json-comments-0.0.30.tgz#9aa30c04db212a9a0649d6ae6fd50accc40748a1"
   integrity sha512-7NQmHra/JILCd1QqpSzl8+mJRc8ZHz3uDm8YV1Ks9IhK0epEiTw8aIErbvH9PI+6XbqhyIQy3462nEsn7UVzjQ==
 
+"@types/vue-select@^3.16.2":
+  version "3.16.2"
+  resolved "https://registry.yarnpkg.com/@types/vue-select/-/vue-select-3.16.2.tgz#dbff98ffd9122657c818867b423caf44ec6db516"
+  integrity sha512-KkmQiNI7Cei2YV3wn7O2fmM6PpfuM9ybYFMDqq2AvIZNZ2BRHMMV70yaa1EKBRvqu5qY5ekel5WzcRRfNu56PQ==
+  dependencies:
+    vue "^2.0.0"
+
 "@types/webpack-env@^1.15.2":
   version "1.18.0"
   resolved "https://registry.yarnpkg.com/@types/webpack-env/-/webpack-env-1.18.0.tgz#ed6ecaa8e5ed5dfe8b2b3d00181702c9925f13fb"
@@ -2063,6 +2070,15 @@
   dependencies:
     "@vue/compiler-core" "3.2.40"
     "@vue/shared" "3.2.40"
+
+"@vue/compiler-sfc@2.7.10":
+  version "2.7.10"
+  resolved "https://registry.yarnpkg.com/@vue/compiler-sfc/-/compiler-sfc-2.7.10.tgz#3fe08e780053a3bbf41328c65ae5dfdee0385206"
+  integrity sha512-55Shns6WPxlYsz4WX7q9ZJBL77sKE1ZAYNYStLs6GbhIOMrNtjMvzcob6gu3cGlfpCR4bT7NXgyJ3tly2+Hx8Q==
+  dependencies:
+    "@babel/parser" "^7.18.4"
+    postcss "^8.4.14"
+    source-map "^0.6.1"
 
 "@vue/compiler-sfc@3.2.40":
   version "3.2.40"
@@ -3613,6 +3629,11 @@ csstype@^2.6.8:
   resolved "https://registry.yarnpkg.com/csstype/-/csstype-2.6.21.tgz#2efb85b7cc55c80017c66a5ad7cbd931fda3a90e"
   integrity sha512-Z1PhmomIfypOpoMjRQB70jfvy/wxT50qW08YXO5lMIJkrdq4yOTR+AW7FqutScmB9NkLwxo+jU+kZLbofZZq/w==
 
+csstype@^3.1.0:
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/csstype/-/csstype-3.1.1.tgz#841b532c45c758ee546a11d5bd7b7b473c8c30b9"
+  integrity sha512-DJR/VvkAvSZW9bTouZue2sSxDwdTN92uHjqeKVm+0dAqdfNykRzQ95tay8aXMBAAPpUiq4Qcug2L7neoRh2Egw==
+
 dashdash@^1.12.0:
   version "1.14.1"
   resolved "https://registry.yarnpkg.com/dashdash/-/dashdash-1.14.1.tgz#853cfa0f7cbe2fed5de20326b8dd581035f6e2f0"
@@ -3628,6 +3649,11 @@ data-urls@^2.0.0:
     abab "^2.0.3"
     whatwg-mimetype "^2.3.0"
     whatwg-url "^8.0.0"
+
+date-fns@^2.22.1:
+  version "2.29.3"
+  resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.29.3.tgz#27402d2fc67eb442b511b70bbdf98e6411cd68a8"
+  integrity sha512-dDCnyH2WnnKusqvZZ6+jA1O51Ibt8ZMRNkDZdyAyK4YfbDwa/cEmuztzG5pk6hqlp9aSBPYcjOlktquahGwGeA==
 
 debug@2.6.9, debug@^2.6.9:
   version "2.6.9"
@@ -9195,10 +9221,25 @@ vue3-carousel@^0.2.0:
   resolved "https://registry.yarnpkg.com/vue3-carousel/-/vue3-carousel-0.2.0.tgz#3277d578b7505666004efdf865f96e2d68d31d22"
   integrity sha512-nHfWRdDHzuwO42vq1ks3H6Vw/3IAIh8o3nscjWVZC2++16nN03yGIOVhGH7IXeOEYouo7xs2K82j8HYkSRuYyA==
 
+vue3-datepicker@^0.3.4:
+  version "0.3.4"
+  resolved "https://registry.yarnpkg.com/vue3-datepicker/-/vue3-datepicker-0.3.4.tgz#1f406d8dc6228c06b471a1a52a8b8093238e7997"
+  integrity sha512-pD4Lixnqdr6KeIO/ZK/xdmhYDQUvMPHgTeWkNYeAx5sKY4eaNItOqbLuevwI51d3ubozhNS1y+Z8Enxi33pXiQ==
+  dependencies:
+    date-fns "^2.22.1"
+
 vue3-otp-input@^0.3.6:
   version "0.3.6"
   resolved "https://registry.yarnpkg.com/vue3-otp-input/-/vue3-otp-input-0.3.6.tgz#49c71be7083f78b7dce44663426b5cc66643f48a"
   integrity sha512-08A/33P3dvk8DBQ6ACJ6ajNCNdkJL2Di5CVVLxcYK7+izM4KFMeWsFnZsx2fD0VfLE7t6jpi+cNgNU83nP7/TQ==
+
+vue@^2.0.0:
+  version "2.7.10"
+  resolved "https://registry.yarnpkg.com/vue/-/vue-2.7.10.tgz#ae516cc6c88e1c424754468844218fdd5e280f40"
+  integrity sha512-HmFC70qarSHPXcKtW8U8fgIkF6JGvjEmDiVInTkKZP0gIlEPhlVlcJJLkdGIDiNkIeA2zJPQTWJUI4iWe+AVfg==
+  dependencies:
+    "@vue/compiler-sfc" "2.7.10"
+    csstype "^3.1.0"
 
 vue@^3.2.13:
   version "3.2.40"

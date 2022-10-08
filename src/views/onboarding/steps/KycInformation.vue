@@ -22,7 +22,7 @@
     <div>
       <div class="flex items-center space-x-2">
         <span class="rounded-full p-1 border-2 border-indigo-500"></span>
-        <h1 class="text-grays-black font-medium text-xl">
+        <h1 class="text-grays-black font-medium text-base lg:text-xl">
           {{
             activeView === 0 ? 'Identity verification' : 'Address verification'
           }}
@@ -33,7 +33,7 @@
       >
     </div>
 
-    <template v-if="activeView === 0">
+    <form v-if="activeView === 0">
       <section
         class="
           lg:flex
@@ -59,12 +59,12 @@
               ring-1 ring-gray-300
             "
             @change="handleIdentity"
-            v-model="selected"
+            v-model="identityVerification.selectedIdentity"
           >
             <option value="" hidden>Select a document type</option>
             <option
               v-for="(identity, index) in identificationOptions"
-              :value="index"
+              :value="identity"
               :key="index"
             >
               {{ identity }}
@@ -73,17 +73,18 @@
         </div>
         <div class="space-y-2 w-full">
           <label class="text-xs font-medium text-grays-black-5">{{
-            selected === 0
+            identityVerification.selectedIdentity == 'NIN'
               ? 'NIN'
-              : selected === 1
+              : identityVerification.selectedIdentity == 'Drivers License'
               ? 'Drivers License'
-              : selected === 2
+              : identityVerification.selectedIdentity == 'BVN'
               ? 'BVN'
-              : selected === 3
+              : identityVerification.selectedIdentity == 'Passport'
               ? 'Passport'
               : 'Document Name'
           }}</label>
           <input
+            v-model="identityVerification.documentNumber"
             class="
               text-xs
               border-none
@@ -102,24 +103,6 @@
         <div class="space-y-2 w-full lg:w-6/12">
           <label class="text-xs font-medium text-grays-black-5">D.O.B</label>
           <datepicker
-          class="
-            text-xs
-            border-none
-            outline-none
-            w-full
-            rounded-md
-            p-3
-            placeholder-gray-500 placeholder-opacity-25
-            ring-1 ring-gray-300
-          "
-          placeholder="Choose a date"
-          v-model="picked"
-          :locale="locale"
-          :upperLimit="to"
-          :lowerLimit="from"
-          :clearable="false"
-        />
-          <!-- <input
             class="
               text-xs
               border-none
@@ -130,17 +113,19 @@
               placeholder-gray-500 placeholder-opacity-25
               ring-1 ring-gray-300
             "
-            placeholder="Choose date"
-          /> -->
+            placeholder="Choose a date"
+            v-model="identityVerification.dateOfBirth"
+          />
         </div>
       </section>
-    </template>
+    </form>
 
-    <template v-if="activeView === 1">
+    <form v-if="activeView === 1">
       <section class="flex justify-start flex-col space-y-5 items-start">
         <div class="space-y-2 w-full lg:w-6/12">
           <label class="text-xs font-medium text-grays-black-5">Address</label>
           <input
+            v-model="addressVerification.companyAddress"
             class="
               text-xs
               border-none
@@ -159,34 +144,10 @@
             >Upload document (Electricity bill, Waste bill, water bill
             etc)</label
           >
-          <input type="file" class="hidden" />
-          <form class="" ref="avatar-upload-form">
-            <input
-              type="file"
-              ref="avatar"
-              @change="uploadFile"
-              class="hidden"
-            />
-          </form>
-          <div
-            @click="$refs.avatar.click()"
-            class="
-              py-8
-              ring-1 ring-gray-300
-              w-full
-              flex flex-col
-              rounded-md
-              items-center
-              cursor-pointer
-            "
-          >
-            <img src="@/assets/images/upload.svg" />
-            <p class="text-sm text-green-400">Click to upload</p>
-            <p class="text-xs text-gray-400">or drag and drop</p>
-          </div>
+          <image-upload></image-upload>
         </div>
       </section>
-    </template>
+    </form>
     <div class="flex justify-end">
       <div class="flex items-center space-x-5">
         <button
@@ -203,7 +164,10 @@
             font-medium
           "
           v-if="activeView === 0"
-          @click="$emit('goBack')"
+          @click="
+            $emit('goBack');
+            updateInfo();
+          "
         >
           Go back
         </button>
@@ -257,9 +221,13 @@
             bg-grays-black-10
             font-medium
           "
-          @click="$emit('kycCompleted')"
+          @click="
+            $emit('kycCompleted');
+            handleAddress();
+          "
         >
-          Submit
+          Next
+          <img class="ml-2" src="@/assets/images/arrow.svg" />
         </button>
       </div>
     </div>
@@ -270,15 +238,23 @@
 import { defineComponent } from 'vue';
 import { mapActions } from 'vuex';
 import Datepicker from 'vue3-datepicker';
+import ImageUpload from '@/components/ImageUpload.vue';
 export default defineComponent({
   name: 'KycInformation',
-  components: {Datepicker},
-  data() {
+  components: { Datepicker, ImageUpload },
+  data () {
     return {
+      identityVerification: {
+        selectedIdentity: '',
+        documentNumber: '',
+        dateOfBirth: ''
+      },
+      addressVerification: {
+        companyAddress: ''
+      },
       activeView: 0,
-      picked: '',
       file: '',
-      selected: '',
+      selectedIdentity: '',
       identificationOptions: ['NIN', 'Drivers License', 'BVN', 'Passport']
     };
   },
@@ -287,11 +263,25 @@ export default defineComponent({
     setupInterfaceData () {
       this.activeView = 0;
     },
-    next () {
+    async next () {
+      console.log(this.identityVerification);
+      // let response = await this.$axios.post('/verifyIdentity', this.identityVerification);
+      // console.log(response);
       this.activeView += 1;
     },
     previous () {
       this.activeView -= 1;
+    },
+    goBack () {
+      console.log('Hello');
+    },
+    updateInfo () {
+      // let response = await this.$axios.patch('/updateIdentity', this.identityVerification);
+      // console.log(response);
+      console.log('Reverting...');
+    },
+    handleAddress () {
+      console.log(this.addressVerification);
     },
     uploadFile () {
       this.file = this.$refs.avatar.files[0];

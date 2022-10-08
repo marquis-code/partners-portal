@@ -32,8 +32,9 @@
     <button
       v-if="activeIndex !== null"
       class="
-        pt-5
+        mt-11
         bg-sh-green-500
+        lg:w-4/12
         w-7/12
         text-sh-grey-900
         rounded-md
