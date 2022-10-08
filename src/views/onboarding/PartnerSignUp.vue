@@ -1,7 +1,18 @@
 <template>
   <OnboardingLayout>
     <CenteredPageHeader :title="headerTitle" :description="headerDescription" />
-    <section class="md:flex items-center justify-center space-y-5 md:space-y-0 md:space-x-5 w-7/12 mx-auto md:w-10/12">
+    <section
+      class="
+        md:flex
+        items-center
+        justify-center
+        space-y-5
+        md:space-y-0 md:space-x-5
+        w-7/12
+        mx-auto
+        md:w-10/12
+      "
+    >
       <div
         @click="selected(index)"
         v-for="({ title, description }, index) in signupOptions"
@@ -21,8 +32,9 @@
     <button
       v-if="activeIndex !== null"
       class="
+        pt-5
         bg-sh-green-500
-        w-5/12
+        w-7/12
         text-sh-grey-900
         rounded-md
         text-sm
@@ -51,7 +63,7 @@ export default defineComponent({
     CenteredPageHeader,
     OnboardingLayout
   },
-  data() {
+  data () {
     return {
       activeIndex: null,
       headerTitle: 'Create a partner account',
@@ -71,12 +83,32 @@ export default defineComponent({
     };
   },
   methods: {
-    selected(index: any) {
+    selected (index: any) {
       this.activeIndex = index;
     },
-    handleRedirection() {
+    async handleRedirection () {
       if (this.activeIndex === 0) {
-        this.$router.push('/get-started');
+        try {
+          await this.$axios.post('/v1/partner', { mode: 'company' });
+          this.$router.push({
+            path: 'get-started',
+            query: { type: 'company' }
+          });
+        } catch (error: any) {
+          this.$toast.error(error?.response?.data?.message);
+        }
+      }
+
+      if (this.activeIndex === 1) {
+        try {
+          await this.$axios.post('/v1/partner', { mode: 'individual' });
+          this.$router.push({
+            path: 'get-started',
+            query: { type: 'individual' }
+          });
+        } catch (error: any) {
+          this.$toast.error(error?.response?.data?.message);
+        }
       }
     }
   }
