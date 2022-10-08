@@ -56,11 +56,11 @@ export class AppInitializerService {
     if (sessionDataString) {
       console.info('Session initialized');
       const sessionData: UserSessionModel = JSON.parse(sessionDataString);
-      if(sessionData.token) {
+      if (sessionData.token) {
         setAuthorization(sessionData.token);
         try {
           const userResponse: LoginResponse = await this.axios.get(`v1/users/profile`).then(res => res.data);
-          if(userResponse && userResponse.id) {
+          if (userResponse && userResponse.id) {
             userResponse.token = sessionData.token;
             await this.store.dispatch('auth/authSuccess', sessionData);
           } else {

@@ -73,7 +73,7 @@ module.exports = {
         },
         'sh-purple': {
           700: "#4848ED"
-        } 
+        }
       }
     }
   },

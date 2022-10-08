@@ -1,6 +1,6 @@
 import {RouteRecordRaw} from "vue-router";
-import HomeView from "@/views/HomeView.vue";
-import Dashboard from "@/views/Dashboard.vue";
+import HomeView from "@/views/app/HomeView.vue";
+import Dashboard from "@/views/app/Dashboard.vue";
 
 export const AppRoutes: Array<RouteRecordRaw> = [
   {
