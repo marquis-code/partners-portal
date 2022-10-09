@@ -1,8 +1,8 @@
 <template>
   <div
-    class="h-screen py-9 pr-4 bg-white"
+    class="h-screen py-9 bg-white"
     :class="
-      isSidebarFolded ? 'w-20 pl-0' : 'w-64 pl-4'
+      isSidebarFolded ? 'w-20 pl-0 pr-0' : 'w-64 pl-4 pr-4'
     "
   >
     <div
@@ -32,7 +32,7 @@
           <div>
             <div
               class="h-5 w-1"
-              :class="menu.selected && !isSidebarFolded ? 'bg-sh-green-500' : ''"
+              :class="menu.selected && !isSidebarFolded ? 'bg-sh-green-500' : 'hidden'"
             ></div>
           </div>
         </div>
