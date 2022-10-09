@@ -80,6 +80,9 @@ export default defineComponent({
     OnboardingLayout,
     FormContainer
   },
+  created() {
+    this.setupRedirect();
+  },
   data() {
     return {
       currentStep: 0 as number,
@@ -110,21 +113,6 @@ export default defineComponent({
       }
     };
   },
-  watch: {
-    $route: {
-      handler(newRoute) {
-        if (newRoute.query.type === 'company') {
-          this.currentStep = 0;
-          this.routeType = 'company';
-        } else {
-          this.routeType = 'individual';
-          this.currentStep = 1;
-        }
-      },
-      // force eager callback execution
-      immediate: true
-    }
-  },
   methods: {
     next() {
       this.currentStep += 1 as number;
@@ -138,6 +126,15 @@ export default defineComponent({
     handleCompanyData(data: companyFormData) {
       console.log(data);
       this.currentStep += 1 as number;
+    },
+    setupRedirect() {
+      if (this.$route.query.type === 'company') {
+        this.currentStep = 0;
+        this.routeType = 'company';
+      } else {
+        this.routeType = 'individual';
+        this.currentStep = 1;
+      }
     }
   }
 });
