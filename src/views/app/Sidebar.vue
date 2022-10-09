@@ -2,7 +2,7 @@
   <div
     class="h-screen py-9 bg-white"
     :class="
-      isSidebarFolded ? 'w-20 pl-0 pr-0' : 'w-64 pl-4 pr-4'
+      isSidebarFolded ? 'w-12 pl-0 pr-0' : 'w-64 pl-4 pr-4'
     "
   >
     <div
@@ -11,19 +11,31 @@
     >
       <img v-if="isSidebarFolded" class="w-6 h-6 mb-6" src="@/assets/images/square-logo.svg">
       <img v-else src="@/assets/logo.png" class="h-6">
-      <img @click="toggleSidebar" class="w-6 h-6 transform hover:scale-105 transition ease-out duration-500" src="@/assets/images/toggle.svg">
+      <img v-if="!isMobileScreen" @click="toggleSidebar" class="w-6 h-6 transform hover:scale-105 transition ease-out duration-500" src="@/assets/images/toggle.svg">
     </div>
-    <div class="side-bar-item">
-      <div v-for="(menu, index) in menus" :key="index" class="item">
+    <div v-for="(group, groupIndex) in menuGroup" :key="groupIndex" class="mb-5">
+      <div v-if="!isSidebarFolded" class="text-gray-400 text-xs border-b-[0.5px] px-2 py-4 w-full">
+        {{group.sectionTitle}}
+      </div>
+      <div class="side-bar-item">
+      <div v-for="(menu, index) in group.menus" :key="index" class="item">
         <div
-          class="h-12 rounded-lg pl-5 py-4 flex flex-row justify-between transform hover:scale-95 transition ease-out duration-200"
-          :class="{ 'bg-black': menu.selected, '' : isSidebarFolded}"
-          @click="selectThisSection(index)"
+          class="h-12 rounded-lg py-4 flex flex-row transform hover:scale-95 transition ease-out duration-200"
+          :class="{
+            'bg-black': menu.selected,
+            'justify-center' : isSidebarFolded,
+            'justify-between pl-5': !isSidebarFolded
+          }"
+          @click="selectThisSection(groupIndex,index)"
         >
           <div class="flex flex-row items-center">
             <span
-              class="material-icons mr-3"
-              :class="menu.selected ? 'text-white' : 'text-gray-500'"
+              class="material-icons"
+              :class="{
+                'text-white' : menu.selected,
+                'text-gray-500' : !menu.selected,
+                'mr-3' : !isSidebarFolded
+              }"
             >{{menu.icon}}</span>
             <span :class="menu.selected ? 'text-white' : 'text-gray-500'">
               {{isSidebarFolded ? ''  : menu.title }}
@@ -38,6 +50,23 @@
         </div>
       </div>
     </div>
+    </div>
+    <div
+      class="max-w-56 absolute bottom-10 flex flex-row justify-between items-center py-3 rounded-xl bg-green-200"
+      :class="isSidebarFolded ? 'p-1' : 'px-3'"
+    >
+      <div class="flex flex-row items-center">
+        <img
+          src="@/assets/images/avatar-placeholder.svg"
+          class="w-10 h-10 mr-2"
+          :class="isSidebarFolded && 'text-center mr-0'"
+        >
+        <span v-if="!isSidebarFolded" class="text-sm font-medium mr-7">{{`Daniel Sumah`}}</span>
+      </div>
+      <span v-if="!isSidebarFolded" class="material-icons">
+        logout
+      </span>
+    </div>
   </div>
 </template>
 <script lang="ts">
@@ -46,6 +75,24 @@ export default {
   data() {
     return {
       isSidebarFolded: false,
+      windowWidth: 0,
+      isMobileScreen: false,
+      menuGroup: [
+        {
+          sectionTitle: 'GENERAL',
+          menus: [
+            {title: 'Dashboard', icon: 'home', selected: true},
+            {title: 'Driver Management', icon: 'group', selected: false},
+            {title: 'Vehicle Management', icon: 'directions_car', selected: false}
+          ],
+        },
+        {
+          sectionTitle: 'SYSTEM',
+          menus: [
+            {title: 'Settings', icon: 'settings', selected: false}
+          ],
+        }
+      ],
       menus: [
         {title: 'Dashboard', icon: 'home', selected: true},
         {title: 'Driver Management', icon: 'group', selected: false},
@@ -53,16 +100,35 @@ export default {
       ],
     }
   },
+  created() {
+    window.addEventListener('resize', this.checkScreen)
+    this.checkScreen()
+  },
   methods: {
-    selectThisSection(itemIndex: number) {
-      for (let index = 0; index < this.menus.length; index++) {
-        if (index === itemIndex) {
-          this.menus[index].selected = true;
-        } else this.menus[index].selected = false;
+    selectThisSection(groupIndex: number, itemIndex: number) {
+      for (let index = 0; index < this.menuGroup.length; index++) {
+        const groupMenus = this.menuGroup[index].menus;
+        for (let indexJ = 0; indexJ < groupMenus.length; indexJ++) {
+          const section = groupMenus[indexJ];
+          if (index === groupIndex && indexJ === itemIndex) {
+            this.$emit('sideBarNavigation', 'section.title')
+            section.selected = true;
+          } else section.selected = false;
+        }
       }
     },
     toggleSidebar() {
       this.isSidebarFolded = !this.isSidebarFolded
+    },
+    checkScreen() {
+      this.windowWidth = window.innerWidth;
+      if (this.windowWidth <= 768) {
+        this.isSidebarFolded = true;
+        this.isMobileScreen = true;
+      } else {
+        this.isSidebarFolded = false;
+        this.isMobileScreen = false;
+      }
     }
   }
 }
