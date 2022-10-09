@@ -37,7 +37,9 @@
                 'mr-3' : !isSidebarFolded
               }"
             >{{menu.icon}}</span>
-            <span :class="menu.selected ? 'text-white' : 'text-gray-500'">
+            <span
+              class="font-sm"
+              :class="menu.selected ? 'text-white' : 'text-gray-500'">
               {{isSidebarFolded ? ''  : menu.title }}
             </span>
           </div>
@@ -52,7 +54,7 @@
     </div>
     </div>
     <div
-      class="max-w-56 absolute bottom-10 flex flex-row justify-between items-center py-3 rounded-xl bg-green-200"
+      class="absolute bottom-10 flex flex-row justify-between items-center py-3 rounded-xl bg-green-200"
       :class="isSidebarFolded ? 'p-1' : 'px-3'"
     >
       <div class="flex flex-row items-center">
@@ -61,7 +63,7 @@
           class="w-10 h-10 mr-2"
           :class="isSidebarFolded && 'text-center mr-0'"
         >
-        <span v-if="!isSidebarFolded" class="text-sm font-medium mr-7">{{`Daniel Sumah`}}</span>
+        <span v-if="!isSidebarFolded" class="text-sm font-medium">{{`Daniel Sumah`}}</span>
       </div>
       <span v-if="!isSidebarFolded" class="material-icons">
         logout
@@ -83,8 +85,9 @@ export default defineComponent({
           sectionTitle: 'GENERAL',
           menus: [
             {title: 'Dashboard', icon: 'home', selected: true},
-            {title: 'Driver Management', icon: 'group', selected: false},
-            {title: 'Vehicle Management', icon: 'directions_car', selected: false}
+            {title: 'Drivers', icon: 'group', selected: false},
+            {title: 'Vehicles', icon: 'directions_car', selected: false},
+            {title: 'Earning', icon: 'payments', selected: false}
           ],
         },
         {
@@ -93,12 +96,7 @@ export default defineComponent({
             {title: 'Settings', icon: 'settings', selected: false}
           ],
         }
-      ],
-      menus: [
-        {title: 'Dashboard', icon: 'home', selected: true},
-        {title: 'Driver Management', icon: 'group', selected: false},
-        {title: 'Vehicle Management', icon: 'directions_car', selected: false}
-      ],
+      ]
     }
   },
   created() {
@@ -112,7 +110,7 @@ export default defineComponent({
         for (let indexJ = 0; indexJ < groupMenus.length; indexJ++) {
           const section = groupMenus[indexJ];
           if (index === groupIndex && indexJ === itemIndex) {
-            this.$emit('sideBarNavigation', 'section.title')
+            this.$emit('sideBarNavigationClicked', section.title)
             section.selected = true;
           } else section.selected = false;
         }
