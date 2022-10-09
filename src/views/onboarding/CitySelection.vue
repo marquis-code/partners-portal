@@ -2,7 +2,7 @@
     <OnboardingLayout>
       <CenteredPageHeader :title="'What cities do you operate in?'" :description="'We would love to know your country, in order to proceed.'" />
       <FormContainer>
-        <form class="w-full">
+        <form class="max-w-{500px}">
           <div class="flex flex-col">
             <div class="flex flex-col space-y-2">
                 <label class="text-grays-black-5 font-medium text-sm"
@@ -10,7 +10,7 @@
                 >
                   <select
                     type="email"
-                    class="py-3 px-5 border-none placeholder:text-grays-black-7
+                    class="max-w-96 py-3 px-5 border-none placeholder:text-grays-black-7
                     outline-none ring-1 border text-sm rounded-md placeholder-opacity-50"
                     @change="selectThisCity($event)"
                     >
