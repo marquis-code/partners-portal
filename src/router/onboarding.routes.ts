@@ -1,6 +1,7 @@
 import PartnerSignUp from "@/views/onboarding/PartnerSignUp.vue";
 import GetStarted from "@/views/onboarding/GetStarted.vue";
 import citySelection from "@/views/onboarding/CitySelection.vue";
+import UserSelection from "@/views/onboarding/UserSelection.vue";
 
 export const OnboardRoutes: Array<any> = [
   {
@@ -13,7 +14,7 @@ export const OnboardRoutes: Array<any> = [
     },
   },
   {
-    path: "/get-started",
+    path: "/get-started/:type?",
     name: "GetStarted",
     component: GetStarted,
     meta: {
@@ -27,6 +28,15 @@ export const OnboardRoutes: Array<any> = [
     component: citySelection,
     meta: {
       title: "GetStarted",
+      requiresAuth: false,
+    },
+  },
+  {
+    path: "/user-selection",
+    name: "UserSelection",
+    component: UserSelection,
+    meta: {
+      title: "UserSelection",
       requiresAuth: false,
     },
   },
