@@ -4,8 +4,8 @@
     <div class="w-full">
       <AppHeader :activeSection="activeSection"/>
       <app-body>
+        <router-view/>
         <button class="px-4 bg-sh-green-500 text-grays-black-3 text-sm font-medium" @click="logout()">Logout</button>
-        <!-- <router-view/> -->
       </app-body>
     </div>
 </div>
@@ -37,6 +37,8 @@ export default defineComponent({
     },
     changeNavigation(activeSection: string) {
       this.activeSection = activeSection;
+      console.log(`/${activeSection.toLowerCase()}`)
+      this.$router.push(`/${activeSection.toLowerCase()}`)
     }
   },
   components: { Sidebar, AppHeader, AppBody }
