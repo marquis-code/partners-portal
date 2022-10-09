@@ -37,7 +37,6 @@ export default defineComponent({
     },
     changeNavigation(activeSection: string) {
       this.activeSection = activeSection;
-      console.log(`/${activeSection.toLowerCase()}`)
       this.$router.push(`/${activeSection.toLowerCase()}`)
     }
   },
