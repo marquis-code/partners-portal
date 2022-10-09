@@ -1,5 +1,5 @@
 <template>
-  <main class="space-y-3 lg:space-y-7">
+  <form class="space-y-3 lg:space-y-7">
     <section
       class="
         lg:flex
@@ -14,6 +14,8 @@
           >Company name</label
         >
         <input
+          v-model="formData.companyName"
+          type="text"
           class="
             text-xs
             border-none
@@ -32,6 +34,8 @@
           >Company RC number</label
         >
         <input
+          type="tel"
+          v-model="formData.companyRcNumber"
           class="
             text-xs
             border-none
@@ -60,6 +64,8 @@
           >Company address</label
         >
         <input
+          type="text"
+          v-model="formData.companyAddress"
           class="
             text-xs
             border-none
@@ -78,6 +84,7 @@
           >Type of Incorporated Businesses</label
         >
         <select
+          v-model="formData.businessType"
           class="
             text-xs
             border-none
@@ -90,7 +97,11 @@
           "
         >
           <option hidden>Select your business type</option>
-          <option v-for="(option, index) in businessOptions" :key="index">
+          <option
+            :value="option"
+            v-for="(option, index) in businessOptions"
+            :key="index"
+          >
             {{ option }}
           </option>
         </select>
@@ -98,9 +109,9 @@
     </section>
 
     <section class="flex justify-start space-x-10 items-start">
-      <div class="space-y-2 w-full lg:w-6/12 pr-5">
+      <div class="space-y-2 w-full lg:w-6/12 pr-1">
         <label class="text-xs font-medium text-grays-black-5"
-          >Business start date</label
+          >When did you start your transport business ?</label
         >
         <datepicker
           class="
@@ -114,15 +125,33 @@
             ring-1 ring-gray-300
           "
           placeholder="Choose a date"
-          v-model="picked"
-          :locale="locale"
-          :upperLimit="to"
-          :lowerLimit="from"
-          :clearable="false"
+          v-model="formData.startDate"
+          format="dd MMM yyyy"
         />
       </div>
     </section>
-  </main>
+    <div class="flex justify-end items-end">
+      <button
+        type="button"
+        @click="$emit('handleCompanyData', formData)"
+        class="
+          rounded-md
+          w-32
+          flex
+          justify-center
+          items-center
+          p-3
+          px-5
+          text-sm text-grays-black-5
+          bg-grays-black-10
+        "
+      >
+        Next
+        <img class="ml-2" src="@/assets/images/arrow.svg" />
+      </button>
+    </div>
+    <!-- <button type="button" @click="handleCompany()">Emitting.....</button> -->
+  </form>
 </template>
 
 <script lang="ts">
@@ -133,9 +162,16 @@ export default defineComponent({
   components: {
     Datepicker
   },
-  data () {
+  emits: ['handleCompanyData'],
+  data() {
     return {
-      picked: '',
+      formData: {
+        startDate: '',
+        companyName: '',
+        companyRcNumber: '',
+        companyAddress: '',
+        businessType: ''
+      },
       businessOptions: [
         'Incorporated Trustee',
         'Limited Partnership',
