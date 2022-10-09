@@ -28,38 +28,6 @@ export default defineComponent({
   },
   data() {
     return {
-      routes: [
-        {
-          label: 'Welcome ',
-          route: '',
-          active: true
-        },
-        {
-          label: 'Driver',
-          route: '',
-          active: false
-        },
-        {
-          label: 'Vehicles',
-          route: '',
-          active: false
-        },
-        {
-          label: 'Earnings',
-          route: '',
-          active: false
-        },
-        {
-          label: 'Settings',
-          route: '',
-          active: false
-        },
-        {
-          label: 'Earnings',
-          route: '',
-          active: false
-        }
-      ]
     };
   },
   methods: {},
