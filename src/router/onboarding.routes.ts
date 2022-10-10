@@ -10,7 +10,7 @@ export const OnboardRoutes: Array<any> = [
     component: PartnerSignUp,
     meta: {
       title: "PartnerSignUp",
-      requiresAuth: false,
+      requiresAuth: true,
     },
   },
   {
@@ -19,7 +19,7 @@ export const OnboardRoutes: Array<any> = [
     component: GetStarted,
     meta: {
       title: "GetStarted",
-      requiresAuth: false,
+      requiresAuth: true,
     },
   },
   {
@@ -28,7 +28,7 @@ export const OnboardRoutes: Array<any> = [
     component: citySelection,
     meta: {
       title: "GetStarted",
-      requiresAuth: false,
+      requiresAuth: true,
     },
   },
   {
@@ -37,7 +37,7 @@ export const OnboardRoutes: Array<any> = [
     component: UserSelection,
     meta: {
       title: "UserSelection",
-      requiresAuth: false,
+      requiresAuth: true,
     },
   },
 ];

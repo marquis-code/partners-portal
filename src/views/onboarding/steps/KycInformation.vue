@@ -49,14 +49,14 @@
           >
           <select
             class="
-              text-xs
+              text-sm
               border-none
               outline-none
               w-full
               rounded-md
               p-3
               placeholder-gray-500 placeholder-opacity-25
-              ring-1 ring-gray-300
+              ring-1 ring-sh-grey-300
             "
             @change="handleIdentity"
             v-model="identityVerification.selectedIdentity"
@@ -84,6 +84,7 @@
               : 'Document Name'
           }}</label>
           <input
+            type="text"
             v-model="identityVerification.documentNumber"
             class="
               text-xs
@@ -239,11 +240,18 @@ import { defineComponent } from 'vue';
 import { mapActions } from 'vuex';
 import Datepicker from 'vue3-datepicker';
 import ImageUpload from '@/components/ImageUpload.vue';
+import { required } from '@vuelidate/validators';
+// import moment from 'moment';
+import { extractErrorMessage } from '@/utils/helper';
+
 export default defineComponent({
   name: 'KycInformation',
   components: { Datepicker, ImageUpload },
-  data () {
+  data() {
     return {
+      loading: false,
+      identityVerified: false,
+      addressVerified: false,
       identityVerification: {
         selectedIdentity: '',
         documentNumber: '',
@@ -258,32 +266,113 @@ export default defineComponent({
       identificationOptions: ['NIN', 'Drivers License', 'BVN', 'Passport']
     };
   },
+  created() {
+    this.verfifyUploadedData();
+  },
+  validations() {
+    return {
+      identityVerification: {
+        selectedIdentity: { required },
+        documentNumber: { required },
+        dateOfBirth: { required }
+      }
+    };
+  },
+  computed: {
+    formattedDate() {
+      return this.identityVerification.dateOfBirth;
+    }
+  },
   methods: {
     ...mapActions('auth', ['setSessionData']),
-    setupInterfaceData () {
+    setupInterfaceData() {
       this.activeView = 0;
     },
-    async next () {
-      console.log(this.identityVerification);
-      // let response = await this.$axios.post('/verifyIdentity', this.identityVerification);
-      // console.log(response);
-      this.activeView += 1;
+    async verfifyUploadedData() {
+      try {
+        const response = await this.$axios.get(
+          '/v1/identity/partner/2/verification'
+        );
+        response?.data?.data?.forEach((eachData) => {
+          if (eachData.document_type !== null) {
+            this.identityVerified = true;
+          } else {
+            this.identityVerified = false;
+          }
+        });
+      } catch (err) {
+        const errorMessage = extractErrorMessage(
+          err,
+          null,
+          'Oops! An error occurred, please try again.'
+        );
+        this.$toast.error(errorMessage);
+      }
+      console.log(this.identityVerified);
     },
-    previous () {
+    async next() {
+      // this.v$.identityVerification.$touch();
+      // if (this.loading || this.v$.identityVerification.$errors.length) {
+      //   return;
+      // }
+      const payload = {
+        user: {
+          document_owner_id: 1,
+          partner_type: this.$route.query.type
+        },
+        document: {
+          document_id: this.identityVerification.documentNumber,
+          type: this.identityVerification.selectedIdentity.toLowerCase(),
+          dob: this.formattedDate,
+          fname: 'dominic',
+          lname: 'olije'
+        }
+      };
+      console.log(payload);
+      if (this.identityVerified === false) {
+        try {
+          this.loading = true;
+          await this.$axios.post(
+            '/v1/identity/partner/2/verification',
+            payload
+          );
+          this.activeView += 1;
+        } catch (err) {
+          const errorMessage = extractErrorMessage(
+            err,
+            null,
+            'Oops! An error occurred, please try again.'
+          );
+          this.$toast.error(errorMessage);
+        } finally {
+          this.loading = false;
+        }
+      } else {
+        this.$toast.error('Verification has already been complete');
+      }
+    },
+    previous() {
       this.activeView -= 1;
     },
-    goBack () {
+    goBack() {
       console.log('Hello');
     },
-    updateInfo () {
+    async updateInfo() {
+      // try {
+      //  const response = await this.$axios.get('https://eb2e-41-58-214-179.ngrok.io/v1/identity/partner/2/verification')
+      // } catch (error) {
+
+      // }finally {
+
+      // }
       // let response = await this.$axios.patch('/updateIdentity', this.identityVerification);
       // console.log(response);
       console.log('Reverting...');
     },
-    handleAddress () {
+    handleAddress() {
       console.log(this.addressVerification);
     },
-    uploadFile () {
+    uploadFile() {
       this.file = this.$refs.avatar.files[0];
 
       const reader = new FileReader();
