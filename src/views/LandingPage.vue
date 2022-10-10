@@ -1,12 +1,13 @@
 <template>
   <section class="bg-white">
+<!--    <sh-full-modal-component></sh-full-modal-component>-->
     <div class="lg:grid lg:min-h-screen lg:grid-cols-12">
       <section class="relative flex items-end bg-grays-black-2 lg:col-span-5 lg:h-full">
         <div class="hidden lg:relative lg:block lg:p-12 carousel-wrapper pb-20">
           <carousel :items-to-show="1" :autoplay="8000" :wrap-around="true" class="lg:pb-12">
             <slide v-for="(slide, index) in highlights" :key="index">
               <div class="w-full text-white flex flex-col items-center pb-8 justify-center">
-                <img class="max-w-xs" src="@/assets/images/grey_blob.svg">
+                <img class="max-w-xs" :src="slide.image">
                 <h2 class="font-bold text-3xl leading-10 mt-16">{{slide.label}}</h2>
                 <p class="text-grays-black-6 leading-8 mt-4">{{slide.description}}</p>
               </div>
@@ -27,7 +28,7 @@
           <router-link to="/login" class="block cursor-pointer mt-10 border rounded-lg border-sh-grey-900 text-sh-grey-900 font-bold text-sm w-full py-3 text-center">
             Login
           </router-link>
-          <a :href="registrationLink" class="hover:bg-sh-green-600 block cursor-pointer mt-4 rounded-lg text-sh-grey-900 font-bold bg-sh-green-500 text-sm w-full py-3 text-center">
+          <a :href="registrationLink" class="hover:bg-sh-green-600 block cursor-pointer mt-4 rounded-lg border border-transparent text-sh-grey-900 font-bold bg-sh-green-500 text-sm w-full py-3 text-center">
             Become a vehicle partner
           </a>
         </div>
@@ -41,10 +42,12 @@ import 'vue3-carousel/dist/carousel.css'
 import { Carousel, Slide, Pagination } from 'vue3-carousel'
 
 import {defineComponent} from "vue";
+// import ShFullModalComponent from '@/libs/modals/components';
 
 export default defineComponent({
   name: 'LandingPage',
   components: {
+    // ShFullModalComponent,
     Carousel,
     Slide,
     Pagination,
@@ -54,11 +57,13 @@ export default defineComponent({
       highlights: [
         {
           label: 'Manage your assets',
-          description: 'Keep track of all your Drivers and Vehicles in one place.'
+          description: 'Keep track of all your Drivers and Vehicles in one place.',
+          image: require('@/assets/images/banners/manage_banner.svg')
         },
         {
           label: 'Earn from your Vehicles',
-          description: 'Move shuttlers using your Vehicles and earn while doing so'
+          description: 'Move shuttlers using your Vehicles and earn while doing so',
+          image: require('@/assets/images/banners/earn_banner.svg')
         }
       ]
     }

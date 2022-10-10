@@ -80,10 +80,10 @@ export default defineComponent({
     OnboardingLayout,
     FormContainer
   },
-  created() {
+  created () {
     this.setupRedirect();
   },
-  data() {
+  data () {
     return {
       currentStep: 0 as number,
       routeType: '',
@@ -114,20 +114,20 @@ export default defineComponent({
     };
   },
   methods: {
-    next() {
+    next () {
       this.currentStep += 1 as number;
     },
-    goBack(): void {
+    goBack (): void {
       this.currentStep = 0 as number;
     },
-    redirectToCitySelection() {
+    redirectToCitySelection () {
       this.$router.push('/city-selection');
     },
-    handleCompanyData(data: companyFormData) {
+    handleCompanyData (data: companyFormData) {
       console.log(data);
       this.currentStep += 1 as number;
     },
-    setupRedirect() {
+    setupRedirect () {
       if (this.$route.query.type === 'company') {
         this.currentStep = 0;
         this.routeType = 'company';

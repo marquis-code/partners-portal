@@ -64,7 +64,7 @@ export default defineComponent({
     CenteredPageHeader,
     OnboardingLayout
   },
-  data() {
+  data () {
     return {
       activeIndex: null,
       headerTitle: 'Create a partner account',
@@ -84,10 +84,10 @@ export default defineComponent({
     };
   },
   methods: {
-    selected(index: any) {
+    selected (index: any) {
       this.activeIndex = index;
     },
-    async handleRedirection() {
+    async handleRedirection () {
       if (this.activeIndex === 0) {
         try {
           await this.$axios.post('/v1/partner', { mode: 'company' });

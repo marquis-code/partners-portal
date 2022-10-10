@@ -16,7 +16,7 @@ export class AuthGuard implements RouteGuard {
         name: "login",
         query: { redirect: to.fullPath }
       });
-    }else if (isLoggedIn && !requiresAuth) {
+    } else if (isLoggedIn && !requiresAuth) {
       return next({
         name: "dashboard",
         // query: { redirect: to.fullPath }
