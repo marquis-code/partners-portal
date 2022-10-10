@@ -51,6 +51,7 @@ router.beforeEach((to: RouteLocationNormalized, from: RouteLocationNormalized, n
     next();
     return;
   }
+
   for (const routeGuard of routeGuards) {
     // the handle function handles the redirection internally
     const isNavigable = routeGuard.handle(to, from, next);

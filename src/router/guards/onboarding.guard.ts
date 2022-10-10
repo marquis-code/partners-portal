@@ -2,34 +2,34 @@ import {RouteGuard} from "@/models/route-guard";
 import {NavigationGuardNext, RouteLocationNormalized, RouteLocationRaw} from "vue-router";
 import {Store} from "vuex";
 import {PartnerOrganization} from "@/models/organisation.model";
+import {UserSessionModel} from "@/models/user-session.model";
 export class OnboardingGuard implements RouteGuard {
   constructor (private store: Store<any>) {
   }
 
   handle (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext): boolean {
-    const contextOrg: PartnerOrganization = this.store.getters['auth/activeContext'];
-    console.log({contextOrg});
-    const isOnboardingRoute = !to.matched.some(route => route.meta.isOnboardingRoute);
-    const onboardingComplete = contextOrg?.partner?.city_id && contextOrg.onboardingState?.address !== 'not-submitted' &&
-      contextOrg.onboardingState?.identity !== 'not-submitted';
-
-    if (contextOrg && !isOnboardingRoute && !onboardingComplete) {
-      next({
-        name: 'PartnerSignUp'
-      });
-      return false;
+    const isLoggedIn = this.store.getters["auth/isLoggedIn"];
+    if (!isLoggedIn) {
+      return true;
     }
+    const contextOrg: PartnerOrganization = this.store.getters['auth/activeContext'];
+    const sessionData: UserSessionModel = this.store.getters['auth/userSessionData'];
+    const isOnboardingRoute = to.matched.some(route => route.meta.isOnboardingRoute);
+    const kycFormCompleted = contextOrg && contextOrg.onboardingState?.address && contextOrg.onboardingState?.identity &&
+      contextOrg.onboardingState?.address !== 'not-submitted' && contextOrg.onboardingState?.identity !== 'not-submitted';
+    const onboardingComplete = !!(contextOrg?.partner?.city_id && kycFormCompleted);
+    const hasOrgs = sessionData?.associatedOrganizations?.length;
 
     if (contextOrg && isOnboardingRoute && !onboardingComplete) {
-      if (contextOrg.onboardingState?.address !== 'not-submitted' && contextOrg.onboardingState?.identity !== 'not-submitted') {
+      debugger;
+      if (to.name !== 'citySelection' && kycFormCompleted) {
         next({
           name: 'citySelection',
           query: {progress: 'true'}
         });
         return false;
       }
-
-      if (contextOrg.onboardingState?.identity !== 'not-submitted') {
+      if (to.name !== 'GetStarted' && contextOrg.onboardingState?.identity !== 'not-submitted') {
         next({
           name: 'GetStarted',
           query: {progress: 'true', state: 'address'},
@@ -37,11 +37,12 @@ export class OnboardingGuard implements RouteGuard {
         });
         return false;
       }
+      return true;
+    }
 
+    if ((!hasOrgs && to.name !== 'PartnerSignUp') || (contextOrg && to.name !== 'PartnerSignUp' && !onboardingComplete)) {
       next({
-        name: 'GetStarted',
-        query: {progress: 'true'},
-        params: {type: contextOrg.partner.mode}
+        name: 'PartnerSignUp'
       });
       return false;
     }

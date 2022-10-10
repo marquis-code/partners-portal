@@ -3,7 +3,7 @@
 import {App, createApp, h} from "vue";
 import {ModalOptions} from "@/libs/modals/full-modal-options";
 import ShFullModalComponent from "@/libs/modals/ShFullModalComponent.vue";
-
+import './styles/sh-modal.scss';
 export interface ShModal {
   open(modalOptions: ModalOptions): void;
   close(): void;
@@ -25,8 +25,9 @@ export class ShFullModal/* implements ShModal*/ {
 
   private createElement (): Element {
     const modalEl: HTMLDivElement = document.createElement('div');
-    const modalRef: string = `sh_modal_${Math.random()}`.slice(2, 8);
+    const modalRef: string = `sh_modal_${Math.random()}`.slice(2);
     modalEl.setAttribute('id', modalRef);
+    modalEl.setAttribute('class', 'sh-modal');
     return modalEl;
   }
 
@@ -35,9 +36,10 @@ export class ShFullModal/* implements ShModal*/ {
     document.body.appendChild(this.elementRef);
     const component = h(ShFullModalComponent, {
       options,
-      onCloseClicked: (e: any) => {
-        console.log('Close clicked');
-        this.close();
+      onActionClicked: (e: any) => {
+        // Review for extension in future update...for cases where action processes async call
+        // this.close();
+        options.clickCallBack?.call(e);
       }
     });
     this.modalApp = createApp(component);

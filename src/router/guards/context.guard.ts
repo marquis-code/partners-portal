@@ -1,19 +1,17 @@
 import {RouteGuard} from "@/models/route-guard";
 import {Store} from "vuex";
 import {NavigationGuardNext, RouteLocationNormalized} from "vue-router";
-import {comment} from "postcss";
+import {UserSessionModel} from "@/models/user-session.model";
 
 export class ContextGuard implements RouteGuard {
   constructor (private store: Store<any>) {
   }
 
   handle (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext): boolean {
+    const sessionData: UserSessionModel = this.store.getters['auth/userSessionData'];
     const activeContextOrg = this.store.getters['auth/activeContext'];
-    const isLoggedIn = this.store.getters["auth/isLoggedIn"];
-    const contextSelectionPage = to.matched.some(route => route.meta.contextPage);
-
-    console.log({activeContextOrg});
-    if (!activeContextOrg && isLoggedIn && !contextSelectionPage) {
+    const hasOrgs = sessionData?.associatedOrganizations?.length;
+    if (to.name !== 'organization.selection' && hasOrgs && !activeContextOrg) {
       next({
         name: 'organization.selection'
       });

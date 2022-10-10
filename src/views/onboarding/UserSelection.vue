@@ -98,7 +98,6 @@ export default defineComponent({
       this.activeIndex = index;
     },
     gotoDashBoard () {
-      console.log('Dashboard');
       this.$router.push('/dashboard');
     }
   },

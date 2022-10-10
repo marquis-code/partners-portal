@@ -42,15 +42,21 @@ import 'vue3-carousel/dist/carousel.css'
 import { Carousel, Slide, Pagination } from 'vue3-carousel'
 
 import {defineComponent} from "vue";
-// import ShFullModalComponent from '@/libs/modals/components';
 
 export default defineComponent({
   name: 'LandingPage',
   components: {
-    // ShFullModalComponent,
     Carousel,
     Slide,
     Pagination,
+  },
+  mounted () {
+    this.$shModal.open({
+      type: 'success',
+      buttonText: 'Proceed',
+      description: "Blah blah blah",
+      title: "Completed"
+    });
   },
   data () {
     return {

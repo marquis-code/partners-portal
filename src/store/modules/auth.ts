@@ -37,14 +37,22 @@ export default <StoreOptions<AuthState>>{
       if (data) {
         setAuthorization(data.token);
         try {
-          // TODO: abstract impl
-          const response = await axiosInstance.get<{data: PartnerOrganization[]}>(`v1/users/${data.user.id}/partner-members`)
+          const response = await axiosInstance
+            .get<{data: PartnerOrganization[]}>(`v1/users/${data.user.id}/partner-members`)
             .then((res) => <PartnerOrganization[]>(res.data.data || []));
-          const statusResponse: any[] = await Promise.all([response.map(org => axiosInstance.get(`/v1/partners/${org.partner.account_sid}/kyc/status`).then(r => <OnboardingState>r.data))]);
-          response.forEach((org, index) => {
-            console.log(org, statusResponse[index]);
-            org.onboardingState = statusResponse[index];
-          });
+          const statusResponse: any[] =
+            await Promise.all([response.map(org => axiosInstance.get(`/v1/partners/${org.partner.account_sid}/kyc/status`).then(r => <OnboardingState>r.data.data))]);
+          // response.map(async (org, index) => {
+          //   console.log(org, statusResponse[index]);
+          //   org.onboardingState = await statusResponse[index];
+          // });
+
+          await Promise.all([response.map(org => {
+            return axiosInstance.get(`/v1/partners/${org.partner.account_sid}/kyc/status`).then(r => {
+              org.onboardingState = {...<OnboardingState>r.data.data};
+              return <OnboardingState>r.data;
+            });
+          })]);
           data.associatedOrganizations = response;
         } catch (e) {
           console.info('No partners associated');
@@ -65,9 +73,7 @@ export default <StoreOptions<AuthState>>{
     setActiveContext ({commit, getters}, context: PartnerOrganization) {
       const session: UserSessionModel = getters.userSessionData;
       session.activeContext = context;
-      console.log('Here');
       commit('setSession', session);
-      // localStorage.setItem(USER_SESSION_KEY, JSON.stringify(session));
     },
     clearSessionData ({commit}) {
       commit('setSession', null);
