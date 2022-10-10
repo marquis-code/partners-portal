@@ -2,11 +2,11 @@
     <OnboardingLayout>
       <CenteredPageHeader :title="'What cities do you operate in?'" :description="'We would love to know your country, in order to proceed.'" />
       <FormContainer>
-        <form class="max-w-{500px}">
+        <form class="w-96 h-64">
           <div class="flex flex-col">
             <div class="flex flex-col space-y-2">
                 <label class="text-grays-black-5 font-medium text-sm"
-                    >Cities (Select Multiple Cities)</label
+                    >Cities</label
                 >
                   <select
                     type="email"
@@ -24,6 +24,7 @@
                     </option>
                 </select>
                 </div>
+                <span class="text-sh-purple-700 mt-4 text-xs" v-if="selectedCities.length> 0">You can select multiple cities</span>
                 <span class="flex flex-row flex-wrap mt-6">
                 <span v-for="city in selectedCities" :key="city.city" class="mr-4">
                   <SelectedCityBadge
