@@ -5,12 +5,13 @@ import UserSelection from "@/views/onboarding/UserSelection.vue";
 
 export const OnboardRoutes: Array<any> = [
   {
-    path: "/sign-up",
+    path: "/welcome",
     name: "PartnerSignUp",
     component: PartnerSignUp,
     meta: {
       title: "PartnerSignUp",
       requiresAuth: true,
+      isOnboardingRoute: true
     },
   },
   {
@@ -20,6 +21,7 @@ export const OnboardRoutes: Array<any> = [
     meta: {
       title: "GetStarted",
       requiresAuth: true,
+      isOnboardingRoute: true
     },
   },
   {
@@ -29,15 +31,7 @@ export const OnboardRoutes: Array<any> = [
     meta: {
       title: "GetStarted",
       requiresAuth: true,
-    },
-  },
-  {
-    path: "/user-selection",
-    name: "UserSelection",
-    component: UserSelection,
-    meta: {
-      title: "UserSelection",
-      requiresAuth: true,
+      isOnboardingRoute: true
     },
   },
 ];

@@ -18,6 +18,11 @@ export interface Partner {
   company_phone: string;
 }
 
+export interface OnboardingState {
+  identity: 'completed' | 'submitted' | 'not-submitted' | 'failed' | null;
+  address: 'completed' | 'submitted' | 'not-submitted' | 'failed' | null;
+}
+
 /**
  * Represents the organization a user is associated with.
  * */
@@ -29,4 +34,5 @@ export interface PartnerOrganization {
   created_at: Date;
   updated_at: Date;
   partner: Partner;
+  onboardingState: OnboardingState | null | undefined;
 }

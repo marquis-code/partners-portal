@@ -10,7 +10,8 @@ export const AuthRoutes: Array<any> = [
     component: Login,
     meta: {
       title: 'Login',
-      requiresAuth: false
+      requiresAuth: false,
+      isGuest: true
     }
   },
   /*  {
