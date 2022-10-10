@@ -163,7 +163,7 @@ export default defineComponent({
     Datepicker
   },
   emits: ['handleCompanyData'],
-  data() {
+  data () {
     return {
       formData: {
         startDate: '',

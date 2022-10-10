@@ -77,7 +77,7 @@ import OnboardingLayout from '@/views/layouts/OnboardingLayout.vue';
 import CenteredPageHeader from '@/components/CenteredPageHeader.vue';
 export default defineComponent({
   name: 'UserSelection',
-  data() {
+  data () {
     return {
       title: 'Who\'s using Shuttlers?',
       description: 'With Shuttlers Vehicle partner portal,  you can shuffle between your organisations.',
@@ -99,7 +99,7 @@ export default defineComponent({
     };
   },
   methods: {
-    selected(index: any) {
+    selected (index: any) {
       this.activeIndex = index;
     }
   },
