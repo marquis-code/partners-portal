@@ -50,14 +50,6 @@ export default defineComponent({
     Slide,
     Pagination,
   },
-  /*  mounted () {
-    this.$shModal.open({
-      type: 'success',
-      buttonText: 'Proceed',
-      description: "Blah blah blah",
-      title: "Completed"
-    });
-  }, */
   data () {
     return {
       highlights: [

@@ -9,7 +9,7 @@ export interface ShModal {
   close(): void;
 }
 
-export class ShFullModal/* implements ShModal*/ {
+export class ShFullModal implements ShModal {
   private elementRef: Element | null = null;
   private modalApp!: App<Element>;
 
@@ -21,6 +21,11 @@ export class ShFullModal/* implements ShModal*/ {
     if (this.elementRef) {
       document.body.removeChild(this.elementRef);
     }
+    const mainApp = document.getElementById('sh-vp-portal');
+    if (mainApp) {
+      mainApp.style.position = 'inherit';
+      mainApp.style.opacity  = '1';
+    }
   }
 
   private createElement (): Element {
@@ -28,6 +33,11 @@ export class ShFullModal/* implements ShModal*/ {
     const modalRef: string = `sh_modal_${Math.random()}`.slice(2);
     modalEl.setAttribute('id', modalRef);
     modalEl.setAttribute('class', 'sh-modal');
+    const mainApp = document.getElementById('sh-vp-portal');
+    if (mainApp) {
+      mainApp.style.position = 'fixed';
+      mainApp.style.opacity  = '0';
+    }
     return modalEl;
   }
 
