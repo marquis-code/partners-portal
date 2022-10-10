@@ -58,7 +58,6 @@ import { defineComponent } from 'vue';
 import CenteredPageHeader from '../../components/CenteredPageHeader.vue';
 import OnboardingLayout from '../layouts/OnboardingLayout.vue';
 import { extractErrorMessage } from '@/utils/helper';
-import { axiosInstance } from '@/plugins/axios';
 
 export default defineComponent({
   name: 'PartnerSignUp',
@@ -94,7 +93,7 @@ export default defineComponent({
       if (this.activeIndex === 0) {
         this.$router.push({
           path: 'get-started',
-          query: { type: 'company' }
+          query: { type: 'business' }
         });
       }
 
