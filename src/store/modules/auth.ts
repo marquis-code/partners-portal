@@ -52,21 +52,19 @@ export default <StoreOptions<AuthState>>{
       const response = await axiosInstance
         .get<{data: PartnerOrganization[]}>(`v1/users/${userId}/partner-members`)
         .then((res) => <PartnerOrganization[]>(res.data.data || []))
-        .then(async (res: PartnerOrganization[]) => {
-          await Promise.all([res.map(org => {
-            return axiosInstance.get(`/v1/partners/${org.partner.account_sid}/kyc/status`).then(r => {
-              org.onboardingState = {...<OnboardingState>r.data.data};
-              return <OnboardingState>r.data;
-            });
-          })]);
-          await Promise.all([res.map(org => {
-            return axiosInstance.get(`/v1/partners/${org.partner.id}/cities`).then(r => {
-              org.supportedCities = [...(r.data.data || [])];
-              return r.data;
-            });
-          })]);
-          return res;
+
+      await Promise.all(response.map(org => {
+        return axiosInstance.get(`/v1/partners/${org.partner.account_sid}/kyc/status`).then(r => {
+          org.onboardingState = {...<OnboardingState>r.data.data};
+          return <OnboardingState>r.data;
         });
+      }));
+      await Promise.all(response.map(org => {
+        return axiosInstance.get(`/v1/partners/${org.partner.id}/cities`).then(r => {
+          org.supportedCities = [...(r.data.data || [])];
+          return r.data;
+        });
+      }));
       return response;
     },
     async refreshActiveContext ({dispatch, commit, getters}, userId: number) {

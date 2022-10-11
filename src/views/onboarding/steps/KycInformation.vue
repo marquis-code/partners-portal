@@ -328,7 +328,7 @@ export default defineComponent<any, any, any>({
     setFormDefaults () {
       const user: UserData = this.user;
       this.identityForm.user.document_owner_id = user.id;
-      this.identityForm.user.partner_type = this.$route.query.type;
+      this.identityForm.user.partner_type = this.$route.query.type === 'individual' ? 'individual' : 'business';
       this.identityForm.document.fname = user.fname;
       this.identityForm.document.lname = user.lname;
 
@@ -374,7 +374,7 @@ export default defineComponent<any, any, any>({
       if (this.loading || this.v$.addressForm.$errors.length) {
         return;
       }
-      if(!this.file) {
+      if (!this.file) {
         this.$toast.error('Kindly select a file');
       }
       try {
@@ -383,12 +383,14 @@ export default defineComponent<any, any, any>({
         formData.append('file', this.file);
 
         const response = await this.$axios.post(`/v1/upload/identity/files`, formData);
-        if(response.data?.files?.length) {
+        if (response.data?.files?.length) {
           this.addressForm.document.files = [response.data.files[0].Location];
         }
         await this.$axios.post(`/v1/partners/${this.contextOrganization.account_sid}/address-verification`, this.addressForm);
         await this.$store.dispatch('auth/refreshActiveContext', this.user.id);
-        this.$emit('kycCompleted');
+        setTimeout(() => {
+          this.$router.push({name: 'citySelection'});
+        }, 1000);
       } catch (err) {
         const errorMessage = extractErrorMessage(err, null, 'Oops! An error occurred, please try again.');
         this.$toast.error(errorMessage);
@@ -397,7 +399,7 @@ export default defineComponent<any, any, any>({
       }
     },
     setPageState () {
-      const identityFormStatus = this.contextOrganization.onboardingState.identity;
+      const identityFormStatus = this.contextOrganization.onboardingState?.identity;
       if (this.contextOrganization && (identityFormStatus === 'completed')) {
         this.activeView = 1;
         this.addressProgress = true;

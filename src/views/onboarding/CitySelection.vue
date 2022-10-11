@@ -66,7 +66,8 @@ export default {
   },
   computed: {
     ...mapGetters({
-      contextOrg: 'auth/activeContext'
+      contextOrg: 'auth/activeContext',
+      user: 'auth/user'
     })
   },
   methods: {
@@ -89,20 +90,13 @@ export default {
       if (this.selectedCities.length) {
         try {
           this.loading = true;
-          console.log(this.selectedCities);
           await Promise.all([...(this.selectedCities.map(city =>
-            this.$axios.post(`v1/partner/${this.contextOrg?.id}/`, {city_id: city.id})))]);
+            this.$axios.post(`v1/partners/${this.contextOrg?.partner?.id}/cities`, {city_id: city.id})))]);
           await this.$store.dispatch('auth/refreshActiveContext', this.user.id);
-          // this.$shModal.open({
-          //   type: 'success',
-          //   title: '',
-          //   description: '',
-          //   buttonText: '',
-          //   clickCallBack: '',
-          // })
           this.$toast.success('Partner account created');
           await this.$router.push({name: 'dashboard'})
         } catch (e) {
+          console.log(e);
           this.$toast.error(extractErrorMessage(e));
         } finally {
           this.loading = false;
