@@ -79,12 +79,12 @@ export default defineComponent({
   },
   methods: {
     uploadFile (event : any) {
-      console.log(event.target.files[0])
       if (this.isFileSizeOk(event.target.files[0].size)) {
         this.selectedFile = event.target.files[0];
         this.fileSize = (event.target.files[0].size / 1000000).toFixed(1).toString();
         this.fileUploaded = true;
         this.fileName = event.target.files[0].name;
+        this.$emit('fileSelected', this.selectedFile);
       } else this.$toast.warning('file must be less than 10 MB')
     },
     isFileSizeOk (fileSizeInBytes : number) : boolean {
@@ -97,6 +97,7 @@ export default defineComponent({
       this.fileUploaded = false;
       this.fileName = '';
       this.fileSize = '';
+      this.$emit('fileRemoved');
     }
   },
 });

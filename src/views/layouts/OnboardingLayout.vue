@@ -1,7 +1,7 @@
 <template>
 <main
 class="
-    h-screen
+    min-h-screen
     w-screen
     flex
     justify-center

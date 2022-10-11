@@ -36,15 +36,7 @@ export default <StoreOptions<AuthState>>{
       if (data) {
         setAuthorization(data.token);
         try {
-          const response = await axiosInstance
-            .get<{data: PartnerOrganization[]}>(`v1/users/${data.user.id}/partner-members`)
-            .then((res) => <PartnerOrganization[]>(res.data.data || []));
-          await Promise.all([response.map(org => {
-            return axiosInstance.get(`/v1/partners/${org.partner.account_sid}/kyc/status`).then(r => {
-              org.onboardingState = {...<OnboardingState>r.data.data};
-              return <OnboardingState>r.data;
-            });
-          })]);
+          const response = await dispatch('getPartnerMemberOrganizations', data.user.id);
           data.associatedOrganizations = response;
         } catch (e) {
           console.info('No partners associated');
@@ -53,10 +45,41 @@ export default <StoreOptions<AuthState>>{
       } else {
         dispatch('clearSessionData');
       }
+      // Forcing a delay
+      await (new Promise(resolve => setTimeout(() => resolve(true), 1000)));
+    },
+    async getPartnerMemberOrganizations ({commit}, userId: number) {
+      const response = await axiosInstance
+        .get<{data: PartnerOrganization[]}>(`v1/users/${userId}/partner-members`)
+        .then((res) => <PartnerOrganization[]>(res.data.data || []))
+        .then(async (res: PartnerOrganization[]) => {
+          await Promise.all([res.map(org => {
+            return axiosInstance.get(`/v1/partners/${org.partner.account_sid}/kyc/status`).then(r => {
+              org.onboardingState = {...<OnboardingState>r.data.data};
+              return <OnboardingState>r.data;
+            });
+          })]);
+          await Promise.all([res.map(org => {
+            return axiosInstance.get(`/v1/partners/${org.partner.id}/cities`).then(r => {
+              org.supportedCities = [...(r.data.data || [])];
+              return r.data;
+            });
+          })]);
+          return res;
+        });
+      return response;
+    },
+    async refreshActiveContext ({dispatch, commit, getters}, userId: number) {
+      const associatedOrganizations = await dispatch('getPartnerMemberOrganizations', userId);
+      if (associatedOrganizations.length) {
+        const session: UserSessionModel = getters.userSessionData;
+        session.associatedOrganizations = associatedOrganizations;
+        dispatch('setSessionData', session);
+      }
     },
     setSessionData ({commit}, data: UserSessionModel) {
       // Auto set active context if user is associated with only a single partner
-      if (!data.activeContext && data.associatedOrganizations?.length === 1) {
+      if (data.associatedOrganizations?.length === 1) {
         data.activeContext = data.associatedOrganizations[0];
       }
       commit('setSession', data);

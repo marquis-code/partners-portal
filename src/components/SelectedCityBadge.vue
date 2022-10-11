@@ -1,9 +1,9 @@
 <template>
-    <span class="flex flex-row align-middle">
+    <span class="flex flex-row align-middle items-center">
       <span class=".text-value bg-black text-white p-3 rounded-lg">
-        {{value}}
+        {{value.city.name}}
       </span>
-      <img @click="$emit('deleteThisItem')" class="w-5 h-5" src="@/assets/images/cancel.svg">
+      <img @click="$emit('removeCity', value)" class="w-5 h-5 ml-1" src="@/assets/images/cancel.svg">
     </span>
 </template>
 
@@ -11,7 +11,7 @@
 export default {
   name: "SelectedCityBadge",
   props: {
-    value: String
+    value: Object
   }
 }
 </script>

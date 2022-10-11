@@ -6,37 +6,21 @@
         <div
           v-if="routeType !== 'individual'"
           class="flex items-center space-x-1"
-          :class="[
-            currentStep === 0 ? 'text-grays-black-2' : 'text-grays-black-6'
-          ]"
-        >
+          :class="currentStep === 0 ? 'text-grays-black-2' : 'text-grays-black-6'">
           <span
             class="text-white rounded-full w-5 text-center text-xs"
-            :class="[
-              currentStep === 0 ? 'bg-grays-black-2' : 'bg-grays-black-7'
-            ]"
-            >1</span
-          >
+            :class="currentStep === 0 ? 'bg-grays-black-2' : 'bg-grays-black-7'">1</span>
           <p class="lg:text-base text-sm">Company information</p>
         </div>
-        <p
-          v-if="routeType !== 'individual'"
-          class="h-0.5 w-6 lg:w-20 bg-gray-500"
-        ></p>
+        <p v-if="routeType !== 'individual'" class="h-0.5 w-6 lg:w-20 bg-gray-500"></p>
         <div
           v-if="routeType === 'individual' || routeType === 'company'"
           class="flex items-center space-x-1"
-          :class="[
-            currentStep === 1 ? 'text-grays-black-2' : 'text-grays-black-6'
-          ]"
-        >
+          :class="currentStep === 1 ? 'text-grays-black-2' : 'text-grays-black-6'">
           <span
             class="text-white rounded-full w-5 text-center text-xs"
-            :class="[
-              currentStep === 1 ? 'bg-grays-black-2' : 'bg-grays-black-7'
-            ]"
-            >{{ routeType === 'business' ? '2' : '1' }}</span
-          >
+            :class="currentStep === 1 ? 'bg-grays-black-2' : 'bg-grays-black-7'">
+            {{ routeType === 'company' ? '2' : '1' }}</span>
           <p class="lg:text-base text-sm">Kyc verification</p>
         </div>
       </div>
@@ -44,7 +28,7 @@
       <main class="w-full px-7">
         <keep-alive>
           <component
-            @handleCompanyData="handleCompanyData"
+            @companySignUpSuccessful="handleCompanyData"
             @goBack="goBack()"
             @kycCompleted="redirectToCitySelection"
             :is="steps[currentStep].component"
@@ -64,6 +48,7 @@ import KycInformation from '../onboarding/steps/KycInformation.vue';
 import CenteredPageHeader from '../../components/CenteredPageHeader.vue';
 import OnboardingLayout from '../layouts/OnboardingLayout.vue';
 import FormContainer from '../layouts/FormContainer.vue';
+import {mapGetters} from "vuex";
 export default defineComponent({
   name: 'GetStarted',
   components: {
@@ -74,11 +59,11 @@ export default defineComponent({
     FormContainer
   },
   created() {
-    this.setupRedirect();
+    this.initializePageState();
   },
   data() {
     return {
-      currentStep: 0 as number,
+      currentStep: 0,
       routeType: '',
       title: 'Create a partner account',
       description: 'Select a category to sign up as',
@@ -106,26 +91,30 @@ export default defineComponent({
       }
     };
   },
+  computed: {
+    ...mapGetters({
+      contextOrg: 'auth/activeContext'
+    })
+  },
   methods: {
     next() {
-      this.currentStep += 1 as number;
+      this.currentStep += 1;
     },
     goBack(): void {
-      this.currentStep = 0 as number;
+      this.currentStep = 0;
     },
     redirectToCitySelection() {
       this.$router.push('/city-selection');
     },
-    handleCompanyData(data: any) {
-      console.log(data);
-      // make api call to send company data
-      this.currentStep += 1 as number;
+    handleCompanyData() {
+      this.currentStep = 1;
     },
-    setupRedirect() {
-      if (this.$route.query.type === 'company') {
+    initializePageState() {
+      if (this.$route.query.type === 'company' && !this.contextOrg) {
         this.currentStep = 0;
         this.routeType = 'company';
       } else {
+        this.$route.query.type = 'individual';
         this.routeType = 'individual';
         this.currentStep = 1;
       }

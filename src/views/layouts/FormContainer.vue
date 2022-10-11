@@ -11,6 +11,8 @@ class="
     items-center
     flex-col
     space-y-8
+    mt-6
+    {{extraClass || ''}}
     "
     :class="hasRing ? 'ring-1 ring-gray-300' : ''"
 >
@@ -26,7 +28,8 @@ export default defineComponent({
   components: {
   },
   props: {
-    hasRing: Boolean
+    hasRing: Boolean,
+    extraClass: String
   }
 })
 </script>
