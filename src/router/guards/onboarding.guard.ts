@@ -49,7 +49,7 @@ export class OnboardingGuard implements RouteGuard {
       return true;
     }
 
-    if ((!hasOrgs && to.name !== 'PartnerSignUp') || (contextOrg && to.name !== 'PartnerSignUp' && !onboardingComplete)) {
+    if (!isOnboardingRoute && ((!hasOrgs && to.name !== 'PartnerSignUp') || (contextOrg && to.name !== 'PartnerSignUp' && !onboardingComplete))) {
       next({
         name: 'PartnerSignUp'
       });
