@@ -117,7 +117,8 @@ export default defineComponent({
       this.$router.push('/city-selection');
     },
     handleCompanyData(data: any) {
-      console.log(data); ///make api call to send company data
+      console.log(data);
+      // make api call to send company data
       this.currentStep += 1 as number;
     },
     setupRedirect() {
