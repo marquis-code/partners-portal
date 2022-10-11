@@ -14,7 +14,7 @@
           >Company name</label
         >
         <input
-          v-model="formData.companyName"
+          v-model="formData.company_name"
           type="text"
           class="
             text-xs
@@ -35,7 +35,7 @@
         >
         <input
           type="tel"
-          v-model="formData.companyRcNumber"
+          v-model="formData.rc_number"
           class="
             text-xs
             border-none
@@ -65,7 +65,7 @@
         >
         <input
           type="text"
-          v-model="formData.companyAddress"
+          v-model="formData.company_address"
           class="
             text-xs
             border-none
@@ -84,7 +84,7 @@
           >Type of Incorporated Businesses</label
         >
         <select
-          v-model="formData.businessType"
+          v-model="formData.business_type"
           class="
             text-xs
             border-none
@@ -107,8 +107,15 @@
         </select>
       </div>
     </section>
-
-    <section class="flex justify-start space-x-10 items-start">
+    <section
+      class="
+        lg:flex
+        justify-between
+        space-y-3
+        lg:space-y-0 lg:space-x-10
+        items-center
+      "
+    >
       <div class="space-y-2 w-full lg:w-6/12 pr-1">
         <label class="text-xs font-medium text-grays-black-5"
           >When did you start your transport business ?</label
@@ -125,8 +132,49 @@
             ring-1 ring-gray-300
           "
           placeholder="Choose a date"
-          v-model="formData.startDate"
-          format="dd MMM yyyy"
+          v-model="formData.experience_start_date"
+        />
+      </div>
+      <div class="space-y-2 w-full">
+        <label class="text-xs font-medium text-grays-black-5"
+          >Company email</label
+        >
+        <input
+          type="text"
+          v-model="formData.company_email"
+          class="
+            text-xs
+            border-none
+            outline-none
+            w-full
+            rounded-md
+            p-3
+            placeholder-gray-500 placeholder-opacity-25
+            ring-1 ring-gray-300
+          "
+          placeholder="Enter company's email"
+        />
+      </div>
+    </section>
+    <section class="flex justify-start space-x-10 items-start">
+      <div class="space-y-2 w-full lg:w-6/12 pr-1">
+        <label class="text-xs font-medium text-grays-black-5"
+          >Company phone number</label
+        >
+        <input
+          type="tel"
+          v-model="formData.company_phone"
+          class="
+            text-xs
+            border-none
+            outline-none
+            w-full
+            rounded-md
+            p-3
+            placeholder-gray-500 placeholder-opacity-25
+            ring-1 ring-gray-300
+          "
+          placeholder="Enter your company's phone number"
         />
       </div>
     </section>
@@ -150,13 +198,13 @@
         <img class="ml-2" src="@/assets/images/arrow.svg" />
       </button>
     </div>
-    <!-- <button type="button" @click="handleCompany()">Emitting.....</button> -->
   </form>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
 import Datepicker from 'vue3-datepicker';
+import { format } from 'date-fns';
 export default defineComponent({
   name: 'companyInformation',
   components: {
@@ -166,11 +214,14 @@ export default defineComponent({
   data () {
     return {
       formData: {
-        startDate: '',
-        companyName: '',
-        companyRcNumber: '',
-        companyAddress: '',
-        businessType: ''
+        mode: this.$route.query.type,
+        experience_start_date: '' as any,
+        company_name: '',
+        rc_number: '',
+        company_address: '',
+        business_type: '',
+        company_email: '',
+        company_phone: ''
       },
       businessOptions: [
         'Incorporated Trustee',
@@ -179,7 +230,13 @@ export default defineComponent({
         'Company'
       ]
     };
-  }
+  },
+  // computed: {
+  //   formattedDate() {
+  //     return format(this.formData.experience_start_date, 'dd-MM-yyyy');
+  //   }
+  // }
+
 });
 </script>
 

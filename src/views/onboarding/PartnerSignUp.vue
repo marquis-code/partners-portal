@@ -58,6 +58,8 @@ import { defineComponent } from 'vue';
 import CenteredPageHeader from '../../components/CenteredPageHeader.vue';
 import OnboardingLayout from '../layouts/OnboardingLayout.vue';
 import { extractErrorMessage } from '@/utils/helper';
+import { mapGetters } from 'vuex';
+import { UserData } from '@/models/user-session.model';
 
 export default defineComponent({
   name: 'PartnerSignUp',
@@ -80,12 +82,30 @@ export default defineComponent({
         {
           title: 'An Individual',
           description:
-            'You own a company that rents vehicles for an agreed time and fee.'
+            'You are not a company but you rent out one or more vehicles for an agreed time and fee.'
         }
       ]
     };
   },
+  created() {
+    this.setUpUser();
+  },
+  computed: {
+    ...mapGetters(['userSessionData'])
+  },
   methods: {
+    async setUpUser() {
+      const user: UserData = this.$store.getters['auth/user'];
+      console.log(user);
+      try {
+        const response = await this.$axios.get(
+          `/v1/users/:${user.id}/partner-members`
+        );
+        console.log(response);
+      } catch (error) {
+        console.log(error);
+      }
+    },
     selected (index: any) {
       this.activeIndex = index;
     },

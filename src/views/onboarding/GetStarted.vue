@@ -64,13 +64,6 @@ import KycInformation from '../onboarding/steps/KycInformation.vue';
 import CenteredPageHeader from '../../components/CenteredPageHeader.vue';
 import OnboardingLayout from '../layouts/OnboardingLayout.vue';
 import FormContainer from '../layouts/FormContainer.vue';
-interface companyFormData {
-  startDate: string;
-  companyName: string;
-  companyRcNumber: number;
-  companyAddress: string;
-  businessType: string;
-}
 export default defineComponent({
   name: 'GetStarted',
   components: {
@@ -80,10 +73,10 @@ export default defineComponent({
     OnboardingLayout,
     FormContainer
   },
-  created () {
+  created() {
     this.setupRedirect();
   },
-  data () {
+  data() {
     return {
       currentStep: 0 as number,
       routeType: '',
@@ -114,20 +107,20 @@ export default defineComponent({
     };
   },
   methods: {
-    next () {
+    next() {
       this.currentStep += 1 as number;
     },
-    goBack (): void {
+    goBack(): void {
       this.currentStep = 0 as number;
     },
-    redirectToCitySelection () {
+    redirectToCitySelection() {
       this.$router.push('/city-selection');
     },
-    handleCompanyData (data: companyFormData) {
-      console.log(data);
+    handleCompanyData(data: any) {
+      console.log(data); ///make api call to send company data
       this.currentStep += 1 as number;
     },
-    setupRedirect () {
+    setupRedirect() {
       if (this.$route.query.type === 'company') {
         this.currentStep = 0;
         this.routeType = 'company';
