@@ -26,7 +26,6 @@ export class OnboardingGuard implements RouteGuard {
       });
       return false;
     }
-    debugger;
 
     if (contextOrg && isOnboardingRoute && !onboardingComplete) {
       if (to.name !== 'citySelection' && kycFormCompleted && !contextOrg.supportedCities.length) {
