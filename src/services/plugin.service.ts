@@ -1,7 +1,9 @@
 import ToastPlugin from 'vue-toast-notification';
+import ShModalPlugin from '@/plugins/sh-modal';
 import {App, Plugin} from "@vue/runtime-core";
 const PLUGINS: Array<Plugin> = [
-  ToastPlugin
+  ToastPlugin,
+  ShModalPlugin
 ];
 
 class PluginService {

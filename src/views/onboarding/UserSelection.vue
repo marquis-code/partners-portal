@@ -13,8 +13,8 @@
       "
     >
       <div
-        @click="selected(index)"
-        v-for="({ name, description }, index) in users"
+        @click="selected(index, organization)"
+        v-for="(organization, index) in organizations"
         :key="index"
         :class="[
           activeIndex == index
@@ -43,10 +43,10 @@
             bg-sh-green-200
             text-sh-green-500
           "
-          >{{ name.slice(0, 1) }}</small
+          >{{ organization.partner.company_name.slice(0, 1) }}</small
         >
-        <h1 class="text-sh-grey-900 font-bold text-center md:text-sm">{{ name }}</h1>
-        <p class="text-xs text-grays-black-5 text-center">{{ description }}</p>
+        <h1 class="text-sh-grey-900 font-bold text-center md:text-sm">{{ organization.partner.company_name }}</h1>
+        <p class="text-xs text-grays-black-5 text-center">{{ 'Company' }}</p>
       </div>
     </section>
     <button
@@ -64,8 +64,7 @@
         items-center
         w-4/12
       "
-      @click="handleRedirection"
-    >
+      @click="gotoDashBoard()">
       Proceed
       <img class="ml-1" src="@/assets/images/arrow.svg" />
     </button>
@@ -75,32 +74,31 @@
 import { defineComponent } from 'vue';
 import OnboardingLayout from '@/views/layouts/OnboardingLayout.vue';
 import CenteredPageHeader from '@/components/CenteredPageHeader.vue';
+import {PartnerOrganization} from "@/models/organisation.model";
 export default defineComponent({
   name: 'UserSelection',
-  data() {
+  data () {
     return {
       title: 'Who\'s using Shuttlers?',
       description: 'With Shuttlers Vehicle partner portal,  you can shuffle between your organisations.',
-      activeIndex: null,
-      users: [
-        {
-          name: 'Jiggy Logistics',
-          description: 'Shuttlers Shuttlers'
-        },
-        {
-          name: 'Nikki Tauraus',
-          description: 'Shuttlers Shuttlers'
-        },
-        {
-          name: 'Kelcare',
-          description: 'Shuttlers Shuttlers'
-        },
-      ]
+      activeIndex: -1,
+      organizations: []
     };
   },
+  created () {
+    this.getPartnerMembers();
+  },
   methods: {
-    selected(index: any) {
+    getPartnerMembers() {
+      const members = this.$store.getters['auth/userSessionData'];
+      this.organizations = members.associatedOrganizations;
+    },
+    selected (index: number, partner: PartnerOrganization) {
+      this.$store.dispatch('auth/setActiveContext', partner);
       this.activeIndex = index;
+    },
+    gotoDashBoard () {
+      this.$router.push('/dashboard');
     }
   },
   components: {

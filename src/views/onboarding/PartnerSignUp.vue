@@ -57,6 +57,8 @@
 import { defineComponent } from 'vue';
 import CenteredPageHeader from '../../components/CenteredPageHeader.vue';
 import OnboardingLayout from '../layouts/OnboardingLayout.vue';
+import { extractErrorMessage } from '@/utils/helper';
+import { axiosInstance } from '@/plugins/axios';
 
 export default defineComponent({
   name: 'PartnerSignUp',
@@ -64,9 +66,10 @@ export default defineComponent({
     CenteredPageHeader,
     OnboardingLayout
   },
-  data() {
+  data () {
     return {
       activeIndex: null,
+      loading: false,
       headerTitle: 'Create a partner account',
       headerDescription: 'Select a category to sign up as',
       signupOptions: [
@@ -84,31 +87,38 @@ export default defineComponent({
     };
   },
   methods: {
-    selected(index: any) {
+    selected (index: any) {
       this.activeIndex = index;
     },
-    async handleRedirection() {
+    async handleRedirection () {
       if (this.activeIndex === 0) {
-        try {
-          await this.$axios.post('/v1/partner', { mode: 'company' });
-          this.$router.push({
-            path: 'get-started',
-            query: { type: 'company' }
-          });
-        } catch (error: any) {
-          this.$toast.error(error?.response?.data?.message);
-        }
+        this.$router.push({
+          path: 'get-started',
+          query: { type: 'company' }
+        });
       }
 
       if (this.activeIndex === 1) {
         try {
-          await this.$axios.post('/v1/partner', { mode: 'individual' });
+          this.loading = true;
+
+          await this.$axios.post('/v1/partners', {
+            mode: 'individual'
+          });
+
           this.$router.push({
             path: 'get-started',
             query: { type: 'individual' }
           });
-        } catch (error: any) {
-          this.$toast.error(error?.response?.data?.message);
+        } catch (err) {
+          const errorMessage = extractErrorMessage(
+            err,
+            null,
+            'Oops! An error occurred, please try again.'
+          );
+          this.$toast.error(errorMessage);
+        } finally {
+          this.loading = false;
         }
       }
     }

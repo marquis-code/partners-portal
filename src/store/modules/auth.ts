@@ -1,7 +1,9 @@
 import {StoreOptions} from "vuex";
 import {UserSessionModel} from "@/models/user-session.model";
-import {removeAuthorization, setAuthorization} from "@/plugins/axios";
+import {axiosInstance, removeAuthorization, setAuthorization} from "@/plugins/axios";
 import {LoginResponse} from "@/models/login-response.model";
+import {OnboardingState, PartnerOrganization} from "@/models/organisation.model";
+import {data} from "autoprefixer";
 
 export const USER_SESSION_KEY = 'USER_SESSION';
 /**
@@ -21,24 +23,57 @@ export default <StoreOptions<AuthState>>{
   actions: {
     async authSuccess ({dispatch}, data: LoginResponse) {
       const userSession: UserSessionModel = {
-        token: data.token, user: data
+        token: data.token, user: data,
       };
-      await dispatch('initializeSession', userSession);
+
+      const sessionDataString = localStorage.getItem(USER_SESSION_KEY);
+      const sessionData: UserSessionModel = JSON.parse(sessionDataString || '{}');
+      await dispatch('initializeSession', <UserSessionModel>{ activeContext: sessionData?.activeContext, ...userSession});
     },
     async initializeSession ({dispatch}, data: UserSessionModel) {
       // This method is called after a successful login with login data passed in as response
       // and also when the app is refreshed with a valid user session data in the browser local storage
+
       if (data) {
         setAuthorization(data.token);
+        try {
+          const response = await axiosInstance
+            .get<{data: PartnerOrganization[]}>(`v1/users/${data.user.id}/partner-members`)
+            .then((res) => <PartnerOrganization[]>(res.data.data || []));
+          const statusResponse: any[] =
+            await Promise.all([response.map(org => axiosInstance.get(`/v1/partners/${org.partner.account_sid}/kyc/status`).then(r => <OnboardingState>r.data.data))]);
+          // response.map(async (org, index) => {
+          //   console.log(org, statusResponse[index]);
+          //   org.onboardingState = await statusResponse[index];
+          // });
+
+          await Promise.all([response.map(org => {
+            return axiosInstance.get(`/v1/partners/${org.partner.account_sid}/kyc/status`).then(r => {
+              org.onboardingState = {...<OnboardingState>r.data.data};
+              return <OnboardingState>r.data;
+            });
+          })]);
+          data.associatedOrganizations = response;
+        } catch (e) {
+          console.info('No partners associated');
+        }
         dispatch('setSessionData', data);
-        // Other asynchronous calls can be made here relative to user state
       } else {
         dispatch('clearSessionData');
       }
     },
     setSessionData ({commit}, data: UserSessionModel) {
+      // Auto set active context if user is associated with only a single partner
+      if (!data.activeContext && data.associatedOrganizations?.length === 1) {
+        data.activeContext = data.associatedOrganizations[0];
+      }
       commit('setSession', data);
       localStorage.setItem(USER_SESSION_KEY, JSON.stringify(data));
+    },
+    setActiveContext ({commit, getters}, context: PartnerOrganization) {
+      const session: UserSessionModel = getters.userSessionData;
+      session.activeContext = context;
+      commit('setSession', session);
     },
     clearSessionData ({commit}) {
       commit('setSession', null);
@@ -51,10 +86,13 @@ export default <StoreOptions<AuthState>>{
       return state.sessionData
     },
     user: (state) => {
-      return state.sessionData?.user
+      return state.sessionData?.user;
     },
-    startedOnboarding: (/* state */) => {
-      return true;
+    activeContext: (state: AuthState) => {
+      return state.sessionData?.activeContext;
+    },
+    onboardingCompleted: (/* state */) => {
+      return false;
     },
     completedOnboarding: (state) => {
       return state.sessionData?.onboardComplete
