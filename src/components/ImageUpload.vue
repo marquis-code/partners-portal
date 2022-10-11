@@ -42,7 +42,8 @@
         "
         @click="removeFile"
         >
-        <img src="@/assets/images/export.svg" />
+        <img v-if="uploadType === 'pdf'" src="@/assets/images/pdfUploaded.svg" />
+        <img v-else src="@/assets/images/imageUploaded.svg" />
         <div class="flex flex-col w-full">
             <div class="doc-info-and-delete flex flex-row justify-between">
                 <div>
@@ -74,7 +75,8 @@ export default defineComponent({
       selectedFile: {},
       fileUploaded: false,
       fileName: '',
-      fileSize: ''
+      fileSize: '',
+      uploadType: 'image'
     }
   },
   methods: {
@@ -84,6 +86,9 @@ export default defineComponent({
         this.fileSize = (event.target.files[0].size / 1000000).toFixed(1).toString();
         this.fileUploaded = true;
         this.fileName = event.target.files[0].name;
+        if (event.target.files[0].type === 'application/pdf') {
+          this.uploadType = 'pdf'
+        } else this.uploadType = 'image'
         this.$emit('fileSelected', this.selectedFile);
       } else this.$toast.warning('file must be less than 10 MB')
     },

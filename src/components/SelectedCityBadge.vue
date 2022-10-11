@@ -1,5 +1,5 @@
 <template>
-    <span class="flex flex-row align-middle items-center">
+    <span class="flex flex-row align-middle items-center mb-2">
       <span class=".text-value bg-black text-white p-3 rounded-lg">
         {{value.city.name}}
       </span>
