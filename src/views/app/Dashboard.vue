@@ -1,18 +1,15 @@
 <template>
-  <div class="text-sh-green-500">Dashboard Content Area...coming soon</div>
   <div class="p-10">
-    <ImageUpload :field="'nin'"/>
+    <h1 class="">Dashboard Content Area...coming soon</h1>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import ImageUpload from '@/components/ImageUpload.vue';
 
 export default defineComponent({
   name: 'HomeView',
   components: {
-    ImageUpload
   }
 })
 </script>
