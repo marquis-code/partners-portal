@@ -34,5 +34,6 @@ export interface PartnerOrganization {
   created_at: Date;
   updated_at: Date;
   partner: Partner;
-  onboardingState: OnboardingState | null | undefined;
+  onboardingState: OnboardingState;
+  supportedCities: any[];
 }

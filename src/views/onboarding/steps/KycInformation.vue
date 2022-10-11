@@ -1,21 +1,11 @@
 <template>
   <main class="space-y-5">
     <div class="flex justify-center items-center space-x-4">
-      <p
-        :class="[
-          activeView === 0 ? 'text-grays-black-2' : 'text-grays-black-6'
-        ]"
-        class="text-sm"
-      >
+      <p :class="activeView === 0 ? 'text-grays-black-2' : 'text-grays-black-6'" class="text-sm">
         Identity verification
       </p>
       <img src="@/assets/images/pointer.svg" />
-      <p
-        :class="[
-          activeView === 1 ? 'text-grays-black-2' : 'text-grays-black-6'
-        ]"
-        class="text-sm"
-      >
+      <p :class="activeView === 1 ? 'text-grays-black-2' : 'text-grays-black-6'" class="text-sm">
         Address verification
       </p>
     </div>
@@ -23,30 +13,16 @@
       <div class="flex items-center space-x-2">
         <span class="rounded-full p-1 border-2 border-indigo-500"></span>
         <h1 class="text-grays-black font-medium text-base lg:text-xl">
-          {{
-            activeView === 0 ? 'Identity verification' : 'Address verification'
-          }}
+          {{ activeView === 0 ? 'Identity verification' : 'Address verification' }}
         </h1>
       </div>
-      <small class="text-grays-black-3"
-        >These information will help us know you more</small
-      >
+      <small class="text-grays-black-3">These information will help us know you more</small>
     </div>
 
     <form v-if="activeView === 0">
-      <section
-        class="
-          lg:flex
-          justify-between
-          space-y-3
-          lg:space-y-0 lg:space-x-10
-          items-center
-        "
-      >
+      <section class="lg:flex justify-between space-y-3 lg:space-y-0 lg:space-x-10 items-center">
         <div class="space-y-2 w-full">
-          <label class="text-xs font-medium text-grays-black-5"
-            >Means of Identification</label
-          >
+          <label class="text-xs font-medium text-grays-black-5">Means of Identification</label>
           <select
             class="
               text-sm
@@ -58,34 +34,26 @@
               placeholder-gray-500 placeholder-opacity-25
               ring-1 ring-sh-grey-300
             "
-            @change="handleIdentity"
-            v-model="identityVerification.selectedIdentity"
+            @change="handleIdentityChange()"
+            v-model="v$.identityForm.document.type.$model"
           >
             <option value="" hidden>Select a document type</option>
             <option
               v-for="(identity, index) in identificationOptions"
-              :value="identity"
-              :key="index"
-            >
-              {{ identity }}
+              :value="identity.key"
+              :key="index">
+              {{ identity.label }}
             </option>
           </select>
+          <span class="text-sm font-light text-red-500" v-if="v$.identityForm.document.type.$dirty && v$.identityForm.document.type.required.$invalid">
+          This field is required
+        </span>
         </div>
         <div class="space-y-2 w-full">
-          <label class="text-xs font-medium text-grays-black-5">{{
-            identityVerification.selectedIdentity == 'NIN'
-              ? 'NIN'
-              : identityVerification.selectedIdentity == 'Drivers License'
-              ? 'Drivers License'
-              : identityVerification.selectedIdentity == 'BVN'
-              ? 'BVN'
-              : identityVerification.selectedIdentity == 'Passport'
-              ? 'Passport'
-              : 'Document Name'
-          }}</label>
+          <label class="text-xs font-medium text-grays-black-5">{{ getDocumentLabel }}</label>
           <input
             type="text"
-            v-model="identityVerification.documentNumber"
+            v-model="v$.identityForm.document.document_id.$model"
             class="
               text-xs
               border-none
@@ -98,11 +66,14 @@
             "
             placeholder="Enter document number"
           />
+          <span class="text-sm font-light text-red-500" v-if="v$.identityForm.document.document_id.$dirty && v$.identityForm.document.document_id.required.$invalid">
+            This field is required
+          </span>
         </div>
       </section>
       <section class="flex justify-start space-x-10 items-start">
-        <div class="space-y-2 w-full lg:w-6/12">
-          <label class="text-xs font-medium text-grays-black-5">D.O.B</label>
+        <div class="space-y-2 w-full lg:w-6/12 pr-5">
+          <label class="text-xs font-medium text-grays-black-5">Date Of Birth</label>
           <datepicker
             class="
               text-xs
@@ -115,8 +86,11 @@
               ring-1 ring-gray-300
             "
             placeholder="Choose a date"
-            v-model="identityVerification.dateOfBirth"
+            v-model="v$.identityForm.document.dob.$model"
           />
+          <span class="text-sm font-light text-red-500" v-if="v$.identityForm.document.dob.$dirty && v$.identityForm.document.dob.required.$invalid">
+            This field is required
+          </span>
         </div>
       </section>
     </form>
@@ -126,7 +100,7 @@
         <div class="space-y-2 w-full lg:w-6/12">
           <label class="text-xs font-medium text-grays-black-5">Address</label>
           <input
-            v-model="addressVerification.companyAddress"
+            v-model="v$.addressForm.document.full_address.$model"
             class="
               text-xs
               border-none
@@ -139,19 +113,23 @@
             "
             placeholder="Enter your address"
           />
+          <span class="text-sm font-light text-red-500" v-if="v$.addressForm.document.full_address.$dirty && v$.addressForm.document.full_address.required.$invalid">
+            Please provide a valid address
+          </span>
         </div>
         <div class="space-y-2 w-full relative">
           <label class="text-xs font-medium text-grays-black-5"
             >Upload document (Electricity bill, Waste bill, water bill
             etc)</label
           >
-          <image-upload></image-upload>
+<!--          TODO: Review for a more scalable approach-->
+          <image-upload @fileSelected="selectFile($event)" @fileRemoved="removeFile()"></image-upload>
         </div>
       </section>
     </form>
     <div class="flex justify-end">
       <div class="flex items-center space-x-5">
-        <button
+<!--        <button
           class="
             rounded-md
             w-32
@@ -164,14 +142,11 @@
             ring-1 ring-gray-400
             font-medium
           "
-          v-if="activeView === 0"
-          @click="
-            $emit('goBack');
-            updateInfo();
-          "
+          v-if="activeView === 1"
+          @click="$emit('goBack');"
         >
           Go back
-        </button>
+        </button>-->
         <button
           class="
             rounded-md
@@ -185,7 +160,7 @@
             bg-grays-black-10
           "
           v-if="activeView === 0"
-          @click="next()"
+          @click.prevent="saveIdentityForm()"
         >
           Next
           <img class="ml-2" src="@/assets/images/arrow.svg" />
@@ -205,8 +180,8 @@
             ring-1 ring-gray-400
             font-medium
           "
-          @click="previous()"
-        >
+          v-if="!addressProgress"
+          @click.prevent="previous()">
           Go back
         </button>
         <button
@@ -222,10 +197,7 @@
             bg-grays-black-10
             font-medium
           "
-          @click="
-            $emit('kycCompleted');
-            handleAddress();
-          "
+          @click.prevent="saveAddressForm();"
         >
           Next
           <img class="ml-2" src="@/assets/images/arrow.svg" />
@@ -235,156 +207,208 @@
   </main>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent } from 'vue';
-import { mapActions } from 'vuex';
+import {mapActions, mapGetters} from 'vuex';
 import Datepicker from 'vue3-datepicker';
 import ImageUpload from '@/components/ImageUpload.vue';
-import { required } from '@vuelidate/validators';
-// import moment from 'moment';
+import {email, required} from '@vuelidate/validators';
+import { format } from 'date-fns';
 import { extractErrorMessage } from '@/utils/helper';
+import useVuelidate from "@vuelidate/core";
+import {UserData} from "@/models/user-session.model";
 
-export default defineComponent({
+export default defineComponent<any, any, any>({
   name: 'KycInformation',
   components: { Datepicker, ImageUpload },
-  data() {
+  data () {
     return {
+      v$: useVuelidate(),
+      identityForm: {
+        user: {
+          document_owner_id: null,
+          partner_type: null
+        },
+        document: {
+          document_id: null,
+          type: null,
+          dob: null,
+          fname: null,
+          lname: null
+        }
+      },
+      addressForm: {
+        user: {
+          document_owner_id: null,
+          partner_type: null
+        },
+        document: {
+          full_address: null,
+          files: [],
+        }
+      },
       loading: false,
-      identityVerified: false,
-      addressVerified: false,
-      identityVerification: {
-        selectedIdentity: '',
-        documentNumber: '',
-        dateOfBirth: ''
-      },
-      addressVerification: {
-        companyAddress: ''
-      },
       activeView: 0,
       file: '',
-      selectedIdentity: '',
-      identificationOptions: ['NIN', 'Drivers License', 'BVN', 'Passport']
+      fileData: null,
+      identificationOptions: [
+        {
+          key: 'nin',
+          label: 'NIN',
+          desc: 'National Identification Number'
+        },
+        {
+          key: 'bvn',
+          label: 'BVN',
+          desc: 'Bank Verification Number'
+        },
+        {
+          key: 'drivers-license',
+          label: 'Drivers License',
+          desc: 'Drivers License'
+        },
+        {
+          key: 'passport',
+          label: 'Passport',
+          desc: 'Passport'
+        },
+        {
+          key: 'voters-card',
+          label: 'Voters card',
+          desc: 'Voters Card'
+        }
+      ],
+      selectedIdentityDoc: null,
+      addressProgress: false
     };
   },
-  created() {
-    this.verfifyUploadedData();
-  },
-  validations() {
+  validations () {
     return {
-      identityVerification: {
-        selectedIdentity: { required },
-        documentNumber: { required },
-        dateOfBirth: { required }
+      identityForm: {
+        user: {
+          document_owner_id: { required },
+          partner_type: { required },
+        },
+        document: {
+          document_id: { required },
+          type: { required },
+          dob: { required },
+          fname: { required },
+          lname: { required }
+        }
+      },
+      addressForm: {
+        user: {
+          document_owner_id: { required },
+          partner_type: { required }
+        },
+        document: {
+          full_address: { required },
+        }
       }
     };
   },
+  created () {
+    this.setPageState();
+    this.setFormDefaults();
+  },
   computed: {
-    formattedDate() {
-      return this.identityVerification.dateOfBirth;
+    ...mapGetters({
+      user: 'auth/user',
+      contextOrganization: 'auth/activeContext'
+    }),
+    getDocumentLabel () {
+      if (this.activeView === 0) {
+        return this.identityForm.document.type ? this.selectedIdentityDoc?.desc : 'Document ID';
+      }
+      return '';
     }
   },
   methods: {
-    ...mapActions('auth', ['setSessionData']),
-    setupInterfaceData() {
-      this.activeView = 0;
+    setFormDefaults () {
+      const user: UserData = this.user;
+      this.identityForm.user.document_owner_id = user.id;
+      this.identityForm.user.partner_type = this.$route.query.type;
+      this.identityForm.document.fname = user.fname;
+      this.identityForm.document.lname = user.lname;
+
+      this.addressForm.user.document_owner_id = user.id;
+      this.addressForm.user.partner_type = this.$route.query.type;
     },
-    async verfifyUploadedData() {
-      try {
-        const response = await this.$axios.get(
-          '/v1/identity/partner/2/verification'
-        );
-        response?.data?.data?.forEach((eachData) => {
-          if (eachData.document_type !== null) {
-            this.identityVerified = true;
-          } else {
-            this.identityVerified = false;
-          }
-        });
-      } catch (err) {
-        const errorMessage = extractErrorMessage(
-          err,
-          null,
-          'Oops! An error occurred, please try again.'
-        );
-        this.$toast.error(errorMessage);
-      }
-      console.log(this.identityVerified);
-    },
-    async next() {
-      // this.v$.identityVerification.$touch();
-      // if (this.loading || this.v$.identityVerification.$errors.length) {
-      //   return;
-      // }
-      const payload = {
-        user: {
-          document_owner_id: 1,
-          partner_type: this.$route.query.type
-        },
-        document: {
-          document_id: this.identityVerification.documentNumber,
-          type: this.identityVerification.selectedIdentity.toLowerCase(),
-          dob: this.formattedDate,
-          fname: 'dominic',
-          lname: 'olije'
-        }
-      };
-      console.log(payload);
-      if (this.identityVerified === false) {
-        try {
-          this.loading = true;
-          await this.$axios.post(
-            '/v1/identity/partner/2/verification',
-            payload
-          );
-          this.activeView += 1;
-        } catch (err) {
-          const errorMessage = extractErrorMessage(
-            err,
-            null,
-            'Oops! An error occurred, please try again.'
-          );
-          this.$toast.error(errorMessage);
-        } finally {
-          this.loading = false;
-        }
-      } else {
-        this.$toast.error('Verification has already been complete');
-      }
-    },
-    previous() {
+    previous () {
       this.activeView -= 1;
     },
-    goBack() {
-      console.log('Hello');
-    },
-    async updateInfo() {
-      // try {
-      //  const response = await this.$axios.get('https://eb2e-41-58-214-179.ngrok.io/v1/identity/partner/2/verification')
-      // } catch (error) {
-
-      // }finally {
-
-      // }
-      // let response = await this.$axios.patch('/updateIdentity', this.identityVerification);
-      // console.log(response);
-      console.log('Reverting...');
-    },
-    handleAddress() {
-      console.log(this.addressVerification);
-    },
-    uploadFile() {
+    uploadFile () {
       this.file = this.$refs.avatar.files[0];
-
       const reader = new FileReader();
-
       reader.addEventListener('load', (fileLoadedEvent) => {
-        const avatar = fileLoadedEvent.target.result;
-
+        const avatar = fileLoadedEvent.target?.result;
         this.uploadingAvatar = true;
       });
-
       reader.readAsDataURL(this.file);
+    },
+    handleIdentityChange () {
+      this.selectedIdentityDoc = this.identificationOptions.find((obj: any) => obj.key === this.identityForm.document.type);
+    },
+    async saveIdentityForm () {
+      this.v$.identityForm.$touch();
+      // console.log(this.identityForm);
+      if (this.loading || this.v$.identityForm.$errors.length) {
+        return;
+      }
+      try {
+        this.loading = true;
+        await this.$axios.post(`/v1/partners/${this.contextOrganization.account_sid}/identity-verification`, this.identityForm);
+        await this.$store.dispatch('auth/refreshActiveContext', this.user.id);
+        this.activeView += 1;
+      } catch (err) {
+        const errorMessage = extractErrorMessage(err, null, 'Oops! An error occurred, please try again.');
+        this.$toast.error(errorMessage);
+      } finally {
+        this.loading = false;
+      }
+    },
+    async saveAddressForm () {
+      this.v$.addressForm.$touch();
+      console.log(this.addressForm);
+      if (this.loading || this.v$.addressForm.$errors.length) {
+        return;
+      }
+      if(!this.file) {
+        this.$toast.error('Kindly select a file');
+      }
+      try {
+        this.loading = true;
+        const formData = new FormData();
+        formData.append('file', this.file);
+
+        const response = await this.$axios.post(`/v1/upload/identity/files`, formData);
+        if(response.data?.files?.length) {
+          this.addressForm.document.files = [response.data.files[0].Location];
+        }
+        await this.$axios.post(`/v1/partners/${this.contextOrganization.account_sid}/address-verification`, this.addressForm);
+        await this.$store.dispatch('auth/refreshActiveContext', this.user.id);
+        this.$emit('kycCompleted');
+      } catch (err) {
+        const errorMessage = extractErrorMessage(err, null, 'Oops! An error occurred, please try again.');
+        this.$toast.error(errorMessage);
+      } finally {
+        this.loading = false;
+      }
+    },
+    setPageState () {
+      const identityFormStatus = this.contextOrganization.onboardingState.identity;
+      if (this.contextOrganization && (identityFormStatus === 'completed')) {
+        this.activeView = 1;
+        this.addressProgress = true;
+      }
+    },
+    selectFile ($event: File) {
+      this.file = $event;
+    },
+    removeFile () {
+      this.file = '';
     }
-  }
+  },
 });
 </script>

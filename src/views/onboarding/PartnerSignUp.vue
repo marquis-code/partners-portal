@@ -45,9 +45,10 @@
         p-3
         items-center
       "
+      :disabled="loading"
       @click="handleRedirection"
     >
-      Proceed
+      {{ loading ? 'Processing' : 'Proceed' }}
       <img class="ml-1" src="@/assets/images/arrow.svg" />
     </button>
   </OnboardingLayout>
@@ -58,7 +59,9 @@ import { defineComponent } from 'vue';
 import CenteredPageHeader from '../../components/CenteredPageHeader.vue';
 import OnboardingLayout from '../layouts/OnboardingLayout.vue';
 import { extractErrorMessage } from '@/utils/helper';
-import { axiosInstance } from '@/plugins/axios';
+import { mapGetters } from 'vuex';
+import { UserData } from '@/models/user-session.model';
+import {Partner, PartnerOrganization} from "@/models/organisation.model";
 
 export default defineComponent({
   name: 'PartnerSignUp',
@@ -81,10 +84,16 @@ export default defineComponent({
         {
           title: 'An Individual',
           description:
-            'You own a company that rents vehicles for an agreed time and fee.'
+            'You are not a company but you rent out one or more vehicles for an agreed time and fee.'
         }
       ]
     };
+  },
+  computed: {
+    ...mapGetters({
+      user: 'auth/user',
+      userSessionData: 'auth/userSessionData'
+    }),
   },
   methods: {
     selected (index: any) {
@@ -92,30 +101,19 @@ export default defineComponent({
     },
     async handleRedirection () {
       if (this.activeIndex === 0) {
-        this.$router.push({
-          path: 'get-started',
-          query: { type: 'company' }
-        });
+        this.$router.push({ path: 'get-started', query: { type: 'business' }});
       }
 
       if (this.activeIndex === 1) {
         try {
           this.loading = true;
-
-          await this.$axios.post('/v1/partners', {
-            mode: 'individual'
-          });
-
-          this.$router.push({
-            path: 'get-started',
-            query: { type: 'individual' }
-          });
+          const response = await this.$axios.post('/v1/partners', { mode: 'individual'});
+          if (response.data) {
+            await this.$store.dispatch('auth/refreshActiveContext', this.user.id);
+            await this.$router.push({ name: 'GetStarted', query: { type: 'individual' }});
+          }
         } catch (err) {
-          const errorMessage = extractErrorMessage(
-            err,
-            null,
-            'Oops! An error occurred, please try again.'
-          );
+          const errorMessage = extractErrorMessage(err, null, 'Oops! An error occurred, please try again.');
           this.$toast.error(errorMessage);
         } finally {
           this.loading = false;

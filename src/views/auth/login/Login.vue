@@ -52,12 +52,6 @@ export default defineComponent({
   },
   created () {
     this.fetchCountries();
-    // console.log(this.$shModal);
-    // this.$shModal.open({
-    //   description: "Test Description",
-    //   title: "Test",
-    //   type: 'error'
-    // });
   },
   methods: {
     setOtpActive (value: string) {

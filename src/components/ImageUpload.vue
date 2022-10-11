@@ -89,6 +89,7 @@ export default defineComponent({
         if (event.target.files[0].type === 'application/pdf') {
           this.uploadType = 'pdf'
         } else this.uploadType = 'image'
+        this.$emit('fileSelected', this.selectedFile);
       } else this.$toast.warning('file must be less than 10 MB')
     },
     isFileSizeOk (fileSizeInBytes : number) : boolean {
@@ -101,6 +102,7 @@ export default defineComponent({
       this.fileUploaded = false;
       this.fileName = '';
       this.fileSize = '';
+      this.$emit('fileRemoved');
     }
   },
 });

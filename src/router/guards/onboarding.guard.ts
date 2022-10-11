@@ -17,22 +17,32 @@ export class OnboardingGuard implements RouteGuard {
     const isOnboardingRoute = to.matched.some(route => route.meta.isOnboardingRoute);
     const kycFormCompleted = contextOrg && contextOrg.onboardingState?.address && contextOrg.onboardingState?.identity &&
       contextOrg.onboardingState?.address !== 'not-submitted' && contextOrg.onboardingState?.identity !== 'not-submitted';
-    const onboardingComplete = !!(contextOrg?.partner?.city_id && kycFormCompleted);
+    const onboardingComplete = !!(contextOrg?.supportedCities?.length && kycFormCompleted);
     const hasOrgs = sessionData?.associatedOrganizations?.length;
+
+    if (onboardingComplete) {
+      return true;
+    }
 
     if (contextOrg && isOnboardingRoute && !onboardingComplete) {
       if (to.name !== 'citySelection' && kycFormCompleted) {
         next({
           name: 'citySelection',
-          query: {progress: 'true'}
+          query: { progress: 'true' }
         });
         return false;
       }
       if (to.name !== 'GetStarted' && contextOrg.onboardingState?.identity !== 'not-submitted') {
         next({
           name: 'GetStarted',
-          query: {progress: 'true', state: 'address'},
-          params: {type: contextOrg.partner.mode}
+          query: {state: 'identity', type: contextOrg.partner.mode},
+        });
+        return false;
+      }
+      if (to.name !== 'GetStarted' && contextOrg.onboardingState?.address !== 'not-submitted') {
+        next({
+          name: 'GetStarted',
+          query: {state: 'address', type: contextOrg.partner.mode},
         });
         return false;
       }
