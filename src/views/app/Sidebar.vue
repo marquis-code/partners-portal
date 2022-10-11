@@ -63,7 +63,7 @@
           class="w-10 h-10 mr-2"
           :class="isSidebarFolded && 'text-center mr-0'"
         >
-        <span v-if="!isSidebarFolded" class="text-sm font-medium">{{`Daniel Sumah`}}</span>
+        <span v-if="!isSidebarFolded && user" class="text-sm font-medium">{{user.fname}}</span>
       </div>
       <span v-if="!isSidebarFolded" class="material-icons">
         logout
@@ -73,6 +73,7 @@
 </template>
 <script lang="ts">
 import {defineComponent} from 'vue';
+import {mapGetters} from "vuex";
 export default defineComponent({
   name: "Sidebar",
   data() {
@@ -87,7 +88,7 @@ export default defineComponent({
             {title: 'Dashboard', icon: 'home', selected: true},
             {title: 'Drivers', icon: 'group', selected: false},
             {title: 'Vehicles', icon: 'directions_car', selected: false},
-            {title: 'Earning', icon: 'payments', selected: false}
+            {title: 'Earnings', icon: 'payments', selected: false}
           ],
         },
         {
@@ -101,9 +102,13 @@ export default defineComponent({
   },
   created() {
     window.addEventListener('resize', this.checkScreen)
-    this.checkScreen()
+    this.checkScreen();
+  },
+  computed: {
+    ...mapGetters({user: 'auth/user'}),
   },
   methods: {
+    // TODO (Tobi): Refactor component implementation
     selectThisSection(groupIndex: number, itemIndex: number) {
       for (let index = 0; index < this.menuGroup.length; index++) {
         const groupMenus = this.menuGroup[index].menus;

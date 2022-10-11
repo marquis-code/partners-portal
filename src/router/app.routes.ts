@@ -32,43 +32,43 @@ export const AppRoutes: Array<RouteRecordRaw> = [
         meta: {
           title: 'Dashboard'
         }
+      },
+      {
+        path: '/drivers',
+        name: 'drivers',
+        component: Drivers,
+        meta: {
+          title: 'Drivers',
+          requiresAuth: false
+        }
+      },
+      {
+        path: '/vehicles',
+        name: 'vehicles',
+        component: Vehicles,
+        meta: {
+          title: 'Vehicles',
+          requiresAuth: false
+        }
+      },
+      {
+        path: '/earnings',
+        name: 'earnings',
+        component: Earnings,
+        meta: {
+          title: 'Earnings',
+          requiresAuth: false
+        }
+      },
+      {
+        path: '/settings',
+        name: 'settings',
+        component: Settings,
+        meta: {
+          title: 'Settings',
+          requiresAuth: false
+        }
       }
     ]
   },
-  {
-    path: '/drivers',
-    name: 'drivers',
-    component: Drivers,
-    meta: {
-      title: 'Drivers',
-      requiresAuth: false
-    }
-  },
-  {
-    path: '/vehicles',
-    name: 'vehicles',
-    component: Vehicles,
-    meta: {
-      title: 'Vehicles',
-      requiresAuth: false
-    }
-  },
-  {
-    path: '/earnings',
-    name: 'earnings',
-    component: Earnings,
-    meta: {
-      title: 'Earnings',
-      requiresAuth: false
-    }
-  },
-  {
-    path: '/settings',
-    name: 'settings',
-    component: Settings,
-    meta: {
-      title: 'Settings',
-      requiresAuth: false
-    }
-  }
 ]
