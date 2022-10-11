@@ -241,7 +241,7 @@ import { mapActions } from 'vuex';
 import Datepicker from 'vue3-datepicker';
 import ImageUpload from '@/components/ImageUpload.vue';
 import { required } from '@vuelidate/validators';
-// import moment from 'moment';
+import { format } from 'date-fns';
 import { extractErrorMessage } from '@/utils/helper';
 
 export default defineComponent({
@@ -263,7 +263,13 @@ export default defineComponent({
       activeView: 0,
       file: '',
       selectedIdentity: '',
-      identificationOptions: ['NIN', 'Drivers License', 'BVN', 'Passport']
+      identificationOptions: [
+        'NIN',
+        'Drivers License',
+        'BVN',
+        'Passport',
+        'Voters Card'
+      ]
     };
   },
   created() {
@@ -311,10 +317,7 @@ export default defineComponent({
       console.log(this.identityVerified);
     },
     async next() {
-      // this.v$.identityVerification.$touch();
-      // if (this.loading || this.v$.identityVerification.$errors.length) {
-      //   return;
-      // }
+      // const authUser: UserData = this.$store.getters['auth/user']
       const payload = {
         user: {
           document_owner_id: 1,
@@ -324,8 +327,8 @@ export default defineComponent({
           document_id: this.identityVerification.documentNumber,
           type: this.identityVerification.selectedIdentity.toLowerCase(),
           dob: this.formattedDate,
-          fname: 'dominic',
-          lname: 'olije'
+          fname: 'marquis',
+          lname: 'abah'
         }
       };
       console.log(payload);
@@ -351,6 +354,31 @@ export default defineComponent({
         this.$toast.error('Verification has already been complete');
       }
     },
+    async handleAddress() {
+      // console.log(this.addressVerification);
+      if (this.addressVerified === false) {
+        try {
+          this.loading = true;
+          await this.$axios.post(
+            '/v1/identity/partner/2/verification',
+            this.addressVerification
+          );
+          // this.activeView += 1;
+        } catch (err) {
+          const errorMessage = extractErrorMessage(
+            err,
+            null,
+            'Oops! An error occurred, please try again.'
+          );
+          this.$toast.error(errorMessage);
+        } finally {
+          this.loading = false;
+        }
+      } else {
+        this.activeView += 1;
+        this.$toast.info('KYC identity Verification has already been complete');
+      }
+    },
     previous() {
       this.activeView -= 1;
     },
@@ -358,19 +386,7 @@ export default defineComponent({
       console.log('Hello');
     },
     async updateInfo() {
-      // try {
-      //  const response = await this.$axios.get('https://eb2e-41-58-214-179.ngrok.io/v1/identity/partner/2/verification')
-      // } catch (error) {
-
-      // }finally {
-
-      // }
-      // let response = await this.$axios.patch('/updateIdentity', this.identityVerification);
-      // console.log(response);
       console.log('Reverting...');
-    },
-    handleAddress() {
-      console.log(this.addressVerification);
     },
     uploadFile() {
       this.file = this.$refs.avatar.files[0];
