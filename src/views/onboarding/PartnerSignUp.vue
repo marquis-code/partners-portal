@@ -101,7 +101,7 @@ export default defineComponent({
     },
     async handleRedirection () {
       if (this.activeIndex === 0) {
-        this.$router.push({ path: 'get-started', query: { type: 'business' }});
+        this.$router.push({ name: 'GetStarted', query: { type: 'company' }});
       }
 
       if (this.activeIndex === 1) {
