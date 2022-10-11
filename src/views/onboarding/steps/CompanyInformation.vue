@@ -135,7 +135,7 @@
           v-model="formData.experience_start_date"
         />
       </div>
-      <div class="space-y-2 w-full">
+      <div class="space-y-2 w-full lg:w-6/12 pr-1">
         <label class="text-xs font-medium text-grays-black-5"
           >Company email</label
         >

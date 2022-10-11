@@ -35,7 +35,7 @@
             :class="[
               currentStep === 1 ? 'bg-grays-black-2' : 'bg-grays-black-7'
             ]"
-            >{{ routeType === 'company' ? '2' : '1' }}</span
+            >{{ routeType === 'business' ? '2' : '1' }}</span
           >
           <p class="lg:text-base text-sm">Kyc verification</p>
         </div>
