@@ -160,9 +160,10 @@
             bg-grays-black-10
           "
           v-if="activeView === 0"
+          :disabled="loading"
           @click.prevent="saveIdentityForm()"
         >
-          Next
+          {{loading ? 'Saving' : 'Next'}}
           <img class="ml-2" src="@/assets/images/arrow.svg" />
         </button>
       </div>
@@ -197,9 +198,10 @@
             bg-grays-black-10
             font-medium
           "
+          :disabled="loading"
           @click.prevent="saveAddressForm();"
         >
-          Next
+          {{loading ? 'Saving' : 'Next'}}
           <img class="ml-2" src="@/assets/images/arrow.svg" />
         </button>
       </div>
@@ -333,7 +335,7 @@ export default defineComponent<any, any, any>({
       this.identityForm.document.lname = user.lname;
 
       this.addressForm.user.document_owner_id = user.id;
-      this.addressForm.user.partner_type = this.$route.query.type;
+      this.addressForm.user.partner_type = this.$route.query.type === 'individual' ? 'individual' : 'business';
     },
     previous () {
       this.activeView -= 1;
@@ -390,7 +392,7 @@ export default defineComponent<any, any, any>({
         await this.$store.dispatch('auth/refreshActiveContext', this.user.id);
         setTimeout(() => {
           this.$router.push({name: 'citySelection'});
-        }, 1000);
+        }, 200);
       } catch (err) {
         const errorMessage = extractErrorMessage(err, null, 'Oops! An error occurred, please try again.');
         this.$toast.error(errorMessage);
