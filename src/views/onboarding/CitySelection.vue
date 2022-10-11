@@ -86,7 +86,7 @@ export default {
       });
     },
     async savePartnerCities () {
-      if (!this.selectedCities.length) {
+      if (this.selectedCities.length) {
         try {
           this.loading = true;
           console.log(this.selectedCities);
