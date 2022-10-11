@@ -9,12 +9,22 @@ import store from '@/store';
 import {OnboardingGuard} from "@/router/guards/onboarding.guard";
 import LandingPage from "@/views/LandingPage.vue";
 import {ContextGuard} from "@/router/guards/context.guard";
+import MemberInvite from "@/views/MemberInvite.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     name: 'splash',
     component: LandingPage,
+    meta: {
+      requiresAuth: false,
+      openPage: true
+    }
+  },
+  {
+    path: '/invitations',
+    name: 'invitations',
+    component: MemberInvite,
     meta: {
       requiresAuth: false,
       openPage: true

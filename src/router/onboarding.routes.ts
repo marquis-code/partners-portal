@@ -1,7 +1,7 @@
 import PartnerSignUp from "@/views/onboarding/PartnerSignUp.vue";
 import GetStarted from "@/views/onboarding/GetStarted.vue";
 import citySelection from "@/views/onboarding/CitySelection.vue";
-import UserSelection from "@/views/onboarding/UserSelection.vue";
+import UserSelection from "@/views/app/OrganizationSelection.vue";
 
 export const OnboardRoutes: Array<any> = [
   {

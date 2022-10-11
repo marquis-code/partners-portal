@@ -1,8 +1,8 @@
 /* eslint-disable */
 
 import {App, createApp, h} from "vue";
-import {ModalOptions} from "@/libs/modals/full-modal-options";
-import ShFullModalComponent from "@/libs/modals/ShFullModalComponent.vue";
+import {ModalOptions} from "@/libs/modals/modal-options";
+import ShFullModalComponent from "@/libs/modals/components/ShFullModalComponent.vue";
 import './styles/sh-modal.scss';
 export interface ShModal {
   open(modalOptions: ModalOptions): void;

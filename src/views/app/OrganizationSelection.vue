@@ -46,7 +46,7 @@
           >{{ organization.partner.company_name.slice(0, 1) }}</small
         >
         <h1 class="text-sh-grey-900 font-bold text-center md:text-sm">{{ organization.partner.company_name }}</h1>
-        <p class="text-xs text-grays-black-5 text-center">{{ 'Company' }}</p>
+        <p class="text-xs text-grays-black-5 text-center">{{ getOrganizationRole(organization.role) }}</p>
       </div>
     </section>
     <button
@@ -76,7 +76,7 @@ import OnboardingLayout from '@/views/layouts/OnboardingLayout.vue';
 import CenteredPageHeader from '@/components/CenteredPageHeader.vue';
 import {PartnerOrganization} from "@/models/organisation.model";
 export default defineComponent({
-  name: 'UserSelection',
+  name: 'OrganizationSelection',
   data () {
     return {
       title: 'Who\'s using Shuttlers?',
@@ -99,6 +99,18 @@ export default defineComponent({
     },
     gotoDashBoard () {
       this.$router.push('/dashboard');
+    },
+    getOrganizationRole (role: PartnerOrganization['role']) {
+      switch (role) {
+        case "owner":
+          return 'Owner'
+        case "admin":
+          return 'Admin'
+        case "staff":
+          return 'Staff'
+        case "super-admin":
+          return 'Super Admin'
+      }
     }
   },
   components: {

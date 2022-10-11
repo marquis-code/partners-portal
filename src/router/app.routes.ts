@@ -1,7 +1,7 @@
 import {RouteRecordRaw} from "vue-router";
 import HomeView from "@/views/app/HomeView.vue";
 import Dashboard from "@/views/app/Dashboard.vue";
-import UserSelection from "@/views/onboarding/UserSelection.vue";
+import UserSelection from "@/views/app/OrganizationSelection.vue";
 
 export const AppRoutes: Array<RouteRecordRaw> = [
   {
