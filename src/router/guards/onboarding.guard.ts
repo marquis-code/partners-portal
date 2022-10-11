@@ -21,7 +21,6 @@ export class OnboardingGuard implements RouteGuard {
     const hasOrgs = sessionData?.associatedOrganizations?.length;
 
     if (contextOrg && isOnboardingRoute && !onboardingComplete) {
-      debugger;
       if (to.name !== 'citySelection' && kycFormCompleted) {
         next({
           name: 'citySelection',

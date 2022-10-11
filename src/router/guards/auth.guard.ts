@@ -12,8 +12,6 @@ export class AuthGuard implements RouteGuard {
   handle (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext): boolean {
     const requiresAuth = to.matched.some(route => route.meta.requiresAuth);
     const isLoggedIn = this.store.getters["auth/isLoggedIn"];
-    console.log('Auth', to.name);
-    debugger;
     if (!isLoggedIn && requiresAuth) {
       this.store.dispatch('auth/clearSessionData');
       next({

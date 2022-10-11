@@ -3,7 +3,6 @@ import {UserSessionModel} from "@/models/user-session.model";
 import {axiosInstance, removeAuthorization, setAuthorization} from "@/plugins/axios";
 import {LoginResponse} from "@/models/login-response.model";
 import {OnboardingState, PartnerOrganization} from "@/models/organisation.model";
-import {data} from "autoprefixer";
 
 export const USER_SESSION_KEY = 'USER_SESSION';
 /**
@@ -40,13 +39,6 @@ export default <StoreOptions<AuthState>>{
           const response = await axiosInstance
             .get<{data: PartnerOrganization[]}>(`v1/users/${data.user.id}/partner-members`)
             .then((res) => <PartnerOrganization[]>(res.data.data || []));
-          const statusResponse: any[] =
-            await Promise.all([response.map(org => axiosInstance.get(`/v1/partners/${org.partner.account_sid}/kyc/status`).then(r => <OnboardingState>r.data.data))]);
-          // response.map(async (org, index) => {
-          //   console.log(org, statusResponse[index]);
-          //   org.onboardingState = await statusResponse[index];
-          // });
-
           await Promise.all([response.map(org => {
             return axiosInstance.get(`/v1/partners/${org.partner.account_sid}/kyc/status`).then(r => {
               org.onboardingState = {...<OnboardingState>r.data.data};
@@ -91,8 +83,8 @@ export default <StoreOptions<AuthState>>{
     activeContext: (state: AuthState) => {
       return state.sessionData?.activeContext;
     },
-    onboardingCompleted: (/* state */) => {
-      return false;
+    hasOrganizations: (state: AuthState) => {
+      return !!state.sessionData?.associatedOrganizations?.length;
     },
     completedOnboarding: (state) => {
       return state.sessionData?.onboardComplete
