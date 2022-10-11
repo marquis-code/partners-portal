@@ -19,27 +19,26 @@ export class OnboardingGuard implements RouteGuard {
       contextOrg.onboardingState?.address !== 'not-submitted' && contextOrg.onboardingState?.identity !== 'not-submitted';
     const onboardingComplete = !!(contextOrg?.supportedCities?.length && kycFormCompleted);
     const hasOrgs = sessionData?.associatedOrganizations?.length;
-
     if (onboardingComplete) {
       return true;
     }
 
     if (contextOrg && isOnboardingRoute && !onboardingComplete) {
-      if (to.name !== 'citySelection' && kycFormCompleted) {
+      if (to.name !== 'citySelection' && kycFormCompleted && !contextOrg.supportedCities?.length) {
         next({
           name: 'citySelection',
           query: { progress: 'true' }
         });
         return false;
       }
-      if (to.name !== 'GetStarted' && contextOrg.onboardingState?.identity !== 'not-submitted') {
+      if (to.name !== 'GetStarted' && contextOrg.onboardingState?.identity !== 'not-submitted' && !kycFormCompleted) {
         next({
           name: 'GetStarted',
           query: {state: 'identity', type: contextOrg.partner.mode},
         });
         return false;
       }
-      if (to.name !== 'GetStarted' && contextOrg.onboardingState?.address !== 'not-submitted') {
+      if (to.name !== 'GetStarted' && contextOrg.onboardingState?.address !== 'not-submitted' && !kycFormCompleted) {
         next({
           name: 'GetStarted',
           query: {state: 'address', type: contextOrg.partner.mode},
