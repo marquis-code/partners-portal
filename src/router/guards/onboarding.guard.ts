@@ -19,6 +19,7 @@ export class OnboardingGuard implements RouteGuard {
       contextOrg.onboardingState?.address !== 'not-submitted' && contextOrg.onboardingState?.identity !== 'not-submitted';
     const onboardingComplete = !!(contextOrg?.supportedCities?.length && kycFormCompleted);
     const hasOrgs = sessionData?.associatedOrganizations?.length;
+    debugger;
 
     if (onboardingComplete && isOnboardingRoute) {
       next({
@@ -28,6 +29,7 @@ export class OnboardingGuard implements RouteGuard {
     }
 
     if (contextOrg && isOnboardingRoute && !onboardingComplete) {
+      // if kyc is completed and cities of operation not yet set, then redirect to city selection
       if (to.name !== 'citySelection' && kycFormCompleted && !contextOrg.supportedCities.length) {
         next({
           name: 'citySelection',
@@ -35,14 +37,18 @@ export class OnboardingGuard implements RouteGuard {
         });
         return false;
       }
-      if (to.name !== 'GetStarted' && contextOrg.onboardingState?.identity !== 'not-submitted' && !kycFormCompleted) {
+
+      // If business type selected kyc identity is not submitted redirect to get started page with identity form
+      if (to.name !== 'GetStarted' && !(contextOrg.onboardingState?.identity !== 'not-submitted') && !kycFormCompleted) {
         next({
           name: 'GetStarted',
           query: {state: 'identity', type: contextOrg.partner.mode},
         });
         return false;
       }
-      if (to.name !== 'GetStarted' && contextOrg.onboardingState?.address !== 'not-submitted' && !kycFormCompleted) {
+
+      // If business type selected kyc address is not submitted redirect to get started page with address form
+      if (to.name !== 'GetStarted' && !(contextOrg.onboardingState?.address !== 'not-submitted') && !kycFormCompleted) {
         next({
           name: 'GetStarted',
           query: {state: 'address', type: contextOrg.partner.mode},
@@ -52,7 +58,7 @@ export class OnboardingGuard implements RouteGuard {
       return true;
     }
 
-    if (!isOnboardingRoute && ((!hasOrgs && to.name !== 'PartnerSignUp') || (contextOrg && to.name !== 'PartnerSignUp' && !onboardingComplete))) {
+    if (!isOnboardingRoute && to.name !== 'PartnerSignUp' && (!hasOrgs || (contextOrg && !onboardingComplete))) {
       next({
         name: 'PartnerSignUp'
       });

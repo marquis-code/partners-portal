@@ -50,7 +50,7 @@
 
       <div class="flex justify-center items-center space-x-2 text-sm md:text-base font-medium">
         <span class="text-grays-black-3">Do you want to be a partner?</span>
-        <a :href="signUpLink" class="text-indigo-600 text-sm md:text-base">Join now</a>
+        <router-link to="/register" class="text-indigo-600 text-sm md:text-base">Join now</router-link>
       </div>
     </div>
   </form>

@@ -17,11 +17,11 @@
         v-for="({ title, description }, index) in signupOptions"
         :key="index"
         :class="[
-          activeIndex == index
+          activeIndex === index
             ? 'bg-sh-green-100 ring-1 ring-sh-green-500'
             : 'bg-sh-grey-50 ring-1 ring-gray-300'
         ]"
-        class="p-6 py-9 rounded-md space-y-3 cursor-pointer"
+        class="p-6 py-9 rounded-md space-y-3 cursor-pointer max-w-xs"
       >
         <img src="@/assets/images/shuttle.svg" />
         <h1 class="text-sh-grey-900 font-bold">{{ title }}</h1>
