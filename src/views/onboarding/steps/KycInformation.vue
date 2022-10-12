@@ -197,8 +197,7 @@
             items-center
             p-3
             px-5
-            text-sm text-grays-black-5
-            bg-grays-black-10
+            text-sm
             font-medium
           "
           :disabled="v$.addressForm.$invalid || loading"
