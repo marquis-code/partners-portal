@@ -1,42 +1,35 @@
 <template>
     <OnboardingLayout>
-      <CenteredPageHeader :title="'What cities do you operate in?'" :description="'We would love to know your country, in order to proceed.'" />
+      <CenteredPageHeader :title="'What cities do you operate in?'" :description="'We would love to know the cities you operate in, in order to proceed.'" />
       <FormContainer>
-        <form class="w-96 h-64">
+        <form class="w-full max-w-xl mx-auto">
           <div class="flex flex-col">
             <div class="flex flex-col space-y-2">
-                <label class="text-grays-black-5 font-medium text-sm"
-                    >Cities</label
-                >
+                <label class="text-grays-black-5 font-medium text-sm">Cities (Select Multiple Cities)</label>
                   <select
-                    type="email"
-                    class="max-w-96 py-3 px-5 border-none placeholder:text-grays-black-7
+                    class="py-3 px-5 border-none placeholder:text-grays-black-7
                     outline-none ring-1 border text-sm rounded-md placeholder-opacity-50"
-                    @change="selectThisCity($event)"
-                    >
+                    @change="selectThisCity($event)">
                     <option disabled selected>Select a City</option>
                     <option
                       v-for="(city,index) in cities"
                       :key="index"
-                      :value="index"
-                    >
-                      {{city.city}}
+                      :value="index">
+                      {{city.city.name}}
                     </option>
                 </select>
                 </div>
-                <span class="text-sh-purple-700 mt-4 text-xs" v-if="selectedCities.length> 0">You can select multiple cities</span>
-                <span class="flex flex-row flex-wrap mt-6">
-                <span v-for="city in selectedCities" :key="city.city" class="mr-4">
-                  <SelectedCityBadge
-                    @removeSelectedCity="removeThisCity(city.city)"
-                    :value="city.city" >
-                  </SelectedCityBadge>
+            <div class="mt-4 flex flex-wrap">
+                <span v-for="(city, index) in selectedCities" :key="city.city.id">
+                  <SelectedCityBadge class="mr-2" :value="city" @removeCity="removeCity(index)"></SelectedCityBadge>
                 </span>
-              </span>
+            </div>
                 <button
+                  :disabled="loading || loadingData"
+                  @click.prevent="savePartnerCities()"
                     type="button"
                     class="bg-sh-green-500 border-none outline-none py-3 rounded-md text-sm flex justify-center items-center w-full mt-11">
-                    Proceed
+                  {{ loading ? 'Saving...' : 'Proceed' }}
                     <img class="ml-2" src="@/assets/images/arrow.svg" />
                 </button>
             </div>
@@ -49,26 +42,17 @@ import OnboardingLayout from '@/views/layouts/OnboardingLayout.vue';
 import FormContainer from '@/views/layouts/FormContainer.vue';
 import CenteredPageHeader from '@/components/CenteredPageHeader.vue'
 import SelectedCityBadge from '@/components/SelectedCityBadge.vue'
+import {mapGetters} from "vuex";
+import {extractErrorMessage} from "@/utils/helper";
 export default {
   name: 'CitySelection',
   data () {
     return {
       selectedCities: [],
       selectedIndex: -1,
-      cities: [
-        {
-          city: 'Lagos'
-        },
-        {
-          city: 'Ogun'
-        },
-        {
-          city: 'Abuja'
-        },
-        {
-          city: 'Ibadan'
-        },
-      ]
+      cities: [],
+      loading: false,
+      loadingData: false,
     }
   },
   components: {
@@ -77,32 +61,56 @@ export default {
     CenteredPageHeader,
     SelectedCityBadge
   },
+  created () {
+    this.fetchCities();
+  },
+  computed: {
+    ...mapGetters({
+      contextOrg: 'auth/activeContext',
+      user: 'auth/user'
+    })
+  },
   methods: {
-    selectThisCity(event) {
-      if (this.selectedCities.length > 0) {
-        if (!this.selectedThisCityBefore(event.target.value)) {
-          const newAddition = this.cities[event.target.value];
-          this.selectedCities.push(newAddition);
-        } else this.$toast.warning('You cannot select a city twice');
-      } else {
-        const newAddition = this.cities[event.target.value];
-        this.selectedCities.push(newAddition);
+    selectThisCity (event) {
+      const newAddition = this.cities[event.target.value];
+      const index = this.selectedCities.findIndex(o => o.city.id === newAddition?.city.id);
+      if(index < 0) {
+        this.selectedCities.push(newAddition)
       }
     },
-    removeThisCity(cityName) {
-      const index = this.selectedCities.findIndex(city => city.city === `${cityName}`);
+    fetchCities () {
+      this.loadingData = true;
+      this.$axios.get('/v1/city').then(res => {
+        this.cities = res.data.data;
+      }).finally(() => {
+        this.loadingData = false;
+      });
+    },
+    async savePartnerCities () {
+      if (this.selectedCities.length) {
+        try {
+          this.loading = true;
+          await Promise.all([...(this.selectedCities.map(city =>
+            this.$axios.post(`v1/partners/${this.contextOrg?.partner?.id}/cities`, {city_id: city.id})))]);
+          await this.$store.dispatch('auth/refreshActiveContext', this.user.id);
+          this.$toast.success('Partner account created');
+          await this.$router.push({name: 'dashboard'})
+        } catch (e) {
+          console.log(e);
+          this.$toast.error(extractErrorMessage(e));
+        } finally {
+          this.loading = false;
+        }
+      } else {
+        this.$toast.error('Please select at least one city of operation');
+      }
+    },
+    removeCity (index) {
       this.selectedCities.splice(index, 1);
-    },
-    selectedThisCityBefore(cityIndex) {
-      const cityName = this.getSelectedCityName(cityIndex);
-      const index = this.selectedCities.findIndex(city => city.city === `${cityName}`);
-      if (index !== -1) {
-        return true;
-      } else return false;
-    },
-    getSelectedCityName(cityIndex) {
-      return this.cities[cityIndex].city;
     }
+  },
+  beforeUnmount () {
+    // this.$shModal.close();
   }
 }
 </script>

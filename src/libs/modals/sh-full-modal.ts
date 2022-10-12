@@ -57,7 +57,9 @@ export class ShFullModal implements ShModal {
   }
 
   close (): void {
-    this.modalApp.unmount();
+    if(this.modalApp){
+      this.modalApp.unmount();
+    }
     this.cleanUp();
   }
 }

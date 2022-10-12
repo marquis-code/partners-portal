@@ -17,29 +17,42 @@ export class OnboardingGuard implements RouteGuard {
     const isOnboardingRoute = to.matched.some(route => route.meta.isOnboardingRoute);
     const kycFormCompleted = contextOrg && contextOrg.onboardingState?.address && contextOrg.onboardingState?.identity &&
       contextOrg.onboardingState?.address !== 'not-submitted' && contextOrg.onboardingState?.identity !== 'not-submitted';
-    const onboardingComplete = !!(contextOrg?.partner?.city_id && kycFormCompleted);
+    const onboardingComplete = !!(contextOrg?.supportedCities?.length && kycFormCompleted);
     const hasOrgs = sessionData?.associatedOrganizations?.length;
 
+    if (onboardingComplete && isOnboardingRoute) {
+      next({
+        name: 'dashboard'
+      });
+      return false;
+    }
+
     if (contextOrg && isOnboardingRoute && !onboardingComplete) {
-      if (to.name !== 'citySelection' && kycFormCompleted) {
+      if (to.name !== 'citySelection' && kycFormCompleted && !contextOrg.supportedCities.length) {
         next({
           name: 'citySelection',
-          query: {progress: 'true'}
+          query: { progress: 'true' }
         });
         return false;
       }
-      if (to.name !== 'GetStarted' && contextOrg.onboardingState?.identity !== 'not-submitted') {
+      if (to.name !== 'GetStarted' && contextOrg.onboardingState?.identity !== 'not-submitted' && !kycFormCompleted) {
         next({
           name: 'GetStarted',
-          query: {progress: 'true', state: 'address'},
-          params: {type: contextOrg.partner.mode}
+          query: {state: 'identity', type: contextOrg.partner.mode},
+        });
+        return false;
+      }
+      if (to.name !== 'GetStarted' && contextOrg.onboardingState?.address !== 'not-submitted' && !kycFormCompleted) {
+        next({
+          name: 'GetStarted',
+          query: {state: 'address', type: contextOrg.partner.mode},
         });
         return false;
       }
       return true;
     }
 
-    if ((!hasOrgs && to.name !== 'PartnerSignUp') || (contextOrg && to.name !== 'PartnerSignUp' && !onboardingComplete)) {
+    if (!isOnboardingRoute && ((!hasOrgs && to.name !== 'PartnerSignUp') || (contextOrg && to.name !== 'PartnerSignUp' && !onboardingComplete))) {
       next({
         name: 'PartnerSignUp'
       });

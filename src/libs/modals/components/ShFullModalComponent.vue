@@ -42,9 +42,6 @@ export default defineComponent({
       }
     }
   },
-  created () {
-    console.log(this.options);
-  },
   methods: {
     actionClicked () {
       this.$emit('action-clicked');
