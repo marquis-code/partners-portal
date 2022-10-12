@@ -19,6 +19,7 @@ export class OnboardingGuard implements RouteGuard {
       contextOrg.onboardingState?.address !== 'not-submitted' && contextOrg.onboardingState?.identity !== 'not-submitted';
     const onboardingComplete = !!(contextOrg?.supportedCities?.length && kycFormCompleted);
     const hasOrgs = sessionData?.associatedOrganizations?.length;
+    debugger;
 
     if (onboardingComplete && isOnboardingRoute) {
       next({
@@ -57,7 +58,7 @@ export class OnboardingGuard implements RouteGuard {
       return true;
     }
 
-    if (to.name !== 'PartnerSignUp' && (!hasOrgs || (contextOrg && !onboardingComplete))) {
+    if (!isOnboardingRoute && to.name !== 'PartnerSignUp' && (!hasOrgs || (contextOrg && !onboardingComplete))) {
       next({
         name: 'PartnerSignUp'
       });
