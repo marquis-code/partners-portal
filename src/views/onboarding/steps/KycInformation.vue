@@ -127,6 +127,7 @@
         </div>
       </section>
     </form>
+
     <div class="flex justify-end">
       <div class="flex items-center space-x-5">
 <!--        <button
@@ -156,11 +157,12 @@
             items-center
             p-3
             px-5
-            text-sm text-grays-black-5
-            bg-grays-black-10
+            text-sm
           "
           v-if="activeView === 0"
-          :disabled="loading"
+          :disabled="v$.identityForm.$invalid || loading"
+          :class="v$.identityForm.$invalid || loading ?
+         'cursor-not-allowed text-grays-black-5 bg-grays-black-7' : 'bg-sh-green-500 font-medium'"
           @click.prevent="saveIdentityForm()"
         >
           {{loading ? 'Saving' : 'Next'}}
@@ -199,8 +201,8 @@
             bg-grays-black-10
             font-medium
           "
-          :disabled="v$.addressForm.$error || loading"
-          :class="v$.form.$error || loading ?
+          :disabled="v$.addressForm.$invalid || loading"
+          :class="v$.addressForm.$invalid || loading ?
          'cursor-not-allowed text-grays-black-5 bg-grays-black-7' : 'bg-sh-green-500 font-medium'"
           @click.prevent="saveAddressForm();"
         >
@@ -267,7 +269,7 @@ export default defineComponent<any, any, any>({
           label: 'BVN',
           desc: 'Bank Verification Number'
         },
-        {
+        /*        {
           key: 'drivers-license',
           label: 'Drivers License',
           desc: 'Drivers License'
@@ -281,7 +283,7 @@ export default defineComponent<any, any, any>({
           key: 'voters-card',
           label: 'Voters card',
           desc: 'Voters Card'
-        }
+        } */
       ],
       selectedIdentityDoc: null,
       addressProgress: false
@@ -402,7 +404,7 @@ export default defineComponent<any, any, any>({
       }
     },
     setPageState () {
-      if(!this.contextOrganization) {
+      if (!this.contextOrganization) {
         this.$router.push({name: 'PartnerSignUp'});
         return;
       }
