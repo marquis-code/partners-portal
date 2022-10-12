@@ -184,7 +184,9 @@
         type="button"
         @click="saveForm()"
         class=" rounded-md w-32 flex justify-center items-center p-3 px-5 text-sm text-grays-black-5 bg-grays-black-10"
-        :disabled="processing">
+        :disabled="v$.form.$error || processing"
+        :class="v$.form.$error ?
+         'cursor-not-allowed text-grays-black-5 bg-grays-black-7' : 'bg-sh-green-500 font-medium'">
         {{ processing ? 'Saving': 'Next' }}
         <img class="ml-2" src="@/assets/images/arrow.svg" />
       </button>

@@ -1,7 +1,5 @@
 import Login from "@/views/auth/login/Login.vue";
-import PasswordReset from "@/views/auth/PasswordReset.vue";
-import ForgotPassword from "@/views/auth/ForgotPassword.vue";
-import {loadRouteComponent} from "@/utils/route-helper.util";
+import Register from "@/views/auth/Register.vue";
 
 export const AuthRoutes: Array<any> = [
   {
@@ -10,6 +8,16 @@ export const AuthRoutes: Array<any> = [
     component: Login,
     meta: {
       title: 'Login',
+      requiresAuth: false,
+      isGuest: true
+    }
+  },
+  {
+    path: '/register',
+    name: 'register',
+    component: Register,
+    meta: {
+      title: 'Become a Partner',
       requiresAuth: false,
       isGuest: true
     }
