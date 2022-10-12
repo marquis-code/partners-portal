@@ -44,12 +44,12 @@
               id="first-name"
             />
             <span
-              class="text-xs font-bold text-red-400"
-              v-if="!v$.form.fname.required && v$.form.fname.$error"
+              class="text-xs text-red-400"
+              v-if="v$.form.fname.required.$invalid && v$.form.fname.$error"
             >Please enter your first name</span
             >
             <span
-              class="text-xs font-bold text-red-400"
+              class="text-xs text-red-400"
               v-if="!v$.form.fname.validName && v$.form.fname.$error"
             >
             Special characters and numbers are not allowed
@@ -76,12 +76,12 @@
               id="last-name"
             />
             <span
-              class="text-xs font-bold text-red-400"
-              v-if="!v$.form.lname.required && v$.form.lname.$error"
+              class="text-xs text-red-400"
+              v-if="v$.form.lname.required.$invalid && v$.form.lname.$error"
             >Please enter your last name</span
             >
             <span
-              class="text-xs font-bold text-red-400"
+              class="text-xs text-red-400"
               v-if="!v$.form.lname.validName && v$.form.lname.$error"
             >
             Special characters and numbers are not allowed
@@ -113,8 +113,8 @@
               placeholder="sample@mail.com"
             />
             <span
-              class="text-xs font-bold text-red-400"
-              v-if="!v$.form.email.required && v$.form.email.$error"
+              class="text-xs text-red-400"
+              v-if="v$.form.email.required.$invalid && v$.form.email.$error"
             >Please enter your email address</span
             >
           </div>
@@ -142,13 +142,13 @@
               placeholder="0706 111 1198"
             />
             <div
-              class="text-xs font-bold text-red-400"
-              v-if="!v$.form.phone.required && v$.form.phone.$error"
+              class="text-xs text-red-400"
+              v-if="v$.form.phone.required.$invalid && v$.form.phone.$error"
             >
               Please enter a valid phone number
             </div>
             <div
-              class="text-xs font-bold text-red-400"
+              class="text-xs text-red-400"
               v-if="v$.form.phone.phoneNumber && !v$.form.phone.minLength"
             >
               Phone number must be at least
@@ -183,8 +183,8 @@
               </option>
             </select>
             <div
-              class="text-xs font-bold text-red-400"
-              v-if="!v$.form.city_id.required && v$.form.city_id.$error"
+              class="text-xs text-red-400"
+              v-if="v$.form.city_id.required.$invalid && v$.form.city_id.$error"
             >
               Please select a city
             </div>
@@ -233,8 +233,8 @@
             </div>
           </div>
           <span
-            class="text-xs font-bold text-red-400"
-            v-if="!v$.form.password.required && v$.form.password.$error"
+            class="text-xs text-red-400"
+            v-if="v$.form.password.required.$invalid && v$.form.password.$error"
           >Please enter a password</span
           >
         </div>
@@ -276,12 +276,11 @@
 </template>
 
 <script lang="ts">
-import { mapGetters } from "vuex";
 import {minLength, required} from "@vuelidate/validators";
 import {extractErrorMessage, hasRecaptchaKey} from "../../utils/helper";
 import useVuelidate from "@vuelidate/core";
 import {defineComponent} from "vue";
-import {IReCaptchaComposition, useReCaptcha} from "vue-recaptcha-v3";
+import {useReCaptcha} from "vue-recaptcha-v3";
 import {AxiosResponse} from "axios";
 import {LoginResponse} from "@/models/login-response.model";
 

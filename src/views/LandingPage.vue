@@ -28,9 +28,9 @@
           <router-link to="/login" class="block cursor-pointer mt-10 border rounded-lg border-sh-grey-900 text-sh-grey-900 font-bold text-sm w-full py-3 text-center">
             Login
           </router-link>
-          <a :href="registrationLink" class="hover:bg-sh-green-600 block cursor-pointer mt-4 rounded-lg border border-transparent text-sh-grey-900 font-bold bg-sh-green-500 text-sm w-full py-3 text-center">
+          <router-link to="/register" class="hover:bg-sh-green-600 block cursor-pointer mt-4 rounded-lg border border-transparent text-sh-grey-900 font-bold bg-sh-green-500 text-sm w-full py-3 text-center">
             Become a vehicle partner
-          </a>
+          </router-link>
         </div>
       </main>
     </div>

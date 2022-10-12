@@ -8,6 +8,10 @@ export class OnboardingGuard implements RouteGuard {
   }
 
   handle (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext): boolean {
+    const isLoggedIn = this.store.getters["auth/isLoggedIn"];
+    if (!isLoggedIn) {
+      return true;
+    }
     const contextOrg: PartnerOrganization = this.store.getters['auth/activeContext'];
     const sessionData: UserSessionModel = this.store.getters['auth/userSessionData'];
     const isOnboardingRoute = to.matched.some(route => route.meta.isOnboardingRoute);
