@@ -6,7 +6,9 @@
     />
     <section
       class="
-        grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3
+        flex flex-wrap
+        items-center
+        justify-center
         mx-auto
         lg:w-7/12
         xl:w-6/12
@@ -27,6 +29,9 @@
           rounded-md
           space-y-3
           cursor-pointer
+          w-52
+          mt-8
+          mr-6
           flex justify-center items-center flex-col
         "
       >
@@ -94,6 +99,10 @@ export default defineComponent({
       this.organizations = members.associatedOrganizations;
     },
     selected (index: number, partner: PartnerOrganization) {
+      if (partner.role !== 'owner' && !partner.supportedCities) {
+        this.$toast.info('This profile setup is yet to be completed');
+        return;
+      }
       this.$store.dispatch('auth/setActiveContext', partner);
       this.activeIndex = index;
     },

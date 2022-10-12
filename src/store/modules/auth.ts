@@ -115,7 +115,7 @@ export default <StoreOptions<AuthState>>{
   mutations: {
     setSession (state: AuthState, session: UserSessionModel) {
       state.isLoggedIn = !!session;
-      state.sessionData = session;
+      state.sessionData = session || null;
     }
   }
 };

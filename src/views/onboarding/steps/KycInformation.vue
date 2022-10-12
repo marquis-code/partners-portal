@@ -182,6 +182,7 @@
             font-medium
           "
           v-if="!addressProgress"
+          :disabled="loading"
           @click.prevent="previous()">
           Go back
         </button>
@@ -198,7 +199,9 @@
             bg-grays-black-10
             font-medium
           "
-          :disabled="loading"
+          :disabled="v$.addressForm.$error || loading"
+          :class="v$.form.$error || loading ?
+         'cursor-not-allowed text-grays-black-5 bg-grays-black-7' : 'bg-sh-green-500 font-medium'"
           @click.prevent="saveAddressForm();"
         >
           {{loading ? 'Saving' : 'Next'}}
@@ -354,7 +357,6 @@ export default defineComponent<any, any, any>({
     },
     async saveIdentityForm () {
       this.v$.identityForm.$touch();
-      // console.log(this.identityForm);
       if (this.loading || this.v$.identityForm.$errors.length) {
         return;
       }
@@ -372,7 +374,6 @@ export default defineComponent<any, any, any>({
     },
     async saveAddressForm () {
       this.v$.addressForm.$touch();
-      console.log(this.addressForm);
       if (this.loading || this.v$.addressForm.$errors.length) {
         return;
       }
@@ -401,6 +402,10 @@ export default defineComponent<any, any, any>({
       }
     },
     setPageState () {
+      if(!this.contextOrganization) {
+        this.$router.push({name: 'PartnerSignUp'});
+        return;
+      }
       const identityFormStatus = this.contextOrganization.onboardingState?.identity;
       if (this.contextOrganization && (identityFormStatus === 'completed')) {
         this.activeView = 1;
