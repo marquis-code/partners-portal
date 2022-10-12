@@ -34,7 +34,7 @@ import DownloadButton from '@/components/DownloadButton.vue';
 export default defineComponent({
   name: 'Vehicles',
   components: { AppTable, DownloadButton },
-  created(){
+  created() {
     this.fetchVehicles();
   },
   data() {
@@ -50,24 +50,7 @@ export default defineComponent({
         { label: 'Driver', key: 'driver' },
         { label: 'Actions', key: 'actions' }
       ],
-      items: [
-        // {
-        //   brand: 'Toyota',
-        //   model: 'Hiace',
-        //   plate_number: '204 551 KDN',
-        //   type: 'Bus',
-        //   capacity: 50,
-        //   driver: 'Davidson'
-        // },
-        // {
-        //   brand: 'Benz',
-        //   model: 'Hiace',
-        //   plate_number: '204 551 KDN',
-        //   type: 'Bus',
-        //   capacity: 70,
-        //   driver: 'Marquis'
-        // }
-      ]
+      items: []
     };
   },
   methods: {
@@ -75,7 +58,7 @@ export default defineComponent({
       await this.$axios
         .get('/v1/vehicles')
         .then((res) => {
-          this.items = res.data
+          this.items = res.data;
         })
         .catch((e) => {
           console.log(e);

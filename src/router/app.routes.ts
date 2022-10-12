@@ -3,9 +3,10 @@ import HomeView from "@/views/app/HomeView.vue";
 import Dashboard from "@/views/app/Dashboard.vue";
 import UserSelection from "@/views/app/OrganizationSelection.vue";
 import Drivers from "@/views/app/Drivers.vue";
-import Vehicles from "@/views/app/Vehicles.vue";
+import Vehicles from "@/views/vehiclesManagement/Vehicles.vue";
 import Earnings from "@/views/app/Earnings.vue";
 import Settings from "@/views/app/Settings.vue";
+import AddVehicle from "@/views/vehiclesManagement/AddVehicle.vue";
 
 export const AppRoutes: Array<RouteRecordRaw> = [
   {
@@ -48,6 +49,15 @@ export const AppRoutes: Array<RouteRecordRaw> = [
         component: Vehicles,
         meta: {
           title: 'Vehicles',
+          requiresAuth: false
+        }
+      },
+      {
+        path: '/add-vehicle',
+        name: 'AddVehicle',
+        component: AddVehicle,
+        meta: {
+          title: 'AddVehicle',
           requiresAuth: false
         }
       },

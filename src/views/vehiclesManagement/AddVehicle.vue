@@ -1,230 +1,122 @@
 <template>
-  <form class="space-y-3 lg:space-y-7">
-    <section
-      class="
-        lg:flex
-        justify-between
-        space-y-3
-        lg:space-y-0 lg:space-x-10
-        items-center
-      "
-    >
-      <div class="space-y-2 w-full">
-        <label class="text-xs font-medium text-grays-black-5"
-          >Vehicle Brand</label
-        >
-        <select
-          v-model="formData.brand"
+  <main class="space-y-16">
+    <div class="flex w-11/12 lg:w-6/12 mx-auto items-center space-x-3">
+      <div class="flex items-center space-x-1">
+        <span
           class="
-            text-xs
-            border-none
-            outline-none
-            w-full
-            rounded-md
-            p-3
-            placeholder-gray-500 placeholder-opacity-25
-            ring-1 ring-gray-300
+            flex
+            justify-center
+            items-center
+            w-5
+            h-5
+            rounded-full
+            text-xs text-white
+            bg-gray-300
           "
+          :class="currentStep === 0 ? 'bg-grays-black-2' : 'bg-grays-black-7'"
+          >1</span
         >
-         <option value="" disabled hidden>Select vehicle brand</option>
-          <option
-            :value="option"
-            v-for="(option, index) in businessOptions"
-            :key="index"
-          >
-            {{ option }}
-          </option>
-        </select>
+        <p
+          class="text-xs font-medium"
+          :class="[currentStep === 0 ? 'text-gray-900' : 'text-gray-200']"
+        >
+          Vehicle information
+        </p>
       </div>
-      <div class="space-y-2 w-full">
-        <label class="text-xs font-medium text-grays-black-5"
-          >Vehicle Model</label
-        >
-        <select
-          v-model="formData.model"
+      <div class="w-10 h-0.5 bg-gray-400"></div>
+      <div class="flex items-center space-x-1">
+        <span
           class="
+            flex
+            justify-center
+            items-center
+            w-5
+            h-5
+            rounded-full
             text-xs
-            border-none
-            outline-none
-            w-full
-            rounded-md
-            p-3
-            placeholder-gray-500 placeholder-opacity-25
-            ring-1 ring-gray-300
+            bg-gray-300
+            text-white
           "
+          :class="currentStep === 1 ? 'bg-grays-black-2' : 'bg-grays-black-7'"
+          >2</span
         >
-         <option value="" disabled hidden>Select vehicle model</option>
-          <option
-            :value="option"
-            v-for="(option, index) in businessOptions"
-            :key="index"
-          >
-            {{ option }}
-          </option>
-        </select>
+        <p
+          class="text-xs font-medium"
+          :class="[currentStep === 1 ? 'text-gray-900' : 'text-gray-200']"
+        >
+          Vehicle documents
+        </p>
       </div>
-    </section>
-    <section
-      class="
-        lg:flex
-        justify-between
-        space-y-3
-        lg:space-y-0 lg:space-x-10
-        items-center
-      "
-    >
-      <div class="space-y-2 w-full">
-        <label class="text-xs font-medium text-grays-black-5"
-          >Vehicle Year</label
-        >
-        <select
-          v-model="formData.year"
+      <div class="w-10 h-0.5 bg-gray-400"></div>
+      <div class="flex items-center space-x-1">
+        <span
           class="
-            text-xs
-            border-none
-            outline-none
-            w-full
-            rounded-md
-            p-3
-            placeholder-gray-500 placeholder-opacity-25
-            ring-1 ring-gray-300
+            flex
+            justify-center
+            items-center
+            w-5
+            h-5
+            rounded-full
+            text-xs text-white
+            bg-gray-300
           "
+          :class="currentStep === 2 ? 'bg-grays-black-2' : 'bg-grays-black-7'"
+          >3</span
         >
-         <option value="" disabled hidden>Select your vehicle year</option>
-          <option
-            :value="option"
-            v-for="(option, index) in businessOptions"
-            :key="index"
-          >
-            {{ option }}
-          </option>
-        </select>
+        <p
+          class="text-xs font-medium"
+          :class="[currentStep === 2 ? 'text-gray-900' : 'text-gray-200']"
+        >
+          Vehicle images
+        </p>
       </div>
-      <div class="space-y-2 w-full">
-        <label class="text-xs font-medium text-grays-black-5"
-          >Capacity (Includes drivers seat)</label
-        >
-        <select
-          v-model="formData.capacity"
-          class="
-            text-xs
-            border-none
-            outline-none
-            w-full
-            rounded-md
-            p-3
-            placeholder-gray-500 placeholder-opacity-25
-            ring-1 ring-gray-300
-          "
-        >
-          <option value="" disabled hidden>what is the capacity of your vehicle</option>
-          <option
-            :value="option"
-            v-for="(option, index) in businessOptions"
-            :key="index"
-          >
-            {{ option }}
-          </option>
-        </select>
-      </div>
-    </section>
-
-    <section class="flex justify-start space-x-10 items-start">
-      <select-city :placeholder="placeholder" :title="title" :cities="cities" @selectThisCity="selectThisCity"></select-city>
-    </section>
-    <div class="flex justify-end items-end">
-      <button
-        type="button"
-        @click="$emit('handleCompanyData', formData)"
-        class="
-          rounded-md
-          w-32
-          flex
-          justify-center
-          items-center
-          p-3
-          px-5
-          text-sm text-grays-black-5
-          bg-grays-black-10
-        "
-      >
-        Next
-        <img class="ml-2" src="@/assets/images/arrow.svg" />
-      </button>
     </div>
-  </form>
+    <main class="w-11/12 mx-auto">
+      <keep-alive>
+        <component @next="next" :is="steps[currentStep].component"></component>
+      </keep-alive>
+    </main>
+  </main>
 </template>
 
-<script>
-import SelectCity from '@/components/SelectCity.vue';
-export default {
+<script lang="ts">
+import { defineComponent } from 'vue';
+import VehicleDocuments from '../vehiclesManagement/steps/VehicleDocuments.vue';
+import VehicleInformation from '../vehiclesManagement/steps/VehicleInformation.vue';
+import VehicleImages from '../vehiclesManagement/steps/VehicleImages.vue';
+export default defineComponent({
   name: 'AddVehicle',
-  components: { SelectCity },
+  components: { VehicleDocuments, VehicleInformation, VehicleImages },
   data() {
     return {
-      placeholder: 'What city would this vehicle operate in?',
-      title: 'City of Operation',
-      formData: {
-        brand: '',
-        model: '',
-        year: '',
-        capacity: '',
-        city: ''
-      },
-      cities: [
+      currentStep: 0,
+      steps: [
         {
-          city: 'Lagos'
+          component: VehicleInformation
         },
         {
-          city: 'Ogun'
+          component: VehicleDocuments
         },
         {
-          city: 'Abuja'
-        },
-        {
-          city: 'Ibadan'
+          component: VehicleImages
         }
-      ],
-      businessOptions: [
-        'Incorporated Trustee',
-        'Limited Partnership',
-        'C-Corporation (C-Corp)',
-        'Company'
       ]
     };
   },
   methods: {
-    selectThisCity(event) {
-      if (this.selectedCities.length > 0) {
-        if (!this.selectedThisCityBefore(event.target.value)) {
-          const newAddition = this.cities[event.target.value];
-          this.selectedCities.push(newAddition);
-        } else this.$toast.warning('You cannot select a city twice');
-      } else {
-        const newAddition = this.cities[event.target.value];
-        this.selectedCities.push(newAddition);
+    next() {
+      this.currentStep += 1;
+    },
+    goBack(): void {
+      this.currentStep = 0;
+    },
+    previous(): void {
+      if (this.currentStep !== 0) {
+        this.currentStep -= 1;
       }
-    },
-    removeThisCity(cityName) {
-      const index = this.selectedCities.findIndex(
-        (city) => city.city === `${cityName}`
-      );
-      this.selectedCities.splice(index, 1);
-    },
-    selectedThisCityBefore(cityIndex) {
-      const cityName = this.getSelectedCityName(cityIndex);
-      const index = this.selectedCities.findIndex(
-        (city) => city.city === `${cityName}`
-      );
-      if (index !== -1) {
-        return true;
-      } else return false;
-    },
-    getSelectedCityName(cityIndex) {
-      return this.cities[cityIndex].city;
     }
   }
-};
+});
 </script>
 
 <style>

@@ -1,16 +1,15 @@
 <template>
   <OnboardingLayout>
     <CenteredPageHeader :title="headerTitle" :description="headerDescription" />
-    <section
+     <section
       class="
-        md:flex
-        items-center
-        justify-center
+        grid grid-cols-1 md:grid-cols-2
         space-y-5
         md:space-y-0 md:space-x-5
-        w-7/12
+        w-10/12
         mx-auto
         md:w-10/12
+        lg:w-6/12
       "
     >
       <div

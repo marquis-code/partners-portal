@@ -6,21 +6,34 @@
         <div
           v-if="routeType !== 'individual'"
           class="flex items-center space-x-1"
-          :class="currentStep === 0 ? 'text-grays-black-2' : 'text-grays-black-6'">
+          :class="
+            currentStep === 0 ? 'text-grays-black-2' : 'text-grays-black-6'
+          "
+        >
           <span
             class="text-white rounded-full w-5 text-center text-xs"
-            :class="currentStep === 0 ? 'bg-grays-black-2' : 'bg-grays-black-7'">1</span>
+            :class="currentStep === 0 ? 'bg-grays-black-2' : 'bg-grays-black-7'"
+            >1</span
+          >
           <p class="lg:text-base text-sm">Company information</p>
         </div>
-        <p v-if="routeType !== 'individual'" class="h-0.5 w-6 lg:w-20 bg-gray-500"></p>
+        <p
+          v-if="routeType !== 'individual'"
+          class="h-0.5 w-6 lg:w-20 bg-gray-500"
+        ></p>
         <div
           v-if="routeType === 'individual' || routeType === 'company'"
           class="flex items-center space-x-1"
-          :class="currentStep === 1 ? 'text-grays-black-2' : 'text-grays-black-6'">
+          :class="
+            currentStep === 1 ? 'text-grays-black-2' : 'text-grays-black-6'
+          "
+        >
           <span
             class="text-white rounded-full w-5 text-center text-xs"
-            :class="currentStep === 1 ? 'bg-grays-black-2' : 'bg-grays-black-7'">
-            {{ routeType === 'company' ? '2' : '1' }}</span>
+            :class="currentStep === 1 ? 'bg-grays-black-2' : 'bg-grays-black-7'"
+          >
+            {{ routeType === 'company' ? '2' : '1' }}</span
+          >
           <p class="lg:text-base text-sm">Kyc verification</p>
         </div>
       </div>
@@ -48,7 +61,7 @@ import KycInformation from '../onboarding/steps/KycInformation.vue';
 import CenteredPageHeader from '../../components/CenteredPageHeader.vue';
 import OnboardingLayout from '../layouts/OnboardingLayout.vue';
 import FormContainer from '../layouts/FormContainer.vue';
-import {mapGetters} from "vuex";
+import { mapGetters } from 'vuex';
 export default defineComponent({
   name: 'GetStarted',
   components: {
