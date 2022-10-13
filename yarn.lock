@@ -9264,6 +9264,11 @@ vue@^3.2.13:
     "@vue/server-renderer" "3.2.40"
     "@vue/shared" "3.2.40"
 
+vuejs-progress-bar@^1.2.8:
+  version "1.2.8"
+  resolved "https://registry.yarnpkg.com/vuejs-progress-bar/-/vuejs-progress-bar-1.2.8.tgz#0e88291ad2c215ca165e63907dca356a9463e75c"
+  integrity sha512-FSXg42UlV0X6EMI0Tk6JFf9U55cWjlLVFQVoZef+o0oiAX7dvYKqVJSrsO5tR09FiN3KbVJGASbpuUoK/iNw9w==
+
 vuelidate@^0.7.7:
   version "0.7.7"
   resolved "https://registry.yarnpkg.com/vuelidate/-/vuelidate-0.7.7.tgz#5df3930a63ddecf56fde7bdacea9dbaf0c9bf899"
