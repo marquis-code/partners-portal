@@ -30,6 +30,7 @@
     "vue-toast-notification": "^3.0",
     "vue3-carousel": "^0.2.0",
     "vue3-datepicker": "^0.3.4",
+    "vue3-google-map": "^0.15.0",
     "vue3-otp-input": "^0.3.6",
     "vuelidate": "^0.7.7",
     "vuex": "^4.0.0"

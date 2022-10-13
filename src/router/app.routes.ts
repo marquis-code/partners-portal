@@ -8,6 +8,10 @@ import Earnings from "@/views/app/Earnings.vue";
 import Settings from "@/views/app/Settings.vue";
 import AddVehicle from "@/views/vehiclesManagement/AddVehicle.vue";
 
+import Trips from "@/views/vehiclesManagement/Trips.vue";
+import VehicleDocuments from "@/views/vehiclesManagement/VehicleDocuments.vue";
+import VehicleInformation from "@/views/vehiclesManagement/VehicleInformation.vue";
+
 export const AppRoutes: Array<RouteRecordRaw> = [
   {
     path: "/organization",
@@ -58,6 +62,33 @@ export const AppRoutes: Array<RouteRecordRaw> = [
         component: AddVehicle,
         meta: {
           title: 'AddVehicle',
+          requiresAuth: false
+        }
+      },
+      {
+        path: '/vehicle-information',
+        name: 'VehicleInformation',
+        component: VehicleInformation,
+        meta: {
+          title: 'VehicleInformation',
+          requiresAuth: false
+        }
+      },
+      {
+        path: '/trips',
+        name: 'Trips',
+        component: Trips,
+        meta: {
+          title: 'Trips',
+          requiresAuth: false
+        }
+      },
+      {
+        path: '/vehicle-documents',
+        name: 'VehicleDocuments',
+        component: VehicleDocuments,
+        meta: {
+          title: 'VehicleDocuments',
           requiresAuth: false
         }
       },

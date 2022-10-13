@@ -1,5 +1,6 @@
 <template>
   <div class="w-full px-3 md:px-7 py-5 bg-white">
+  <dynamic-tabs></dynamic-tabs>
     <div class="top-part flex flex-row justify-between items-center">
       <div class="dashboard-name text-xl font-medium">
         Dashboard
