@@ -2,10 +2,9 @@
   <OnboardingLayout>
     <CenteredPageHeader :title="headerTitle" :description="headerDescription" />
      <section
-      class="
-        grid grid-cols-1 md:grid-cols-2
+      class="flex flex-wrap items-center justify-center
         space-y-5
-        md:space-y-0 md:space-x-5
+        md:space-y-0
         w-10/12
         mx-auto
         md:w-10/12
@@ -21,7 +20,7 @@
             ? 'bg-sh-green-100 ring-1 ring-sh-green-500'
             : 'bg-sh-grey-50 ring-1 ring-gray-300'
         ]"
-        class="p-6 py-9 rounded-md space-y-3 cursor-pointer max-w-xs"
+        class="p-6 py-9 rounded-md space-y-3 cursor-pointer max-w-xs mr-8"
       >
         <img src="@/assets/images/shuttle.svg" />
         <h1 class="text-sh-grey-900 font-bold">{{ title }}</h1>
@@ -100,7 +99,6 @@ export default defineComponent({
     },
     async handleRedirection () {
       if (this.activeIndex === 0) {
-        console.log('Here');
         await this.$router.push({ name: 'GetStarted', query: { type: 'company' }});
       }
 

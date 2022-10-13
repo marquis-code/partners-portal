@@ -10,7 +10,7 @@
         </button>
       </div>
       <main class="flex flex-col space-y-2 justify-center items-center">
-        <img src="@/assets/images/car.svg" />
+<!--        <img src="@/assets/images/car.svg" />-->
         <h1 class="font-medium">Toyota Hiace</h1>
         <small class="text-xs text-gray-300"
           >Registered: 20th August, 2021</small

@@ -1,72 +1,33 @@
 <template>
-  <main class="space-y-16">
+  <main class="space-y-16 bg-white py-8">
     <div class="flex w-11/12 lg:w-6/12 mx-auto items-center space-x-3">
       <div class="flex items-center space-x-1">
         <span
-          class="
-            flex
-            justify-center
-            items-center
-            w-5
-            h-5
-            rounded-full
-            text-xs text-white
-            bg-gray-300
-          "
+          class="flex justify-center items-center w-5 h-5 rounded-full text-xs text-white cursor-pointer"
           :class="currentStep === 0 ? 'bg-grays-black-2' : 'bg-grays-black-7'"
-          >1</span
-        >
+          >1</span>
         <p
-          class="text-xs font-medium"
-          :class="[currentStep === 0 ? 'text-gray-900' : 'text-gray-200']"
-        >
+          class="text-xs font-medium cursor-pointer"
+          :class="[currentStep === 0 ? 'text-bg-grays-black-2' : 'text-gray-200']">
           Vehicle information
         </p>
       </div>
       <div class="w-10 h-0.5 bg-gray-400"></div>
       <div class="flex items-center space-x-1">
         <span
-          class="
-            flex
-            justify-center
-            items-center
-            w-5
-            h-5
-            rounded-full
-            text-xs
-            bg-gray-300
-            text-white
-          "
-          :class="currentStep === 1 ? 'bg-grays-black-2' : 'bg-grays-black-7'"
-          >2</span
-        >
-        <p
-          class="text-xs font-medium"
-          :class="[currentStep === 1 ? 'text-gray-900' : 'text-gray-200']"
-        >
+          class="flex justify-center items-center w-5 h-5 rounded-full text-xs text-white cursor-pointer"
+          :class="currentStep === 1 ? 'bg-grays-black-2' : 'bg-grays-black-7'">2</span>
+        <p class="text-xs font-medium cursor-pointer" :class="[currentStep === 1 ? 'text-gray-900' : 'text-gray-200']">
           Vehicle documents
         </p>
       </div>
       <div class="w-10 h-0.5 bg-gray-400"></div>
       <div class="flex items-center space-x-1">
         <span
-          class="
-            flex
-            justify-center
-            items-center
-            w-5
-            h-5
-            rounded-full
-            text-xs text-white
-            bg-gray-300
-          "
+          class="flex justify-center items-center w-5 h-5 rounded-full text-xs text-white cursor-pointer"
           :class="currentStep === 2 ? 'bg-grays-black-2' : 'bg-grays-black-7'"
-          >3</span
-        >
-        <p
-          class="text-xs font-medium"
-          :class="[currentStep === 2 ? 'text-gray-900' : 'text-gray-200']"
-        >
+          >3</span>
+        <p class="text-xs font-medium cursor-pointer" :class="[currentStep === 2 ? 'text-gray-900' : 'text-gray-200']">
           Vehicle images
         </p>
       </div>
