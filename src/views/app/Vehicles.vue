@@ -1,22 +1,25 @@
 <template>
-  <div class="">
+  <div class="w-6/12 mx-auto">
     <!-- <h1 class="">Vehicles Content Area...coming soon</h1> -->
-    <modal-parent
+    <!-- <modal-parent
       :type="type"
       :title="title"
       :description="description"
       :modalExtras="modalExtras"
-    ></modal-parent>
+    ></modal-parent> -->
+    <action-button></action-button>
   </div>
 </template>
 
 <script lang="ts">
-import ModalParent from '@/components/Modals/NotificationModal.vue';
+// import ModalParent from '@/components/Modals/NotificationModal.vue';
+import ActionButton from '@/components/ActionButton.vue';
 import { defineComponent } from 'vue';
 
 export default defineComponent({
+  components: { ActionButton },
   name: 'Vehicles',
-  components: { ModalParent },
+  // components: { ModalParent },
   data() {
     return {
       type: 'failure',
