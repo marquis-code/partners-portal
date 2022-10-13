@@ -18,13 +18,13 @@
       <div class="">
         <img
           class="rounded-full"
-          src="@/assets/images/pdfIcon.svg"
+          src="@/assets/images/imageIcon.svg"
           v-if="fileType == 'png'"
           id="file_type"
         />
         <img
           class="rounded-full"
-          src="@/assets/images/pdfIcon.svg"
+          src="@/assets/images/imageIcon.svg"
           v-if="fileType == 'jpg'"
           id="file_type"
         />
