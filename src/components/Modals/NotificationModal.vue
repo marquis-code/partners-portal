@@ -58,13 +58,13 @@
           </button>
         </div>
 
-        <div v-else class="flex space-x-7">
+        <div v-else class="flex pt-5 space-x-7 w-full px-5">
           <button
-            class="text-gray-600 rounded-md px-7 py-2 ring-1 ring-gray-500"
+            class="text-gray-600 rounded-md px-7 py-2 ring-1 ring-gray-500 w-full"
           >
             Cancel
           </button>
-          <button class="text-white bg-red-500 rounded-md px-7 py-2">
+          <button class="text-white bg-red-500 rounded-md px-7 py-2 w-full">
             Remove
           </button>
         </div>
