@@ -1,5 +1,5 @@
 <template>
-  <section class="lg:w-6/12 md:w-7/12 ring-1 ring-gray-50 rounded-md bg-white shadow-md">
+  <section class="lg:w-4/12 md:w-7/12 ring-1 ring-gray-50 rounded-md bg-white shadow-md">
     <div class="space-y-10 lg:p-8 p-7">
       <div class="flex justify-between items-center">
         <p class="text-sm">Vehicle Information</p>

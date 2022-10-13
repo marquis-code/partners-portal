@@ -1,5 +1,6 @@
 <template>
   <div class="w-full px-3 md:px-7 py-5 bg-white">
+  <dynamic-tabs></dynamic-tabs>
     <div class="top-part flex flex-row justify-between items-center">
       <div class="dashboard-name text-xl font-medium">
         Dashboard
@@ -12,7 +13,7 @@
         <img class="ml-2 md:ml-9" src="@/assets/images/notification-present.svg">
       </div>
     </div>
-    <hr class="mt-5 mb-0">
+   <hr class="mt-5 mb-0">
     <div class="bottom-part">
       <Breadcrumbs :activeSection="activeSection"/>
     </div>
