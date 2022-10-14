@@ -1,13 +1,21 @@
 <template>
-  <div>
-    <page-action-header>
-      <template #action>
-        <router-link to="/add-vehicle" class="bg-sh-green-500 font-medium border-none outline-none py-3 rounded-md text-sm flex justify-center items-center w-full mt-8">Add Vehicle</router-link>
-      </template>
-    </page-action-header>
+  <page-layout page-title="Vehicles">
+    <template #actionsPane>
+      <page-action-header>
+        <template #action>
+          <router-link
+            to="vehicles/add-vehicle"
+           class="bg-sh-green-500 font-medium border-none outline-none px-4 py-2
+          rounded-md text-sm flex justify-center items-center w-full">Add Vehicle</router-link>
+        </template>
+      </page-action-header>
+    </template>
     <div>
       <div class="flex items-center pb-2">
-        <span class="text-sm font-medium leading-6 pb-2 pt-1 px-2 border-b-2 cursor-pointer" :class="this.filters.status === 'active' ? 'text-black border-b-sh-green-500' : 'text-sh-grey-500 border-b-transparent'" @click="setStatusFilter('active')">Active</span>
+        <span class="text-sm font-medium leading-6 pb-2 pt-1 px-2 border-b-2 cursor-pointer"
+              :class="this.filters.status === 'active' ?
+               'text-black border-b-sh-green-500' : 'text-sh-grey-500 border-b-transparent'"
+              @click="setStatusFilter('active')">Active</span>
         <span class="text-sm font-medium leading-6 pb-2 pt-1 px-2 border-b-2 cursor-pointer"
               :class="this.filters.status === 'inactive' ? 'text-black border-b-sh-green-500' : 'text-sh-grey-500 border-b-transparent'" @click="setStatusFilter('inactive')">InActive</span>
       </div>
@@ -19,23 +27,29 @@
           <app-table
             :loading="loading"
             :error-loading="errorLoading"
-            :items="items"
+            :items="tableData"
             :fields="headers"
+            @rowClicked="viewTripDetails"
           >
-            <template v-slot:name="{ item }">
-              <router-link
-                :to="{ name: 'dashboard.users.view', params: { id: item.id } }"
-                class="text-xs font-medium underline text-gray-type-3"
-              >
-                {{ `${item.fname} ${item.lname}` }}
-              </router-link>
+            <template v-slot:driver="{ item }">
+              <span v-if="item.driver">
+                {{item.driver.name || ''}}
+              </span>
+              <span class="text-sm text-grays-black-6" v-else> No driver assigned</span>
+            </template>
+
+            <template v-slot:type="{ item }">
+
+            </template>
+
+            <template v-slot:actions="">
+
             </template>
           </app-table>
         </div>
       </div>
     </div>
-  </div>
-
+  </page-layout>
 </template>
 
 <script lang="ts">
@@ -44,9 +58,15 @@ import AppTable from '@/components/AppTable.vue';
 // import DownloadButton from '@/components/DownloadButton.vue';
 import {mapGetters} from "vuex";
 import PageActionHeader from "@/components/PageActionHeader.vue";
+import PageLayout from "@/components/layout/PageLayout.vue";
+import OptionsDropdown from "@/components/OptionsDropdown.vue";
 export default defineComponent({
-  name: 'Vehicles',
-  components: {PageActionHeader, AppTable, /* DownloadButton */ },
+  name: 'VehiclesList',
+  components: {
+    PageLayout,
+    PageActionHeader,
+    AppTable,
+    /* DownloadButton */ },
   created () {
     this.fetchVehicles();
   },
@@ -62,14 +82,14 @@ export default defineComponent({
       errorLoading: false,
       headers: [
         { label: 'Brand', key: 'brand' },
-        { label: 'Model', key: 'model' },
-        { label: 'Plate No', key: 'plate_number' },
+        { label: 'Model', key: 'name' },
+        { label: 'Plate No', key: 'registration_number' },
         { label: 'Type', key: 'type' },
-        { label: 'Capacity', key: 'capacity' },
+        { label: 'Capacity', key: 'seats' },
         { label: 'Driver', key: 'driver' },
         { label: 'Actions', key: 'actions' }
       ],
-      items: []
+      items: [],
     };
   },
   computed: {
@@ -83,14 +103,24 @@ export default defineComponent({
     },
     fetchVehicles () {
       this.loading = true;
+      const params = {
+        related: 'driver',
+        metadata: true
+      };
       this.$axios
-        .get(`/v1/partner/${this.partnerContext.partner.id}/vehicles`)
+        .get(`/v1/partner/${this.partnerContext.partner.id}/vehicles`, {params })
         .then((res) => {
-          this.tableData = res.data;
+          this.tableData = res.data.data || [];
           this.totalRecords = res.data.metadata?.total;
         }).finally(() => {
           this.loading = false;
         });
+    },
+    viewTripDetails (vehicle: any) {
+      this.$router.push({
+        name: 'vehicle.detail.info',
+        params: {vehicleId: vehicle.id}
+      });
     }
   }
 });

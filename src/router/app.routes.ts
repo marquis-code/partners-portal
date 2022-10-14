@@ -3,14 +3,10 @@ import HomeView from "@/views/app/HomeView.vue";
 import Dashboard from "@/views/app/Dashboard.vue";
 import UserSelection from "@/views/app/OrganizationSelection.vue";
 import Drivers from "@/views/app/Drivers.vue";
-import Vehicles from "@/views/vehiclesManagement/Vehicles.vue";
+import Vehicles from "@/views/app/vehicles/Vehicles.vue";
 import Earnings from "@/views/app/Earnings.vue";
 import Settings from "@/views/app/Settings.vue";
-import AddVehicle from "@/views/vehiclesManagement/AddVehicle.vue";
-
-import Trips from "@/views/vehiclesManagement/Trips.vue";
-import VehicleDocuments from "@/views/vehiclesManagement/VehicleDocuments.vue";
-import VehicleInformation from "@/views/vehiclesManagement/VehicleInformation.vue";
+import {loadRouteComponent} from "@/utils/route-helper.util";
 
 export const AppRoutes: Array<RouteRecordRaw> = [
   {
@@ -51,46 +47,74 @@ export const AppRoutes: Array<RouteRecordRaw> = [
         path: '/vehicles',
         name: 'vehicles',
         component: Vehicles,
+        redirect: 'vehicles.list',
         meta: {
           title: 'Vehicles',
-          requiresAuth: false
-        }
-      },
-      {
-        path: '/add-vehicle',
-        name: 'AddVehicle',
-        component: AddVehicle,
-        meta: {
-          title: 'AddVehicle',
-          requiresAuth: false
-        }
-      },
-      {
-        path: '/vehicle-information',
-        name: 'VehicleInformation',
-        component: VehicleInformation,
-        meta: {
-          title: 'VehicleInformation',
-          requiresAuth: false
-        }
-      },
-      {
-        path: '/trips',
-        name: 'Trips',
-        component: Trips,
-        meta: {
-          title: 'Trips',
-          requiresAuth: false
-        }
-      },
-      {
-        path: '/vehicle-documents',
-        name: 'VehicleDocuments',
-        component: VehicleDocuments,
-        meta: {
-          title: 'VehicleDocuments',
-          requiresAuth: false
-        }
+          requiresAuth: true
+        },
+        children: [
+          {
+            path: '',
+            name: 'vehicles.list',
+            component: loadRouteComponent('app/vehicles/list/VehiclesList'),
+            meta: {
+              title: 'Vehicles',
+              requiresAuth: true
+            },
+          },
+          {
+            path: 'add-vehicle',
+            name: 'AddVehicle',
+            component: loadRouteComponent('app/vehicles/AddVehicle'),
+            meta: {
+              title: 'Add Vehicle',
+              requiresAuth: true
+            }
+          },
+          {
+            path: 'details/:vehicleId',
+            component: loadRouteComponent('app/vehicles/details/VehicleDetailsIndex'),
+            props: true,
+            meta: {
+              title: 'Vehicle Details',
+              requiresAuth: true
+            },
+            children: [
+              {
+                path: '',
+                name: 'vehicle.detail',
+                redirect: 'information'
+              },
+              {
+                path: 'information',
+                name: 'vehicle.detail.info',
+                component: loadRouteComponent('app/vehicles/details/VehicleInfo'),
+                meta: {
+                  title: 'Vehicle Details',
+                  requiresAuth: true
+                },
+              },
+              {
+                path: 'trips',
+                name: 'vehicle.detail.trips',
+                component: loadRouteComponent('app/vehicles/details/VehicleTrips'),
+                meta: {
+                  title: 'Vehicle Details',
+                  requiresAuth: true
+                },
+              },
+              {
+                path: 'documents',
+                name: 'vehicle.detail.documents',
+                component: loadRouteComponent('app/vehicles/details/VehicleDocuments'),
+                meta: {
+                  title: 'Vehicle Details',
+                  requiresAuth: true
+                },
+              },
+            ]
+          },
+        ]
       },
       {
         path: '/earnings',

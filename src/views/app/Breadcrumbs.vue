@@ -33,7 +33,7 @@
 import { defineComponent } from 'vue';
 import DynamicTabs from '../app/DynamicTabs.vue';
 export default defineComponent({
-  mounted() {
+  mounted () {
     console.log(this.activeSection);
   },
   components: { DynamicTabs },
@@ -41,11 +41,11 @@ export default defineComponent({
   props: {
     activeSection: String
   },
-  data() {
+  data () {
     return {};
   },
   methods: {
-    handleVehicle() {
+    handleVehicle () {
       this.$router.push({ name: 'AddVehicle', path: '/add-vehicle' });
     }
   }

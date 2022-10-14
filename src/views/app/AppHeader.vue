@@ -1,6 +1,6 @@
 <template>
   <div class="w-full px-3 md:px-7 py-5 bg-white">
-  <dynamic-tabs></dynamic-tabs>
+<!--  <dynamic-tabs></dynamic-tabs>-->
     <div class="top-part flex flex-row justify-between items-center">
       <div class="dashboard-name text-xl font-medium">
         Dashboard
@@ -22,16 +22,17 @@
 <script lang="ts">
 import {defineComponent} from 'vue';
 import Breadcrumbs from './Breadcrumbs.vue';
+// import DynamicTabs from "@/views/app/DynamicTabs.vue";
 export default defineComponent({
   name: "AppHeader",
   props: {
     activeSection: String
   },
-  data() {
+  data () {
     return {
     };
   },
   methods: {},
-  components: { Breadcrumbs }
+  components: {/* DynamicTabs, */ Breadcrumbs }
 })
 </script>

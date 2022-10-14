@@ -3,25 +3,25 @@
     class="
       w-full
       h-full
-      px-6
       scroll-px-60
       space-y-6
+      bg-gray-50 py-7 px-6
     "
   >
-    <alert-notification
+<!--    <alert-notification
       :message="'You have some documents left to upload !'"
       :showAlert="false"
-    ></alert-notification>
+    ></alert-notification>-->
     <slot></slot>
   </div>
 </template>
 <script lang="ts">
-import AlertNotification from '@/components/AlertNotification.vue';
+// import AlertNotification from '@/components/AlertNotification.vue';
 import { defineComponent } from 'vue';
 export default defineComponent({
-  components: { AlertNotification },
+  components: { /* AlertNotification */ },
   name: 'AppBody',
-  data() {
+  data () {
     return {};
   },
   methods: {}

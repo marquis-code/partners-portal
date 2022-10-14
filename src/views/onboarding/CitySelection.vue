@@ -74,7 +74,7 @@ export default {
     selectThisCity (event) {
       const newAddition = this.cities[event.target.value];
       const index = this.selectedCities.findIndex(o => o.city.id === newAddition?.city.id);
-      if(index < 0) {
+      if (index < 0) {
         this.selectedCities.push(newAddition)
       }
     },

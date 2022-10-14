@@ -54,7 +54,7 @@ export default {
     title: String,
     cities: Array
   },
-  data() {
+  data () {
     return {
       selectedCities: [],
       selectedIndex: -1
@@ -64,7 +64,7 @@ export default {
     SelectedCityBadge
   },
   methods: {
-    selectThisCity(event) {
+    selectThisCity (event) {
       if (this.selectedCities.length > 0) {
         if (!this.selectedThisCityBefore(event.target.value)) {
           const newAddition = this.cities[event.target.value];
@@ -75,13 +75,13 @@ export default {
         this.selectedCities.push(newAddition);
       }
     },
-    removeThisCity(cityName) {
+    removeThisCity (cityName) {
       const index = this.selectedCities.findIndex(
         (city) => city.city === `${cityName}`
       );
       this.selectedCities.splice(index, 1);
     },
-    selectedThisCityBefore(cityIndex) {
+    selectedThisCityBefore (cityIndex) {
       const cityName = this.getSelectedCityName(cityIndex);
       const index = this.selectedCities.findIndex(
         (city) => city.city === `${cityName}`
@@ -90,7 +90,7 @@ export default {
         return true;
       } else return false;
     },
-    getSelectedCityName(cityIndex) {
+    getSelectedCityName (cityIndex) {
       return this.cities[cityIndex].city;
     }
   }

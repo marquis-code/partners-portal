@@ -76,7 +76,7 @@ import {defineComponent} from 'vue';
 import {mapGetters} from "vuex";
 export default defineComponent({
   name: "Sidebar",
-  data() {
+  data () {
     return {
       isSidebarFolded: false,
       windowWidth: 0,
@@ -100,7 +100,7 @@ export default defineComponent({
       ]
     }
   },
-  created() {
+  created () {
     window.addEventListener('resize', this.checkScreen)
     this.checkScreen();
   },
@@ -109,7 +109,7 @@ export default defineComponent({
   },
   methods: {
     // TODO (Tobi): Refactor component implementation
-    selectThisSection(groupIndex: number, itemIndex: number) {
+    selectThisSection (groupIndex: number, itemIndex: number) {
       for (let index = 0; index < this.menuGroup.length; index++) {
         const groupMenus = this.menuGroup[index].menus;
         for (let indexJ = 0; indexJ < groupMenus.length; indexJ++) {
@@ -121,10 +121,10 @@ export default defineComponent({
         }
       }
     },
-    toggleSidebar() {
+    toggleSidebar () {
       this.isSidebarFolded = !this.isSidebarFolded
     },
-    checkScreen() {
+    checkScreen () {
       this.windowWidth = window.innerWidth;
       if (this.windowWidth <= 768) {
         this.isSidebarFolded = true;

@@ -1,6 +1,6 @@
 <template>
-  <div class="w-full px-3 md:px-7 py-5 bg-white">
-    <div class="flex flex-between">
+  <div class="w-full py-2 bg-white h-12 border-t border-t-grays-black-700">
+    <div class="flex justify-between items-end">
       <div>
         <slot name="tabs"></slot>
       </div>

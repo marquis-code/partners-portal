@@ -221,7 +221,7 @@
     </main>
 
     <div class="flex justify-end items-center space-x-5 pt-5">
-     <button class="text-black text-sm bg-gray-300 px-6 py-3 font-medium rounded-md" @click="$emit('goBack')">Previous</button>
+     <button class="text-black text-sm bg-gray-300 px-6 py-3 font-medium rounded-md" @click.prevent="$emit('goBack')">Previous</button>
      <button class="text-black text-sm bg-sh-green-500 px-6 py-3 font-medium rounded-md" @click="$emit('next')">Next</button>
     </div>
   </form>
@@ -238,7 +238,7 @@ import ImageUpload from '@/components/ImageUpload.vue';
 export default defineComponent({
   components: { ImageUpload, Datepicker },
   emits: ['next', 'goBack'],
-  data() {
+  data () {
     return {
       v$: useVuelidate(),
       form: {
@@ -248,17 +248,11 @@ export default defineComponent({
         road_worthiness_expiry_date: '',
         hackney_expiry_date: ''
       },
-      businessOptions: [
-        'Business Name',
-        'Company',
-        'Incorporated Trustee',
-        'Limited Partnership',
-        'Limited Liability Partnership'
-      ],
-      processing: false
+      processing: false,
+      requiredDocuments: null,
     };
   },
-  validations() {
+  validations () {
     return {
       form: {
         vehicle_plate_number: { required },
@@ -271,12 +265,21 @@ export default defineComponent({
   },
   computed: {
     ...mapGetters({
-      userSessionData: 'auth/userSessionData',
-      user: 'auth/user'
+      vehicleFormData: 'vehicle/getVehicleData',
+      user: 'auth/user',
+      partnerContext: 'auth/activeContext'
     })
   },
+  created () {
+    this.getPartnerRequiredDocuments();
+  },
   methods: {
-    async saveForm() {
+    getPartnerRequiredDocuments () {
+      this.$axios.get(`/v1/partners/${this.partnerContext.partner.id}/city-documents`).then(response => {
+        this.requiredDocuments = response.data;
+      })
+    },
+    async saveForm () {
       this.v$.form.$touch();
       console.log(this.form);
       if (this.processing || this.v$.form.$errors.length) {

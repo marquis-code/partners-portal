@@ -73,14 +73,21 @@
 </template>
 
 <script lang="ts">
+
 import { defineComponent } from '@vue/runtime-core';
+
+interface UploadOptions {
+  mimeTypes: string; // e.g *, image/jpg, pdf ...
+  multiple: boolean; // component should support multiple uploads
+  sizeLimit: number;
+}
 
 export default defineComponent({
   name: 'ImageUpload',
   props: {
     field: String
   },
-  data() {
+  data () {
     return {
       selectedFile: {},
       fileUploaded: false,
@@ -90,7 +97,7 @@ export default defineComponent({
     };
   },
   methods: {
-    uploadFile(event: any) {
+    uploadFile (event: any) {
       if (this.isFileSizeOk(event.target.files[0].size)) {
         this.selectedFile = event.target.files[0];
         this.fileSize = (event.target.files[0].size / 1000000)
@@ -102,14 +109,14 @@ export default defineComponent({
           this.uploadType = 'pdf';
         } else this.uploadType = 'image';
         this.$emit('fileSelected', this.selectedFile);
-      } else this.$toast.warning('file must be less than 10 MB');
+      } else this.$toast.warning('File must be less than 10 MB');
     },
-    isFileSizeOk(fileSizeInBytes: number): boolean {
+    isFileSizeOk (fileSizeInBytes: number): boolean {
       if (fileSizeInBytes > 10000000) {
         return false;
       } else return true;
     },
-    removeFile() {
+    removeFile () {
       this.selectedFile = {};
       this.fileUploaded = false;
       this.fileName = '';

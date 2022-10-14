@@ -94,7 +94,7 @@ export default defineComponent({
     this.getPartnerMembers();
   },
   methods: {
-    getPartnerMembers() {
+    getPartnerMembers () {
       const members = this.$store.getters['auth/userSessionData'];
       this.organizations = members.associatedOrganizations;
     },

@@ -45,7 +45,8 @@
               <template v-if="loading">
                 <tr>
                   <td :colspan="fields.length" class="py-10 text-center">
-                    <app-loading-indicator></app-loading-indicator>
+                    <spinner></spinner>
+                    <span>Loading...</span>
                   </td>
                 </tr>
               </template>
@@ -203,7 +204,11 @@
 </template>
 
 <script>
-export default {
+import {defineComponent} from "vue";
+import Spinner from "@/components/layout/Spinner";
+
+export default defineComponent({
+  components: {Spinner},
   props: {
     items: {
       type: Array
@@ -232,7 +237,7 @@ export default {
     }
   },
   emits: ['pageChange', 'sizeChange', 'handleRowClick'],
-  data() {
+  data () {
     return {
       pagination: {
         itemsPerPage: 10,
@@ -242,42 +247,42 @@ export default {
     };
   },
   watch: {
-    'pagination.itemsPerPage'(value, oldValue) {
+    'pagination.itemsPerPage' (value, oldValue) {
       if (value !== oldValue && value !== this.tableOptions.itemsPerPage) {
         this.$emit('sizeChange', value);
         this.pagination.currentPage = 1;
         this.tableOptions.itemsPerPage = value;
       }
     },
-    'extraOptions.totalSize'(value, oldValue) {
+    'extraOptions.totalSize' (value, oldValue) {
       if (value !== oldValue) {
         this.tableOptions.totalSize = value;
       }
     },
-    items(value, old) {
+    items (value, old) {
       console.log({ value, old });
     }
   },
-  created() {
+  created () {
     this.initDefaultOptions(this.extraOptions);
   },
   computed: {
-    total() {
+    total () {
       return this.tableOptions.serverSide
         ? this.tableOptions.totalSize
         : this.items.length;
     },
-    paginationStartIndex() {
+    paginationStartIndex () {
       return (
         this.paginationItemsPerPage * this.pagination.currentPage -
         this.paginationItemsPerPage +
         1
       );
     },
-    paginationItemsPerPage() {
+    paginationItemsPerPage () {
       return parseInt(this.pagination.itemsPerPage);
     },
-    tableItems() {
+    tableItems () {
       if (this.usePagination && !this.tableOptions.serverSide) {
         return this.items.slice(
           this.paginationStartIndex - 1,
@@ -286,29 +291,26 @@ export default {
       }
       return this.items;
     },
-    paginationTotalPages() {
+    paginationTotalPages () {
       return Math.ceil(
         (this.tableOptions.serverSide
           ? this.tableOptions.totalSize
           : this.items.length) / this.paginationItemsPerPage
       );
     },
-    paginationIsInLastPage() {
+    paginationIsInLastPage () {
       return this.pagination.currentPage === this.paginationTotalPages;
     },
-    paginationIsInFirstPage() {
+    paginationIsInFirstPage () {
       return this.pagination.currentPage === 1;
     }
   },
   methods: {
-    handleRowClick(item) {
+    handleRowClick (item) {
       console.log(item);
-      this.$router.push({
-        name: 'SingleVehicle',
-        params: { vehicleId: 1 }
-      });
+      this.$emit('rowClicked', item);
     },
-    initDefaultOptions(options) {
+    initDefaultOptions (options) {
       this.tableOptions = Object.assign(
         {},
         {
@@ -322,7 +324,7 @@ export default {
       this.pagination.currentPage = this.tableOptions.currentPage;
       this.pagination.itemsPerPage = this.tableOptions.itemsPerPage;
     },
-    getPropPath(obj, path) {
+    getPropPath (obj, path) {
       if (!path) {
         return;
       }
@@ -333,14 +335,14 @@ export default {
       });
       return vals.join(' ');
     },
-    getProp(obj, props) {
+    getProp (obj, props) {
       const prop = props.shift();
       if (!obj[prop] || !props.length) {
         return obj[prop];
       }
       return this.getProp(obj[prop], props);
     },
-    prevPage() {
+    prevPage () {
       let page = this.pagination.currentPage - 1;
       if (page < 1) {
         page = 1;
@@ -348,7 +350,7 @@ export default {
       this.pagination.currentPage = page;
       this.$emit('pageChange', this.pagination.currentPage);
     },
-    nextPage() {
+    nextPage () {
       let page = this.pagination.currentPage + 1;
       if (page > this.paginationTotalPages) {
         page = this.paginationTotalPages;
@@ -358,5 +360,5 @@ export default {
       this.$emit('pageChange', this.pagination.currentPage);
     }
   }
-};
+});
 </script>

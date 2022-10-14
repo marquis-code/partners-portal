@@ -8,6 +8,7 @@ import PluginService from './services/plugin.service';
 // Global Styles
 import './assets/scss/styles.scss';
 import 'vue-toast-notification/dist/theme-default.css';
+import "vue-select/dist/vue-select.css";
 
 import {AppInitializerService} from "@/services/app-initializer.service";
 
