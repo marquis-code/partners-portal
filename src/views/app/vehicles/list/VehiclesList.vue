@@ -39,11 +39,16 @@
             </template>
 
             <template v-slot:type="{ item }">
-
+              <span v-if="item.type" class="flex">
+                <img v-if="item.type.toLowerCase() === 'sedan'" src="@/assets/icons/sedan.svg">
+                <img v-else src="@/assets/icons/bus.svg">
+                <span class="ml-1">{{item.type}}</span>
+              </span>
+              <span v-else>Not Available</span>
             </template>
 
             <template v-slot:actions="">
-
+              <img v-else src="@/assets/icons/more_options.svg">
             </template>
           </app-table>
         </div>
@@ -100,11 +105,13 @@ export default defineComponent({
   methods: {
     setStatusFilter (value: string) {
       this.filters.status = value;
+      this.fetchVehicles();
     },
     fetchVehicles () {
       this.loading = true;
       const params = {
         related: 'driver',
+        status: this.filters.status,
         metadata: true
       };
       this.$axios

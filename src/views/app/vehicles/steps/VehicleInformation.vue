@@ -214,7 +214,7 @@ export default defineComponent<any, any, any>({
       form: {
         brand: '',
         name: '',
-        type: 'Sedan',
+        // type: 'Sedan',
         year: '',
         seats: '',
         city_ids: '',
