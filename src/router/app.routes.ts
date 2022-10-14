@@ -2,11 +2,11 @@ import {RouteRecordRaw} from "vue-router";
 import HomeView from "@/views/app/HomeView.vue";
 import Dashboard from "@/views/app/Dashboard.vue";
 import UserSelection from "@/views/app/OrganizationSelection.vue";
-import Drivers from "@/views/app/Drivers.vue";
 import Vehicles from "@/views/app/vehicles/Vehicles.vue";
 import Earnings from "@/views/app/Earnings.vue";
 import Settings from "@/views/app/Settings.vue";
 import {loadRouteComponent} from "@/utils/route-helper.util";
+import Drivers from "@/views/app/drivers/Drivers.vue";
 
 export const AppRoutes: Array<RouteRecordRaw> = [
   {
@@ -38,10 +38,56 @@ export const AppRoutes: Array<RouteRecordRaw> = [
         path: '/drivers',
         name: 'drivers',
         component: Drivers,
+        redirect: 'drivers.list',
         meta: {
           title: 'Drivers',
-          requiresAuth: false
-        }
+          requiresAuth: true
+        },
+        children: [
+          {
+            path: '',
+            name: 'drivers.list',
+            component: loadRouteComponent('app/drivers/list/DriversList'),
+            meta: {
+              title: 'Drivers',
+              requiresAuth: true
+            },
+          },
+          {
+            path: 'add-driiver',
+            name: 'AddVehicle',
+            component: loadRouteComponent('app/vehicles/AddDriver'),
+            meta: {
+              title: 'Add Driver',
+              requiresAuth: true
+            }
+          },
+          {
+            path: 'details/:driverId',
+            component: loadRouteComponent('app/vehicles/details/SingleDriver'),
+            props: true,
+            meta: {
+              title: 'Driver Details',
+              requiresAuth: true
+            },
+            children: [
+              {
+                path: '',
+                name: 'driver.detail',
+                redirect: 'information'
+              },
+              {
+                path: 'information',
+                name: 'driver.detail.info',
+                component: loadRouteComponent('app/Drivers/details/DriverInfo'),
+                meta: {
+                  title: 'Driver Details',
+                  requiresAuth: true
+                },
+              }
+            ]
+          },
+        ]
       },
       {
         path: '/vehicles',
