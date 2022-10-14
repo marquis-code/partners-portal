@@ -56,7 +56,7 @@ export const AppRoutes: Array<RouteRecordRaw> = [
           {
             path: 'add-driiver',
             name: 'AddVehicle',
-            component: loadRouteComponent('app/vehicles/AddDriver'),
+            component: loadRouteComponent('app/drivers/AddDriver'),
             meta: {
               title: 'Add Driver',
               requiresAuth: true
@@ -64,7 +64,7 @@ export const AppRoutes: Array<RouteRecordRaw> = [
           },
           {
             path: 'details/:driverId',
-            component: loadRouteComponent('app/vehicles/details/SingleDriver'),
+            component: loadRouteComponent('app/drivers/details/DriverDetailsIndex'),
             props: true,
             meta: {
               title: 'Driver Details',
@@ -79,7 +79,16 @@ export const AppRoutes: Array<RouteRecordRaw> = [
               {
                 path: 'information',
                 name: 'driver.detail.info',
-                component: loadRouteComponent('app/Drivers/details/DriverInfo'),
+                component: loadRouteComponent('app/drivers/details/DriverInfo'),
+                meta: {
+                  title: 'Driver Details',
+                  requiresAuth: true
+                },
+              },
+              {
+                path: 'trips',
+                name: 'driver.detail.trips',
+                component: loadRouteComponent('app/drivers/details/driverTrips'),
                 meta: {
                   title: 'Driver Details',
                   requiresAuth: true
