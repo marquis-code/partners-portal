@@ -84,24 +84,24 @@ export default defineComponent({
   props: {
     dropdownContents: Array
   },
-  data() {
+  data () {
     return {
       show: false
     };
   },
   methods: {
-    toggle() {
+    toggle () {
       this.show = !this.show;
     },
-    edit() {
+    edit () {
       this.show = !this.show;
       console.log('editing..');
     },
-    assign() {
+    assign () {
       this.show = !this.show;
       console.log('assigning..');
     },
-    remove() {
+    remove () {
       this.show = !this.show;
       console.log('removing..');
     }

@@ -22,7 +22,7 @@ export default defineComponent({
     FileUpload,
     ImageUploadPreview
   },
-  data() {
+  data () {
     return {
       fileType: 'png',
       fileName: 'file_001.pdf',

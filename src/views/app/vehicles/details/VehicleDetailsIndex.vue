@@ -45,7 +45,7 @@ export default {
       isLoading: 'vehicle/getVehicleLoading'
     })
   },
-  data() {
+  data () {
     return {
       loading: true,
     }

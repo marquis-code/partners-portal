@@ -33,18 +33,21 @@ export default defineComponent({
   props: {
     images: Array
   },
-  data() {
+  data () {
     return {
       selectedImage: ''
     };
   },
   methods: {
-    handleImageUpload() {
-      this.uploadedImages.push(this.selectedImage);
+    handleImageUpload () {
+      // this.uploadedImages.push(this.selectedImage);
     },
-    onFileChanged(event) {
+    onFileChanged (event) {
       this.selectedImage = event.target.files[0];
-      this.images.push({ image: this.selectedImage });
+      // this.images.push({ image: this.selectedImage });
+    },
+    onUpload () {
+      // TODO: Impl this
     }
   }
 });
