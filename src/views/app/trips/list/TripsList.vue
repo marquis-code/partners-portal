@@ -231,7 +231,7 @@ export default defineComponent({
     getFormattedDate(date: any) {
       return moment(date).format('LL');
     },
-    transformedTrips(payload: []): any [] {
+    transformedTrips(payload: Array<any>): any [] {
       const newTrips: any = []
       payload.forEach(trip => {
         newTrips.push({
@@ -247,7 +247,7 @@ export default defineComponent({
       });
       return newTrips;
     },
-    transformActiveOrUpcomingTrips(payload: []) {
+    transformActiveOrUpcomingTrips(payload: Array<any>) {
       const newTrips: any = []
       payload.forEach(trip => {
         newTrips.push({
