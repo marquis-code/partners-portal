@@ -1,5 +1,5 @@
 <template>
-<div>
+<div class="relative">
 <!--  <page-action-header>-->
 <!--    <template #action>-->
 
@@ -25,26 +25,24 @@
 <!--    </template>-->
 <!--  </page-action-header>-->
   <div class="w-full relative rounded-sm shadow-sm">
-    <single-vehicle class="absolute left-10 top-10 z-50"></single-vehicle>
-    <Map></Map>
+    <single-vehicle :vehicle-data="vehicleData" class="absolute left-10 top-10 z-50"></single-vehicle>
+<!--    <Map></Map>-->
   </div>
 </div>
 </template>
 
 <script lang="ts">
 import {defineComponent} from "vue";
-import PageLayout from "@//layout/PageLayout.vue";
+// import PageLayout from "@//layout/PageLayout.vue";
 import {extractErrorMessage} from "@/utils/helper";
 import SingleVehicle from "@/views/app/vehicles/components/SingleVehicle.vue";
-import Map from "@/views/app/vehicles/components/Map.vue";
+// import Map from "@/views/app/vehicles/components/Map.vue";
 import {mapGetters} from "vuex";
-import PageActionHeader from "@/components/PageActionHeader.vue";
 
 export default defineComponent({
   name: "VehicleInfo",
   components: {
-    PageActionHeader,
-    Map,
+    // Map,
     SingleVehicle,
   },
   data () {
