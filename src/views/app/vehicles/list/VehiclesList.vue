@@ -48,7 +48,7 @@
             </template>
 
             <template v-slot:actions="">
-              <img v-else src="@/assets/icons/more_options.svg">
+              <img src="@/assets/icons/more_options.svg">
             </template>
           </app-table>
         </div>
