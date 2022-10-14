@@ -141,22 +141,7 @@ export default defineComponent({
         search: ''
       },
       loading: false,
-      tableData: [],
-      tableData2: [
-        {
-          createdAt: '2022-10-13T09:06:08.848Z',
-          pickup: 'Jasper Ike Street, Lagos, Nigeria',
-          dropoff: 'baba adisa bus stop, Lekki, Nigeria',
-          driver: {
-            fname: 'Daniel',
-            lname: 'Sumah'
-          },
-          routeCode: 'IKR104',
-          startTime: "2022-02-24 18:17:26",
-          endTime: "2022-02-24 18:17:26",
-          passengersCount: 28
-        }
-      ],
+      tableData: [] as Array<any>,
       totalRecords: null,
       errorLoading: false,
       headers: [
