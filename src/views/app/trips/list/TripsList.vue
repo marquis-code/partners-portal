@@ -57,12 +57,31 @@
             cursor-pointer
           "
           :class="
-            this.filters.status === 'inactive'
+            this.filters.status === 'upcoming'
               ? 'text-black border-b-sh-green-500'
               : 'text-sh-grey-500 border-b-transparent'
           "
-          @click="setStatusFilter('inactive')"
-          >InActive</span
+          @click="setStatusFilter('upcoming')"
+          >Upcoming</span
+        >
+        <span
+          class="
+            text-sm
+            font-medium
+            leading-6
+            pb-2
+            pt-1
+            px-2
+            border-b-2
+            cursor-pointer
+          "
+          :class="
+            this.filters.status === 'completed'
+              ? 'text-black border-b-sh-green-500'
+              : 'text-sh-grey-500 border-b-transparent'
+          "
+          @click="setStatusFilter('completed')"
+          >Completed</span
         >
       </div>
       <div class="space-y-5 ring-1 ring-gray-50 shadow-sm rounded-sm bg-white">
@@ -77,7 +96,7 @@
             :fields="headers"
             @rowClicked="viewTripDetails"
           >
-            <template v-slot:driver="{ item }">
+            <template v-slot:metadata="{ item }">
               <span v-if="item" class="font-light text-sm text-gray-type-3">
                 {{ item.fname || '' }}
                 {{ item.lname || '' }}
@@ -122,7 +141,8 @@ export default defineComponent({
         search: ''
       },
       loading: false,
-      tableData: [
+      tableData: [],
+      tableData2: [
         {
           createdAt: '2022-10-13T09:06:08.848Z',
           pickup: 'Jasper Ike Street, Lagos, Nigeria',
@@ -164,24 +184,43 @@ export default defineComponent({
     },
     fetchPartnerTripsFromRevenue() {
       this.loading = true;
-      // const params = {
-      //   related: 'driver',
-      //   status: this.filters.status,
-      //   metadata: true
-      // };
-      this.$axios
-        .get(`cost-revenue/v1/partners/${this.partnerContext.partner.id}/revenues`)
-        .then((res) => {
-          console.log(res);
-          // this.tableData = res.data.data || [];
-          this.totalRecords = res.data.metadata?.total;
-        })
-        .catch(err => {
-          this.$toast.error(err.response.data.message || "An error occured")
-        })
-        .finally(() => {
-          this.loading = false;
-        });
+      const params = {
+        related: 'trips',
+        status: this.filters.status,
+        metadata: true
+      };
+      if (params.status === 'active' || params.status === 'upcoming') {
+        this.$axios
+          .get(`/v1/trips/${params.status}?limit=10&page=1&${this.partnerContext.partner.id}=30`)
+          .then((res) => {
+            console.log(res.data.result);
+            const trips = this.transformActiveOrUpcomingTrips(res.data.data);
+            this.tableData = trips;
+            this.totalRecords = res.data.metadata?.total;
+          })
+          .catch(err => {
+            this.$toast.error(err.response.data.message || "An error occured")
+          })
+          .finally(() => {
+            this.loading = false;
+          });
+      }
+      if (params.status === 'completed') {
+        this.$axios
+          .get(`cost-revenue/v1/partners/${this.partnerContext.partner.id}/revenues`)
+          .then((res) => {
+            console.log(res.data.result);
+            const trips = this.transformedTrips(res.data.result)
+            this.tableData = trips;
+            this.totalRecords = res.data.metadata?.total;
+          })
+          .catch(err => {
+            this.$toast.error(err.response.data.message || "An error occured")
+          })
+          .finally(() => {
+            this.loading = false;
+          });
+      }
     },
     viewTripDetails(vehicle: any) {
       this.$router.push({
@@ -191,6 +230,38 @@ export default defineComponent({
     },
     getFormattedDate(date: any) {
       return moment(date).format('LL');
+    },
+    transformedTrips(payload: []): any [] {
+      const newTrips: any = []
+      payload.forEach(trip => {
+        newTrips.push({
+          createdAt: moment(trip.createdAt).format('LL'),
+          pickup: trip.metadata.pickup,
+          dropoff: trip.metadata.dropoff,
+          driver: trip.metadata.driver.fname + ' ' + trip.metadata.driver.lname,
+          routeCode: trip.metadata.routeCode,
+          startTime: moment(trip.metadata.startTime).format('LL'),
+          endTime: moment(trip.metadata.endTime).format('LL'),
+          passengersCount: trip.passengersCount
+        });
+      });
+      return newTrips;
+    },
+    transformActiveOrUpcomingTrips(payload: []) {
+      const newTrips: any = []
+      payload.forEach(trip => {
+        newTrips.push({
+          createdAt: moment(trip.created_at).format('LL'),
+          pickup: trip.route.pickup,
+          dropoff: trip.route.dropoff,
+          driver: trip.driver.fname + ' ' + trip.driver.lname,
+          routeCode: trip.route.route_code,
+          startTime: moment(trip.start_trip).format('LL'),
+          endTime: moment(trip.end_trip).format('LL'),
+          passengersCount: trip.passengers_count
+        });
+      });
+      return newTrips;
     }
   }
 });
