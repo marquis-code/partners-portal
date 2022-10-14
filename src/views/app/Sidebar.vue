@@ -57,7 +57,7 @@
       class="absolute bottom-10 flex flex-row justify-between items-center py-3 rounded-xl bg-green-200"
       :class="isSidebarFolded ? 'p-1' : 'px-3'"
     >
-      <div class="flex flex-row items-center">
+      <div class="flex flex-row items-center" @click="logout">
         <img
           src="@/assets/images/avatar-placeholder.svg"
           class="w-10 h-10 mr-2"
@@ -88,6 +88,7 @@ export default defineComponent({
             {title: 'Dashboard', icon: 'home', selected: true},
             {title: 'Drivers', icon: 'group', selected: false},
             {title: 'Vehicles', icon: 'directions_car', selected: false},
+            {title: 'Trips', icon: 'route', selected: false},
             {title: 'Earnings', icon: 'payments', selected: false}
           ],
         },
@@ -133,6 +134,9 @@ export default defineComponent({
         this.isSidebarFolded = false;
         this.isMobileScreen = false;
       }
+    },
+    logout() {
+      localStorage.clear();
     }
   }
 })
