@@ -19,7 +19,6 @@ export class OnboardingGuard implements RouteGuard {
       contextOrg.onboardingState?.address !== 'not-submitted' && contextOrg.onboardingState?.identity !== 'not-submitted';
     const onboardingComplete = !!(contextOrg?.supportedCities?.length && kycFormCompleted);
     const hasOrgs = sessionData?.associatedOrganizations?.length;
-    debugger;
 
     if (onboardingComplete && isOnboardingRoute) {
       next({

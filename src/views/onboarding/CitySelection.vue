@@ -74,7 +74,7 @@ export default {
     selectThisCity (event) {
       const newAddition = this.cities[event.target.value];
       const index = this.selectedCities.findIndex(o => o.city.id === newAddition?.city.id);
-      if(index < 0) {
+      if (index < 0) {
         this.selectedCities.push(newAddition)
       }
     },
@@ -91,7 +91,7 @@ export default {
         try {
           this.loading = true;
           await Promise.all([...(this.selectedCities.map(city =>
-            this.$axios.post(`v1/partners/${this.contextOrg?.partner?.id}/cities`, {city_id: city.id})))]);
+            this.$axios.post(`v1/partners/${this.contextOrg?.partner?.id}/cities`, {city_id: city.city.id})))]);
           await this.$store.dispatch('auth/refreshActiveContext', this.user.id);
           this.$toast.success('Partner account created');
           await this.$router.push({name: 'dashboard'})

@@ -1,16 +1,14 @@
 <template>
   <OnboardingLayout>
     <CenteredPageHeader :title="headerTitle" :description="headerDescription" />
-    <section
-      class="
-        md:flex
-        items-center
-        justify-center
+     <section
+      class="flex flex-wrap items-center justify-center
         space-y-5
-        md:space-y-0 md:space-x-5
-        w-7/12
+        md:space-y-0
+        w-10/12
         mx-auto
         md:w-10/12
+        lg:w-6/12
       "
     >
       <div
@@ -22,7 +20,7 @@
             ? 'bg-sh-green-100 ring-1 ring-sh-green-500'
             : 'bg-sh-grey-50 ring-1 ring-gray-300'
         ]"
-        class="p-6 py-9 rounded-md space-y-3 cursor-pointer max-w-xs"
+        class="p-6 py-9 rounded-md space-y-3 cursor-pointer max-w-xs mr-8"
       >
         <img src="@/assets/images/shuttle.svg" />
         <h1 class="text-sh-grey-900 font-bold">{{ title }}</h1>
@@ -101,7 +99,6 @@ export default defineComponent({
     },
     async handleRedirection () {
       if (this.activeIndex === 0) {
-        console.log('Here');
         await this.$router.push({ name: 'GetStarted', query: { type: 'company' }});
       }
 
