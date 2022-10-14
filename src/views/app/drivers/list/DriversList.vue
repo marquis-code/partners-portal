@@ -78,10 +78,10 @@
             @rowClicked="viewTripDetails"
           >
             <template v-slot:driver="{ item }">
-              <span v-if="item" class="font-light text-sm text-gray-type-3">
-                <span>
-                   <img v-if="item.avatar" :src="item.avatar" />
-                   <span class="rounded-full p-2 text-gray-100 font-medium bg-gray-400">{{item.fname.slice(0, 1)}}{{item.lname.slice(0, 1)}}</span>
+              <span v-if="item" class="font-light flex items-center text-sm text-gray-type-3">
+                <span class=" pr-2">
+                   <img class="rounded-full h-10 w-10 object-cover" v-if="item.avatar" :src="item.avatar" />
+                   <span v-else class="rounded-full p-2 text-gray-100 font-medium bg-gray-400">{{item.fname.slice(0, 1)}}{{item.lname.slice(0, 1)}}</span>
                 </span>
                 {{ item.fname || '' }}
                 {{ item.lname || '' }}
