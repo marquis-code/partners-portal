@@ -160,7 +160,8 @@ export default defineComponent({
   },
   computed: {
     ...mapGetters({
-      partnerContext: 'auth/activeContext'
+      partnerContext: 'auth/activeContext',
+      userSessionData: 'auth/userSessionData'
     })
   },
   methods: {
@@ -176,9 +177,9 @@ export default defineComponent({
       //   metadata: true
       // };
       this.$axios
-        .get(`/v1/partner/${this.partnerContext.partner.id}/vehicle_drivers`)
+        .get(`/v1/partners/${this.userSessionData.activeContext.account_sid}/drivers`)
         .then((res) => {
-          console.log(res);
+          console.log(res.data.data);
           this.tableData = res.data.data || [];
           this.totalRecords = res.data.metadata?.total;
         })

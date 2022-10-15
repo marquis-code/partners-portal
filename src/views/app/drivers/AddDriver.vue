@@ -418,12 +418,12 @@ export default defineComponent({
           document_type: 'drivers_license',
           password: 'shuttlers'
         };
-        console.log(payload);
         const response = await this.$axios.post(
           `/v1/partners/${this.userSessionData.activeContext.account_sid}/drivers`,
           payload
         );
         console.log(response);
+        this.$router.push({ name: 'driver.detail.info', params: {driverId: response.data.driver_id}});
       } catch (err) {
         const errorMessage = extractErrorMessage(
           err,
