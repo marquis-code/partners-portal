@@ -86,8 +86,8 @@ export default defineComponent({
           sectionTitle: 'GENERAL',
           menus: [
             {title: 'Dashboard', icon: 'home', selected: true},
-            {title: 'Drivers', icon: 'group', selected: false},
             {title: 'Vehicles', icon: 'directions_car', selected: false},
+            {title: 'Drivers', icon: 'group', selected: false},
             {title: 'Trips', icon: 'route', selected: false},
             {title: 'Earnings', icon: 'payments', selected: false}
           ],
