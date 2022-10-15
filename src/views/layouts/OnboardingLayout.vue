@@ -1,15 +1,5 @@
 <template>
-<main
-class="
-    min-h-screen
-    w-screen
-    flex
-    justify-center
-    items-center
-    flex-col
-    space-y-6
-"
->
+<main class=" min-h-screen w-screen flex justify-center items-center flex-col space-y-6">
   <slot></slot>
 </main>
 </template>

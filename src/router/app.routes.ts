@@ -54,8 +54,8 @@ export const AppRoutes: Array<RouteRecordRaw> = [
             },
           },
           {
-            path: 'add-driiver',
-            name: 'AddVehicle',
+            path: 'add-driver',
+            name: 'AddDriver',
             component: loadRouteComponent('app/drivers/AddDriver'),
             meta: {
               title: 'Add Driver',

@@ -20,7 +20,7 @@
         />
         <span
           v-else
-          class="rounded-full h-20 w-20 text-gray-100 font-medium bg-gray-400"
+          class="rounded-full h-20 w-20 flex justify-center items-center text-gray-100 font-medium bg-gray-400"
           >{{ driverData.fname.slice(0, 1)
           }}{{ driverData.lname.slice(0, 1) }}</span
         >
@@ -29,7 +29,8 @@
         {{ driverData.fname }} {{ driverData.lname }}
       </p>
     </div>
-    <div class="w-full h-0.5 bg-gray-200"></div>
+     <hr class="mb-0">
+    <!-- <div class="w-full h-0.5 bg-gray-200"></div> -->
 
     <div class="p-5 md:p-8 grid grid-cols-1 divide-y">
       <div class="flex justify-between items-center pb-6">

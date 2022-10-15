@@ -1,5 +1,5 @@
 <template>
-  <page-layout page-title="Drivers">
+  <page-layout page-title="Add a driver">
     <template #actionsPane>
       <page-action-header>
         <template #action>
