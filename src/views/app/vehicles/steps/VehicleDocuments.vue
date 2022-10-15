@@ -10,59 +10,16 @@
       </div>
       <div class="bg-gray-300 h-0.5 w-full"></div>
     </div>
-
     <main class="space-y-10">
       <p class="text-sm text-gray-300 pt-5">Vehicle Information</p>
-      <section
-        class="
-          lg:flex
-          justify-between
-          space-y-3
-          lg:space-y-0 lg:space-x-10
-          items-center
-        "
-      >
-        <div class="space-y-2 w-full lg:w-6/12 pr-1">
-          <label class="text-xs font-medium text-grays-black-5"
-            >Vehicle Plate number</label
-          >
-          <select
-            v-model="v$.form.vehicle_plate_number.$model"
-            class="
-              text-xs
-              border-none
-              outline-none
-              w-full
-              rounded-md
-              p-4
-              placeholder-gray-500 placeholder-opacity-25
-              ring-1 ring-gray-300
-            "
-          >
-            <option value="" disabled hidden>Ente your plate number</option>
-            <option
-              :value="option"
-              v-for="(option, index) in businessOptions"
-              :key="index"
-            >
-              {{ option }}
-            </option>
-          </select>
-          <span
-            class="text-sm font-light text-red-500"
-            v-if="
-              v$.form.vehicle_plate_number.$dirty &&
-              v$.form.vehicle_plate_number.required.$invalid
-            "
-          >
-            Please provide your vehicle plate number
-          </span>
-        </div>
-        <div class="space-y-2 w-full lg:w-6/12 pr-1">
+      <div class="" v-for="(doc, index) in vehicle_documents_order" :key="index">
+        <p class="text-sm text-gray-300 pt-5">{{payload.vehicle_documents[index].document_type}}</p>
+        <div v-if="doc.expires" class="space-y-2 w-full lg:w-6/12 pr-1 py-5">
           <label class="text-xs font-medium text-grays-black-5"
             >Expiry date</label
           >
-          <datepicker
+          <input
+            type="date"
             class="
               text-xs
               border-none
@@ -74,64 +31,9 @@
               ring-1 ring-gray-300
             "
             placeholder="Choose a date"
-            v-model="v$.form.vehicle_plate_number_expiry_date.$model"
+            v-model="payload.vehicle_documents[index].expiry_date"
           />
-          <span
-            class="text-sm font-light text-red-500"
-            v-if="
-              v$.form.vehicle_plate_number_expiry_date.$dirty &&
-              v$.form.vehicle_plate_number_expiry_date.required.$invalid
-            "
-          >
-            This field is required
-          </span>
-        </div>
-      </section>
-      <div class="space-y-3">
-        <label class="text-gray font-medium text-gray-500 text-xs"
-          >Upload vehicle license document (pdf, jpg, png)</label
-        >
-        <image-upload></image-upload>
-      </div>
-      <div class="space-y-3">
-        <p class="text-gray-300 font-medium text-xs">
-          Central Motor Registry (CMR)
-        </p>
-        <label class="text-gray font-medium text-gray-500 text-xs"
-          >Upload Central Motor Registry (CMR) document (pdf, jpg, png)</label
-        >
-        <image-upload></image-upload>
-      </div>
-
-      <div class="space-y-3">
-        <p class="text-gray-300 font-medium text-xs">Proof of Ownership</p>
-        <label class="text-gray font-medium text-gray-500 text-xs"
-          >Upload proof of ownership document (pdf, jpg, png)</label
-        >
-        <image-upload></image-upload>
-      </div>
-
-      <div class="">
-        <p class="text-sm text-gray-300 pt-5">Vehicle Insurance</p>
-        <div class="space-y-2 w-full lg:w-6/12 pr-1 py-5">
-          <label class="text-xs font-medium text-grays-black-5"
-            >Expiry date</label
-          >
-          <datepicker
-            class="
-              text-xs
-              border-none
-              outline-none
-              w-full
-              rounded-md
-              p-3
-              placeholder-gray-500 placeholder-opacity-25
-              ring-1 ring-gray-300
-            "
-            placeholder="Choose a date"
-            v-model="v$.form.vehicle_insurance_expiry_date.$model"
-          />
-          <span
+          <!-- <span
             class="text-sm font-light text-red-500"
             v-if="
               v$.form.vehicle_insurance_expiry_date.$dirty &&
@@ -139,90 +41,19 @@
             "
           >
             This field is required
-          </span>
+          </span> -->
         </div>
         <label class="text-xs font-medium text-grays-black-5"
-          >Upload vehicle Insurance document (pdf, jpg, png)</label
+          >Upload {{payload.vehicle_documents[index].document_type}} document (pdf, jpg, png)</label
         >
-        <image-upload class="pt-3"></image-upload>
+        <image-upload @fileSelected="selectFile($event, index)" @fileRemoved="removeFile(index)" class="pt-3"></image-upload>
       </div>
 
-      <div>
-        <p class="text-sm text-gray-300 pt-5">Road worthiness</p>
-        <div class="space-y-2 w-full lg:w-6/12 pr-1 py-4">
-          <label class="text-xs font-medium text-grays-black-5"
-            >Expiry date</label
-          >
-          <datepicker
-            class="
-              text-xs
-              border-none
-              outline-none
-              w-full
-              rounded-md
-              p-3
-              placeholder-gray-500 placeholder-opacity-25
-              ring-1 ring-gray-300
-            "
-            placeholder="Choose a date"
-            v-model="v$.form.road_worthiness_expiry_date.$model"
-          />
-          <span
-            class="text-sm font-light text-red-500"
-            v-if="
-              v$.form.road_worthiness_expiry_date.$dirty &&
-              v$.form.road_worthiness_expiry_date.required.$invalid
-            "
-          >
-            This field is required
-          </span>
-        </div>
-        <label class="text-xs font-medium text-grays-black-5"
-          >Upload road worthiness document (pdf, jpg, png)</label
-        >
-        <image-upload class="pt-3"></image-upload>
-      </div>
-
-      <div>
-        <p class="text-sm text-gray-300 pt-5">Hackney permit</p>
-        <div class="space-y-2 w-full lg:w-6/12 pr-1 py-4">
-          <label class="text-xs font-medium text-grays-black-5"
-            >Expiry date</label
-          >
-          <datepicker
-            class="
-              text-xs
-              border-none
-              outline-none
-              w-full
-              rounded-md
-              p-3
-              placeholder-gray-500 placeholder-opacity-25
-              ring-1 ring-gray-300
-            "
-            placeholder="Choose a date"
-            v-model="v$.form.hackney_expiry_date.$model"
-          />
-          <span
-            class="text-sm font-light text-red-500"
-            v-if="
-              v$.form.hackney_expiry_date.$dirty &&
-              v$.form.hackney_expiry_date.required.$invalid
-            "
-          >
-            This field is required
-          </span>
-        </div>
-        <label class="text-xs font-medium text-grays-black-5"
-          >Upload hackney permit document (pdf, jpg, png)</label
-        >
-        <image-upload class="pt-3"></image-upload>
-      </div>
     </main>
 
     <div class="flex justify-end items-center space-x-5 pt-5">
-     <button class="text-black text-sm bg-gray-300 px-6 py-3 font-medium rounded-md" @click.prevent="$emit('goBack')">Previous</button>
-     <button class="text-black text-sm bg-sh-green-500 px-6 py-3 font-medium rounded-md" @click="$emit('next')">Next</button>
+     <button type="button" class="text-black text-sm bg-gray-300 px-6 py-3 font-medium rounded-md" @click.prevent="$emit('goBack')">Previous</button>
+     <button type="button" class="text-black text-sm bg-sh-green-500 px-6 py-3 font-medium rounded-md" @click="saveForm" :disabled="savingVehicleDocuments"> {{savingVehicleDocuments ? 'Saving' : 'Next'}} </button>
     </div>
   </form>
 </template>
@@ -233,20 +64,73 @@ import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import { mapGetters } from 'vuex';
 import { extractErrorMessage } from '@/utils/helper';
-import Datepicker from 'vue3-datepicker';
+import moment from 'moment';
+// import Datepicker from 'vue3-datepicker';
 import ImageUpload from '@/components/ImageUpload.vue';
 export default defineComponent({
-  components: { ImageUpload, Datepicker },
+  components: { ImageUpload },
   emits: ['next', 'goBack'],
   data () {
     return {
       v$: useVuelidate(),
-      form: {
-        vehicle_plate_number: '',
-        vehicle_plate_number_expiry_date: '',
-        vehicle_insurance_expiry_date: '',
-        road_worthiness_expiry_date: '',
-        hackney_expiry_date: ''
+      uploadingFile: false,
+      savingVehicleDocuments: false,
+      documentsToSave: {
+        city_documents: [],
+        vehicle_documents: []
+      },
+      vehicle_documents_order: [
+        {
+          expires: true
+        },
+        {
+          expires: false
+        },
+        {
+          expires: false
+        },
+        {
+          expires: true
+        },
+        {
+          expires: true
+        },
+        {
+          expires: true
+        },
+      ],
+      payload: {
+        city_documents: [],
+        vehicle_documents: [
+          {
+            document_type: "Vehicle Information",
+            expiry_date: '',
+            files: []
+          },
+          {
+            document_type: "Central Motor Registry (CMR)",
+            files: [],
+          },
+          {
+            document_type: "Proof of Ownership",
+            files: [],
+          },
+          {
+            document_type: "Vehicle Insurance",
+            expiry_date: '',
+            files: [],
+          },
+          {
+            document_type: "Road worthiness",
+            expiry_date: '',
+            files: [],
+          },
+          {
+            document_type: "Hackney permit",
+            expiry_date: '',
+            files: [],
+          },
+        ]
       },
       processing: false,
       requiredDocuments: null,
@@ -266,6 +150,7 @@ export default defineComponent({
   computed: {
     ...mapGetters({
       vehicleFormData: 'vehicle/getVehicleData',
+      getVehicleFormData: 'vehicle/getVehicleFormData',
       user: 'auth/user',
       partnerContext: 'auth/activeContext'
     })
@@ -280,32 +165,65 @@ export default defineComponent({
       })
     },
     async saveForm () {
-      this.v$.form.$touch();
-      console.log(this.form);
-      if (this.processing || this.v$.form.$errors.length) {
-        return;
-      }
-      this.processing = true;
+      this.savingVehicleDocuments = true;
+      this.changeExpiryDateToTimeStamp();
+      const newPayload = this.removeDocumentsWithoutFiles();
+      console.log(newPayload);
+      this.savingVehicleDocuments = false;
       try {
-        const payload = {
-          ...this.form
-        };
-        // const response = await this.$axios.post(
-        //   '/v1/create-partners-vehicle',
-        //   payload
-        // );
-        console.log(payload);
+        await this.$axios.post(`/v1/partners/${this.partnerContext.partner.id}/vehicle/${this.getVehicleFormData.id}/vehicle-documents`, {...newPayload});
         this.$emit('next');
-      } catch (err) {
+      } catch (error) {
         const errorMessage = extractErrorMessage(
-          err,
+          error,
           null,
           'Oops! An error occurred, please try again.'
         );
         this.$toast.error(errorMessage);
       } finally {
-        this.processing = false;
+        this.savingVehicleDocuments = false;
       }
+    },
+    async selectFile ($event, index) {
+      const fileHolder = $event
+      const fileUrl = await this.uploadTos3andGetDocumentUrl(fileHolder);
+      this.payload.vehicle_documents[index].files.push(fileUrl);
+      this.$toast.success(`${this.payload.vehicle_documents[index].document_type} uploaded`);
+    },
+    async uploadTos3andGetDocumentUrl(file) {
+      this.uploadingFile = true;
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+        const response = await this.$axios.post(`/v1/upload/identity/files`, formData);
+        if (response.data?.files?.length) {
+          return response.data.files[0].Location;
+        }
+      } catch (error) {
+        this.$toast.warning("An error occured while uploading your file, please try again")
+      } finally {
+        this.uploadingFile = false;
+      }
+    },
+    changeExpiryDateToTimeStamp() {
+      this.payload.vehicle_documents = this.payload.vehicle_documents.map(doc => {
+        if (doc.expiry_date && moment(doc.expiry_date).isValid()) {
+          doc.expiry_date = moment(doc.expiry_date).format('YYYY-MM-DD HH:mm:ss');
+        }
+        return doc
+      });
+    },
+    removeDocumentsWithoutFiles() {
+      const cityDocumentsWithFiles = this.payload.city_documents.filter(doc => {
+        return doc.files.length > 0;
+      });
+      const vehicleDocumentsWithFiles = this.payload.vehicle_documents.filter(doc => {
+        return doc.files.length > 0;
+      });
+      return {city_documents: cityDocumentsWithFiles, vehicle_documents: vehicleDocumentsWithFiles};
+    },
+    removeFile (index) {
+      this.payload.vehicle_documents[index].files = []
     }
   }
 });
