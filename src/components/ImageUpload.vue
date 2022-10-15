@@ -71,17 +71,13 @@
     </p>
   </div>
 </template>
-
 <script lang="ts">
-
 import { defineComponent } from '@vue/runtime-core';
-
 interface UploadOptions {
   mimeTypes: string; // e.g *, image/jpg, pdf ...
   multiple: boolean; // component should support multiple uploads
   sizeLimit: number;
 }
-
 export default defineComponent({
   name: 'ImageUpload',
   props: {
@@ -126,6 +122,5 @@ export default defineComponent({
   }
 });
 </script>
-
 <style scoped>
 </style>

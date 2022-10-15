@@ -13,8 +13,7 @@
 <!--        <small class="text-xs text-gray-300">Registered: 20th August, 2021</small>-->
       </main>
     </div>
-    <div class="w-full h-0.5 bg-gray-200"></div>
-
+    <hr class="mb-0">
     <div class="p-8 grid grid-cols-1 divide-y">
       <div class="flex justify-between items-center pb-6">
         <div class="flex justify-start space-x-2">

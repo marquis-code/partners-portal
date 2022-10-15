@@ -1,5 +1,5 @@
 <template>
-  <main>
+  <main class="modal" v-if="showModal">
     <notification-modal-content>
       <template #modalHeader>
         <div class="flex justify-center items-center">
@@ -10,7 +10,9 @@
       </template>
       <template #modalBody>
         <div class="space-y-2 px-3 w-11/12">
-          <h1 class="text-gray-700 text-lg font-medium text-center">{{ title }}?</h1>
+          <h1 class="text-gray-700 text-lg font-medium text-center">
+            {{ title }}?
+          </h1>
           <p class="text-gray-400 text-xs lg:text-sm text-center">
             {{ description }}
           </p>
@@ -53,6 +55,7 @@
               rounded-md
               bg-sh-green-500
             "
+            @click="closeModal()"
           >
             Dismiss
           </button>
@@ -60,7 +63,15 @@
 
         <div v-else class="flex pt-5 space-x-7 w-full px-5">
           <button
-            class="text-gray-600 rounded-md px-7 py-2 ring-1 ring-gray-500 w-full"
+            class="
+              text-gray-600
+              rounded-md
+              px-7
+              py-2
+              ring-1 ring-gray-500
+              w-full
+            "
+            @click="closeModal()"
           >
             Cancel
           </button>
@@ -82,9 +93,33 @@ export default {
     title: String,
     description: String,
     modalExtras: Boolean
+  },
+  data() {
+    return {
+      showModal: true
+    };
+  },
+  methods: {
+    openModal() {
+      this.showModal = true;
+    },
+    closeModal() {
+      this.showModal = false;
+    }
   }
 };
 </script>
 
-<style>
+<style scoped>
+.modal {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0px;
+  margin: auto;
+  width: 100px;
+  height: 100px;
+  background: rgba(0, 0, 0, 0.45);
+}
 </style>
