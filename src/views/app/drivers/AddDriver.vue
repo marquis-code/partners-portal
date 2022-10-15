@@ -307,19 +307,6 @@
         </section>
 
         <div class="space-x-5 flex justify-end items-center pt-10">
-          <!-- <button
-            class="
-              font-medium
-              text-sm
-              ring-1 ring-gray-400
-              text-gray-700
-              px-6
-              py-2
-              rounded-md
-            "
-          >
-            Go back
-          </button> -->
           <button
             type="button"
             @click="saveForm()"
