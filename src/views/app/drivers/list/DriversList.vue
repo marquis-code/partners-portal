@@ -177,10 +177,11 @@ export default defineComponent({
       //   metadata: true
       // };
       this.$axios
-        .get(`/v1/partners/${this.userSessionData.activeContext.account_sid}/drivers`)
+        .get(
+          `/v1/partners/${this.userSessionData.activeContext.partner.account_sid}/drivers`
+        )
         .then((res) => {
-          console.log(res.data.data);
-          this.tableData = res.data.data || [];
+          this.tableData = this.formatApiFormData(res.data.data) || [];
           this.totalRecords = res.data.metadata?.total;
         })
         .finally(() => {
@@ -193,6 +194,26 @@ export default defineComponent({
         name: 'driver.detail.info',
         params: { driverId: driver.id }
       });
+    },
+    formatApiFormData(apiFormData: Array<any>) {
+      const newTableData: any = [];
+      apiFormData.forEach((eachDriver) => {
+        console.log(eachDriver);
+        newTableData.push({
+          fname: eachDriver.driver.fname,
+          lname: eachDriver.driver.lname,
+          phone: eachDriver.driver.phone,
+          email: eachDriver.driver.email,
+          routes: eachDriver.driver.routes,
+          avatar: eachDriver.driver.avatar,
+          active: eachDriver.driver.active,
+          deleted_at: eachDriver.driver.deleted_at,
+          created_at: eachDriver.driver.created_at,
+          id: eachDriver.driver.id,
+          residential_address: eachDriver.driver.residential_address
+        });
+      });
+      return newTableData;
     }
   }
 });
@@ -200,4 +221,3 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 </style>
-Footer
