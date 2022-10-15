@@ -120,8 +120,8 @@ export default defineComponent({
     return {
       submittingFinalForm: false,
       uploadingFile: false,
-      interiorImages: [],
-      exteriorImages: []
+      interiorImages: [] as Array<any>,
+      exteriorImages: [] as Array<any>
     }
   }
 })
