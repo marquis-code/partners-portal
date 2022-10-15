@@ -1,6 +1,6 @@
 <template>
   <form>
-    <div class="space-y-10">
+    <!-- <div class="space-y-10">
       <div class="space-y-3">
         <p class="text-xs font-medium text-gray-300">Lagos State</p>
         <p class="text-xs font-medium text-gray-500">
@@ -9,7 +9,7 @@
         <image-upload></image-upload>
       </div>
       <div class="bg-gray-300 h-0.5 w-full"></div>
-    </div>
+    </div> -->
     <main class="space-y-10">
       <p class="text-sm text-gray-300 pt-5">Vehicle Information</p>
       <div class="" v-for="(doc, index) in vehicle_documents_order" :key="index">
