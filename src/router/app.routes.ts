@@ -64,6 +64,15 @@ export const AppRoutes: Array<RouteRecordRaw> = [
             }
           },
           {
+            path: ':driverId/edit',
+            name: 'EditDriver',
+            component: loadRouteComponent('app/drivers/EditDriver'),
+            meta: {
+              title: 'Edit Driver',
+              requiresAuth: true
+            }
+          },
+          {
             path: 'details/:driverId',
             component: loadRouteComponent('app/drivers/details/DriverDetailsIndex'),
             props: true,

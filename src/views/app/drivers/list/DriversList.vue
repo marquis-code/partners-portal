@@ -69,7 +69,7 @@
         <!--    <div class="flex items-center justify-end p-5">-->
         <!--      <download-button></download-button>-->
         <!--    </div>-->
-        <div>
+        <div class="relative">
           <app-table
             :loading="loading"
             :error-loading="errorLoading"
@@ -106,8 +106,47 @@
               </span>
             </template>
 
-            <template v-slot:actions="">
-              <img src="@/assets/icons/more_options.svg" />
+            <template v-slot:actions="{ item }">
+              <img
+                class=""
+                @click="handleDriver(item)"
+                src="@/assets/icons/more_options.svg"
+              />
+              <div
+                v-if="showDropdown"
+                id="dropdown"
+                class="
+                  z-50
+                  ring-1 ring-gray-50
+                  rounded-md
+                  bg-white
+                  flex
+                  py-4
+                  justify-start
+                  flex-col
+                  items-start
+                  w-24
+                  h-20
+                  absolute
+                  top-24
+                  shadow-md
+                  right-0
+                  bottom-0
+                "
+              >
+                <p
+                  @click="editDriver(item)"
+                  class="text-gray-500 pl-3 cursor-pointer"
+                >
+                  Edit
+                </p>
+                <p
+                  @click="removeDriver(item)"
+                  class="text-red-500 pl-3 cursor-pointer"
+                >
+                  Remove
+                </p>
+              </div>
             </template>
           </app-table>
         </div>
@@ -144,6 +183,8 @@ export default defineComponent({
         status: 'active',
         search: ''
       },
+      selectedDriverId: null,
+      showDropdown: false,
       loading: false,
       tableData: [],
       totalRecords: null,
@@ -178,7 +219,6 @@ export default defineComponent({
       this.$axios
         .get(`/v1/partner/${this.partnerContext.partner.id}/vehicle_drivers`)
         .then((res) => {
-          console.log(res);
           this.tableData = res.data.data || [];
           this.totalRecords = res.data.metadata?.total;
         })
@@ -192,6 +232,22 @@ export default defineComponent({
         name: 'driver.detail.info',
         params: { driverId: driver.id }
       });
+    },
+    handleDriver(eachDriver: any) {
+      this.showDropdown = !this.showDropdown;
+      this.selectedDriverId = eachDriver.id;
+    },
+    editDriver(item: any) {
+      this.$router.push({
+        name: 'EditDriver',
+        params: { driverId: item.id }
+      });
+    },
+    async removeDriver(item: any) {
+      const response = await this.$axios.delete(
+        `/v1/partner/${item.id}/vehicle_drivers`
+      );
+      console.log(response);
     }
   }
 });
