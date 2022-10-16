@@ -21,6 +21,8 @@
 import {defineComponent} from "vue";
 import Spinner from "@/components/layout/Spinner.vue";
 import AppTable from "@/components/AppTable.vue";
+import moment from 'moment';
+import { mapGetters } from "vuex";
 
 export default defineComponent({
   name: "VehicleTrips",
@@ -31,15 +33,16 @@ export default defineComponent({
     return {
       loading: false,
       totalRecords: null,
-      tableData: [],
+      tableData: [] as Array<any>,
       errorLoading: null,
       headers: [
-        { label: 'Date', key: 'brand' },
-        { label: 'Start Point', key: 'name' },
-        { label: 'Destination', key: 'registration_number' },
-        { label: 'Route Code', key: 'type' },
-        { label: 'End Time', key: 'seats' },
-        { label: 'Amount', key: 'driver' },
+        { label: 'Date', key: 'date' },
+        { label: 'Start Point', key: 'pickup' },
+        { label: 'Destination', key: 'dropoff' },
+        { label: 'Route Code', key: 'routeCode' },
+        { label: 'Start Time', key: 'startTime' },
+        { label: 'End Time', key: 'endTime' },
+        { label: 'Amount', key: 'partnersRevenue' },
       ]
     }
   },
@@ -48,16 +51,44 @@ export default defineComponent({
       this.loading = true;
       // TODO: Support server side pagination
       this.$axios
-        .get(`/v1/vehicles/${this.$attrs.vehicleId}/rides?metadata=true`)
+        .get(`/cost-revenue/v1/vehicles/${this.vehicleData.id}/revenues?metadata=true`)
         .then((res) => {
-          this.tableData = res.data.data || [];
+          const trips = this.transformedTrips(res.data.result) || [];
+          console.log(trips)
+          this.tableData = trips;
           this.totalRecords = res.data.metadata?.total;
         }).finally(() => {
           this.loading = false;
         });
-    }
+    },
+    transformedTrips(payload: Array<any>): any [] {
+      const newTrips: any = []
+      payload.forEach(trip => {
+        newTrips.push({
+          startTime: moment(trip.metadata.startTime).format('LT'),
+          date: moment(trip.metadata.startTime).format('LL'),
+          pickup: trip.metadata.pickup,
+          dropoff: trip.metadata.dropoff,
+          createdAt: moment(trip.createdAt).format('LL'),
+          driver: trip.metadata.driver.fname + ' ' + trip.metadata.driver.lname,
+          routeCode: trip.metadata.routeCode,
+          partnersRevenue: trip.partnersRevenue,
+          endTime: moment(trip.metadata.endTime).format('LT'),
+          passengersCount: trip.passengersCount
+        });
+      });
+      return newTrips;
+    },
   },
-
+  created () {
+    this.fetchTrips();
+  },
+  computed: {
+    ...mapGetters({
+      vehicleData: 'vehicle/getVehicleData',
+      isLoading: 'vehicle/getVehicleLoading'
+    })
+  },
 })
 </script>
 

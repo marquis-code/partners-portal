@@ -225,8 +225,8 @@ export default defineComponent({
           dropoff: trip.metadata.dropoff,
           driver: trip.metadata.driver.fname + ' ' + trip.metadata.driver.lname,
           routeCode: trip.metadata.routeCode,
-          startTime: moment(trip.metadata.startTime).format('LL'),
-          endTime: moment(trip.metadata.endTime).format('LL'),
+          startTime: moment(trip.metadata.startTime).format('LT'),
+          endTime: moment(trip.metadata.endTime).format('LT'),
           passengersCount: trip.passengersCount
         });
       });
