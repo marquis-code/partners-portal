@@ -35,6 +35,7 @@ export default defineComponent({
   },
   computed: {
     ...mapGetters({
+      partnerContext: 'auth/activeContext',
       vehicleData: 'vehicle/getVehicleData',
       isLoading: 'vehicle/getVehicleLoading'
     })
@@ -45,7 +46,7 @@ export default defineComponent({
   methods: {
     fetchPendingDocuments () {
       this.loading = false;
-      this.$axios.get(`v1/partners/vehicle-docs/${this.vehicleData.id}`)
+      this.$axios.get(`v1/partners/${this.partnerContext.partner.id}/vehicle/${this.vehicleData.id}/vehicle-documents`)
         .then(r => {
           this.tableData = r.data.data;
         })
