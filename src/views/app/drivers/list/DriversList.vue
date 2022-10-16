@@ -77,6 +77,17 @@
             :fields="headers"
             @rowClicked="viewDriverDetails"
           >
+            <template v-slot:routes="{ item }">
+              <span v-if="item.routes">
+                <span v-for="(route, index) in item.routes" :key="index">{{
+                  route
+                }}</span>
+              </span>
+              <span class="text-sm text-grays-black-6" v-else
+                >No route assigned</span
+              >
+            </template>
+
             <template v-slot:driver="{ item }">
               <span
                 v-if="item"
@@ -160,7 +171,8 @@ export default defineComponent({
   },
   computed: {
     ...mapGetters({
-      partnerContext: 'auth/activeContext'
+      partnerContext: 'auth/activeContext',
+      userSessionData: 'auth/userSessionData'
     })
   },
   methods: {
@@ -176,10 +188,11 @@ export default defineComponent({
       //   metadata: true
       // };
       this.$axios
-        .get(`/v1/partner/${this.partnerContext.partner.id}/vehicle_drivers`)
+        .get(
+          `/v1/partners/${this.userSessionData.activeContext.partner.account_sid}/drivers`
+        )
         .then((res) => {
-          console.log(res);
-          this.tableData = res.data.data || [];
+          this.tableData = (this.formatApiFormData(res.data.data) as any) || [];
           this.totalRecords = res.data.metadata?.total;
         })
         .finally(() => {
@@ -187,11 +200,29 @@ export default defineComponent({
         });
     },
     viewDriverDetails(driver: any) {
-      console.log(driver);
       this.$router.push({
         name: 'driver.detail.info',
         params: { driverId: driver.id }
       });
+    },
+    formatApiFormData(apiFormData: Array<any>) {
+      const newTableData: any = [];
+      apiFormData.forEach((eachDriver) => {
+        newTableData.push({
+          fname: eachDriver.driver.fname,
+          lname: eachDriver.driver.lname,
+          phone: eachDriver.driver.phone,
+          email: eachDriver.driver.email,
+          routes: eachDriver.driver.routes,
+          avatar: eachDriver.driver.avatar,
+          active: eachDriver.driver.active,
+          deleted_at: eachDriver.driver.deleted_at,
+          created_at: eachDriver.driver.created_at,
+          id: eachDriver.driver.id,
+          residential_address: eachDriver.driver.residential_address
+        });
+      });
+      return newTableData;
     }
   }
 });
@@ -199,4 +230,3 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 </style>
-Footer
