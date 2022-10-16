@@ -202,7 +202,8 @@
             <label class="text-xs font-medium text-grays-black-5"
               >Date of birth</label
             >
-            <datepicker
+            <input
+              type="date"
               v-model="v$.form.dob.$model"
               class="
                 text-xs
@@ -216,6 +217,20 @@
               "
               placeholder="Pick drivers date of dirth"
             />
+            <!-- <datepicker
+              v-model="v$.form.dob.$model"
+              class="
+                text-xs
+                border-none
+                outline-none
+                w-full
+                rounded-md
+                p-3
+                placeholder-gray-500 placeholder-opacity-25
+                ring-1 ring-gray-300
+              "
+              placeholder="Pick drivers date of dirth"
+            /> -->
 
             <span
               class="text-xs font-light text-red-500"
@@ -404,26 +419,29 @@ export default defineComponent({
       }
       this.processing = true;
       try {
+        const expiryDate = this.form.expiry_date;
         const payload = {
           fname: this.form.fname,
           lname: this.form.lname,
           phone: this.form.phone,
           email: this.form.email,
           residential_address: this.form.residential_address,
-          dob: this.format(this.form.dob as any, 'yyyy-MM-dd'),
+          dob: this.form.dob,
           license_number: this.form.license_number,
-          expiry_date: this.format(this.form.dob as any, 'yyyy-MM-dd HH:mm:ss'),
+          expiry_date: format(expiryDate as any, 'yyyy-MM-dd HH:mm:ss') as any,
           files: this.form.files,
           avatar: this.form.avatar,
           document_type: 'drivers_license',
           password: 'shuttlers'
         };
-        console.log(payload);
         const response = await this.$axios.post(
           `/v1/partners/${this.userSessionData.activeContext.account_sid}/drivers`,
           payload
         );
-        console.log(response);
+        this.$router.push({
+          name: 'driver.detail.info',
+          params: { driverId: response.data.driver_id }
+        });
       } catch (err) {
         const errorMessage = extractErrorMessage(
           err,
@@ -436,8 +454,10 @@ export default defineComponent({
       }
     },
     async fileSelected(selectedImage: any) {
-      const imageDbUrl = await this.uploadTos3andGetDocumentUrl(selectedImage) as string;
-      this.form.files.push(imageDbUrl)
+      const imageDbUrl = (await this.uploadTos3andGetDocumentUrl(
+        selectedImage
+      )) as string;
+      this.form.files.push(imageDbUrl);
     },
 
     async handleProfileUpload(e: any) {
@@ -458,7 +478,6 @@ export default defineComponent({
           formData
         );
         if (response.data?.files?.length) {
-          console.log(response.data.files[0].Location);
           return response.data.files[0].Location;
         }
       } catch (error) {

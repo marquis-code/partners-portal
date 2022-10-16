@@ -327,7 +327,7 @@
                 : 'bg-sh-green-500 font-medium'
             "
           >
-            {{ processing ? 'Saving' : 'Submit' }}
+            {{ processing ? 'Saving' : 'Update' }}
             <img class="ml-2" src="@/assets/images/arrow.svg" />
           </button>
         </div>
@@ -406,7 +406,6 @@ export default defineComponent({
       await this.$axios
         .get(`/v1/drivers/${this.$route.params.driverId}`)
         .then((res) => {
-          console.log(res);
           this.form.fname = res.data.fname;
           this.form.lname = res.data.lname;
           this.form.phone = res.data.phone;
@@ -417,7 +416,7 @@ export default defineComponent({
           this.form.expiry_date = res.data.expiry_date;
           this.form.files = res.data.files;
           this.form.avatar = res.data.avatar;
-          this.profilePreview = res.data.avatar
+          this.profilePreview = res.data.avatar;
         })
         .catch((err) => {
           console.log(err);
@@ -444,7 +443,6 @@ export default defineComponent({
           document_type: 'drivers_license',
           password: 'shuttlers'
         };
-        console.log(payload);
         const response = await this.$axios.post(
           `/v1/partners/${this.userSessionData.activeContext.account_sid}/drivers`, //  Endpoint to update driver
           payload
@@ -467,7 +465,6 @@ export default defineComponent({
       const imageDbUrl = (await this.uploadTos3andGetDocumentUrl(
         selectedImage
       )) as string;
-      console.log(imageDbUrl);
       //  this.form.files.push(imageDbUrl)
     },
 
@@ -489,7 +486,6 @@ export default defineComponent({
           formData
         );
         if (response.data?.files?.length) {
-          console.log(response.data.files[0].Location);
           return response.data.files[0].Location;
         }
       } catch (error) {

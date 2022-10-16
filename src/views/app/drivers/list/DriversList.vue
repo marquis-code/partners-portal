@@ -77,6 +77,17 @@
             :fields="headers"
             @rowClicked="viewDriverDetails"
           >
+            <template v-slot:routes="{ item }">
+              <span v-if="item.routes">
+                <span v-for="(route, index) in item.routes" :key="index">{{
+                  route
+                }}</span>
+              </span>
+              <span class="text-sm text-grays-black-6" v-else
+                >No route assigned</span
+              >
+            </template>
+
             <template v-slot:driver="{ item }">
               <span
                 v-if="item"
@@ -112,43 +123,37 @@
                 @click="handleDriver(item)"
                 src="@/assets/icons/more_options.svg"
               />
-              <div
-                v-if="showDropdown"
-                id="dropdown"
-                class="
-                  z-50
-                  ring-1 ring-gray-50
-                  rounded-md
-                  bg-white
-                  flex
-                  py-4
-                  justify-start
-                  flex-col
-                  items-start
-                  w-24
-                  h-20
-                  absolute
-                  top-24
-                  shadow-md
-                  right-0
-                  bottom-0
-                "
-              >
-                <p
-                  @click="editDriver(item)"
-                  class="text-gray-500 pl-3 cursor-pointer"
-                >
-                  Edit
-                </p>
-                <p
-                  @click="removeDriver(item)"
-                  class="text-red-500 pl-3 cursor-pointer"
-                >
-                  Remove
-                </p>
-              </div>
             </template>
           </app-table>
+          <div
+            v-if="showDropdown"
+            id="dropdown"
+            class="
+              z-50
+              ring-1 ring-gray-50
+              rounded-md
+              bg-white
+              flex
+              py-4
+              justify-start
+              flex-col
+              items-start
+              w-24
+              h-20
+              absolute
+              top-24
+              shadow-md
+              right-0
+              bottom-0
+            "
+          >
+            <p @click="editDriver" class="text-gray-500 pl-3 cursor-pointer">
+              Edit
+            </p>
+            <p @click="removeDriver" class="text-red-500 pl-3 cursor-pointer">
+              Remove
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -158,7 +163,6 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import AppTable from '@/components/AppTable.vue';
-// import DownloadButton from '@/components/DownloadButton.vue';
 import { mapGetters } from 'vuex';
 import PageActionHeader from '@/components/PageActionHeader.vue';
 import PageLayout from '@/components/layout/PageLayout.vue';
@@ -169,7 +173,6 @@ export default defineComponent({
     PageLayout,
     PageActionHeader,
     AppTable
-    /* DownloadButton */
   },
   created() {
     this.fetchDrivers();
@@ -201,7 +204,8 @@ export default defineComponent({
   },
   computed: {
     ...mapGetters({
-      partnerContext: 'auth/activeContext'
+      partnerContext: 'auth/activeContext',
+      userSessionData: 'auth/userSessionData'
     })
   },
   methods: {
@@ -217,42 +221,62 @@ export default defineComponent({
       //   metadata: true
       // };
       this.$axios
-        .get(`/v1/partner/${this.partnerContext.partner.id}/vehicle_drivers`)
+        .get(
+          `/v1/partners/${this.userSessionData.activeContext.partner.account_sid}/drivers`
+        )
         .then((res) => {
-          this.tableData = res.data.data || [];
+          this.tableData = (this.formatApiFormData(res.data.data) as any) || [];
           this.totalRecords = res.data.metadata?.total;
         })
         .finally(() => {
           this.loading = false;
         });
     },
-    viewDriverDetails(driver: any) {
-      console.log(driver);
-      this.$router.push({
-        name: 'driver.detail.info',
-        params: { driverId: driver.id }
-      });
-    },
+    // viewDriverDetails(driver: any) {
+    //   this.$router.push({
+    //     name: 'driver.detail.info',
+    //     params: { driverId: driver.id }
+    //   });
+    // },
     handleDriver(eachDriver: any) {
       this.showDropdown = !this.showDropdown;
       this.selectedDriverId = eachDriver.id;
     },
-    editDriver(item: any) {
+    editDriver() {
       this.$router.push({
         name: 'EditDriver',
-        params: { driverId: item.id }
+        params: { driverId: this.selectedDriverId }
       });
     },
-    async removeDriver(item: any) {
+    formatApiFormData(apiFormData: Array<any>) {
+      const newTableData: any = [];
+      apiFormData.forEach((eachDriver) => {
+        newTableData.push({
+          fname: eachDriver.driver.fname,
+          lname: eachDriver.driver.lname,
+          phone: eachDriver.driver.phone,
+          email: eachDriver.driver.email,
+          routes: eachDriver.driver.routes,
+          avatar: eachDriver.driver.avatar,
+          active: eachDriver.driver.active,
+          deleted_at: eachDriver.driver.deleted_at,
+          created_at: eachDriver.driver.created_at,
+          id: eachDriver.driver.id,
+          dob: eachDriver.driver.dob,
+          residential_address: eachDriver.driver.residential_address,
+          license_number: eachDriver.driver.license_number,
+          expiry_date: eachDriver.driver.expiry_date,
+          files: eachDriver.driver.files
+        });
+      });
+      return newTableData;
+    },
+    async removeDriver() {
       const response = await this.$axios.delete(
-        `/v1/partner/${item.id}/vehicle_drivers`
+        `/v1/partner/${this.selectedDriverId}/vehicle_drivers`
       );
       console.log(response);
     }
   }
 });
 </script>
-
-<style lang="scss" scoped>
-</style>
-Footer
