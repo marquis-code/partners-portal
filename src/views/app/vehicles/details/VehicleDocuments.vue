@@ -41,10 +41,10 @@ export default defineComponent({
     })
   },
   mounted () {
-    this.fetchPendingDocuments();
+    this.fetchVehicleDocuments();
   },
   methods: {
-    fetchPendingDocuments () {
+    fetchVehicleDocuments () {
       this.loading = false;
       this.$axios.get(`v1/partners/${this.partnerContext.partner.id}/vehicle/${this.vehicleData.id}/vehicle-documents`)
         .then(r => {
