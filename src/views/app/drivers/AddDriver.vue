@@ -287,8 +287,7 @@
               <label class="text-xs font-medium text-grays-black-5"
                 >Expiry date
               </label>
-              <input
-                type="date"
+              <datepicker
                 v-model="v$.form.expiry_date.$model"
                 class="
                   text-xs
@@ -355,7 +354,7 @@
 <script lang="ts">
 import ImageUpload from '@/components/ImageUpload.vue';
 import { defineComponent } from 'vue';
-// import Datepicker from 'vue3-datepicker';
+import Datepicker from 'vue3-datepicker';
 import useVuelidate from '@vuelidate/core';
 import { email, required } from '@vuelidate/validators';
 import { mapGetters } from 'vuex';
@@ -365,7 +364,7 @@ import { format } from 'date-fns';
 export default defineComponent({
   name: 'AddDriver',
   components: {
-    // Datepicker,
+    Datepicker,
     ImageUpload
   },
   data() {
@@ -429,22 +428,20 @@ export default defineComponent({
           residential_address: this.form.residential_address,
           dob: this.form.dob,
           license_number: this.form.license_number,
-          expiry_date: format(expiryDate as any, 'dd.MM.yyyy'),
+          expiry_date: format(expiryDate as any, 'yyyy-MM-dd HH:mm:ss') as any,
           files: this.form.files,
           avatar: this.form.avatar,
           document_type: 'drivers_license',
           password: 'shuttlers'
         };
-        console.log(payload);
-        // const response = await this.$axios.post(
-        //   `/v1/partners/${this.userSessionData.activeContext.account_sid}/drivers`,
-        //   payload
-        // );
-        // console.log(response.data.driver_id);
-        // this.$router.push({
-        //   name: 'driver.detail.info',
-        //   params: { driverId: response.data.driver_id }
-        // });
+        const response = await this.$axios.post(
+          `/v1/partners/${this.userSessionData.activeContext.account_sid}/drivers`,
+          payload
+        );
+        this.$router.push({
+          name: 'driver.detail.info',
+          params: { driverId: response.data.driver_id }
+        });
       } catch (err) {
         const errorMessage = extractErrorMessage(
           err,
@@ -481,7 +478,6 @@ export default defineComponent({
           formData
         );
         if (response.data?.files?.length) {
-          console.log(response.data.files[0].Location);
           return response.data.files[0].Location;
         }
       } catch (error) {

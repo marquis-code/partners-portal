@@ -77,6 +77,17 @@
             :fields="headers"
             @rowClicked="viewDriverDetails"
           >
+            <template v-slot:routes="{ item }">
+              <span v-if="item.routes">
+                <span v-for="(route, index) in item.routes" :key="index">{{
+                  route
+                }}</span>
+              </span>
+              <span class="text-sm text-grays-black-6" v-else
+                >No route assigned</span
+              >
+            </template>
+
             <template v-slot:driver="{ item }">
               <span
                 v-if="item"
@@ -181,7 +192,7 @@ export default defineComponent({
           `/v1/partners/${this.userSessionData.activeContext.partner.account_sid}/drivers`
         )
         .then((res) => {
-          this.tableData = this.formatApiFormData(res.data.data) || [];
+          this.tableData = (this.formatApiFormData(res.data.data) as any) || [];
           this.totalRecords = res.data.metadata?.total;
         })
         .finally(() => {
@@ -189,7 +200,6 @@ export default defineComponent({
         });
     },
     viewDriverDetails(driver: any) {
-      console.log(driver);
       this.$router.push({
         name: 'driver.detail.info',
         params: { driverId: driver.id }
@@ -198,7 +208,6 @@ export default defineComponent({
     formatApiFormData(apiFormData: Array<any>) {
       const newTableData: any = [];
       apiFormData.forEach((eachDriver) => {
-        console.log(eachDriver);
         newTableData.push({
           fname: eachDriver.driver.fname,
           lname: eachDriver.driver.lname,
