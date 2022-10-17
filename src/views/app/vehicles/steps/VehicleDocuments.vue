@@ -170,7 +170,7 @@ export default defineComponent({
             this.city_documents_order.push(index);
             this.payload.city_documents.push({
               document_type: element.document_type,
-              document_required_id: element.id,
+              document_requirement_id: element.id,
               city_id: element.city_id,
               files: []
             })
