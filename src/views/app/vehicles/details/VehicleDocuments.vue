@@ -1,21 +1,46 @@
 <template>
-  <div class="space-y-5 ring-1 ring-gray-50 shadow-sm rounded-sm bg-white">
-    <app-table
-      :loading="loading"
-      :error-loading="errorLoading"
-      :items="tableData"
-      :fields="headers"
-      @rowClicked="handleRowClick"
-    >
-      <template v-slot:actions="{item}">
-        <VehicleTableDropDown
-          :docUrl="item.actions.docUrl"
-          :docId="item.actions.docId"
-          :selectedDropDown="selectedDropDown"
-          @click="selectThis(item.actions.docId)"
-        />
-      </template>
-    </app-table>
+  <div>
+    <div class="space-y-5 ring-1 ring-gray-50 shadow-sm rounded-sm bg-white">
+      <h1 v-if="cityTableData.length > 0">City Documents</h1>
+      <app-table
+        :loading="loading"
+        :error-loading="errorLoading"
+        :items="cityTableData"
+        :fields="headers"
+        @rowClicked="handleRowClick"
+      >
+        <template v-slot:actions="{item}">
+          <VehicleTableDropDown
+            :docUrl="item.actions.docUrl"
+            :docId="item.actions.docId"
+            :selectedDropDown="selectedDropDown"
+            @click="selectThis(item.actions.docId)"
+          />
+        </template>
+      </app-table>
+    </div>
+    <br>
+    <br>
+    <div class="space-y-5 ring-1 ring-gray-50 shadow-sm rounded-sm bg-white">
+      <h1 v-if="cityTableData.length > 0">Vehicle Documents</h1>
+      <app-table
+        :loading="loading"
+        :error-loading="errorLoading"
+        :items="vehicleTableData"
+        :fields="headers"
+        @rowClicked="handleRowClick"
+      >
+        <template v-slot:actions="{item}">
+          <VehicleTableDropDown
+            :docUrl="item.actions.docUrl"
+            :docId="item.actions.docId"
+            :selectedDropDown="selectedDropDown"
+            @click="selectThis(item.actions.docId)"
+          />
+        </template>
+      </app-table>
+    </div>
+
   </div>
 </template>
 
@@ -33,7 +58,8 @@ export default defineComponent({
     return {
       loading: false,
       totalRecords: null,
-      tableData: [] as Array<any>,
+      vehicleTableData: [] as Array<any>,
+      cityTableData: [] as Array<any>,
       errorLoading: null,
       selectedDropDown: -1,
       options: [
@@ -64,6 +90,7 @@ export default defineComponent({
     })
   },
   mounted () {
+    this.fetchCityDocuments();
     this.fetchVehicleDocuments();
   },
   methods: {
@@ -71,7 +98,17 @@ export default defineComponent({
       this.loading = true;
       this.$axios.get(`v1/partners/${this.partnerContext.partner.id}/vehicle/${this.vehicleData.id}/vehicle-documents`)
         .then(r => {
-          this.tableData = this.structureDocumentTable(r.data.data) || [];
+          this.vehicleTableData = this.structureDocumentTable(r.data.data) || [];
+        })
+        .finally(() => {
+          this.loading = false;
+        })
+    },
+    fetchCityDocuments () {
+      this.loading = true;
+      this.$axios.get(`v1/partners/${this.partnerContext.partner.id}/vehicle/${this.vehicleData.id}/city-documents`)
+        .then(r => {
+          this.cityTableData = this.structureDocumentTable(r.data.data) || [];
         })
         .finally(() => {
           this.loading = false;
@@ -81,7 +118,7 @@ export default defineComponent({
       const newDocumentsList: any = []
       documentResponseResponse.forEach(doc => {
         newDocumentsList.push({
-          type: doc.type || 'city',
+          type: doc.document_requirement_id ? 'City Required' : 'Vehicle Documents',
           name: doc.document_type,
           expiry: getExpiryDate(doc.expiry_date),
           status: doc.status,

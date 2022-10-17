@@ -46,6 +46,8 @@ export default defineComponent({
     onShow() {
       if (this.selectedDropDown === this.docId) {
         this.visibleRef = true;
+      } else {
+        this.visibleRef = false;
       }
     },
     onHide() {
