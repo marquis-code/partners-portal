@@ -28,29 +28,6 @@
         </div>
         <div class="space-y-2 w-full">
           <label class="text-xs font-medium text-grays-black-5">Vehicle Model</label>
-<!--          <select
-            :disabled="fetchingModels || !vehicleModels.length"
-            v-model="v$.form.name.$model"
-            class="
-            text-xs
-            border-none
-            outline-none
-            w-full
-            rounded-md
-            p-3
-            placeholder-gray-500 placeholder-opacity-25
-            ring-1 ring-gray-300
-          "
-          >
-            <option value="" disabled hidden></option>
-            <option
-              :value="option"
-              v-for="(option, index) in vehicleModels"
-              :key="index"
-            >
-              {{ option }}
-            </option>
-          </select>-->
           <v-select
             :disabled="fetchingModels"
             @input="console.log($event)"

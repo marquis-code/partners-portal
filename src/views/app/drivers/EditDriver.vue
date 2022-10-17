@@ -1,19 +1,23 @@
 <template>
-  <page-layout page-title="Add a driver">
+  <page-layout page-title="Edit driver information">
     <template #actionsPane>
       <page-action-header>
         <template #breadcrumbs>
-          <div class="flex items-center space-x-3 py-2">
-            <p class="text-gray-400">Dashboaard</p>
+          <div class="flex items-center space-x-3 py-3">
+            <p class="text-gray-400 text-sm">Dashboard</p>
             <img src="@/assets/images/breadcrumbs.svg" />
-            <p class="text-gray-400">Drivers management</p>
+            <p class="text-gray-400 text-sm">Drivers management</p>
             <img src="@/assets/images/breadcrumbs.svg" />
-            <p class="text-gray-900">Add driver</p>
+            <p class="text-gray-900 text-sm">Edit driver</p>
           </div>
         </template>
       </page-action-header>
     </template>
+    <div v-if="fetchingDriver">
+      <spinner></spinner>
+    </div>
     <main
+      v-else
       class="container mx-auto p-5 lg:p-14 bg-white ring-1 ring-gray-100"
     >
       <div class="flex justify-center items-center flex-col space-y-2 pb-5">
@@ -24,7 +28,7 @@
         />
         <img
           v-if="!profilePreview"
-          class="h-16 w-16"
+          class="h-14 w-14"
           src="@/assets/images/userIcon.svg"
         />
         <input
@@ -218,8 +222,7 @@
               <label class="text-xs font-medium text-grays-black-5"
                 >Date of birth</label
               >
-              <input
-                type="date"
+              <datepicker
                 v-model="v$.form.dob.$model"
                 class="
                   text-xs
@@ -326,7 +329,7 @@
           <div class="space-x-5 flex justify-end items-center pt-10">
             <button
               type="button"
-              @click="saveForm()"
+              @click="updateDriver()"
               class="
                 rounded-md
                 w-32
@@ -344,7 +347,7 @@
                   : 'bg-sh-green-500 font-medium'
               "
             >
-              {{ processing ? 'Saving' : 'Submit' }}
+              {{ processing ? 'Saving' : 'Update' }}
               <img class="ml-2" src="@/assets/images/arrow.svg" />
             </button>
           </div>
@@ -365,34 +368,39 @@ import { extractErrorMessage } from '@/utils/helper';
 import { format } from 'date-fns';
 import PageLayout from '@/components/layout/PageLayout.vue';
 import PageActionHeader from '@/components/PageActionHeader.vue';
+import Spinner from '@/components/layout/Spinner.vue';
+
+interface Driver {
+  fname?: string;
+  lname?: string;
+  phone?: string;
+  email?: string;
+  residential_address?: string;
+  dob?: string;
+  license_number?: string;
+  expiry_date?: string;
+  files?: Array<string>;
+  avatar?: string;
+}
 
 export default defineComponent({
   name: 'AddDriver',
   components: {
     Datepicker,
     ImageUpload,
+    PageActionHeader,
     PageLayout,
-    PageActionHeader
+    Spinner
   },
   data() {
     return {
+      fetchingDriver: false,
       format,
       uploadingFile: false,
       v$: useVuelidate(),
       displayModal: false,
       profilePreview: '',
-      form: {
-        fname: '',
-        lname: '',
-        phone: '',
-        email: '',
-        residential_address: '',
-        dob: '',
-        license_number: '',
-        expiry_date: '',
-        files: [] as Array<string>,
-        avatar: ''
-      },
+      form: {} as Driver,
       processing: false
     };
   },
@@ -408,7 +416,7 @@ export default defineComponent({
         license_number: { required },
         expiry_date: { required },
         files: { required },
-        avatar: { required } //
+        avatar: { required }
       }
     };
   },
@@ -418,37 +426,62 @@ export default defineComponent({
       user: 'auth/user'
     })
   },
+  created() {
+    this.loadDriver();
+  },
   methods: {
-    async saveForm() {
+    async loadDriver() {
+      this.fetchingDriver = true;
+      await this.$axios
+        .get(`/v1/drivers/${this.$route.params.driverId}`)
+        .then((res) => {
+          this.form.fname = res.data.fname;
+          this.form.lname = res.data.lname;
+          this.form.phone = res.data.phone;
+          this.form.email = res.data.email;
+          this.form.residential_address = res.data.residential_address;
+          this.form.dob = res.data.dob;
+          this.form.license_number = res.data.license_number;
+          this.form.expiry_date = res.data.expiry_date;
+          this.form.files = res.data.files;
+          this.form.avatar = res.data.avatar;
+          this.profilePreview = res.data.avatar;
+        })
+        .catch((err) => {
+          console.log(err);
+        })
+        .finally(() => {
+          this.fetchingDriver = false;
+        });
+    },
+    async updateDriver() {
       this.v$.form.$touch();
       if (this.processing || this.v$.form.$errors.length) {
         return;
       }
       this.processing = true;
       try {
-        const expiryDate = this.form.expiry_date;
         const payload = {
           fname: this.form.fname,
           lname: this.form.lname,
           phone: this.form.phone,
           email: this.form.email,
           residential_address: this.form.residential_address,
-          dob: this.form.dob,
+          dob: this.format(this.form.dob as any, 'yyyy-MM-dd'),
           license_number: this.form.license_number,
-          expiry_date: format(expiryDate as any, 'yyyy-MM-dd HH:mm:ss') as any,
+          expiry_date: this.format(this.form.dob as any, 'yyyy-MM-dd HH:mm:ss'),
           files: this.form.files,
           avatar: this.form.avatar,
           document_type: 'drivers_license',
           password: 'shuttlers'
         };
         const response = await this.$axios.post(
-          `/v1/partners/${this.userSessionData.activeContext.account_sid}/drivers`,
+          `/v1/partners/${this.userSessionData.activeContext.account_sid}/drivers`, //  Endpoint to update driver
           payload
         );
-        this.$router.push({
-          name: 'driver.detail.info',
-          params: { driverId: response.data.driver_id }
-        });
+        console.log(response);
+        this.$toast.success('Drivers details was successfully updated');
+        this.$router.push({ name: 'drivers.list' });
       } catch (err) {
         const errorMessage = extractErrorMessage(
           err,
@@ -464,7 +497,7 @@ export default defineComponent({
       const imageDbUrl = (await this.uploadTos3andGetDocumentUrl(
         selectedImage
       )) as string;
-      this.form.files.push(imageDbUrl);
+      //  this.form.files.push(imageDbUrl)
     },
 
     async handleProfileUpload(e: any) {

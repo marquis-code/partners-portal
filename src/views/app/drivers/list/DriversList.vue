@@ -1,5 +1,5 @@
 <template>
-  <page-layout page-title="Add a driver">
+  <page-layout page-title="Drivers management">
     <template #actionsPane>
       <page-action-header>
         <template #action>
@@ -10,22 +10,23 @@
               font-medium
               border-none
               outline-none
-              px-4
+              px-6
               py-2
               rounded-md
               text-sm
               flex
               justify-center
               items-center
+              text-gray-900
               w-full
             "
-            >Add Drivers</router-link
+            >Add driver</router-link
           >
         </template>
       </page-action-header>
     </template>
     <div>
-      <div class="flex items-center pb-2">
+      <div class="flex items-center">
         <span
           class="
             text-sm
@@ -66,10 +67,7 @@
         >
       </div>
       <div class="space-y-5 ring-1 ring-gray-50 shadow-sm rounded-sm bg-white">
-        <!--    <div class="flex items-center justify-end p-5">-->
-        <!--      <download-button></download-button>-->
-        <!--    </div>-->
-        <div>
+        <div class="relative">
           <app-table
             :loading="loading"
             :error-loading="errorLoading"
@@ -112,15 +110,62 @@
                     }}{{ item.lname.slice(0, 1) }}</span
                   >
                 </span>
-                {{ item.fname || '' }}
-                {{ item.lname || '' }}
+                <router-link
+                  class="text-sh-green-700 pr-1 cursor-pointer"
+                  :to="{
+                    name: 'driver.detail.info',
+                    params: { driverId: item.id }
+                  }"
+                  >{{ item.fname || '' }}</router-link
+                >
+                <router-link
+                  class="text-sh-green-700 cursor-pointer"
+                  :to="{
+                    name: 'driver.detail.info',
+                    params: { driverId: item.id }
+                  }"
+                  >{{ item.lname || '' }}</router-link
+                >
               </span>
             </template>
 
-            <template v-slot:actions="">
-              <img src="@/assets/icons/more_options.svg" />
+            <template v-slot:actions="{ item }">
+              <img
+                class=""
+                @click="handleDriver(item)"
+                src="@/assets/icons/more_options.svg"
+              />
             </template>
           </app-table>
+          <div
+            v-if="showDropdown"
+            id="dropdown"
+            class="
+              z-50
+              ring-1 ring-gray-50
+              rounded-md
+              bg-white
+              flex
+              py-4
+              justify-start
+              flex-col
+              items-start
+              w-24
+              h-20
+              absolute
+              top-24
+              shadow-md
+              right-0
+              bottom-0
+            "
+          >
+            <p @click="editDriver" class="text-gray-500 pl-3 cursor-pointer">
+              Edit
+            </p>
+            <p @click="removeDriver" class="text-red-500 pl-3 cursor-pointer">
+              Remove
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -130,7 +175,6 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import AppTable from '@/components/AppTable.vue';
-// import DownloadButton from '@/components/DownloadButton.vue';
 import { mapGetters } from 'vuex';
 import PageActionHeader from '@/components/PageActionHeader.vue';
 import PageLayout from '@/components/layout/PageLayout.vue';
@@ -141,7 +185,6 @@ export default defineComponent({
     PageLayout,
     PageActionHeader,
     AppTable
-    /* DownloadButton */
   },
   created() {
     this.fetchDrivers();
@@ -155,6 +198,8 @@ export default defineComponent({
         status: 'active',
         search: ''
       },
+      selectedDriverId: null,
+      showDropdown: false,
       loading: false,
       tableData: [],
       totalRecords: null,
@@ -199,16 +244,27 @@ export default defineComponent({
           this.loading = false;
         });
     },
-    viewDriverDetails(driver: any) {
+    // viewDriverDetails(driver: any) {
+    //   this.$router.push({
+    //     name: 'driver.detail.info',
+    //     params: { driverId: driver.id }
+    //   });
+    // },
+    handleDriver(eachDriver: any) {
+      this.showDropdown = !this.showDropdown;
+      this.selectedDriverId = eachDriver.id;
+    },
+    editDriver() {
       this.$router.push({
-        name: 'driver.detail.info',
-        params: { driverId: driver.id }
+        name: 'EditDriver',
+        params: { driverId: this.selectedDriverId }
       });
     },
     formatApiFormData(apiFormData: Array<any>) {
       const newTableData: any = [];
       apiFormData.forEach((eachDriver) => {
         newTableData.push({
+          id: eachDriver.driver.id,
           fname: eachDriver.driver.fname,
           lname: eachDriver.driver.lname,
           phone: eachDriver.driver.phone,
@@ -218,15 +274,20 @@ export default defineComponent({
           active: eachDriver.driver.active,
           deleted_at: eachDriver.driver.deleted_at,
           created_at: eachDriver.driver.created_at,
-          id: eachDriver.driver.id,
-          residential_address: eachDriver.driver.residential_address
+          dob: eachDriver.driver.dob,
+          residential_address: eachDriver.driver.residential_address,
+          license_number: eachDriver.driver.license_number,
+          expiry_date: eachDriver.driver.expiry_date,
+          files: eachDriver.driver.files
         });
       });
       return newTableData;
+    },
+    async removeDriver() {
+      // const response = await this.$axios.delete(
+      //   `/v1/partner/${this.selectedDriverId}/vehicle_drivers`
+      // )
     }
   }
 });
 </script>
-
-<style lang="scss" scoped>
-</style>
