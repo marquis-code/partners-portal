@@ -4,7 +4,7 @@ export function getExpiryDate(date: string): string {
   if (moment(date).isValid()) {
     return moment(date).format('LL');
   } else {
-    return 'Does not expire'
+    return '--'
   }
 }
 
