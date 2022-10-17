@@ -8,7 +8,12 @@
       @rowClicked="handleRowClick"
     >
       <template v-slot:actions="{item}">
-        <VehicleTableDropDown :docUrl="item.actions.docUrl" :docId="item.actions.docId"/>
+        <VehicleTableDropDown
+          :docUrl="item.actions.docUrl"
+          :docId="item.actions.docId"
+          :selectedDropDown="selectedDropDown"
+          @click="selectThis(item.actions.docId)"
+        />
       </template>
     </app-table>
   </div>
@@ -30,6 +35,7 @@ export default defineComponent({
       totalRecords: null,
       tableData: [] as Array<any>,
       errorLoading: null,
+      selectedDropDown: -1,
       options: [
         {
           title: 'View',
@@ -90,6 +96,9 @@ export default defineComponent({
     },
     handleRowClick(item: any) {
       // console.log(item)
+    },
+    selectThis(dropDownId: number) {
+      this.selectedDropDown = dropDownId;
     }
   }
 })

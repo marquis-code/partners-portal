@@ -26,7 +26,7 @@
 import {defineComponent} from "vue";
 export default defineComponent({
   name: 'DropDown',
-  props: ['docId', 'docUrl'],
+  props: ['docId', 'docUrl', 'selectedDropDown'],
   data () {
     return {
       isOpen: false,
@@ -44,11 +44,13 @@ export default defineComponent({
       console.log(this.docId)
     },
     onShow() {
-      this.visibleRef = true;
+      if (this.selectedDropDown === this.docId) {
+        this.visibleRef = true;
+      }
     },
     onHide() {
       this.visibleRef = false;
-    }
+    },
   }
 })
 </script>
