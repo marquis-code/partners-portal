@@ -54,7 +54,6 @@ export default defineComponent({
         .get(`/cost-revenue/v1/vehicles/${this.vehicleData.id}/revenues?metadata=true`)
         .then((res) => {
           const trips = this.transformedTrips(res.data.result) || [];
-          console.log(trips)
           this.tableData = trips;
           this.totalRecords = res.data.metadata?.total;
         }).finally(() => {

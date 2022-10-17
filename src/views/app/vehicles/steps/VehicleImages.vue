@@ -103,13 +103,16 @@ export default defineComponent({
         });
         this.viewVehicleDetails(this.getVehicleFormData.id);
       } catch (error) {
-        console.log(error)
         const errorMessage = extractErrorMessage(
           error,
           null,
           'Oops! An error occurred, please try again.'
         );
-        this.$toast.error(errorMessage);
+        if (errorMessage === "\"uploads\" must contain at least 1 items") {
+          this.$toast.error("All Vehicle Images must be uploaded")
+        } else {
+          this.$toast.error(errorMessage);
+        }
       } finally {
         this.submittingFinalForm = false
       }

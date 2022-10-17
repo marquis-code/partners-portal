@@ -1,9 +1,21 @@
 <template>
   <form>
+    <div class="space-y-10">
+      <p class="text-sm text-gray-300 pt-5">City Documents</p>
+      <div class="space-y-3" v-for="(doc, index) in city_documents_order" :key="index">
+        <p class="text-xs font-medium text-gray-300">City Documents {{index + 1}}</p>
+        <p class="text-xs font-medium text-gray-500">
+          {{payload.city_documents[index].document_type}}
+        </p>
+        <image-upload @fileSelected="selectFile($event, index, 'cityDocument')" @fileRemoved="removeFile(index, 'cityDocument')" class="pt-3"></image-upload>
+      </div>
+      <div class="bg-gray-300 h-{0.1px} w-full"></div>
+    </div>
+    <br/>
     <main class="space-y-10">
       <p class="text-sm text-gray-300 pt-5">Vehicle Information</p>
       <div class="" v-for="(doc, index) in vehicle_documents_order" :key="index">
-        <p class="text-sm text-gray-300 pt-5">{{payload.vehicle_documents[index].document_type}}</p>
+        <p class="text-sm text-gray-300">{{payload.vehicle_documents[index].document_type}}</p>
         <div v-if="doc.expires" class="space-y-2 w-full lg:w-6/12 pr-1 py-5">
           <label class="text-xs font-medium text-grays-black-5"
             >Expiry date</label
@@ -27,7 +39,7 @@
         <label class="text-xs font-medium text-grays-black-5"
           >Upload {{payload.vehicle_documents[index].document_type}} document (pdf, jpg, png)</label
         >
-        <image-upload @fileSelected="selectFile($event, index)" @fileRemoved="removeFile(index)" class="pt-3"></image-upload>
+        <image-upload @fileSelected="selectFile($event, index, 'vehicleDocument')" @fileRemoved="removeFile(index, 'vehicleDocument')" class="pt-3"></image-upload>
       </div>
 
     </main>
@@ -60,6 +72,7 @@ export default defineComponent({
         city_documents: [],
         vehicle_documents: []
       },
+      city_documents_order: [],
       vehicle_documents_order: [
         {
           expires: true
@@ -137,17 +150,30 @@ export default defineComponent({
     })
   },
   created () {
-    this.getPartnerRequiredDocuments();
+    this.getPartnerCityRequiredDocuments();
   },
   methods: {
-    getPartnerRequiredDocuments () {
+    getPartnerCityRequiredDocuments () {
       this.$axios.get(`/v1/partners/${this.partnerContext.partner.id}/city-documents`).then(response => {
+        for (const key in response.data) {
+          for (let index = 0; index < response.data[key].docs_required.length; index++) {
+            const element = response.data[key].docs_required[index];
+            this.city_documents_order.push(index);
+            this.payload.city_documents.push({
+              document_type: element.document_type,
+              document_requirement_id: element.id,
+              city_id: element.city_id,
+              files: []
+            })
+          }
+        }
         this.requiredDocuments = response.data;
       })
     },
     async saveForm () {
       this.savingVehicleDocuments = true;
-      this.changeExpiryDateToTimeStamp();
+      this.removeDocumentTypeItemFromCityDocuments();
+      this.changeVehicleDocumentsExpiryDatesToTimeStamp();
       const newPayload = this.removeDocumentsWithoutFiles();
       console.log(newPayload);
       this.savingVehicleDocuments = false;
@@ -165,11 +191,23 @@ export default defineComponent({
         this.savingVehicleDocuments = false;
       }
     },
-    async selectFile ($event, index) {
+    async selectFile ($event, index, type) {
       const fileHolder = $event
       const fileUrl = await this.uploadTos3andGetDocumentUrl(fileHolder);
-      this.payload.vehicle_documents[index].files.push(fileUrl);
-      this.$toast.success(`${this.payload.vehicle_documents[index].document_type} uploaded`);
+      if (type === 'cityDocument') {
+        if (this.payload.city_documents[index].files[0]) {
+          this.payload.city_documents[index].files = []
+        }
+        this.payload.city_documents[index].files.push(fileUrl);
+        this.$toast.success(`${this.payload.city_documents[index].document_type} uploaded`);
+      }
+      if (type === 'vehicleDocument') {
+        if (this.payload.vehicle_documents[index].files[0]) {
+          this.payload.vehicle_documents[index].files = []
+        }
+        this.payload.vehicle_documents[index].files.push(fileUrl);
+        this.$toast.success(`${this.payload.vehicle_documents[index].document_type} uploaded`);
+      }
     },
     async uploadTos3andGetDocumentUrl(file) {
       this.uploadingFile = true;
@@ -186,7 +224,7 @@ export default defineComponent({
         this.uploadingFile = false;
       }
     },
-    changeExpiryDateToTimeStamp() {
+    changeVehicleDocumentsExpiryDatesToTimeStamp() {
       this.payload.vehicle_documents = this.payload.vehicle_documents.map(doc => {
         if (doc.expiry_date && moment(doc.expiry_date).isValid()) {
           doc.expiry_date = moment(doc.expiry_date).format('YYYY-MM-DD HH:mm:ss');
@@ -203,8 +241,19 @@ export default defineComponent({
       });
       return {city_documents: cityDocumentsWithFiles, vehicle_documents: vehicleDocumentsWithFiles};
     },
-    removeFile (index) {
-      this.payload.vehicle_documents[index].files = []
+    removeDocumentTypeItemFromCityDocuments() {
+      this.payload.city_documents = this.payload.city_documents.map(doc => {
+        delete doc.document_type;
+        return doc;
+      })
+    },
+    removeFile (index, type) {
+      if (type === 'cityDocument') {
+        this.payload.city_documents[index].files = []
+      }
+      if (type === 'vehicleDocument') {
+        this.payload.vehicle_documents[index].files = []
+      }
     }
   }
 });
