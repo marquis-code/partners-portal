@@ -236,7 +236,7 @@ export default defineComponent({
       default: null
     }
   },
-  emits: ['pageChange', 'sizeChange', 'handleRowClick'],
+  emits: ['pageChange', 'sizeChange', 'rowClicked'],
   data () {
     return {
       pagination: {

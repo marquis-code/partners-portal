@@ -215,11 +215,10 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import {mapActions, mapGetters} from 'vuex';
+import {mapGetters} from 'vuex';
 import Datepicker from 'vue3-datepicker';
 import ImageUpload from '@/components/ImageUpload.vue';
-import {email, required} from '@vuelidate/validators';
-import { format } from 'date-fns';
+import {required} from '@vuelidate/validators';
 import { extractErrorMessage } from '@/utils/helper';
 import useVuelidate from "@vuelidate/core";
 import {UserData} from "@/models/user-session.model";
