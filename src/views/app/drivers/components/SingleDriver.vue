@@ -112,9 +112,6 @@ export default defineComponent({
   emits: ['driverUpdated'], // emitted when driver is changed or updated
   props: {
     driverData: Object
-  },
-  mounted() {
-    console.log(this.driverData);
   }
 });
 </script>
