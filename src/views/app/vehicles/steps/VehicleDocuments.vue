@@ -35,15 +35,6 @@
             placeholder="Choose a date"
             v-model="payload.vehicle_documents[index].expiry_date"
           />
-          <!-- <span
-            class="text-sm font-light text-red-500"
-            v-if="
-              v$.form.vehicle_insurance_expiry_date.$dirty &&
-              v$.form.vehicle_insurance_expiry_date.required.$invalid
-            "
-          >
-            This field is required
-          </span> -->
         </div>
         <label class="text-xs font-medium text-grays-black-5"
           >Upload {{payload.vehicle_documents[index].document_type}} document (pdf, jpg, png)</label

@@ -64,6 +64,15 @@ export const AppRoutes: Array<RouteRecordRaw> = [
             }
           },
           {
+            path: ':driverId/edit',
+            name: 'EditDriver',
+            component: loadRouteComponent('app/drivers/EditDriver'),
+            meta: {
+              title: 'Edit Driver',
+              requiresAuth: true
+            }
+          },
+          {
             path: 'details/:driverId',
             component: loadRouteComponent('app/drivers/details/DriverDetailsIndex'),
             props: true,
@@ -89,7 +98,7 @@ export const AppRoutes: Array<RouteRecordRaw> = [
               {
                 path: 'trips',
                 name: 'driver.detail.trips',
-                component: loadRouteComponent('app/drivers/details/driverTrips'),
+                component: loadRouteComponent('app/drivers/details/DriverTrips'),
                 meta: {
                   title: 'Driver Details',
                   requiresAuth: true
