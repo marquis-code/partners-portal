@@ -1,5 +1,5 @@
 <template>
-  <page-layout page-title="Add a driver">
+  <page-layout page-title="Drivers management">
     <template #actionsPane>
       <page-action-header>
         <template #action>
@@ -10,22 +10,23 @@
               font-medium
               border-none
               outline-none
-              px-4
+              px-6
               py-2
               rounded-md
               text-sm
               flex
               justify-center
               items-center
+              text-gray-900
               w-full
             "
-            >Add Drivers</router-link
+            >Add driver</router-link
           >
         </template>
       </page-action-header>
     </template>
     <div>
-      <div class="flex items-center pb-2">
+      <div class="flex items-center">
         <span
           class="
             text-sm
@@ -66,9 +67,6 @@
         >
       </div>
       <div class="space-y-5 ring-1 ring-gray-50 shadow-sm rounded-sm bg-white">
-        <!--    <div class="flex items-center justify-end p-5">-->
-        <!--      <download-button></download-button>-->
-        <!--    </div>-->
         <div class="relative">
           <app-table
             :loading="loading"
@@ -112,8 +110,22 @@
                     }}{{ item.lname.slice(0, 1) }}</span
                   >
                 </span>
-                {{ item.fname || '' }}
-                {{ item.lname || '' }}
+                <router-link
+                  class="text-sh-green-700 pr-1 cursor-pointer"
+                  :to="{
+                     name: 'driver.detail.info',
+                    params: { driverId: item.id }
+                  }"
+                  >{{ item.fname || '' }}</router-link
+                >
+                <router-link
+                  class="text-sh-green-700 cursor-pointer"
+                  :to="{
+                    name: 'driver.detail.info',
+                    params: { driverId: item.id }
+                  }"
+                  >{{ item.lname || '' }}</router-link
+                >
               </span>
             </template>
 
@@ -252,6 +264,7 @@ export default defineComponent({
       const newTableData: any = [];
       apiFormData.forEach((eachDriver) => {
         newTableData.push({
+          id: eachDriver.driver.id,
           fname: eachDriver.driver.fname,
           lname: eachDriver.driver.lname,
           phone: eachDriver.driver.phone,
@@ -261,7 +274,6 @@ export default defineComponent({
           active: eachDriver.driver.active,
           deleted_at: eachDriver.driver.deleted_at,
           created_at: eachDriver.driver.created_at,
-          id: eachDriver.driver.id,
           dob: eachDriver.driver.dob,
           residential_address: eachDriver.driver.residential_address,
           license_number: eachDriver.driver.license_number,
@@ -274,8 +286,7 @@ export default defineComponent({
     async removeDriver() {
       const response = await this.$axios.delete(
         `/v1/partner/${this.selectedDriverId}/vehicle_drivers`
-      );
-      console.log(response);
+      )
     }
   }
 });

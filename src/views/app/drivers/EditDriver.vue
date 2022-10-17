@@ -1,237 +1,53 @@
 <template>
-  <main class="w-11/12 mx-auto p-5 lg:p-10 bg-white ring-1 ring-gray-100 mt-10">
-    <div class="flex justify-center items-center flex-col space-y-2 pb-5">
-      <img
-        v-if="profilePreview"
-        class="h-14 w-14 rounded-full object-cover"
-        :src="profilePreview"
-      />
-      <img
-        v-if="!profilePreview"
-        class="h-14 w-14"
-        src="@/assets/images/userIcon.svg"
-      />
-      <input
-        @change="handleProfileUpload"
-        class="hidden"
-        type="file"
-        id="profile"
-      />
-      <label
-        for="profile"
-        class="text-indigo-700 text-sm font-medium cursor-pointer"
-        >Click to upload image Edit driver</label
-      >
+  <page-layout page-title="Edit driver information">
+    <template #actionsPane>
+      <page-action-header>
+        <template #breadcrumbs>
+          <div class="flex items-center space-x-3 py-3">
+            <p class="text-gray-400 text-sm">Dashboard</p>
+            <img src="@/assets/images/breadcrumbs.svg" />
+            <p class="text-gray-400 text-sm">Drivers management</p>
+            <img src="@/assets/images/breadcrumbs.svg" />
+            <p class="text-gray-900 text-sm">Edit driver</p>
+          </div>
+        </template>
+      </page-action-header>
+    </template>
+    <div v-if="fetchingDriver">
+      <spinner></spinner>
     </div>
-    <div>
-      <p class="text-sm text-gray-400 pb-3">Drivers Info</p>
-      <form class="space-y-3 lg:space-y-7">
-        <section
-          class="
-            lg:flex
-            justify-between
-            space-y-3
-            lg:space-y-0 lg:space-x-10
-            items-center
-          "
+    <main
+      v-else
+      class="container mx-auto p-5 lg:p-14 bg-white ring-1 ring-gray-100"
+    >
+      <div class="flex justify-center items-center flex-col space-y-2 pb-5">
+        <img
+          v-if="profilePreview"
+          class="h-14 w-14 rounded-full object-cover"
+          :src="profilePreview"
+        />
+        <img
+          v-if="!profilePreview"
+          class="h-14 w-14"
+          src="@/assets/images/userIcon.svg"
+        />
+        <input
+          @change="handleProfileUpload"
+          class="hidden"
+          type="file"
+          id="profile"
+        />
+        <label
+          for="profile"
+          class="text-indigo-700 text-sm font-medium cursor-pointer"
+          >Click to upload image</label
         >
-          <div class="space-y-2 w-full">
-            <label class="text-xs font-medium text-grays-black-5"
-              >First name</label
-            >
-            <input
-              type="text"
-              v-model="v$.form.fname.$model"
-              class="
-                text-xs
-                border-none
-                outline-none
-                w-full
-                rounded-md
-                p-3
-                placeholder-gray-500 placeholder-opacity-25
-                ring-1 ring-gray-300
-              "
-              placeholder="Enter drivers first name"
-            />
-            <span
-              class="text-xs font-light text-red-500"
-              v-if="v$.form.fname.$dirty && v$.form.fname.required.$invalid"
-            >
-              Please provide your first name
-            </span>
-          </div>
-          <div class="space-y-2 w-full">
-            <label class="text-xs font-medium text-grays-black-5"
-              >Last name</label
-            >
-            <input
-              type="text"
-              v-model="v$.form.lname.$model"
-              class="
-                text-xs
-                border-none
-                outline-none
-                w-full
-                rounded-md
-                p-3
-                placeholder-gray-500 placeholder-opacity-25
-                ring-1 ring-gray-300
-              "
-              placeholder="Enter drivers last name"
-            />
-            <span
-              class="text-xs font-light text-red-500"
-              v-if="v$.form.lname.$dirty && v$.form.lname.required.$invalid"
-            >
-              Please provide your last name
-            </span>
-          </div>
-        </section>
-
-        <section
-          class="
-            lg:flex
-            justify-between
-            space-y-3
-            lg:space-y-0 lg:space-x-10
-            items-center
-          "
-        >
-          <div class="space-y-2 w-full relative">
-            <label class="text-xs font-medium text-grays-black-5"
-              >Phone number</label
-            >
-            <input
-              type="tel"
-              v-model="v$.form.phone.$model"
-              class="
-                text-xs
-                border-none
-                outline-none
-                w-full
-                rounded-md
-                pl-28
-                p-3
-                placeholder-gray-500 placeholder-opacity-25
-                ring-1 ring-gray-300
-              "
-              placeholder="Enter drivers phone number"
-            />
-            <span
-              class="text-xs font-light text-red-500"
-              v-if="v$.form.phone.$dirty && v$.form.phone.required.$invalid"
-            >
-              Please provide your drivers pohone number
-            </span>
-            <span class="absolute top-8 left-2 bottom-0">
-              <div class="flex justify-center items-center space-x-3">
-                <img src="@/assets/images/naira.svg" />
-                <p class="text-sm text-gray-400">+234</p>
-                <div class="h-5 w-0.5 bg-gray-200"></div>
-              </div>
-            </span>
-          </div>
-          <div class="space-y-2 w-full">
-            <label class="text-xs font-medium text-grays-black-5"
-              >Email address</label
-            >
-            <input
-              type="email"
-              v-model="v$.form.email.$model"
-              class="
-                text-xs
-                border-none
-                outline-none
-                w-full
-                rounded-md
-                p-3
-                placeholder-gray-500 placeholder-opacity-25
-                ring-1 ring-gray-300
-              "
-              placeholder="Enter drivers email address"
-            />
-            <span
-              class="text-xs font-light text-red-500"
-              v-if="v$.form.email.$dirty && v$.form.email.required.$invalid"
-            >
-              Please provide your drivers email address
-            </span>
-          </div>
-        </section>
-
-        <section
-          class="
-            lg:flex
-            justify-between
-            space-y-3
-            lg:space-y-0 lg:space-x-10
-            items-center
-          "
-        >
-          <div class="space-y-2 w-full">
-            <label class="text-xs font-medium text-grays-black-5"
-              >Residential address</label
-            >
-            <input
-              type="text"
-              v-model="v$.form.residential_address.$model"
-              class="
-                text-xs
-                border-none
-                outline-none
-                w-full
-                rounded-md
-                p-3
-                placeholder-gray-500 placeholder-opacity-25
-                ring-1 ring-gray-300
-              "
-              placeholder="Enter drivers address"
-            />
-            <span
-              class="text-xs font-light text-red-500"
-              v-if="
-                v$.form.residential_address.$dirty &&
-                v$.form.residential_address.required.$invalid
-              "
-            >
-              Please provide your drivers address
-            </span>
-          </div>
-          <div class="space-y-2 w-full">
-            <label class="text-xs font-medium text-grays-black-5"
-              >Date of birth</label
-            >
-            <datepicker
-              v-model="v$.form.dob.$model"
-              class="
-                text-xs
-                border-none
-                outline-none
-                w-full
-                rounded-md
-                p-3
-                placeholder-gray-500 placeholder-opacity-25
-                ring-1 ring-gray-300
-              "
-              placeholder="Pick drivers date of dirth"
-            />
-
-            <span
-              class="text-xs font-light text-red-500"
-              v-if="v$.form.dob.$dirty && v$.form.dob.required.$invalid"
-            >
-              Please provide your drivers address
-            </span>
-          </div>
-        </section>
-
-        <section>
-          <p class="text-sm text-gray-400 pt-10">Driver’s License</p>
-
+      </div>
+      <div>
+        <p class="text-sm text-gray-400 pb-3">Drivers Info</p>
+        <form class="space-y-3 lg:space-y-7">
           <section
             class="
-              pt-3
               lg:flex
               justify-between
               space-y-3
@@ -241,11 +57,11 @@
           >
             <div class="space-y-2 w-full">
               <label class="text-xs font-medium text-grays-black-5"
-                >License number</label
+                >First name</label
               >
               <input
-                type="tel"
-                v-model="v$.form.license_number.$model"
+                type="text"
+                v-model="v$.form.fname.$model"
                 class="
                   text-xs
                   border-none
@@ -256,24 +72,22 @@
                   placeholder-gray-500 placeholder-opacity-25
                   ring-1 ring-gray-300
                 "
-                placeholder="Enter license number"
+                placeholder="Enter drivers first name"
               />
               <span
                 class="text-xs font-light text-red-500"
-                v-if="
-                  v$.form.license_number.$dirty &&
-                  v$.form.license_number.required.$invalid
-                "
+                v-if="v$.form.fname.$dirty && v$.form.fname.required.$invalid"
               >
-                Please provide your drivers License number
+                Please provide your first name
               </span>
             </div>
             <div class="space-y-2 w-full">
               <label class="text-xs font-medium text-grays-black-5"
-                >Expiry date
-              </label>
-              <datepicker
-                v-model="v$.form.expiry_date.$model"
+                >Last name</label
+              >
+              <input
+                type="text"
+                v-model="v$.form.lname.$model"
                 class="
                   text-xs
                   border-none
@@ -284,56 +98,263 @@
                   placeholder-gray-500 placeholder-opacity-25
                   ring-1 ring-gray-300
                 "
-                placeholder="Select expiry date"
+                placeholder="Enter drivers last name"
               />
               <span
                 class="text-xs font-light text-red-500"
-                v-if="
-                  v$.form.expiry_date.$dirty &&
-                  v$.form.expiry_date.required.$invalid
-                "
+                v-if="v$.form.lname.$dirty && v$.form.lname.required.$invalid"
               >
-                Please provide your License number expiry date
+                Please provide your last name
               </span>
             </div>
           </section>
 
-          <div class="pt-10 space-y-2">
-            <p class="font-medium text-gray-600 text-xs">
-              Upload drivers license document (pdf, jpg, png)
-            </p>
-            <image-upload @fileSelected="fileSelected"></image-upload>
-          </div>
-        </section>
-
-        <div class="space-x-5 flex justify-end items-center pt-10">
-          <button
-            type="button"
-            @click="updateDriver()"
+          <section
             class="
-              rounded-md
-              w-32
-              flex
-              justify-center
+              lg:flex
+              justify-between
+              space-y-3
+              lg:space-y-0 lg:space-x-10
               items-center
-              p-3
-              px-5
-              text-sm
-            "
-            :disabled="v$.form.$invalid || processing"
-            :class="
-              v$.form.$invalid || processing
-                ? 'cursor-not-allowed text-grays-black-5 bg-grays-black-7'
-                : 'bg-sh-green-500 font-medium'
             "
           >
-            {{ processing ? 'Saving' : 'Update' }}
-            <img class="ml-2" src="@/assets/images/arrow.svg" />
-          </button>
-        </div>
-      </form>
-    </div>
-  </main>
+            <div class="space-y-2 w-full relative">
+              <label class="text-xs font-medium text-grays-black-5"
+                >Phone number</label
+              >
+              <input
+                type="tel"
+                v-model="v$.form.phone.$model"
+                class="
+                  text-xs
+                  border-none
+                  outline-none
+                  w-full
+                  rounded-md
+                  pl-28
+                  p-3
+                  placeholder-gray-500 placeholder-opacity-25
+                  ring-1 ring-gray-300
+                "
+                placeholder="Enter drivers phone number"
+              />
+              <span
+                class="text-xs font-light text-red-500"
+                v-if="v$.form.phone.$dirty && v$.form.phone.required.$invalid"
+              >
+                Please provide your drivers pohone number
+              </span>
+              <span class="absolute top-8 left-2 bottom-0">
+                <div class="flex justify-center items-center space-x-3">
+                  <img src="@/assets/images/naira.svg" />
+                  <p class="text-sm text-gray-400">+234</p>
+                  <div class="h-5 w-0.5 bg-gray-200"></div>
+                </div>
+              </span>
+            </div>
+            <div class="space-y-2 w-full">
+              <label class="text-xs font-medium text-grays-black-5"
+                >Email address</label
+              >
+              <input
+                type="email"
+                v-model="v$.form.email.$model"
+                class="
+                  text-xs
+                  border-none
+                  outline-none
+                  w-full
+                  rounded-md
+                  p-3
+                  placeholder-gray-500 placeholder-opacity-25
+                  ring-1 ring-gray-300
+                "
+                placeholder="Enter drivers email address"
+              />
+              <span
+                class="text-xs font-light text-red-500"
+                v-if="v$.form.email.$dirty && v$.form.email.required.$invalid"
+              >
+                Please provide your drivers email address
+              </span>
+            </div>
+          </section>
+
+          <section
+            class="
+              lg:flex
+              justify-between
+              space-y-3
+              lg:space-y-0 lg:space-x-10
+              items-center
+            "
+          >
+            <div class="space-y-2 w-full">
+              <label class="text-xs font-medium text-grays-black-5"
+                >Residential address</label
+              >
+              <input
+                type="text"
+                v-model="v$.form.residential_address.$model"
+                class="
+                  text-xs
+                  border-none
+                  outline-none
+                  w-full
+                  rounded-md
+                  p-3
+                  placeholder-gray-500 placeholder-opacity-25
+                  ring-1 ring-gray-300
+                "
+                placeholder="Enter drivers address"
+              />
+              <span
+                class="text-xs font-light text-red-500"
+                v-if="
+                  v$.form.residential_address.$dirty &&
+                  v$.form.residential_address.required.$invalid
+                "
+              >
+                Please provide your drivers address
+              </span>
+            </div>
+            <div class="space-y-2 w-full">
+              <label class="text-xs font-medium text-grays-black-5"
+                >Date of birth</label
+              >
+              <datepicker
+                v-model="v$.form.dob.$model"
+                class="
+                  text-xs
+                  border-none
+                  outline-none
+                  w-full
+                  rounded-md
+                  p-3
+                  placeholder-gray-500 placeholder-opacity-25
+                  ring-1 ring-gray-300
+                "
+                placeholder="Pick drivers date of dirth"
+              />
+
+              <span
+                class="text-xs font-light text-red-500"
+                v-if="v$.form.dob.$dirty && v$.form.dob.required.$invalid"
+              >
+                Please provide your drivers address
+              </span>
+            </div>
+          </section>
+
+          <section>
+            <p class="text-sm text-gray-400 pt-10">Driver’s License</p>
+
+            <section
+              class="
+                pt-3
+                lg:flex
+                justify-between
+                space-y-3
+                lg:space-y-0 lg:space-x-10
+                items-center
+              "
+            >
+              <div class="space-y-2 w-full">
+                <label class="text-xs font-medium text-grays-black-5"
+                  >License number</label
+                >
+                <input
+                  type="tel"
+                  v-model="v$.form.license_number.$model"
+                  class="
+                    text-xs
+                    border-none
+                    outline-none
+                    w-full
+                    rounded-md
+                    p-3
+                    placeholder-gray-500 placeholder-opacity-25
+                    ring-1 ring-gray-300
+                  "
+                  placeholder="Enter license number"
+                />
+                <span
+                  class="text-xs font-light text-red-500"
+                  v-if="
+                    v$.form.license_number.$dirty &&
+                    v$.form.license_number.required.$invalid
+                  "
+                >
+                  Please provide your drivers License number
+                </span>
+              </div>
+              <div class="space-y-2 w-full">
+                <label class="text-xs font-medium text-grays-black-5"
+                  >Expiry date
+                </label>
+                <datepicker
+                  v-model="v$.form.expiry_date.$model"
+                  class="
+                    text-xs
+                    border-none
+                    outline-none
+                    w-full
+                    rounded-md
+                    p-3
+                    placeholder-gray-500 placeholder-opacity-25
+                    ring-1 ring-gray-300
+                  "
+                  placeholder="Select expiry date"
+                />
+                <span
+                  class="text-xs font-light text-red-500"
+                  v-if="
+                    v$.form.expiry_date.$dirty &&
+                    v$.form.expiry_date.required.$invalid
+                  "
+                >
+                  Please provide your License number expiry date
+                </span>
+              </div>
+            </section>
+
+            <div class="pt-10 space-y-2">
+              <p class="font-medium text-gray-600 text-xs">
+                Upload drivers license document (pdf, jpg, png)
+              </p>
+              <image-upload @fileSelected="fileSelected"></image-upload>
+            </div>
+          </section>
+
+          <div class="space-x-5 flex justify-end items-center pt-10">
+            <button
+              type="button"
+              @click="updateDriver()"
+              class="
+                rounded-md
+                w-32
+                flex
+                justify-center
+                items-center
+                p-3
+                px-5
+                text-sm
+              "
+              :disabled="v$.form.$invalid || processing"
+              :class="
+                v$.form.$invalid || processing
+                  ? 'cursor-not-allowed text-grays-black-5 bg-grays-black-7'
+                  : 'bg-sh-green-500 font-medium'
+              "
+            >
+              {{ processing ? 'Saving' : 'Update' }}
+              <img class="ml-2" src="@/assets/images/arrow.svg" />
+            </button>
+          </div>
+        </form>
+      </div>
+    </main>
+  </page-layout>
 </template>
 
 <script lang="ts">
@@ -345,6 +366,9 @@ import { email, required } from '@vuelidate/validators';
 import { mapGetters } from 'vuex';
 import { extractErrorMessage } from '@/utils/helper';
 import { format } from 'date-fns';
+import PageLayout from '@/components/layout/PageLayout.vue';
+import PageActionHeader from '@/components/PageActionHeader.vue';
+import Spinner from '@/components/layout/Spinner.vue';
 
 interface Driver {
   fname?: string;
@@ -363,10 +387,14 @@ export default defineComponent({
   name: 'AddDriver',
   components: {
     Datepicker,
-    ImageUpload
+    ImageUpload,
+    PageActionHeader,
+    PageLayout,
+    Spinner
   },
   data() {
     return {
+      fetchingDriver: false,
       format,
       uploadingFile: false,
       v$: useVuelidate(),
@@ -403,6 +431,7 @@ export default defineComponent({
   },
   methods: {
     async loadDriver() {
+      this.fetchingDriver = true;
       await this.$axios
         .get(`/v1/drivers/${this.$route.params.driverId}`)
         .then((res) => {
@@ -420,6 +449,9 @@ export default defineComponent({
         })
         .catch((err) => {
           console.log(err);
+        })
+        .finally(() => {
+          this.fetchingDriver = false;
         });
     },
     async updateDriver() {

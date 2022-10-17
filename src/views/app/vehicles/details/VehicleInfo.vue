@@ -25,7 +25,7 @@
 <!--    </template>-->
 <!--  </page-action-header>-->
   <div class="w-full relative rounded-sm shadow-sm">
-    <single-vehicle :vehicle-data="vehicleData" class="absolute left-10 top-10 z-50"></single-vehicle>
+    <single-vehicle :vehicle-data="vehicleData" class="absolute"></single-vehicle>
 <!--    <Map></Map>-->
   </div>
 </div>

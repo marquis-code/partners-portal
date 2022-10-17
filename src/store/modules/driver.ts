@@ -17,11 +17,9 @@ export default <StoreOptions<DriverState>>{
       commit('setDriverData', data);
     },
     async fetchDriverInfo ({commit}, driverId: number) {
-      console.log(driverId, 'drivers id');
       try {
         commit('setDriverLoading', false);
         const response = await axiosInstance.get(`/v1/drivers/${driverId}`);
-        console.log(response);
         commit('setDriverData', response.data);
         return response;
       } finally {

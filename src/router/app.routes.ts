@@ -98,7 +98,7 @@ export const AppRoutes: Array<RouteRecordRaw> = [
               {
                 path: 'trips',
                 name: 'driver.detail.trips',
-                component: loadRouteComponent('app/drivers/details/driverTrips'),
+                component: loadRouteComponent('app/drivers/details/DriverTrips'),
                 meta: {
                   title: 'Driver Details',
                   requiresAuth: true

@@ -17,6 +17,7 @@
             <img class="ml-2 md:ml-9" src="@/assets/images/notification-present.svg" @click="logout()">
           </div>
         </div>
+        <slot name="breadcrumbs"></slot>
         <hr class="mt-5 mb-0 hidden">
         <div class="bottom-part">
 <!--          <Breadcrumbs :activeSection="activeSection"/>-->

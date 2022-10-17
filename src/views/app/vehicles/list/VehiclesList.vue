@@ -20,9 +20,6 @@
               :class="this.filters.status === 'inactive' ? 'text-black border-b-sh-green-500' : 'text-sh-grey-500 border-b-transparent'" @click="setStatusFilter('inactive')">InActive</span>
       </div>
       <div class="space-y-5 ring-1 ring-gray-50 shadow-sm rounded-sm bg-white">
-        <!--    <div class="flex items-center justify-end p-5">-->
-        <!--      <download-button></download-button>-->
-        <!--    </div>-->
         <div>
           <app-table
             :loading="loading"
