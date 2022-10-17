@@ -1,10 +1,10 @@
 <template>
-  <div class="menu-item mx-auto" @click="isOpen = !isOpen">
+  <div class="menu-item mx-auto relative" @click="isOpen = !isOpen">
     <span class="material-icons ">
      more_vert
     </span>
     <transition name="fade" appear>
-      <div class="drop-shadow-sm rounded-2xl p-5 absolute bg-white -translate-x-2/4 w-min" v-if="isOpen">
+      <div class="drop-shadow-sm rounded-2xl p-5 absolute z-10 bg-white -translate-x-2/4 w-min" v-if="isOpen">
         <div @click="previewDocument" class="p-2 rounded-lg menu-item text-black hover:text-white hover:bg-black">
           <a>View</a>
         </div>
@@ -13,25 +13,41 @@
         </div>
       </div>
     </transition>
+    <vue-easy-lightbox
+      :visible="visibleRef"
+      :imgs="imgsRef"
+      :index="indexRef"
+      @hide="onHide"
+    ></vue-easy-lightbox>
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import {defineComponent} from "vue";
 export default defineComponent({
   name: 'DropDown',
   props: ['docId', 'docUrl'],
   data () {
     return {
-      isOpen: false
+      isOpen: false,
+      visibleRef: false,
+      indexRef: 0,
+      imgsRef: [] as Array<string>,
     }
   },
   methods: {
     previewDocument() {
-      console.log(this.docUrl);
+      this.imgsRef = [this.docUrl]
+      this.onShow()
     },
     goToUpdateDocumentView() {
       console.log(this.docId)
+    },
+    onShow() {
+      this.visibleRef = true;
+    },
+    onHide() {
+      this.visibleRef = false;
     }
   }
 })

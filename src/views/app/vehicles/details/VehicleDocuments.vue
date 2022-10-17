@@ -8,7 +8,7 @@
       @rowClicked="handleRowClick"
     >
       <template v-slot:actions="{item}">
-        <drop-down :docUrl="item.actions.docUrl" :docId="item.actions.docId"></drop-down>
+        <VehicleTableDropDown :docUrl="item.actions.docUrl" :docId="item.actions.docId"/>
       </template>
     </app-table>
   </div>
@@ -19,11 +19,11 @@ import {defineComponent} from "vue";
 import {mapGetters} from "vuex";
 import AppTable from "@/components/AppTable.vue";
 import { getExpiryDate, getUserReadableDate } from "@/utils/dateFormatters";
-import DropDown from "../../../../components/DropDown.vue";
+import VehicleTableDropDown from "../../../../components/VehicleTableDropDown.vue";
 
 export default defineComponent({
   name: "VehicleDocuments",
-  components: { AppTable, DropDown },
+  components: { AppTable, VehicleTableDropDown },
   data () {
     return {
       loading: false,

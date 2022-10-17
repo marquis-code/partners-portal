@@ -4,6 +4,7 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 import PluginService from './services/plugin.service';
+import VueEasyLightbox from 'vue-easy-lightbox'
 
 // Global Styles
 import './assets/scss/styles.scss';
@@ -19,5 +20,6 @@ new AppInitializerService(router, store, axiosInstance).initialize()
       .use(axios)
       .use(store)
       .use(router)
+      .use(VueEasyLightbox)
       .mount('#sh-vp-portal');
   });
