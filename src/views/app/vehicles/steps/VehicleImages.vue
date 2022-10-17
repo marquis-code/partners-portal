@@ -46,7 +46,6 @@ export default defineComponent({
       const multipleDocumentObjects = $event;
       const multipleDocumentList = this.convertImageObjectToList(multipleDocumentObjects);
       this.uploadTos3andGetDocumentUrlList(multipleDocumentList, type);
-      // console.log(fileUrls);
     },
     removeFiles(type: any) {
       if (type === 'interior') {

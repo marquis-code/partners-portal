@@ -1,6 +1,7 @@
 <template>
-  <section
+  <main
     class="
+      z-0
       w-full
       lg:w-4/12
       md:w-7/12
@@ -11,7 +12,6 @@
     "
   >
     <div class="space-y-7 lg:p-8 p-7">
-      <p class="text-sm font-medium text-gray-500">Driver Information</p>
       <main class="flex flex-col space-y-2 justify-center items-center">
         <img
           v-if="driverData.avatar"
@@ -20,7 +20,17 @@
         />
         <span
           v-else
-          class="rounded-full h-20 w-20 flex justify-center items-center text-gray-100 font-medium bg-gray-400"
+          class="
+            rounded-full
+            h-20
+            w-20
+            flex
+            justify-center
+            items-center
+            text-gray-100
+            font-medium
+            bg-gray-400
+          "
           >{{ driverData.fname.slice(0, 1)
           }}{{ driverData.lname.slice(0, 1) }}</span
         >
@@ -29,8 +39,7 @@
         {{ driverData.fname }} {{ driverData.lname }}
       </p>
     </div>
-     <hr class="mb-0">
-    <!-- <div class="w-full h-0.5 bg-gray-200"></div> -->
+    <hr class="mb-0" />
 
     <div class="p-5 md:p-8 grid grid-cols-1 divide-y">
       <div class="flex justify-between items-center pb-6">
@@ -61,7 +70,11 @@
             </p>
           </div>
         </div>
-        <p class="underline text-indigo-600 text-sm">Change plate number</p>
+        <router-link
+          :to="{ name: 'EditDriver', params: { driverId: driverData.id } }"
+          class="underline text-indigo-600 text-sm"
+          >Update drivers licence</router-link
+        >
       </div>
       <div class="flex justify-between items-center py-6">
         <div class="flex space-x-2">
@@ -87,7 +100,11 @@
             </p>
           </div>
         </div>
-        <p class="underline text-indigo-600 text-xs">Change email</p>
+        <router-link
+          :to="{ name: 'EditDriver', params: { driverId: driverData.id } }"
+          class="underline text-indigo-600 text-xs"
+          >Change email</router-link
+        >
       </div>
       <div class="flex justify-between items-center py-6">
         <div class="flex space-x-2">
@@ -99,10 +116,14 @@
             </p>
           </div>
         </div>
-        <p class="underline text-indigo-600 text-xs">Change phone</p>
+        <router-link
+          :to="{ name: 'EditDriver', params: { driverId: driverData.id } }"
+          class="underline text-indigo-600 text-xs cursor-pointer"
+          >Change phone</router-link
+        >
       </div>
     </div>
-  </section>
+  </main>
 </template>
 
 <script lang="ts">
