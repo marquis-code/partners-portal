@@ -4,7 +4,12 @@
       :loading="loading"
       :error-loading="errorLoading"
       :items="tableData"
-      :fields="headers">
+      :fields="headers"
+      @rowClicked="handleRowClick"
+    >
+      <template v-slot:actions="{item}">
+        <drop-down :docUrl="item.actions.docUrl" :docId="item.actions.docId"></drop-down>
+      </template>
     </app-table>
   </div>
 </template>
@@ -13,24 +18,35 @@
 import {defineComponent} from "vue";
 import {mapGetters} from "vuex";
 import AppTable from "@/components/AppTable.vue";
-import moment from 'moment';
+import { getExpiryDate, getUserReadableDate } from "@/utils/dateFormatters";
+import DropDown from "../../../../components/DropDown.vue";
 
 export default defineComponent({
   name: "VehicleDocuments",
-  components: {AppTable},
+  components: { AppTable, DropDown },
   data () {
     return {
       loading: false,
       totalRecords: null,
       tableData: [] as Array<any>,
       errorLoading: null,
+      options: [
+        {
+          title: 'View',
+          docUrl: '#'
+        },
+        {
+          title: 'Update',
+          link: '#'
+        }
+      ],
       headers: [
         { label: 'Type', key: 'type' },
         { label: 'Name', key: 'name' },
         { label: 'Expiry Date', key: 'expiry' },
         { label: 'Status', key: 'status' },
         { label: 'Date Created', key: 'date' },
-        { label: 'Action', key: 'action' },
+        { label: 'Action', key: 'actions' },
       ]
     }
   },
@@ -61,12 +77,19 @@ export default defineComponent({
         newDocumentsList.push({
           type: doc.type || 'city',
           name: doc.document_type,
-          expiry: moment(doc.expiry_date).format('LL') || 'Does not expire',
+          expiry: getExpiryDate(doc.expiry_date),
           status: doc.status,
-          date: moment(doc.created_at).format('LL')
+          date: getUserReadableDate(doc.created_at),
+          actions: {
+            docUrl: JSON.parse(doc.files)[0],
+            docId: doc.id
+          }
         });
       });
       return newDocumentsList;
+    },
+    handleRowClick(item: any) {
+      // console.log(item)
     }
   }
 })

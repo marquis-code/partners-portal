@@ -1,15 +1,15 @@
 <template>
-  <div class="menu-item" @click="isOpen = !isOpen">
-    <a href="#">
-      {{ title }}
-    </a>
-    <svg viewBox="0 0 1030 638" width="10">
-      <path d="M1017 68L541 626q-11 12-26 12t-26-12L13 68Q-3 49 6 24.5T39 0h952q24 0 33 24.5t-7 43.5z" fill="#FFF"></path>
-    </svg>
+  <div class="menu-item mx-auto" @click="isOpen = !isOpen">
+    <span class="material-icons ">
+     more_vert
+    </span>
     <transition name="fade" appear>
-      <div class="sub-menu" v-if="isOpen">
-        <div v-for="(item, i) in items" :key="i" class="menu-item">
-          <a :href="item.link">{{ item.title }}</a>
+      <div class="drop-shadow-sm rounded-2xl p-5 absolute bg-white -translate-x-2/4 w-min" v-if="isOpen">
+        <div @click="previewDocument" class="p-2 rounded-lg menu-item text-black hover:text-white hover:bg-black">
+          <a>View</a>
+        </div>
+        <div @click="goToUpdateDocumentView" class="p-2 rounded-lg menu-item text-black hover:text-white hover:bg-black">
+          <a>Update</a>
         </div>
       </div>
     </transition>
@@ -20,35 +20,22 @@
 import {defineComponent} from "vue";
 export default defineComponent({
   name: 'DropDown',
-  props: ['title', 'items'],
+  props: ['docId', 'docUrl'],
   data () {
     return {
       isOpen: false
+    }
+  },
+  methods: {
+    previewDocument() {
+      console.log(this.docUrl);
+    },
+    goToUpdateDocumentView() {
+      console.log(this.docId)
     }
   }
 })
 </script>
 
 <style>
-nav .menu-item svg {
-  width: 10px;
-  margin-left: 10px;
-}
-nav .menu-item .sub-menu {
-  position: absolute;
-  background-color: #222;
-  top: calc(100% + 18px);
-  left: 50%;
-  transform: translateX(-50%);
-  width: max-content;
-  border-radius: 0px 0px 16px 16px;
-}
-.fade-enter-active,
-.fade-leave-active {
-  transition: all .5s ease-out;
-}
-.fade-enter,
-.fade-leave-to {
-  opacity: 0;
-}
 </style>
