@@ -1,15 +1,5 @@
 <template>
   <form>
-    <!-- <div class="space-y-10">
-      <div class="space-y-3">
-        <p class="text-xs font-medium text-gray-300">Lagos State</p>
-        <p class="text-xs font-medium text-gray-500">
-          Lagos state local government papers document (e.g png, jpg, pdf)
-        </p>
-        <image-upload></image-upload>
-      </div>
-      <div class="bg-gray-300 h-0.5 w-full"></div>
-    </div> -->
     <main class="space-y-10">
       <p class="text-sm text-gray-300 pt-5">Vehicle Information</p>
       <div class="" v-for="(doc, index) in vehicle_documents_order" :key="index">
@@ -33,15 +23,6 @@
             placeholder="Choose a date"
             v-model="payload.vehicle_documents[index].expiry_date"
           />
-          <!-- <span
-            class="text-sm font-light text-red-500"
-            v-if="
-              v$.form.vehicle_insurance_expiry_date.$dirty &&
-              v$.form.vehicle_insurance_expiry_date.required.$invalid
-            "
-          >
-            This field is required
-          </span> -->
         </div>
         <label class="text-xs font-medium text-grays-black-5"
           >Upload {{payload.vehicle_documents[index].document_type}} document (pdf, jpg, png)</label

@@ -113,7 +113,7 @@
                 <router-link
                   class="text-sh-green-700 pr-1 cursor-pointer"
                   :to="{
-                     name: 'driver.detail.info',
+                    name: 'driver.detail.info',
                     params: { driverId: item.id }
                   }"
                   >{{ item.fname || '' }}</router-link
@@ -284,9 +284,9 @@ export default defineComponent({
       return newTableData;
     },
     async removeDriver() {
-      const response = await this.$axios.delete(
-        `/v1/partner/${this.selectedDriverId}/vehicle_drivers`
-      )
+      // const response = await this.$axios.delete(
+      //   `/v1/partner/${this.selectedDriverId}/vehicle_drivers`
+      // )
     }
   }
 });

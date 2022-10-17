@@ -86,12 +86,6 @@ export default defineComponent({
   created() {
     this.fetchTrips();
   }
-  // computed: {
-  //   ...mapGetters({
-  //     vehicleData: 'vehicle/getVehicleData',
-  //     isLoading: 'vehicle/getVehicleLoading'
-  //   })
-  // }
 });
 </script>
 
