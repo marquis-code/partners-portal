@@ -13,9 +13,7 @@
         </template>
       </page-action-header>
     </template>
-    <main
-      class="container mx-auto p-5 lg:p-14 bg-white ring-1 ring-gray-100"
-    >
+    <main class="container mx-auto p-5 lg:p-14 bg-white ring-1 ring-gray-100">
       <div class="flex justify-center items-center flex-col space-y-2 pb-5">
         <img
           v-if="profilePreview"
@@ -464,15 +462,20 @@ export default defineComponent({
       const imageDbUrl = (await this.uploadTos3andGetDocumentUrl(
         selectedImage
       )) as string;
+      if (imageDbUrl) {
+        this.$toast.success('Vehicle license was uploaded successfully');
+      }
       this.form.files.push(imageDbUrl);
     },
 
     async handleProfileUpload(e: any) {
       const selectedProfile = e.target.files[0];
       this.profilePreview = URL.createObjectURL(selectedProfile);
-      this.form.avatar = await this.uploadTos3andGetDocumentUrl(
-        selectedProfile
-      );
+      const response = await this.uploadTos3andGetDocumentUrl(selectedProfile);
+      if (response) {
+        this.$toast.success('Profile picture was uploaded successfully');
+      }
+      this.form.avatar = response;
     },
 
     async uploadTos3andGetDocumentUrl(file: any) {
