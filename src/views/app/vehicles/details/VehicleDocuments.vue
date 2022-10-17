@@ -13,6 +13,7 @@
 import {defineComponent} from "vue";
 import {mapGetters} from "vuex";
 import AppTable from "@/components/AppTable.vue";
+import moment from 'moment';
 
 export default defineComponent({
   name: "VehicleDocuments",
@@ -21,7 +22,7 @@ export default defineComponent({
     return {
       loading: false,
       totalRecords: null,
-      tableData: [],
+      tableData: [] as Array<any>,
       errorLoading: null,
       headers: [
         { label: 'Type', key: 'type' },
@@ -45,14 +46,27 @@ export default defineComponent({
   },
   methods: {
     fetchVehicleDocuments () {
-      this.loading = false;
+      this.loading = true;
       this.$axios.get(`v1/partners/${this.partnerContext.partner.id}/vehicle/${this.vehicleData.id}/vehicle-documents`)
         .then(r => {
-          this.tableData = r.data.data;
+          this.tableData = this.structureDocumentTable(r.data.data) || [];
         })
         .finally(() => {
           this.loading = false;
         })
+    },
+    structureDocumentTable(documentResponseResponse: Array<any>): [] {
+      const newDocumentsList: any = []
+      documentResponseResponse.forEach(doc => {
+        newDocumentsList.push({
+          type: doc.type || 'city',
+          name: doc.document_type,
+          expiry: moment(doc.expiry_date).format('LL') || 'Does not expire',
+          status: doc.status,
+          date: moment(doc.created_at).format('LL')
+        });
+      });
+      return newDocumentsList;
     }
   }
 })
