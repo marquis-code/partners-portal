@@ -1,7 +1,7 @@
 <template>
 <div class="relative">
   <div class="w-full relative rounded-sm shadow-sm">
-    <single-vehicle :vehicle-data="vehicleData" class="absolute"></single-vehicle>
+    <single-vehicle :singleVehicleData="vehicleData" class="absolute"></single-vehicle>
   </div>
 </div>
 </template>

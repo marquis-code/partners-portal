@@ -137,6 +137,15 @@ export const AppRoutes: Array<RouteRecordRaw> = [
             }
           },
           {
+            path: ':vehicleId/edit',
+            name: 'EditVehicle',
+            component: loadRouteComponent('app/vehicles/EditVehicle'),
+            meta: {
+              title: 'Edit Vehicle',
+              requiresAuth: true
+            }
+          },
+          {
             path: 'details/:vehicleId',
             component: loadRouteComponent('app/vehicles/details/VehicleDetailsIndex'),
             props: true,
@@ -176,7 +185,7 @@ export const AppRoutes: Array<RouteRecordRaw> = [
                   title: 'Vehicle Details',
                   requiresAuth: true
                 },
-              },
+              }
             ]
           },
         ]
