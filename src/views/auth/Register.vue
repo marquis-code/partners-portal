@@ -1,18 +1,16 @@
 <template>
-  <main class="flex justify-center items-center flex-col relative mx-auto min-h-screen space-y-5">
-    <div class="absolute top-0 z-10 flex items-center justify-center w-full py-4 text-white bg-grays-black" style="height: 72px">
-      <img src="@/assets/images/sh_brand_white.svg" class="h-6" />
-    </div>
+  <main
+    class="flex items-center min-h-screen justify-center px-8 py-8 sm:px-12 lg:col-span-7 lg:py-12 lg:px-16">
     <div class="relative px-6 mt-20 py-3 pb-6 text-dark-type-4 max-w-xl lg:max-w-2xl mx-auto  z-10 bg-white rounded-lg " style="margin-top: 80px">
       <div class>
-        <div class="mx-auto font-bold text-center text-dark-type-3">
-          Become a shuttler
+        <div class="text-sh-grey-900 font-bold text-lg lg:text-2xl text-center">
+          Vehicle Partner Sign up
         </div>
       </div>
       <div class="mt-2">
         <div class="text-xs font-medium text-center">
           Already have an account?
-          <router-link to="/login" class="text-sh-green-500">Login</router-link>
+          <p @click="$emit('goToLogin')" class="text-sh-green-500 cursor-pointer">Login</p>
         </div>
       </div>
 <!--      <div

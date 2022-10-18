@@ -18,21 +18,9 @@
           </carousel>
         </div>
       </section>
-
-      <main
-        class="flex items-center min-h-screen justify-center px-8 py-8 sm:px-12 lg:col-span-7 lg:py-12 lg:px-16">
-        <div class="max-w-xl lg:max-w-2xl lg:w-3/6">
-          <img alt="Shuttlers Logo" src="@/assets/images/brand_green.svg">
-          <h2 class="font-bold text-4xl text-sh-grey-900 mt-8">Vehicle Partner Portal</h2>
-          <p class="text-grays-black-5 leading-10 mt-4 max-w-sm">A new experience to managing your Vehicles and Drivers and earning with them.</p>
-          <router-link to="/login" class="block cursor-pointer mt-10 border rounded-lg border-sh-grey-900 text-sh-grey-900 font-bold text-sm w-full py-3 text-center">
-            Login
-          </router-link>
-          <router-link to="/register" class="hover:bg-sh-green-600 block cursor-pointer mt-4 rounded-lg border border-transparent text-sh-grey-900 font-bold bg-sh-green-500 text-sm w-full py-3 text-center">
-            Become a vehicle partner
-          </router-link>
-        </div>
-      </main>
+        <login-or-signup v-if="step===0" @goToLogin="step=1" @goToSignUp="step=2"/>
+        <login v-if="step===1" @goToSignUp="step=2"/>
+        <register v-if="step===2"  @goToLogin="step=1"/>
     </div>
   </section>
 
@@ -42,6 +30,9 @@ import 'vue3-carousel/dist/carousel.css'
 import { Carousel, Slide, Pagination } from 'vue3-carousel'
 
 import {defineComponent} from "vue";
+import LoginOrSignup from './auth/LoginOrSignup.vue';
+import Register from './auth/Register.vue';
+import Login from './auth/login/Login.vue';
 
 export default defineComponent({
   name: 'LandingPage',
@@ -49,9 +40,13 @@ export default defineComponent({
     Carousel,
     Slide,
     Pagination,
+    LoginOrSignup,
+    Register,
+    Login
   },
   data () {
     return {
+      step: 0,
       highlights: [
         {
           label: 'Manage your assets',

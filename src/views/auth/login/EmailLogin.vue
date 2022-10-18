@@ -50,7 +50,7 @@
 
       <div class="flex justify-center items-center space-x-2 text-sm md:text-base font-medium">
         <span class="text-grays-black-3">Do you want to be a partner?</span>
-        <router-link to="/register" class="text-indigo-600 text-sm md:text-base">Join now</router-link>
+        <p @click="$emit('goToSignUp')" class="text-indigo-600 text-sm md:text-base">Join now</p>
       </div>
     </div>
   </form>
@@ -71,6 +71,7 @@ export default defineComponent({
   name: 'EmailLogin',
   // setup: () => ({ v$: useVuelidate() }),
   mixins: [LoginMixin],
+  emits: ['goToSignUp'],
   data () {
     return {
       form: {

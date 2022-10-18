@@ -1,14 +1,15 @@
 <template>
-  <main class="flex justify-center items-center flex-col relative container mx-auto min-h-screen space-y-5">
-    <div class="flex flex-col md:w-5/12 lg:w-4/12 w-11/12 mx-auto px-4 py-8 z-10 bg-white rounded-lg">
+  <main
+    class="flex items-center min-h-screen justify-center px-8 py-8 sm:px-12 lg:col-span-7 lg:py-12 lg:px-16">
+    <div class="flex flex-col md:w-5/12 lg:w-7/12 w-11/12 mx-auto px-4 py-8 z-10 bg-white rounded-lg">
       <div class="space-y-1 flex justify-between items-center flex-col">
         <img src="@/assets/logo.png" class="h-10" />
         <h1 class="text-sh-grey-900 font-bold text-lg lg:text-2xl text-center">
-          {{ otpActive ? 'Confirm OTP' : 'Log into your account' }}
+          {{ otpActive ? 'Confirm OTP' : 'Welcome Partner' }}
         </h1>
         <p class="mt-4 text-grays-black-5 font-light text-sm md:text-base text-center">
           <span v-if="otpActive" v-html="otpText"></span>
-          <span v-else>Welcome back! Please enter your login details</span>
+          <span v-else>Log into your account</span>
         </p>
 
       </div>
@@ -26,7 +27,7 @@
           Phone number
         </button>
       </div>
-      <component @otp-state-change="setOtpActive($event)" :countries="countries || []" :is="activeForm" />
+      <component @goToSignUp="$emit('goToSignUp')" @otp-state-change="setOtpActive($event)" :countries="countries || []" :is="activeForm" />
     </div>
    <div class="absolute bottom-0 hidden lg:flex absolute bottom-0 z-0 ">
     <img src="@/assets/images/backgroundGraphics.svg" class=" w-auto"/>
@@ -41,6 +42,7 @@ import PhoneLogin from './PhoneLogin.vue';
 
 export default defineComponent({
   name: 'Login',
+  emits: ['goToSignUp'],
   components: { EmailLogin, PhoneLogin },
   data () {
     return {

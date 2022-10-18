@@ -19,7 +19,7 @@ const routes: Array<RouteRecordRaw> = [
     meta: {
       requiresAuth: false,
       openPage: true
-    }
+    },
   },
   {
     path: '/invitations',
