@@ -1,11 +1,12 @@
 <template>
-  <div
-    class="h-screen py-9 bg-white"
+  <div class="h-screen flex justify-between flex-col py-6"
+
+  >
+  <div  class="bg-white"
     :class="
       isSidebarFolded ? 'w-12 pl-0 pr-0' : 'w-64 pl-4 pr-4'
-    "
-  >
-    <div
+    ">
+         <div
       class="flex mb-9"
       :class="isSidebarFolded ? 'flex-col items-center' : 'flex-row justify-between'"
     >
@@ -53,9 +54,11 @@
       </div>
     </div>
     </div>
+  </div>
+
     <div
-      class="absolute bottom-10 flex flex-row justify-between items-center py-3 rounded-xl bg-green-200"
-      :class="isSidebarFolded ? 'p-1' : 'px-3'"
+      class="flex flex-row justify-between items-center py-2 cursor-pointer space-x-3 rounded-xl bg-green-200 mx-4"
+      :class="isSidebarFolded ? 'p-1' : 'px-3 '"
     >
       <div class="flex flex-row items-center" @click="logout">
         <img
@@ -137,6 +140,7 @@ export default defineComponent({
     },
     logout() {
       localStorage.clear();
+      this.$router.push('/');
     }
   }
 })
