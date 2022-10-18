@@ -113,7 +113,7 @@
         </span>
         </div>
       </section>
-      <section class="flex justify-start space-x-10 items-start">
+      <section class="lg:flex justify-start lg:space-x-10 items-start">
         <div class="space-y-2 w-full lg:w-6/12">
           <label class="text-xs font-medium text-grays-black-5">Cities</label>
           <v-select
@@ -140,7 +140,7 @@
           This field is required
         </span>
         </div>
-        <div class="space-y-2 w-full lg:w-6/12">
+        <div class="space-y-2 w-full lg:w-6/12 pt-5 lg:pt-0">
           <label class="text-xs font-medium text-grays-black-5">Registration Number</label>
           <input
             type="tel"

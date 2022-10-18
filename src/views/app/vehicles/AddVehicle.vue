@@ -1,7 +1,7 @@
 <template>
   <page-layout page-title="Add Vehicle">
-    <main class="space-y-16 bg-white py-8">
-      <div class="flex w-11/12 lg:w-6/12 mx-auto items-center space-x-3">
+    <main class="space-y-16 bg-white py-8 lg:w-10/12 mx-auto" >
+      <div class="flex justify-center pl-3 md:pl-0 lg:w-10/12 mx-auto items-center md:space-x-3 w-full">
         <div class="flex items-center space-x-1">
         <span
           class="flex justify-center items-center w-5 h-5 rounded-full text-xs text-white cursor-pointer"
@@ -13,7 +13,7 @@
             Vehicle information
           </p>
         </div>
-        <div class="w-10 h-0.5 bg-gray-400"></div>
+        <div class="w-10 h-0.5 bg-gray-400 mr-3"></div>
         <div class="flex items-center space-x-1">
         <span
           class="flex justify-center items-center w-5 h-5 rounded-full text-xs text-white cursor-pointer"
@@ -22,7 +22,7 @@
             Vehicle documents
           </p>
         </div>
-        <div class="w-10 h-0.5 bg-gray-400"></div>
+        <div class="w-10 h-0.5 bg-gray-400 mr-3"></div>
         <div class="flex items-center space-x-1">
         <span
           class="flex justify-center items-center w-5 h-5 rounded-full text-xs text-white cursor-pointer"
