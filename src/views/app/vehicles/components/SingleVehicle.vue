@@ -9,7 +9,7 @@
       </div>
       <main class="flex flex-col space-y-2 justify-center items-center">
         <img src="@/assets/images/car.svg" />
-        <h1 class="font-medium">{{ vehicleData.brand }} {{ vehicleData.name }}</h1>
+        <h1 class="font-medium">{{ singleVehicleData.brand }} {{ singleVehicleData.name }}</h1>
 <!--        <small class="text-xs text-gray-300">Registered: 20th August, 2021</small>-->
       </main>
     </div>
@@ -19,7 +19,7 @@
         <div class="flex justify-start space-x-2">
           <img class="h-5 w-5" src="@/assets/images/driversIcon.svg" />
           <div class="">
-            <p class="font-medium text-xs" v-if="vehicleData.driver">Assigned driver</p>
+            <p class="font-medium text-xs" v-if="singleVehicleData.driver">Assigned driver</p>
             <p class="font-medium text-xs" v-else>No driver</p>
           </div>
         </div>
@@ -30,20 +30,20 @@
           <img class="h-5 w-5" src="@/assets/images/plateNumberIcon.svg" />
           <div class="">
             <p class="font-medium text-xs">Plate number</p>
-            <p class="font-light text-xs">{{ vehicleData.registration_number }}</p>
+            <p class="font-light text-xs">{{ singleVehicleData.registration_number }}</p>
           </div>
         </div>
-        <router-link to="update" class="underline text-indigo-600 text-xs">Change plate number</router-link>
+        <p @click="editVehicle" class="underline text-indigo-600 text-xs">Change plate number</p>
       </div>
       <div class="flex justify-between items-center py-6">
         <div class="flex space-x-2">
           <img class="h-5 w-5" src="@/assets/images/carIcon.svg" />
           <div class="">
             <p class="font-medium text-xs">Capacity</p>
-            <p class="font-light text-xs">{{ vehicleData.seats }}</p>
+            <p class="font-light text-xs">{{ singleVehicleData.seats }}</p>
           </div>
         </div>
-        <router-link to="update" class="underline text-indigo-600 text-xs">Change capacity</router-link>
+        <p @click="editVehicle" class="underline text-indigo-600 text-xs">Change capacity</p>
       </div>
       <div class="flex justify-between items-center py-6">
         <div class="flex space-x-2">
@@ -61,12 +61,27 @@
 
 <script lang="ts">
 import {defineComponent} from "vue";
+import { mapGetters } from "vuex";
 
 export default defineComponent({
   emits: ['vehicleUpdated'], // emitted when driver is changed or updated
   props: {
-    vehicleData: Object
+    singleVehicleData: Object
   },
+  computed: {
+    ...mapGetters({
+      vehicleData: 'vehicle/getVehicleData',
+      isLoading: 'vehicle/getVehicleLoading'
+    })
+  },
+  methods: {
+    editVehicle() {
+      this.$router.push({
+        name: 'EditVehicle',
+        params: { vehicleId: this.vehicleData.id }
+      });
+    },
+  }
 });
 </script>
 

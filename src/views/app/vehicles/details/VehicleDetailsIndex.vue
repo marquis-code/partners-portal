@@ -189,7 +189,8 @@ export default {
     },
     editVehicle() {
       this.$router.push({
-        name: 'vehicle.information.update'
+        name: 'EditVehicle',
+        params: { vehicleId: this.$attrs.vehicleId }
       });
       this.showDropdown = false;
     },

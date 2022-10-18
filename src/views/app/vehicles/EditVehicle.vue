@@ -1,11 +1,23 @@
 <template>
   <page-layout page-title="Edit Vehicle Information">
+    <template #actionsPane>
+      <PageActionHeader>
+        <template #breadcrumbs>
+          <div class="flex items-center space-x-3 py-3">
+            <p class="text-gray-400 text-sm">Dashboard</p>
+            <img src="@/assets/images/breadcrumbs.svg" />
+            <p class="text-gray-400 text-sm">Vehicle management</p>
+            <img src="@/assets/images/breadcrumbs.svg" />
+            <p class="text-gray-900 text-sm">Update Vehicle Information</p>
+          </div>
+        </template>
+      </PageActionHeader>
+    </template>
     <main class="space-y-16 bg-white py-8 lg:w-10/12 mx-auto" >
       <div class="flex justify-center pl-3 md:pl-0 lg:w-10/12 mx-auto items-center md:space-x-3 w-full">
         <div class="flex items-center space-x-1">
           <p
-            class="text-xs font-medium cursor-pointer"
-            :class="[currentStep === 0 ? 'text-bg-grays-black-2' : 'text-gray-200']">
+            class="text-xs text-left font-medium cursor-pointer text-bg-grays-black-2">
             Update Vehicle information
           </p>
         </div>
@@ -197,9 +209,12 @@ import { mapGetters } from 'vuex';
 import { extractErrorMessage } from '@/utils/helper';
 import {AxiosResponse} from "axios";
 import Spinner from "@/components/layout/Spinner.vue";
+import PageLayout from '@/components/layout/PageLayout.vue';
+import PageActionHeader from '@/components/PageActionHeader.vue';
+
 export default defineComponent<any, any, any>({
-  name: 'editVehicleInformation',
-  components: {Spinner},
+  name: 'EditVehicle ',
+  components: { Spinner, PageLayout, PageActionHeader},
   emits: ['next'],
   data () {
     return {
@@ -266,7 +281,6 @@ export default defineComponent<any, any, any>({
       });
     },
     showVehicleData() {
-      console.log(this.vehicleData)
       this.form.brand = this.vehicleData.brand;
       this.form.name = this.vehicleData.name;
       this.form.year = this.vehicleData.year;
@@ -331,7 +345,7 @@ export default defineComponent<any, any, any>({
         await this.$store.dispatch('vehicle/setVehicleData', response.data);
         setTimeout(() => {
           this.viewVehicleDetails(this.vehicleData.id);
-        }, 1000)
+        }, 300)
         this.$toast.success('Vehicle Information Update');
       } catch (err) {
         const errorMessage = extractErrorMessage(
