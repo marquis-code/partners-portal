@@ -177,6 +177,16 @@ export const AppRoutes: Array<RouteRecordRaw> = [
                   requiresAuth: true
                 },
               },
+              {
+                path: 'update',
+                name: 'vehicle.information.update',
+                component: loadRouteComponent('app/vehicles/details/editVehicle'),
+                props: true,
+                meta: {
+                  title: 'Vehicle Information Update',
+                  requiresAuth: true
+                }
+              },
             ]
           },
         ]

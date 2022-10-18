@@ -25,7 +25,7 @@
               w-full
             "
           >
-            Actions
+            <router-link to="update">Actions</router-link>
           </button>
         </template>
 

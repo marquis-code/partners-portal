@@ -66,7 +66,7 @@ export default defineComponent({
   emits: ['vehicleUpdated'], // emitted when driver is changed or updated
   props: {
     vehicleData: Object
-  }
+  },
 });
 </script>
 

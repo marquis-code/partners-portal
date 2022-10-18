@@ -38,7 +38,7 @@
             cursor-pointer
           "
           :class="
-            this.filters.status === 'active'
+            filters.status === 'active'
               ? 'text-black border-b-sh-green-500'
               : 'text-sh-grey-500 border-b-transparent'
           "
@@ -57,7 +57,7 @@
             cursor-pointer
           "
           :class="
-            this.filters.status === 'inactive'
+            filters.status === 'inactive'
               ? 'text-black border-b-sh-green-500'
               : 'text-sh-grey-500 border-b-transparent'
           "
