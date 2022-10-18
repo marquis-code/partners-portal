@@ -10,6 +10,7 @@
       <page-action-header>
         <template #action>
           <button
+            @click="toggleDropdown"
             class="
               bg-sh-green-500
               font-medium
@@ -25,8 +26,69 @@
               w-full
             "
           >
-            <router-link to="update">Actions</router-link>
+          <span>Actions</span>
+          <span class="material-icons">
+            expand_more
+          </span>
           </button>
+          <div
+              v-if="showDropdown"
+              class="
+                absolute
+                top-36
+                bottom-0
+                right-7
+                h-36
+                w-40
+                z-50
+                rounded-md
+                shadow-md
+                flex flex-col
+                bg-white
+                px-5
+              "
+            >
+              <a
+                href="#"
+                @click="editVehicle"
+                class="
+                  text-gray-500
+                  cursor-pointer
+                  hover:bg-black hover:text-white
+                  rounded-md
+                  p-2
+                  pl-2
+                  mt-3
+                "
+                >Edit</a
+              >
+              <a
+                href="#"
+                @click="assignDriver(vehicleData)"
+                class="
+                  text-gray-500
+                  cursor-pointer
+                  hover:bg-black hover:text-white
+                  rounded-md
+                  p-2
+                  pl-2
+                "
+                >Assign Driver</a
+              >
+              <a
+                href="#"
+                @click="removeVehicle(vehicleData)"
+                class="
+                  text-red-500
+                  cursor-pointer
+                  hover:bg-red-500 hover:text-white
+                  rounded-md
+                  p-2
+                  pl-2
+                "
+                >Remove</a
+              >
+            </div>
         </template>
 
         <template #tabs>
@@ -110,7 +172,8 @@ export default {
   },
   data() {
     return {
-      loading: true
+      loading: true,
+      showDropdown: false
     };
   },
   created() {
@@ -119,6 +182,23 @@ export default {
       .finally(() => {
         this.loading = false;
       });
+  },
+  methods: {
+    toggleDropdown() {
+      this.showDropdown = !this.showDropdown;
+    },
+    editVehicle() {
+      this.$router.push({
+        name: 'vehicle.information.update'
+      });
+      this.showDropdown = false;
+    },
+    assignDriver(item) {
+      console.log(item)
+    },
+    removeVehicle(item) {
+      console.log(item)
+    },
   }
 };
 </script>

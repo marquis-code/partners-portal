@@ -33,7 +33,7 @@
             <p class="font-light text-xs">{{ vehicleData.registration_number }}</p>
           </div>
         </div>
-        <p class="underline text-indigo-600 text-xs">Change plate number</p>
+        <router-link to="update" class="underline text-indigo-600 text-xs">Change plate number</router-link>
       </div>
       <div class="flex justify-between items-center py-6">
         <div class="flex space-x-2">
@@ -43,7 +43,7 @@
             <p class="font-light text-xs">{{ vehicleData.seats }}</p>
           </div>
         </div>
-        <p class="underline text-indigo-600 text-xs">Change capacity</p>
+        <router-link to="update" class="underline text-indigo-600 text-xs">Change capacity</router-link>
       </div>
       <div class="flex justify-between items-center py-6">
         <div class="flex space-x-2">

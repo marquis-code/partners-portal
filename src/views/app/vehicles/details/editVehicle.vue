@@ -47,7 +47,7 @@
                   @option:selected="onCarModelChanged($event)"
                   class="form-group"
                   :options="vehicleModels"
-                  v-model="form.model"
+                  v-model="form.name"
                   label="name"
                   required>
                   <template v-slot:option="model">
@@ -261,17 +261,18 @@ export default defineComponent<any, any, any>({
         });
     },
     showVehicleData() {
-      this.form.seats = this.vehicleData.seats;
-      this.form.registration_number = this.vehicleData.registration_number;
+      console.log(this.vehicleData)
       this.form.brand = this.vehicleData.brand;
-      this.form.model = this.vehicleData.name;
+      this.form.name = this.vehicleData.name;
       this.form.year = this.vehicleData.year;
+      this.form.seats = this.vehicleData.seats;
       this.vehicleData.cities.forEach((city:{
         id: number
       }) => {
         this.form.city_ids.push(city.id)
-        // console.log(city.id);
       });
+      this.form.registration_number = this.vehicleData.registration_number;
+      this.form.partner_id = this.vehicleData.partner_id
     },
     fetchPageData () {
       this.loading = true;
@@ -319,10 +320,11 @@ export default defineComponent<any, any, any>({
           ...this.form
         };
         const response = await this.$axios.patch(
-          '/v1/vehicles',
+          `/v1/vehicles/${this.vehicleData.id}`,
           payload
         );
         await this.$store.dispatch('vehicle/setVehicleFormData', response.data);
+        this.$toast.success('Vehicle Information Update');
       } catch (err) {
         const errorMessage = extractErrorMessage(
           err,
