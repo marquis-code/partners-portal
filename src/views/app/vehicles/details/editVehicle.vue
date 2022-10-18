@@ -328,9 +328,10 @@ export default defineComponent<any, any, any>({
           `/v1/vehicles/${this.vehicleData.id}`,
           payload
         );
-        await this.$store.dispatch('vehicle/setVehicleFormData', response.data);
-        console.log(response.data)
-        this.viewVehicleDetails(this.vehicleData.id);
+        await this.$store.dispatch('vehicle/setVehicleData', response.data);
+        setTimeout(() => {
+          this.viewVehicleDetails(this.vehicleData.id);
+        }, 1000)
         this.$toast.success('Vehicle Information Update');
       } catch (err) {
         const errorMessage = extractErrorMessage(
