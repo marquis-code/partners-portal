@@ -71,8 +71,8 @@
           </span>
         </div>
       </section>
-      <section class="flex justify-start space-x-10 items-start">
-        <div class="space-y-2 w-full lg:w-6/12 pr-5">
+      <section class="flex justify-start space-x-10 items-start pt-5">
+        <div class="space-y-2 w-full lg:w-6/12 md:pr-5">
           <label class="text-xs font-medium text-grays-black-5">Date Of Birth</label>
           <datepicker
             class="
@@ -97,7 +97,7 @@
 
     <form v-if="activeView === 1">
       <section class="flex justify-start flex-col space-y-5 items-start">
-        <div class="space-y-2 w-full lg:w-6/12">
+        <div class="space-y-2 w-full">
           <label class="text-xs font-medium text-grays-black-5">Address</label>
           <input
             v-model="v$.addressForm.document.full_address.$model"

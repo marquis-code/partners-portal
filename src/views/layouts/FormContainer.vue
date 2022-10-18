@@ -2,7 +2,7 @@
   <div
     class="
       w-11/12
-      lg:w-9/12
+      lg:w-6/12
       rounded-md
       py-8
       mx-auto
