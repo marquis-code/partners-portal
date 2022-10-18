@@ -177,7 +177,6 @@
                 :class="v$.form.$invalid || processing ?
                 'cursor-not-allowed text-grays-black-5 bg-grays-black-7' : 'bg-sh-green-500 font-medium'">
                 {{ processing ? 'Updating' : 'Update' }}
-                <img v-if="!processing" class="ml-2" src="@/assets/images/arrow.svg" />
               </button>
             </div>
           </template>
@@ -260,6 +259,12 @@ export default defineComponent<any, any, any>({
           this.$toast.error(extractErrorMessage(e));
         });
     },
+    viewVehicleDetails(id : number) {
+      this.$router.push({
+        name: 'vehicle.detail.info',
+        params: {vehicleId: id}
+      });
+    },
     showVehicleData() {
       console.log(this.vehicleData)
       this.form.brand = this.vehicleData.brand;
@@ -324,6 +329,8 @@ export default defineComponent<any, any, any>({
           payload
         );
         await this.$store.dispatch('vehicle/setVehicleFormData', response.data);
+        console.log(response.data)
+        this.viewVehicleDetails(this.vehicleData.id);
         this.$toast.success('Vehicle Information Update');
       } catch (err) {
         const errorMessage = extractErrorMessage(

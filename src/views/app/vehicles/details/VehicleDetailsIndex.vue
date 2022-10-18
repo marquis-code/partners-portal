@@ -194,10 +194,12 @@ export default {
       this.showDropdown = false;
     },
     assignDriver(item) {
-      console.log(item)
+      console.log(item);
+      this.showDropdown = false;
     },
     removeVehicle(item) {
-      console.log(item)
+      console.log(item);
+      this.showDropdown = false;
     },
   }
 };
