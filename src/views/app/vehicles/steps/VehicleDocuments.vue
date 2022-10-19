@@ -3,7 +3,6 @@
     <div class="space-y-10">
       <p class="text-sm text-gray-300 pt-5">City Documents</p>
       <div class="space-y-3" v-for="(doc, index) in city_documents_order" :key="index">
-        <p class="text-xs font-medium text-gray-300">City Documents {{index + 1}}</p>
         <p class="text-xs font-medium text-gray-500">
           {{payload.city_documents[index].document_type}}
         </p>
