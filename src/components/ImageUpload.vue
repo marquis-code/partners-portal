@@ -9,7 +9,10 @@
         class="hidden"
       />
     </form>
-    <div v-if="!fileUploaded" class="space-y-2 w-full relative">
+    <div
+      v-if="!fileUploaded && !uploadStatus"
+      class="space-y-2 w-full relative"
+    >
       <div
         class="
           py-8
@@ -63,7 +66,7 @@
       </div>
     </div>
     <p
-      v-if="fileUploaded"
+      v-if="fileUploaded || uploadStatus"
       @click="$refs.avatar.click()"
       class="text-sh-purple-700 font-medium text-sm mb-4"
     >
@@ -86,6 +89,10 @@ export default defineComponent({
   },
   data() {
     return {
+      existingImage: {
+        name: 'Vehile License',
+        size: '10'
+      },
       selectedFile: {},
       fileUploaded: false,
       fileName: '',
@@ -94,8 +101,11 @@ export default defineComponent({
     };
   },
   watch: {
-    uploadStatus(value) {
-      console.log(value);
+    uploadStatus(newVal, oldVal) {
+      if (newVal === true) {
+        this.fileName = this.existingImage.name;
+        this.fileSize = this.existingImage.size;
+      }
     }
   },
   methods: {

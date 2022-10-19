@@ -329,7 +329,11 @@
               <p class="font-medium text-gray-600 text-xs">
                 Upload drivers license document (pdf, jpg, png)
               </p>
-              <image-upload @fileSelected="fileSelected"></image-upload>
+              <image-upload
+               :uploadStatus="isUploaded"
+                @fileSelected="fileSelected"
+                @fileRemoved="handleFileRemoval"
+               ></image-upload>
             </div>
           </section>
 
@@ -426,7 +430,8 @@ export default defineComponent({
       profilePreview: '',
       form: {} as Driver,
       processing: false,
-      documentId: null
+      documentId: null,
+      isUploaded: false
     };
   },
   validations() {
