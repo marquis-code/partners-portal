@@ -64,24 +64,25 @@ import {defineComponent} from "vue";
 import { mapGetters } from "vuex";
 
 export default defineComponent({
-  emits: ['vehicleUpdated'], // emitted when driver is changed or updated
+  emits: ["vehicleUpdated"],
   props: {
     singleVehicleData: Object
   },
   computed: {
     ...mapGetters({
-      vehicleData: 'vehicle/getVehicleData',
-      isLoading: 'vehicle/getVehicleLoading'
+      vehicleData: "vehicle/getVehicleData",
+      isLoading: "vehicle/getVehicleLoading"
     })
   },
   methods: {
     editVehicle() {
       this.$router.push({
-        name: 'EditVehicle',
+        name: "EditVehicle",
         params: { vehicleId: this.vehicleData.id }
       });
     },
-  }
+  },
+  components: { }
 });
 </script>
 
