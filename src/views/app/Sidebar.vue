@@ -141,6 +141,7 @@ export default defineComponent({
     logout() {
       localStorage.clear();
       this.$router.push('/');
+      this.$router.go(0)
     }
   }
 })
