@@ -23,7 +23,7 @@
             <p class="font-medium text-xs" v-else>No driver</p>
           </div>
         </div>
-        <p class="underline text-indigo-600 text-xs">Assign driver</p>
+        <p class="underline text-indigo-600 text-xs" @click="showAssignDriverModal">Select a Driver</p>
       </div>
       <div class="flex justify-between items-center py-6">
         <div class="flex space-x-2">
@@ -56,33 +56,125 @@
         <router-link to="trips" class="underline text-indigo-600 text-xs">View all</router-link>
       </div>
     </div>
+    <app-modal :modal-active="assignDriverModal">
+      <div v-if="step=0" class="pb-5 px-5">
+        <p class="flex flex-row justify-end my-5" @click="assignDriverModal= !assignDriverModal"><img src="@/assets/icons/cancel.svg"></p>
+        <p class="font-bold text-lg">Assign Driver to Vehicle</p>
+        <p class="mb-5 text-sm text-gray-400">You are about to assign a vehicle.</p>
+        <div class="space-y-2 w-full">
+          <label class="text-xs font-medium text-grays-black-5">Assign Driver</label>
+            <v-select
+              @input="console.log($event)"
+              @option:selected="selectThisDriver($event)"
+              class="form-group"
+              :options="vehiclePartnersDrivers"
+              label="name"
+              required>
+              <template v-slot:option="item">
+                {{ item.driver.fname }} {{ item.driver.lname }} ({{ item.driver.fname }})
+              </template>
+              <template v-slot:selected-option="item">
+                {{ item.driver.fname }} {{ item.driver.lname }}
+              </template>
+            </v-select>
+        </div>
+        <button
+          :disabled="selectedDriverId ? false : true"
+          :class="assigningDriver || !selectedDriverId ? 'bg-sh-green-100' : 'bg-sh-green-500'"
+          class="text-black-5 text-xs font-medium w-full py-3 rounded-lg"
+          @click="assignDriverToThisVehicle"
+        >
+        {{assigningDriver ? 'Processing' : 'Assign Driver'}}
+        </button>
+    </div>
+    <div v-if="step=1" class="pb-5 px-5 text-center">
+      <img src="@/assets/icons/question.svg" class="mx-auto">
+      <p>Assign driver?</p>
+      <p>Are you sure you want to continue?</p>
+      <div class="flex flex-row justify-between bottom-0 w-full">
+        <button class="border border-sh-grey-400 rounded-lg w-40 py-2">Cancel</button>
+        <button class="rounded-lg py-3 px-12 bg-sh-green-500 w-40 py-2">Proceed</button>
+      </div>
+    </div>
+    </app-modal>
   </section>
 </template>
 
 <script lang="ts">
 import {defineComponent} from "vue";
 import { mapGetters } from "vuex";
+import AppModal from "@/components/Modals/AppModal.vue";
 
 export default defineComponent({
   emits: ["vehicleUpdated"],
   props: {
-    singleVehicleData: Object
+    singleVehicleData: Object,
+  },
+  data () {
+    return {
+      step: 1,
+      assignDriverModal: false,
+      assigningDriver: false,
+      selectedDriverId: null,
+      vehiclePartnersDrivers: [],
+      fetchingVehiclePartnersDriver: false
+    }
   },
   computed: {
     ...mapGetters({
       vehicleData: "vehicle/getVehicleData",
-      isLoading: "vehicle/getVehicleLoading"
+      isLoading: "vehicle/getVehicleLoading",
+      userSessionData: 'auth/userSessionData'
     })
   },
+  created() {
+    this.fetchVehiclePartnerDrivers()
+  },
   methods: {
+    async assignDriverToThisVehicle() {
+      this.assigningDriver = true;
+      try {
+        const response = await this.$axios.put(`/v1/partners/${this.userSessionData.activeContext.partner.id}/driver/${this.selectedDriverId}/vehicle-assignment?status=assign`, {
+          vehicle_id: this.vehicleData.id
+        });
+      } catch (error: any) {
+        this.$toast.warning(error.response.data.message || "Error occurred while assigning this driver")
+      } finally {
+        this.assigningDriver = false
+      }
+    },
     editVehicle() {
       this.$router.push({
         name: "EditVehicle",
         params: { vehicleId: this.vehicleData.id }
       });
     },
+    selectThisDriver(driver: any) {
+      // console.log(id)
+      this.selectedDriverId = driver.id;
+    },
+    showAssignDriverModal() {
+      this.assignDriverModal = true;
+    },
+    fetchVehiclePartnerDrivers() {
+      this.fetchingVehiclePartnersDriver = true;
+      this.$axios
+        .get(
+          `/v1/partners/${this.userSessionData.activeContext.partner.account_sid}/drivers`
+        )
+        .then((res) => {
+          this.vehiclePartnersDrivers = res.data.data;
+        })
+        .catch(err => {
+          console.log(err)
+          this.$toast.warning("Error occured while fetching your drivers")
+        })
+        .finally(() => {
+          this.fetchingVehiclePartnersDriver = false;
+        });
+    },
   },
-  components: { }
+  components: { AppModal }
 });
 </script>
 
