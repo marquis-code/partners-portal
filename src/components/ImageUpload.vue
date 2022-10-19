@@ -81,9 +81,10 @@ interface UploadOptions {
 export default defineComponent({
   name: 'ImageUpload',
   props: {
-    field: String
+    field: String,
+    uploadStatus: Boolean
   },
-  data () {
+  data() {
     return {
       selectedFile: {},
       fileUploaded: false,
@@ -92,8 +93,13 @@ export default defineComponent({
       uploadType: 'image'
     };
   },
+  watch: {
+    uploadStatus(value) {
+      console.log(value);
+    }
+  },
   methods: {
-    uploadFile (event: any) {
+    uploadFile(event: any) {
       if (this.isFileSizeOk(event.target.files[0].size)) {
         this.selectedFile = event.target.files[0];
         this.fileSize = (event.target.files[0].size / 1000000)
@@ -107,12 +113,12 @@ export default defineComponent({
         this.$emit('fileSelected', this.selectedFile);
       } else this.$toast.warning('File must be less than 10 MB');
     },
-    isFileSizeOk (fileSizeInBytes: number): boolean {
+    isFileSizeOk(fileSizeInBytes: number): boolean {
       if (fileSizeInBytes > 10000000) {
         return false;
       } else return true;
     },
-    removeFile () {
+    removeFile() {
       this.selectedFile = {};
       this.fileUploaded = false;
       this.fileName = '';

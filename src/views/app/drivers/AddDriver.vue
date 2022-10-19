@@ -13,7 +13,16 @@
         </template>
       </page-action-header>
     </template>
-    <main class="md:w-9/12 p-5 lg:p-14 bg-white ring-1 ring-gray-100">
+    <main
+      class="
+        md:w-9/12
+        p-5
+        lg:p-14
+        bg-white
+        ring-1 ring-gray-100
+        overflow-scroll
+      "
+    >
       <div class="flex justify-center items-center flex-col space-y-2 pb-5">
         <img
           v-if="profilePreview"
@@ -349,6 +358,23 @@
         </form>
       </div>
     </main>
+    <app-modal :modalActive="showModal">
+      <div class="flex flex-col justify-center items-center py-3">
+        <img src="@/assets/images/successCheck.svg" />
+        <div class="space-y-3 pb-16 pt-5">
+          <h1 class="text-center font-medium">Driver created</h1>
+          <p class="text-gray-400 text-center">
+            You have successfully created a driver
+          </p>
+        </div>
+        <button
+          @click="closeModal"
+          class="text-black bg-sh-green-500 rounded-md p-2 w-11/12 font-medium"
+        >
+          Dismiss
+        </button>
+      </div>
+    </app-modal>
   </page-layout>
 </template>
 
@@ -363,6 +389,7 @@ import { extractErrorMessage } from '@/utils/helper';
 import { format } from 'date-fns';
 import PageLayout from '@/components/layout/PageLayout.vue';
 import PageActionHeader from '@/components/PageActionHeader.vue';
+import AppModal from '@/components/Modals/AppModal.vue';
 
 export default defineComponent({
   name: 'AddDriver',
@@ -370,14 +397,15 @@ export default defineComponent({
     Datepicker,
     ImageUpload,
     PageLayout,
-    PageActionHeader
+    PageActionHeader,
+    AppModal
   },
   data() {
     return {
       format,
       uploadingFile: false,
       v$: useVuelidate(),
-      displayModal: false,
+      showModal: false,
       profilePreview: '',
       form: {
         fname: '',
@@ -417,6 +445,12 @@ export default defineComponent({
     })
   },
   methods: {
+    openModal() {
+      this.showModal = true;
+    },
+    closeModal() {
+      this.showModal = false;
+    },
     async saveForm() {
       this.v$.form.$touch();
       if (this.processing || this.v$.form.$errors.length) {
@@ -443,10 +477,12 @@ export default defineComponent({
           `/v1/partners/${this.userSessionData.activeContext.account_sid}/drivers`,
           payload
         );
+        this.openModal();
         this.$router.push({
           name: 'driver.detail.info',
           params: { driverId: response.data.driver_id }
         });
+        this.closeModal();
       } catch (err) {
         const errorMessage = extractErrorMessage(
           err,
