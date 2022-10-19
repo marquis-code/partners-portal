@@ -1,5 +1,5 @@
 <template>
-  <div class="h-screen flex justify-between flex-col py-6"
+  <div class="h-screen flex justify-between items-center flex-col py-6 sticky top-0"
 
   >
   <div  class="bg-white"
@@ -57,7 +57,7 @@
   </div>
 
     <div
-      class="flex flex-row justify-between items-center py-2 cursor-pointer space-x-3 rounded-xl bg-green-200 mx-4"
+      class="flex flex-row justify-between items-center py-2 cursor-pointer space-x-3 rounded-xl bg-green-200 w-10/12"
       :class="isSidebarFolded ? 'p-1' : 'px-3 '"
     >
       <div class="flex flex-row items-center" @click="logout">
