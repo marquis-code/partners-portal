@@ -238,7 +238,7 @@ export default defineComponent<any, any, any>({
       this.loading = true;
       this.vehicleYears = this.getYearsFrom('1980');
       this.cities = this.partnerContext.supportedCities;
-      this.$axios.get('/v1/vehicle-makes').then((r: AxiosResponse) => {
+      this.$axios.get('/v1/vehicle-makes?limit=1000').then((r: AxiosResponse) => {
         this.vehicleBrands = r.data.data || [];
       })
         .catch((e: any) => {
@@ -301,7 +301,7 @@ export default defineComponent<any, any, any>({
         this.vehicleModels = this.vehicleModelMap.get(brandId);
       } else {
         try {
-          const vehicleModelsResponse = await this.$axios.get(`v1/vehicle-makes/${brandId}/vehicle-models`);
+          const vehicleModelsResponse = await this.$axios.get(`v1/vehicle-makes/${brandId}/vehicle-models?limit=1000`);
           this.vehicleModels = vehicleModelsResponse.data.data;
         } catch (e) {
           this.$toast.error(extractErrorMessage(e, null, 'An error occurred!'));
