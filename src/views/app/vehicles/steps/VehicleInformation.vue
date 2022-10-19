@@ -145,7 +145,7 @@
             Plate Number
             <span class="tooltip ml-3">
               <img src="@/assets/icons/info.svg" class="boarder-2">
-              <span class="tooltiptext shadow-lg text-left">example: <br> ABC-123XY or AB123-XZY</span>
+              <span class="tooltiptext shadow-lg text-left">example: <br> ABC-123XY </span>
             </span>
           </label>
           <input
@@ -383,7 +383,7 @@ select {
 
 .tooltip .tooltiptext {
   visibility: hidden;
-  width: 300px;
+  width: 250px;
   background-color: white;
   color: #667085;
   border-radius: 6px;
