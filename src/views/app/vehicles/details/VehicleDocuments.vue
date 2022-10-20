@@ -113,15 +113,32 @@ export default defineComponent({
       this.loading = true;
       this.$axios.get(`v1/partners/${this.partnerContext.partner.id}/vehicle/${this.vehicleData.id}/vehicle-documents`)
         .then(r => {
-          const cityDocuments = r.data.cityDocuments;
           const vehicleDocuments = r.data.vehicleDocuments;
           this.documentTableData = this.structureDocumentTable(vehicleDocuments) || [];
+          const cityDocuments = r.data.cityDocuments;
+          const cityDocumentsObject = this.structureCityDocuments(cityDocuments);
+          if (cityDocumentsObject) {
+            this.documentTableData.unshift(cityDocumentsObject)
+          }
         })
         .finally(() => {
           this.loading = false;
         })
     },
-    structureDocumentTable(documentResponseResponse: Array<any>): [] {
+    structureCityDocuments (cityDocumentArray: Array<any>) {
+      const cityRequiredDocuments = cityDocumentArray?.[0]?.required_document;
+      const cityDocumentObect = cityDocumentArray?.[0].documents?.[0]
+      const cityDoc = {
+        type: cityRequiredDocuments.document_type,
+        category: 'City Document',
+        expiry: 'N/A',
+        status: cityDocumentObect.status,
+        date: getUserReadableDate(cityDocumentObect.created_at),
+        actions: {docUrl: cityDocumentObect.files[0], docId: cityDocumentObect.id}
+      }
+      return cityDoc
+    },
+    structureDocumentTable (documentResponseResponse: Array<any>): [] {
       const newDocumentsList: any = []
       documentResponseResponse.forEach(doc => {
         const docProp = doc?.documents?.[0] || {}
@@ -136,7 +153,7 @@ export default defineComponent({
       });
       return newDocumentsList;
     },
-    selectThis(dropDownId: number) {
+    selectThis (dropDownId: number) {
       this.selectedDropDown = dropDownId;
     }
   }

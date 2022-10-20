@@ -155,7 +155,6 @@
 import PageLayout from '../../../../components/layout/PageLayout';
 import { mapGetters } from 'vuex';
 import Spinner from '../../../../components/layout/Spinner';
-import { extractErrorMessage } from '../../../../utils/helper';
 import PageActionHeader from '../../../../components/PageActionHeader';
 export default {
   name: 'VehicleDetailsIndex',
@@ -170,13 +169,13 @@ export default {
       isLoading: 'vehicle/getVehicleLoading'
     })
   },
-  data() {
+  data () {
     return {
       loading: true,
       showDropdown: false
     };
   },
-  created() {
+  created () {
     this.$store
       .dispatch('vehicle/fetchVehicleInfo', this.$attrs.vehicleId)
       .finally(() => {
@@ -184,21 +183,21 @@ export default {
       });
   },
   methods: {
-    toggleDropdown() {
+    toggleDropdown () {
       this.showDropdown = !this.showDropdown;
     },
-    editVehicle() {
+    editVehicle () {
       this.$router.push({
         name: 'EditVehicle',
         params: { vehicleId: this.$attrs.vehicleId }
       });
       this.showDropdown = false;
     },
-    assignDriver(item) {
+    assignDriver (item) {
       console.log(item);
       this.showDropdown = false;
     },
-    removeVehicle(item) {
+    removeVehicle (item) {
       console.log(item);
       this.showDropdown = false;
     },

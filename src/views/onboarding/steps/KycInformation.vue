@@ -355,8 +355,7 @@ export default defineComponent<any, any, any>({
     uploadFile () {
       this.file = this.$refs.avatar.files[0];
       const reader = new FileReader();
-      reader.addEventListener('load', (fileLoadedEvent) => {
-        const avatar = fileLoadedEvent.target?.result;
+      reader.addEventListener('load', () => {
         this.uploadingAvatar = true;
       });
       reader.readAsDataURL(this.file);

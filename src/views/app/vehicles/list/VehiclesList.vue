@@ -111,7 +111,6 @@ import AppTable from '@/components/AppTable.vue';
 import { mapGetters } from 'vuex';
 import PageActionHeader from '@/components/PageActionHeader.vue';
 import PageLayout from '@/components/layout/PageLayout.vue';
-import OptionsDropdown from '@/components/OptionsDropdown.vue';
 export default defineComponent({
   name: 'VehiclesList',
   components: {
@@ -119,10 +118,10 @@ export default defineComponent({
     PageActionHeader,
     AppTable
   },
-  created() {
+  created () {
     this.fetchVehicles();
   },
-  data() {
+  data () {
     return {
       filters: {
         status: 'active',
@@ -150,11 +149,11 @@ export default defineComponent({
     })
   },
   methods: {
-    setStatusFilter(value: string) {
+    setStatusFilter (value: string) {
       this.filters.status = value;
       this.fetchVehicles();
     },
-    fetchVehicles() {
+    fetchVehicles () {
       this.loading = true;
       const params = {
         related: 'driver',
@@ -173,7 +172,7 @@ export default defineComponent({
           this.loading = false;
         });
     },
-    viewTripDetails(vehicle: any) {
+    viewTripDetails (vehicle: any) {
       this.$router.push({
         name: 'vehicle.detail.info',
         params: { vehicleId: vehicle.id }

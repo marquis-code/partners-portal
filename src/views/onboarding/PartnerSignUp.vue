@@ -58,8 +58,6 @@ import CenteredPageHeader from '../../components/CenteredPageHeader.vue';
 import OnboardingLayout from '../layouts/OnboardingLayout.vue';
 import { extractErrorMessage } from '@/utils/helper';
 import { mapGetters } from 'vuex';
-import { UserData } from '@/models/user-session.model';
-import {Partner, PartnerOrganization} from "@/models/organisation.model";
 
 export default defineComponent({
   name: 'PartnerSignUp',
