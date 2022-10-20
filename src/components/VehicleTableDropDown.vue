@@ -51,7 +51,10 @@ export default defineComponent({
     goToUpdateDocumentView() {
       this.$router.push({
         name: 'EditVehicleDocument',
-        params: {vehicleId: this.vehicleData.id}
+        params: {
+          vehicleId: this.vehicleData.id,
+          documentId: this.docId
+        }
       })
     },
     onShow() {
