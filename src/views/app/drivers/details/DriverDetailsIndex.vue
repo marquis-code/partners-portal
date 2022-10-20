@@ -131,6 +131,79 @@
     <template v-else>
       <router-view></router-view>
     </template>
+    <app-modal :modalActive="openAssignModal">
+      <div class="px-3 py-5">
+        <div class="flex justify-end items-end">
+          <img
+            src="@/assets/images/cancel.svg"
+            @click="handleCloseAssignModal()"
+          />
+        </div>
+        <h1 class="font-bold text-xl pt-5">Assign Vehicle to driver</h1>
+        <p class="text-xs">
+          You are about to assign a vehicle to
+          <span class="font-medium"
+            >{{ driverData?.fname }} {{ driverData?.lname }}</span
+          >
+        </p>
+        <div class="space-y-2 w-full pt-7">
+          <label class="text-xs font-medium text-grays-black-5"
+            >Select vehicle</label
+          >
+          <v-select
+            @input="console.log($event)"
+            @option:selected="selectThisDriver($event)"
+            class="form-group mb-3"
+            :options="vehiclePartnersDrivers"
+            label="name"
+            required
+          >
+            <template v-slot:option="item">
+              {{ item.driver.fname }} {{ item.driver.lname }} ({{
+                item.driver.fname
+              }})
+            </template>
+            <template v-slot:selected-option="item">
+              {{ item.driver.fname }} {{ item.driver.lname }}
+            </template>
+          </v-select>
+        </div>
+        <div
+          v-if="selectedVehicle"
+          class="
+            rounded-md
+            bg-gray-50
+            p-4
+            grid grid-cols-1
+            divide-y
+            space-y-5
+            mt-4
+          "
+        >
+          <div class="flex justify-between items-center">
+            <p class="text-gray-300">Brand</p>
+            <p class="font-medium text-gray-500">Toyota</p>
+          </div>
+          <div class="flex justify-between items-center pt-5">
+            <p class="text-gray-300">Brand model</p>
+            <p class="font-medium text-gray-500">Hiace</p>
+          </div>
+          <div class="flex justify-between items-center pt-5">
+            <p class="text-gray-300">Plate number</p>
+            <p class="font-medium text-gray-500">FKJ 675 GT</p>
+          </div>
+          <div class="flex justify-between items-center pt-5">
+            <p class="text-gray-300">Vehicle category</p>
+            <p class="font-medium text-gray-500">Mini Bus</p>
+          </div>
+        </div>
+        <div class="pt-4">
+          <button class="w-full p-2 rounded-md bg-gray-300">
+            Assign vehicle
+          </button>
+        </div>
+      </div>
+    </app-modal>
   </page-layout>
 </template>
 
@@ -140,12 +213,14 @@ import { mapGetters } from 'vuex';
 import Spinner from '@/components/layout/Spinner';
 import { extractErrorMessage } from '../../../../utils/helper';
 import PageActionHeader from '@/components/PageActionHeader';
+import AppModal from '@/components/Modals/AppModal.vue';
 export default {
   name: 'DriverDetailsIndex',
   components: {
     PageActionHeader,
     Spinner,
-    PageLayout
+    PageLayout,
+    AppModal
   },
   computed: {
     ...mapGetters({
@@ -156,7 +231,9 @@ export default {
   data() {
     return {
       loading: true,
-      showDropdown: false
+      showDropdown: false,
+      openAssignModal: true,
+      selectedVehicle: true
     };
   },
   created() {
@@ -178,10 +255,18 @@ export default {
       this.showDropdown = false;
     },
     assignDriver(item) {
+      this.showDropdown = false;
+      this.handleOpenAssignModal();
       console.log(item, 'assign');
     },
     removeDriver(item) {
       console.log(item, 'remove');
+    },
+    handleOpenAssignModal() {
+      this.openAssignModal = true;
+    },
+    handleCloseAssignModal() {
+      this.openAssignModal = false;
     }
   }
 };
