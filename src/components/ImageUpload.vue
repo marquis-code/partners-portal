@@ -11,7 +11,7 @@
     </form>
 
     <!-- This shows when a file is yet to be uploaded -->
-    <div v-if="!fileUploaded" class="space-y-2 w-full relative">
+    <div v-if="!fileUploaded && !uploading" class="space-y-2 w-full relative">
       <div
         class="
           py-8
@@ -73,7 +73,7 @@
       Change Document
     </p>
     <!-- This shows in the process of uploading the image to s3 -->
-    <div v-if="uploading && componentIdenitfier === instanceIdentifier">
+    <div v-if="uploading">
       <Spinner/>
     </div>
   </div>
@@ -90,9 +90,7 @@ export default defineComponent({
   name: "ImageUpload",
   props: {
     field: String,
-    uploading: Boolean,
-    componentIdenitfier: Number,
-    instanceIdentifier: Number
+    uploading: Boolean
   },
   data () {
     return {
@@ -105,6 +103,7 @@ export default defineComponent({
   },
   methods: {
     uploadFile (event: any) {
+      console.log("working")
       if (this.isFileSizeOk(event.target.files[0].size)) {
         this.selectedFile = event.target.files[0];
         this.fileSize = (event.target.files[0].size / 1000000)

@@ -127,6 +127,9 @@ export default defineComponent<any, any, any>({
       this.edit_expiry_date = this.document.documents[0].expiry_date?.slice(0, 10);
       this.edit_files = this.document.documents[0].files[0];
       this.edit_id = this.document.documents[0].id
+    },
+    updateThisDocument () {
+      console.log(this.edit_id)
     }
   },
   created() {

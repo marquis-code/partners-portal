@@ -46,11 +46,9 @@
           >Upload {{payload.vehicle_documents[index].document_type}} document (pdf, jpg, png)</label
         >
         <image-upload
-          :uploading="uploadingFile"
+          :uploading="payload.vehicle_documents[index].loading"
           @fileSelected="selectFile($event, index, 'vehicleDocument')"
           @fileRemoved="removeFile(index, 'vehicleDocument')" class="pt-3"
-          :componentIdenitfier="index"
-          :instanceIdentifier="selectedImageUploader"
         ></image-upload>
       </div>
 
@@ -112,30 +110,36 @@ export default defineComponent({
           {
             document_type: "Vehicle Information",
             expiry_date: '',
-            files: []
+            files: [],
+            loading: false
           },
           {
             document_type: "Central Motor Registry (CMR)",
             files: [],
+            loading: false
           },
           {
             document_type: "Proof of Ownership",
             files: [],
+            loading: false
           },
           {
             document_type: "Vehicle Insurance",
             expiry_date: '',
             files: [],
+            loading: false
           },
           {
             document_type: "Road worthiness",
             expiry_date: '',
             files: [],
+            loading: false
           },
           {
             document_type: "Hackney permit",
             expiry_date: '',
             files: [],
+            loading: false
           },
         ]
       },
@@ -236,7 +240,9 @@ export default defineComponent({
       this.selectedImageUploader = index;
       const fileHolder = $event
       this.uploadingFile = true;
+      this.payload.vehicle_documents[index].loading = true;
       const fileUrl = await this.uploadTos3andGetDocumentUrl(fileHolder);
+      this.payload.vehicle_documents[index].loading = false;
       this.uploadingFile = false;
       if (type === 'cityDocument') {
         if (this.payload.city_documents[index].files[0]) {
