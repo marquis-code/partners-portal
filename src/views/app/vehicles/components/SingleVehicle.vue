@@ -57,7 +57,7 @@
       </div>
     </div>
     <app-modal :modal-active="assignDriverModal">
-      <div v-if="step=0" class="pb-5 px-5">
+      <div v-if="assignStep === 0" class="pb-5 px-5">
         <p class="flex flex-row justify-end my-5" @click="assignDriverModal= !assignDriverModal"><img src="@/assets/icons/cancel.svg"></p>
         <p class="font-bold text-lg">Assign Driver to Vehicle</p>
         <p class="mb-5 text-sm text-gray-400">You are about to assign a vehicle.</p>
@@ -66,7 +66,7 @@
             <v-select
               @input="console.log($event)"
               @option:selected="selectThisDriver($event)"
-              class="form-group"
+              class="form-group mb-3"
               :options="vehiclePartnersDrivers"
               label="name"
               required>
@@ -80,21 +80,40 @@
         </div>
         <button
           :disabled="selectedDriverId ? false : true"
-          :class="assigningDriver || !selectedDriverId ? 'bg-sh-green-100' : 'bg-sh-green-500'"
-          class="text-black-5 text-xs font-medium w-full py-3 rounded-lg"
-          @click="assignDriverToThisVehicle"
+          :class="!selectedDriverId ? 'bg-gray-100' : 'bg-sh-green-500'"
+          class="text-black-5 text-xs font-medium w-full py-3 rounded-lg mt-3"
+          @click="nextAssignStep"
         >
-        {{assigningDriver ? 'Processing' : 'Assign Driver'}}
+        Assign Driver
         </button>
     </div>
-    <div v-if="step=1" class="pb-5 px-5 text-center">
-      <img src="@/assets/icons/question.svg" class="mx-auto">
-      <p>Assign driver?</p>
-      <p>Are you sure you want to continue?</p>
+    <div v-if="assignStep === 1" class="pb-5 px-5 text-center">
+      <img src="@/assets/icons/question.svg" class="mx-auto mb-7">
+      <p class="mb-2 font-bold font-lg">Assign driver?</p>
+      <p class="mb-14">Are you sure you want to continue?</p>
       <div class="flex flex-row justify-between bottom-0 w-full">
-        <button class="border border-sh-grey-400 rounded-lg w-40 py-2">Cancel</button>
-        <button class="rounded-lg py-3 px-12 bg-sh-green-500 w-40 py-2">Proceed</button>
+        <button
+          @click="cancelAssignment"
+          class="border border-sh-grey-400 rounded-lg w-32 md:w-40 py-2"
+        >Cancel</button>
+        <button
+          :disabled="assigningDriver"
+          class="rounded-lg bg-sh-green-500 w-32 md:w-40 py-2"
+          :class="assigningDriver || !selectedDriverId ? 'bg-sh-green-100' : 'bg-sh-green-500'"
+          @click="assignDriverToThisVehicle"
+        >{{assigningDriver ? 'Processing' : 'Continue'}}</button>
       </div>
+    </div>
+    <div v-if="assignStep === 2" class="pb-5 px-5 text-center">
+      <img src="@/assets/icons/success.svg" class="mx-auto mb-7">
+      <p class="mb-2 font-bold font-lg">Driver assigned successfully</p>
+      <p class="mb-14">You have successfully assigned a driver to this vehicle.</p>
+      <button
+        class="bg-sh-green-500 w-full text-black-5 text-xs font-medium w-full py-3 rounded-lg mt-3"
+        @click="finishAssignment"
+      >
+      Dismiss
+      </button>
     </div>
     </app-modal>
   </section>
@@ -112,7 +131,7 @@ export default defineComponent({
   },
   data () {
     return {
-      step: 1,
+      assignStep: 0,
       assignDriverModal: false,
       assigningDriver: false,
       selectedDriverId: null,
@@ -131,16 +150,30 @@ export default defineComponent({
     this.fetchVehiclePartnerDrivers()
   },
   methods: {
+    nextAssignStep () {
+      this.assignStep += 1;
+    },
+    cancelAssignment () {
+      this.assignDriverModal = false;
+      this.assignStep = 0;
+      this.selectedDriverId = null;
+    },
+    finishAssignment () {
+      this.assignDriverModal = false;
+      this.assignStep = 0;
+      this.selectedDriverId = null;
+    },
     async assignDriverToThisVehicle() {
       this.assigningDriver = true;
       try {
-        const response = await this.$axios.put(`/v1/partners/${this.userSessionData.activeContext.partner.id}/driver/${this.selectedDriverId}/vehicle-assignment?status=assign`, {
+        const response = await this.$axios.put(`/v1/partners/${this.userSessionData.activeContext.partner.account_sid}/driver/${this.selectedDriverId}/vehicle-assignment?status=assign`, {
           vehicle_id: this.vehicleData.id
         });
+        this.nextAssignStep();
       } catch (error: any) {
         this.$toast.warning(error.response.data.message || "Error occurred while assigning this driver")
       } finally {
-        this.assigningDriver = false
+        this.assigningDriver = false;
       }
     },
     editVehicle() {
