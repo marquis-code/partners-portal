@@ -92,13 +92,13 @@ export default defineComponent({
             {title: 'Vehicles', icon: 'directions_car', selected: false},
             {title: 'Drivers', icon: 'group', selected: false},
             {title: 'Trips', icon: 'route', selected: false},
-            {title: 'Earnings', icon: 'payments', selected: false}
+            // {title: 'Earnings', icon: 'payments', selected: false}
           ],
         },
         {
           sectionTitle: 'SYSTEM',
           menus: [
-            {title: 'Settings', icon: 'settings', selected: false}
+            // {title: 'Settings', icon: 'settings', selected: false}
           ],
         }
       ]
