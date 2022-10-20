@@ -17,10 +17,6 @@
       <spinner></spinner>
     </div>
     <main class="md:w-9/12 p-5 lg:p-14 bg-white ring-1 ring-gray-100">
-      <!-- <main
-      v-else
-      class="container mx-auto p-5 lg:p-14 bg-white ring-1 ring-gray-100"
-    > -->
       <div class="flex justify-center items-center flex-col space-y-2 pb-5">
         <img
           v-if="profilePreview"
@@ -41,7 +37,13 @@
         />
         <label
           for="profile"
-          class="text-indigo-700 text-sm font-medium cursor-not-allowed select-none opacity-25 "
+          class="
+            text-indigo-700 text-sm
+            font-medium
+            cursor-not-allowed
+            select-none
+            opacity-25
+          "
           >Click to upload image</label
         >
       </div>
@@ -246,7 +248,7 @@
                 class="text-xs font-light text-red-500"
                 v-if="v$.form.dob.$dirty && v$.form.dob.required.$invalid"
               >
-                Please provide your drivers address
+                Please provide your drivers date of birth
               </span>
             </div>
           </section>
@@ -298,8 +300,8 @@
                   >Expiry date
                 </label>
                 <input
+                 readonly
                   type="date"
-                  readonly
                   v-model="v$.form.expiry_date.$model"
                   class="
                     text-xs
@@ -330,10 +332,10 @@
                 Upload drivers license document (pdf, jpg, png)
               </p>
               <image-upload
-               :uploadStatus="isUploaded"
+                :uploadStatus="isUploaded"
                 @fileSelected="fileSelected"
                 @fileRemoved="handleFileRemoval"
-               ></image-upload>
+              ></image-upload>
             </div>
           </section>
 
@@ -458,21 +460,31 @@ export default defineComponent({
   },
   created() {
     this.loadDriver();
-    console.log(this.userSessionData);
   },
   methods: {
+    handleFileRemoval() {
+      this.form.files = [];
+      this.isUploaded = false;
+    },
     openModal() {
       this.showModal = true;
     },
     closeModal() {
       this.showModal = false;
     },
-    async loadDriver() {
+    loadDriver() {
       this.fetchingDriver = true;
-      await this.$axios
+      this.$axios
         .get(`/v1/drivers/${this.$route.params.driverId}`)
         .then((res) => {
-          console.log(res);
+          const result = this.getUploadedFileUrlFromStringifiedArray(
+            res.data.documents[0].files
+          );
+          if (result.length > 1) {
+            this.isUploaded = true;
+          } else {
+            this.isUploaded = false;
+          }
           this.form.fname = res.data.fname;
           this.form.lname = res.data.lname;
           this.form.phone = res.data.phone;
@@ -480,8 +492,8 @@ export default defineComponent({
           this.form.residential_address = res.data.residential_address;
           this.form.dob = res.data.dob;
           this.form.license_number = res.data.documents[0].registration_number;
-          this.form.expiry_date = res.data.expiry_date;
-          this.form.files = res.data.files;
+          this.form.expiry_date = res.data.documents[0].expiry_date;
+          this.form.files = JSON.parse(res.data.documents[0].files)[0];
           this.form.avatar = res.data.avatar;
           this.profilePreview = res.data.avatar;
           this.documentId = res.data.documents[0].id;
@@ -492,6 +504,13 @@ export default defineComponent({
         .finally(() => {
           this.fetchingDriver = false;
         });
+    },
+    getUploadedFileUrlFromStringifiedArray(stringifiedArray: any) {
+      const parsedArray = JSON.parse(stringifiedArray);
+      if (parsedArray.length > 0) {
+        return parsedArray[0];
+      }
+      return null;
     },
     async updateDriver() {
       this.v$.form.$touch();
@@ -505,17 +524,19 @@ export default defineComponent({
           lname: this.form.lname,
           phone: this.form.phone,
           email: this.form.email,
-          registeration_number: this.form.license_number,
+          residential_address: this.form.residential_address,
+          dob: this.format(this.form.dob as any, 'yyyy-MM-dd'),
+          license_number: this.form.license_number,
           files: this.form.files,
-          document_type: 'drivers license',
-          password: 'shuttlers',
-          document_id: this.documentId
+          avatar: this.form.avatar,
+          document_type: 'drivers_license',
+          password: 'shuttlers'
         };
+
         const response = await this.$axios.patch(
           `/v1/partners/${this.userSessionData.activeContext.partner.account_sid}/drivers/${this.user.id}`, //  Endpoint to update driver
           payload
         );
-        console.log(response);
         this.openModal();
         this.$router.push({ name: 'drivers.list' });
         this.closeModal();
