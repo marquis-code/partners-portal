@@ -24,6 +24,7 @@
 
 <script lang="ts">
 import {defineComponent} from "vue";
+import { mapGetters } from "vuex";
 export default defineComponent({
   name: 'DropDown',
   props: ['docId', 'docUrl', 'selectedDropDown'],
@@ -35,13 +36,23 @@ export default defineComponent({
       imgsRef: [] as Array<string>,
     }
   },
+  computed: {
+    ...mapGetters({
+      partnerContext: 'auth/activeContext',
+      vehicleData: 'vehicle/getVehicleData',
+      isLoading: 'vehicle/getVehicleLoading'
+    })
+  },
   methods: {
     previewDocument() {
       this.imgsRef = [this.docUrl]
       this.onShow()
     },
     goToUpdateDocumentView() {
-      console.log(this.docId)
+      this.$router.push({
+        name: 'EditVehicleDocument',
+        params: {vehicleId: this.vehicleData.id}
+      })
     },
     onShow() {
       if (this.selectedDropDown === this.docId) {
