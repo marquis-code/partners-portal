@@ -53,7 +53,7 @@ export default defineComponent({
   components: {PageLayout, VehicleDocuments, VehicleInformation, VehicleImages },
   data () {
     return {
-      currentStep: 1,
+      currentStep: 0,
       steps: [
         {
           component: markRaw(VehicleInformation)

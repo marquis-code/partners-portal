@@ -127,8 +127,6 @@
           <image-upload
             @fileSelected="selectFile($event)"
             @fileRemoved="removeFile()"
-            :componentIdenitfier="98"
-            :instanceIdentifier="98"
           >
           </image-upload>
         </div>

@@ -10,8 +10,6 @@
           :uploading="uploadingCityDoc"
           @fileSelected="selectCityDocument($event)"
           @fileRemoved="removeFile('cityDocument')"
-          :componentIdenitfier="99"
-          :instanceIdentifier="99"
           class="pt-3"
         ></image-upload>
       </div>
@@ -75,8 +73,6 @@ export default defineComponent({
   data () {
     return {
       v$: useVuelidate(),
-      selectedImageUploader: -1,
-      uploadingFile: false,
       uploadingCityDoc: false,
       savingVehicleDocuments: false,
       documentsToSave: {
@@ -237,13 +233,10 @@ export default defineComponent({
       this.$toast.success(`${this.payload.city_documents[0].document_type} uploaded`);
     },
     async selectFile ($event, index, type) {
-      this.selectedImageUploader = index;
       const fileHolder = $event
-      this.uploadingFile = true;
       this.payload.vehicle_documents[index].loading = true;
       const fileUrl = await this.uploadTos3andGetDocumentUrl(fileHolder);
       this.payload.vehicle_documents[index].loading = false;
-      this.uploadingFile = false;
       if (type === 'cityDocument') {
         if (this.payload.city_documents[index].files[0]) {
           this.payload.city_documents[index].files = []
