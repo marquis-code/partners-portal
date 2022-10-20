@@ -1,4 +1,9 @@
 <template>
+  <Notification
+    type="action"
+    message="You have documents left to upload"
+    actionRequired = true
+  />
   <section class="lg:w-4/12 md:w-7/12 ring-1 ring-gray-50 rounded-md bg-white shadow-md">
     <div class="space-y-10 lg:p-8 p-7">
       <div class="flex justify-between items-center">
@@ -123,6 +128,7 @@
 import {defineComponent} from "vue";
 import { mapGetters } from "vuex";
 import AppModal from "@/components/Modals/AppModal.vue";
+import Notification from "../../../../components/Notification.vue";
 
 export default defineComponent({
   emits: ["vehicleUpdated"],
@@ -207,7 +213,7 @@ export default defineComponent({
         });
     },
   },
-  components: { AppModal }
+  components: { AppModal, Notification }
 });
 </script>
 
