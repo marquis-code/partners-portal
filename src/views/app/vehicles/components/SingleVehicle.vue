@@ -129,6 +129,7 @@ import {defineComponent} from "vue";
 import { mapGetters } from "vuex";
 import AppModal from "@/components/Modals/AppModal.vue";
 import Notification from "../../../../components/Notification.vue";
+import Spinner from "@/components/layout/Spinner.vue";
 
 export default defineComponent({
   emits: ["vehicleUpdated"],

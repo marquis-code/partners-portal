@@ -140,7 +140,7 @@ export default defineComponent({
     },
     logout() {
       localStorage.clear();
-      this.$router.push('/');
+      this.$router.push('/login');
       this.$router.go(0)
     }
   }

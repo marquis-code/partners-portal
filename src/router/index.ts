@@ -7,19 +7,54 @@ import {RouteGuard} from "@/models/route-guard";
 import {AuthGuard} from "@/router/guards/auth.guard";
 import store from '@/store';
 import {OnboardingGuard} from "@/router/guards/onboarding.guard";
-import LandingPage from "@/views/LandingPage.vue";
+import SplashIntro from "@/views/LandingPage/SplashIntro.vue";
+import Login from "@/views/LandingPage/Login.vue";
+import Register from "@/views/LandingPage/Register.vue";
+import LandingPage from "@/views/LandingPage/Base.vue";
 import {ContextGuard} from "@/router/guards/context.guard";
 import MemberInvite from "@/views/MemberInvite.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
-    name: 'splash',
     component: LandingPage,
-    meta: {
-      requiresAuth: false,
-      openPage: true
-    },
+    // meta: {
+    //   requiresAuth: false,
+    //   openPage: true,
+    //   isGuest: true
+    // },
+    children: [
+      {
+        path: '',
+        name: 'slash',
+        component: SplashIntro,
+        meta: {
+          title: 'Welcome',
+          requiresAuth: false,
+          isGuest: true
+        }
+      },
+      {
+        path: 'login',
+        name: 'login',
+        component: Login,
+        meta: {
+          title: 'Login',
+          requiresAuth: false,
+          isGuest: true
+        }
+      },
+      {
+        path: 'register',
+        name: 'register',
+        component: Register,
+        meta: {
+          title: 'Become a Partner',
+          requiresAuth: false,
+          isGuest: true
+        }
+      },
+    ]
   },
   {
     path: '/invitations',
