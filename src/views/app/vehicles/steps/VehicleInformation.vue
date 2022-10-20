@@ -6,7 +6,6 @@
         <div class="space-y-2 w-full">
           <label class="text-xs font-medium text-grays-black-5">Vehicle brand</label>
           <v-select
-            @input="console.log($event)"
             @option:selected="onCarBrandChanged($event)"
             class="form-group"
             :options="vehicleBrands"
@@ -30,7 +29,6 @@
           <label class="text-xs font-medium text-grays-black-5">Vehicle Model</label>
           <v-select
             :disabled="fetchingModels"
-            @input="console.log($event)"
             @option:selected="onCarModelChanged($event)"
             class="form-group"
             :options="vehicleModels"
@@ -119,11 +117,9 @@
           <v-select
             :disabled="fetchingModels"
             @input="console.log($event)"
-            v-model="v$.form.city_ids.$model"
             class="form-group"
-            :reduce="(option) => option.city.id"
+            @option:selected="selectThisCity($event)"
             :options="cities"
-            :multiple="true"
             label="id"
             required>
             <template v-slot:option="model">
@@ -206,7 +202,7 @@ export default defineComponent<any, any, any>({
         // type: 'Sedan',
         year: '',
         seats: '',
-        city_ids: '',
+        city_ids: [],
         registration_number: '',
         partner_id: ''
       },
@@ -256,6 +252,10 @@ export default defineComponent<any, any, any>({
     this.form.partner_id = this.partnerContext?.partner?.id;
   },
   methods: {
+    selectThisCity(city: any) {
+      const cityId = city.city.id
+      this.form.city_ids = [cityId]
+    },
     uppercase($event: any) {
       this.form.registration_number = this.form.registration_number.toUpperCase();
       this.getKeyStroke($event)

@@ -1,12 +1,17 @@
 <template>
   <form>
-    <div class="space-y-10">
+    <div v-if="payload.city_documents[0]" class="space-y-10">
       <p class="text-sm text-gray-300 pt-5">City Documents</p>
-      <div class="space-y-3" v-for="(doc, index) in city_documents_order" :key="index">
+      <div class="space-y-3">
         <p class="text-xs font-medium text-gray-500">
-          {{payload.city_documents[index].document_type}}
+          {{payload.city_documents[0].document_type}}
         </p>
-        <image-upload @fileSelected="selectFile($event, index, 'cityDocument')" @fileRemoved="removeFile(index, 'cityDocument')" class="pt-3"></image-upload>
+        <image-upload
+          :uploading="uploadingCityDoc"
+          @fileSelected="selectCityDocument($event)"
+          @fileRemoved="removeFile('cityDocument')"
+          class="pt-3"
+        ></image-upload>
       </div>
       <div class="bg-gray-300 h-{0.1px} w-full"></div>
     </div>
@@ -38,11 +43,14 @@
         <label class="text-xs font-medium text-grays-black-5"
           >Upload {{payload.vehicle_documents[index].document_type}} document (pdf, jpg, png)</label
         >
-        <image-upload @fileSelected="selectFile($event, index, 'vehicleDocument')" @fileRemoved="removeFile(index, 'vehicleDocument')" class="pt-3"></image-upload>
+        <image-upload
+          :uploading="payload.vehicle_documents[index].loading"
+          @fileSelected="selectFile($event, index, 'vehicleDocument')"
+          @fileRemoved="removeFile(index, 'vehicleDocument')" class="pt-3"
+        ></image-upload>
       </div>
 
     </main>
-
     <div class="flex justify-end items-center space-x-5 pt-5">
      <button type="button" class="text-black text-sm bg-gray-300 px-6 py-3 font-medium rounded-md" @click.prevent="$emit('goBack')">Previous</button>
      <button type="button" class="text-black text-sm bg-sh-green-500 px-6 py-3 font-medium rounded-md" @click="saveForm" :disabled="savingVehicleDocuments"> {{savingVehicleDocuments ? 'Saving' : 'Next'}} </button>
@@ -65,7 +73,7 @@ export default defineComponent({
   data () {
     return {
       v$: useVuelidate(),
-      uploadingFile: false,
+      uploadingCityDoc: false,
       savingVehicleDocuments: false,
       documentsToSave: {
         city_documents: [],
@@ -98,30 +106,36 @@ export default defineComponent({
           {
             document_type: "Vehicle Information",
             expiry_date: '',
-            files: []
+            files: [],
+            loading: false
           },
           {
             document_type: "Central Motor Registry (CMR)",
             files: [],
+            loading: false
           },
           {
             document_type: "Proof of Ownership",
             files: [],
+            loading: false
           },
           {
             document_type: "Vehicle Insurance",
             expiry_date: '',
             files: [],
+            loading: false
           },
           {
             document_type: "Road worthiness",
             expiry_date: '',
             files: [],
+            loading: false
           },
           {
             document_type: "Hackney permit",
             expiry_date: '',
             files: [],
+            loading: false
           },
         ]
       },
@@ -149,25 +163,42 @@ export default defineComponent({
     })
   },
   created () {
-    this.getPartnerCityRequiredDocuments();
+    this.getvehicleCityRequiredDocuments();
   },
   methods: {
-    getPartnerCityRequiredDocuments () {
-      this.$axios.get(`/v1/partners/${this.partnerContext.partner.id}/city-documents`).then(response => {
-        for (const key in response.data) {
-          for (let index = 0; index < response.data[key].docs_required.length; index++) {
-            const element = response.data[key].docs_required[index];
-            this.city_documents_order.push(index);
-            this.payload.city_documents.push({
-              document_type: element.document_type,
-              document_requirement_id: element.id,
-              city_id: element.city_id,
-              files: []
-            })
-          }
-        }
-        this.requiredDocuments = response.data;
-      })
+    async getvehicleCityRequiredDocuments () {
+      const vehicleCityId = await this.getVehicleCityId();
+      console.log(`this is it na ${vehicleCityId}`)
+      try {
+        const response = await this.$axios.get(`/v1/admins/city-documents/${vehicleCityId}`)
+        const element = response.data[0];
+        this.payload.city_documents = [{
+          document_type: element.document_type,
+          document_requirement_id: element.id,
+          city_id: element.city_id,
+          files: []
+        }];
+      } catch (error) {
+        const errorMessage = extractErrorMessage(
+          error,
+          null,
+          'Oops! An error occurred, please try again.'
+        );
+        this.$toast.error(errorMessage);
+      }
+    },
+    async getVehicleCityId() {
+      try {
+        const response = await this.$axios.get(`/v1/vehicles/${this.getVehicleFormData.id}`);
+        return response.data.cities[0].id
+      } catch (error) {
+        const errorMessage = extractErrorMessage(
+          error,
+          null,
+          'Oops! An error occurred, please try again.'
+        );
+        this.$toast.error(errorMessage);
+      }
     },
     async saveForm () {
       this.savingVehicleDocuments = true;
@@ -190,9 +221,22 @@ export default defineComponent({
         this.savingVehicleDocuments = false;
       }
     },
+    async selectCityDocument ($event) {
+      const fileHolder = $event
+      this.uploadingCityDoc = true;
+      const fileUrl = await this.uploadTos3andGetDocumentUrl(fileHolder);
+      this.uploadingCityDoc = false;
+      if (this.payload.city_documents[0].files[0]) {
+        this.payload.city_documents[0].files = []
+      }
+      this.payload.city_documents[0].files.push(fileUrl);
+      this.$toast.success(`${this.payload.city_documents[0].document_type} uploaded`);
+    },
     async selectFile ($event, index, type) {
       const fileHolder = $event
+      this.payload.vehicle_documents[index].loading = true;
       const fileUrl = await this.uploadTos3andGetDocumentUrl(fileHolder);
+      this.payload.vehicle_documents[index].loading = false;
       if (type === 'cityDocument') {
         if (this.payload.city_documents[index].files[0]) {
           this.payload.city_documents[index].files = []
@@ -209,7 +253,6 @@ export default defineComponent({
       }
     },
     async uploadTos3andGetDocumentUrl(file) {
-      this.uploadingFile = true;
       try {
         const formData = new FormData();
         formData.append('file', file);
@@ -220,7 +263,7 @@ export default defineComponent({
       } catch (error) {
         this.$toast.warning("An error occured while uploading your file, please try again")
       } finally {
-        this.uploadingFile = false;
+        console.log('uploading')
       }
     },
     changeVehicleDocumentsExpiryDatesToTimeStamp() {
