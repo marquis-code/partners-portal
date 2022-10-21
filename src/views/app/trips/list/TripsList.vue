@@ -38,11 +38,11 @@
             cursor-pointer
           "
           :class="
-            this.filters.status === 'active'
+            this.filters.status === 'active-trips'
               ? 'text-black border-b-sh-green-500'
               : 'text-sh-grey-500 border-b-transparent'
           "
-          @click="setStatusFilter('active')"
+          @click="setStatusFilter('active-trips')"
           >Active</span
         >
         <span
@@ -57,11 +57,11 @@
             cursor-pointer
           "
           :class="
-            this.filters.status === 'upcoming'
+            this.filters.status === 'upcoming-trips'
               ? 'text-black border-b-sh-green-500'
               : 'text-sh-grey-500 border-b-transparent'
           "
-          @click="setStatusFilter('upcoming')"
+          @click="setStatusFilter('upcoming-trips')"
           >Upcoming</span
         >
         <span
@@ -76,11 +76,11 @@
             cursor-pointer
           "
           :class="
-            this.filters.status === 'completed'
+            this.filters.status === 'completed-trips'
               ? 'text-black border-b-sh-green-500'
               : 'text-sh-grey-500 border-b-transparent'
           "
-          @click="setStatusFilter('completed')"
+          @click="setStatusFilter('completed-trips')"
           >Completed</span
         >
       </div>
@@ -137,7 +137,7 @@ export default defineComponent({
     return {
       result: [],
       filters: {
-        status: 'active',
+        status: 'active-trips',
         search: ''
       },
       loading: false,
@@ -145,14 +145,14 @@ export default defineComponent({
       totalRecords: null,
       errorLoading: false,
       headers: [
-        { label: 'Date', key: 'createdAt'},
-        { label: 'Pickup', key: 'pickup'},
-        { label: 'Destination', key: 'dropoff'},
+        { label: 'Date', key: 'createdAt' },
+        { label: 'Pickup', key: 'pickup' },
+        { label: 'Destination', key: 'dropoff' },
         { label: 'Driver', key: 'driver' },
         { label: 'Route Code', key: 'routeCode' },
         { label: 'Start Time', key: 'startTime' },
         { label: 'End Time', key: 'endTime' },
-        { label: 'Passengers', key: 'passengersCount' },
+        { label: 'Passengers', key: 'passengersCount' }
       ],
       items: []
     };
@@ -162,45 +162,58 @@ export default defineComponent({
       partnerContext: 'auth/activeContext'
     })
   },
+  watch: {
+    'filters.status'() {
+      this.fetchPartnerTripsFromRevenue();
+    }
+  },
   methods: {
     setStatusFilter(value: string) {
       this.filters.status = value;
       this.fetchPartnerTripsFromRevenue();
     },
-    fetchPartnerTripsFromRevenue() {
+    async fetchPartnerTripsFromRevenue() {
       this.loading = true;
       const params = {
         related: 'trips',
         status: this.filters.status,
         metadata: true
       };
-      if (params.status === 'active' || params.status === 'upcoming') {
+      if (
+        params.status === 'active-trips' ||
+        params.status === 'inactive-trips'
+      ) {
         this.$axios
-          .get(`/v1/trips/${params.status}?limit=10&page=1&${this.partnerContext.partner.id}=30`)
+          .get(
+            `/v1/partners/${this.partnerContext.partner.id}/${params.status}?metadata=${params.metadata}`
+          )
           .then((res) => {
             console.log(res.data.result);
             const trips = this.transformActiveOrUpcomingTrips(res.data.data);
             this.tableData = trips;
             this.totalRecords = res.data.metadata?.total;
           })
-          .catch(err => {
-            this.$toast.error(err.response.data.message || "An error occured")
+          .catch((err) => {
+            this.$toast.error(err.response.data.message || 'An error occured');
           })
           .finally(() => {
             this.loading = false;
           });
       }
-      if (params.status === 'completed') {
+      if (params.status === 'completed-trips') {
         this.$axios
-          .get(`cost-revenue/v1/partners/${this.partnerContext.partner.id}/revenues`)
+          .get(
+            // `/v1/partners/${this.partnerContext.partner.id}/${params.status}?metadata=${params.metadata}`
+            `cost-revenue/v1/partners/${this.partnerContext.partner.id}/revenues`
+          )
           .then((res) => {
             console.log(res.data.result);
-            const trips = this.transformedTrips(res.data.result)
+            const trips = this.transformedTrips(res.data.result);
             this.tableData = trips;
             this.totalRecords = res.data.metadata?.total;
           })
-          .catch(err => {
-            this.$toast.error(err.response.data.message || "An error occured")
+          .catch((err) => {
+            this.$toast.error(err.response.data.message || 'An error occured');
           })
           .finally(() => {
             this.loading = false;
@@ -216,9 +229,9 @@ export default defineComponent({
     getFormattedDate(date: any) {
       return moment(date).format('LL');
     },
-    transformedTrips(payload: Array<any>): any [] {
-      const newTrips: any = []
-      payload.forEach(trip => {
+    transformedTrips(payload: Array<any>): any[] {
+      const newTrips: any = [];
+      payload.forEach((trip) => {
         newTrips.push({
           createdAt: moment(trip.createdAt).format('LL'),
           pickup: trip.metadata.pickup,
@@ -233,8 +246,8 @@ export default defineComponent({
       return newTrips;
     },
     transformActiveOrUpcomingTrips(payload: Array<any>) {
-      const newTrips: any = []
-      payload.forEach(trip => {
+      const newTrips: any = [];
+      payload.forEach((trip) => {
         newTrips.push({
           createdAt: moment(trip.created_at).format('LL'),
           pickup: trip.route.pickup,
