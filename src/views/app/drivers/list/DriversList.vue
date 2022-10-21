@@ -73,7 +73,6 @@
             :error-loading="errorLoading"
             :items="tableData"
             :fields="headers"
-            @rowClicked="viewDriverDetails"
           >
             <template v-slot:routes="{ item }">
               <span v-if="item.routes">
@@ -178,7 +177,6 @@ import AppTable from '@/components/AppTable.vue';
 import { mapGetters } from 'vuex';
 import PageActionHeader from '@/components/PageActionHeader.vue';
 import PageLayout from '@/components/layout/PageLayout.vue';
-import OptionsDropdown from '@/components/OptionsDropdown.vue';
 export default defineComponent({
   name: 'DriversList',
   components: {

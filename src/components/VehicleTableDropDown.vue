@@ -58,9 +58,12 @@ export default defineComponent({
       })
     },
     onShow() {
+      console.log(this.selectedDropDown, this.docId)
       if (this.selectedDropDown === this.docId) {
+        console.log("ture")
         this.visibleRef = true;
       } else {
+        console.log("false")
         this.visibleRef = false;
       }
     },
