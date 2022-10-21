@@ -40,7 +40,7 @@
               text-bg-grays-black-2
             "
           >
-          {{edit_document_type}}
+            {{ edit_document_type }}
           </p>
         </div>
       </div>
@@ -48,10 +48,13 @@
         <main class="space-y-10">
           <!-- <p class="text-sm text-gray-300 pt-5"></p> -->
           <div class="">
-            <p class="text-sm text-gray-300">{{edit_document_type}}</p>
-            <div v-if="edit_expiry_date" class="space-y-2 w-full lg:w-6/12 pr-1 py-5">
+            <p class="text-sm text-gray-300">{{ edit_document_type }}</p>
+            <div
+              v-if="edit_expiry_date && edit_expiry_date !== 'N/A'"
+              class="space-y-2 w-full lg:w-6/12 pr-1 py-5"
+            >
               <label class="text-xs font-medium text-grays-black-5"
-                >Expiry date</label
+                >Expiry date{{ edit_expiry_date }}</label
               >
               <input
                 type="date"
@@ -92,7 +95,7 @@ export default defineComponent<any, any, any>({
   data() {
     return {
       edit_id: null,
-      edit_document_type: "",
+      edit_document_type: '',
       edit_expiry_date: '',
       edit_files: [],
       document: {
@@ -124,12 +127,15 @@ export default defineComponent<any, any, any>({
     },
     setExistingFormDate() {
       this.edit_document_type = this.document.document_type;
-      this.edit_expiry_date = this.document.documents[0].expiry_date?.slice(0, 10);
+      this.edit_expiry_date = this.document.documents[0].expiry_date?.slice(
+        0,
+        10
+      );
       this.edit_files = this.document.documents[0].files[0];
-      this.edit_id = this.document.documents[0].id
+      this.edit_id = this.document.documents[0].id;
     },
-    updateThisDocument () {
-      console.log(this.edit_id)
+    updateThisDocument() {
+      console.log(this.edit_id);
     }
   },
   created() {

@@ -106,7 +106,6 @@
               >Assign Driver</label
             >
             <v-select
-              @input="console.log($event)"
               @option:selected="selectThisDriver($event)"
               class="form-group mb-3"
               :options="vehiclePartnersDrivers"
@@ -240,6 +239,7 @@ import AppModal from '@/components/Modals/AppModal.vue';
 import Notification from '../../../../components/Notification.vue';
 import Spinner from '@/components/layout/Spinner.vue';
 import { axiosInstance } from '@/plugins/axios';
+import emitter from '@/libs/emitter'
 
 export default defineComponent({
   emits: ['vehicleUpdated'],
@@ -268,6 +268,14 @@ export default defineComponent({
   },
   created () {
     this.fetchVehiclePartnerDrivers();
+  },
+  mounted() {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    emitter.on("vehicles:assign-driver", () => {
+      console.log("Heere")
+      this.showAssignDriverModal();
+    });
   },
   methods: {
     nextAssignStep () {

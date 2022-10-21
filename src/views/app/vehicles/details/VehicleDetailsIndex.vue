@@ -171,6 +171,7 @@ import PageLayout from '../../../../components/layout/PageLayout';
 import { mapGetters } from 'vuex';
 import Spinner from '../../../../components/layout/Spinner';
 import PageActionHeader from '../../../../components/PageActionHeader';
+import emitter from '@/libs/emitter'
 export default {
   name: 'VehicleDetailsIndex',
   components: {
@@ -209,7 +210,7 @@ export default {
       this.showDropdown = false;
     },
     assignDriver (item) {
-      console.log(item);
+      emitter.emit("vehicles:assign-driver", item?.id);
       this.showDropdown = false;
     },
     removeVehicle (item) {
