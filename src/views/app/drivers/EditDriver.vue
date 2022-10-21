@@ -4,9 +4,20 @@
       <page-action-header>
         <template #breadcrumbs>
           <div class="flex items-center space-x-3 py-3">
-            <p class="text-gray-400 text-sm">Dashboard</p>
+            <router-link
+              :to="{ name: 'drivers.list' }"
+              class="text-gray-400 text-sm hover:text-gray-900"
+              >Dashboard</router-link
+            >
             <img src="@/assets/images/breadcrumbs.svg" />
-            <p class="text-gray-400 text-sm">Drivers management</p>
+            <router-link
+              :to="{
+                name: 'driver.detail.info',
+                params: { driverId: this.$route.params.driverId }
+              }"
+              class="text-gray-400 text-sm hover:text-gray-900"
+              >Drivers management</router-link
+            >
             <img src="@/assets/images/breadcrumbs.svg" />
             <p class="text-gray-900 text-sm">Edit driver</p>
           </div>
