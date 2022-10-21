@@ -19,13 +19,14 @@
     <main class="md:w-9/12 p-5 lg:p-14 bg-white ring-1 ring-gray-100">
       <div class="flex justify-center items-center flex-col space-y-2 pb-5">
         <img
-          v-if="profilePreview"
+          v-if="profilePreview && !uploadingProfile"
           class="h-14 w-14 rounded-full object-cover"
           :src="profilePreview"
         />
+        <spinner v-if="uploadingProfile"></spinner>
         <img
-          v-if="!profilePreview"
-          class="h-14 w-14"
+          v-if="!profilePreview && !uploadingProfile"
+          class="h-16 w-16"
           src="@/assets/images/userIcon.svg"
         />
         <input
@@ -36,14 +37,11 @@
         />
         <label
           for="profile"
-          class="
-            text-indigo-700 text-sm
-            font-medium
-            cursor-not-allowed
-            select-none
-            opacity-25
-          "
-          >Click to upload image</label
+          class="text-indigo-700 text-sm font-medium cursor-pointer"
+          :class="[uploadingProfile ? 'opacity-25 cursor-not-allowed' : '']"
+          >{{
+            uploadingProfile ? 'Uploading...' : 'Click to upload image'
+          }}</label
         >
       </div>
       <div>
@@ -358,7 +356,8 @@
               "
             >
               {{ processing ? 'Saving' : 'Update' }}
-              <img class="ml-2" src="@/assets/images/arrow.svg" />
+              <spinner v-if="processing"></spinner>
+              <img v-if="!processing" class="ml-2" src="@/assets/images/arrow.svg" />
             </button>
           </div>
         </form>
@@ -431,7 +430,8 @@ export default defineComponent({
       form: {} as Driver,
       processing: false,
       documentId: null,
-      isUploaded: false
+      isUploaded: false,
+      uploadingProfile: false
     };
   },
   validations() {
@@ -562,13 +562,21 @@ export default defineComponent({
       )) as string;
       // this.form.files.push(imageDbUrl);
     },
-
     async handleProfileUpload(e: any) {
       const selectedProfile = e.target.files[0];
-      this.profilePreview = URL.createObjectURL(selectedProfile);
-      this.form.avatar = await this.uploadTos3andGetDocumentUrl(
-        selectedProfile
-      );
+      this.uploadingProfile = true;
+      await this.uploadTos3andGetDocumentUrl(selectedProfile)
+        .then((res) => {
+          this.form.avatar = res;
+          this.profilePreview = URL.createObjectURL(selectedProfile);
+          this.$toast.success('Profile picture was uploaded successfully');
+        })
+        .catch(() => {
+          this.$toast.error('Something went wrong while uploading profile');
+        })
+        .finally(() => {
+          this.uploadingProfile = false;
+        });
     },
 
     async uploadTos3andGetDocumentUrl(file: any) {

@@ -143,6 +143,7 @@
             >
               Cancel
             </button>
+
             <button
               :disabled="assigningDriver"
               class="rounded-lg bg-sh-green-500 w-32 md:w-40 py-2"
@@ -154,6 +155,7 @@
               @click="assignDriverToThisVehicle"
             >
               {{ assigningDriver ? 'Processing' : 'Continue' }}
+              <spinner v-if="assigningDriver"></spinner>
             </button>
           </div>
         </div>
@@ -169,7 +171,6 @@
               w-full
               text-black-5 text-xs
               font-medium
-              w-full
               py-3
               rounded-lg
               mt-3
@@ -203,6 +204,7 @@
               @click="unassignDriverToThisVehicle"
             >
               {{ unassigningDriver ? 'Processing' : 'Continue' }}
+              <spinner v-if="unassigningDriver"></spinner>
             </button>
           </div>
         </div>
@@ -218,7 +220,6 @@
               w-full
               text-black-5 text-xs
               font-medium
-              w-full
               py-3
               rounded-lg
               mt-3
@@ -242,6 +243,7 @@ import Spinner from '@/components/layout/Spinner.vue';
 import { axiosInstance } from '@/plugins/axios';
 
 export default defineComponent({
+
   emits: ['vehicleUpdated'],
   props: {
     singleVehicleData: Object
@@ -380,7 +382,7 @@ export default defineComponent({
         });
     }
   },
-  components: { AppModal, Notification }
+  components: { AppModal, Notification, Spinner }
 });
 </script>
 

@@ -21,7 +21,7 @@
 
     <div class="flex justify-end items-center space-x-5 pt-5">
      <button type="button" class="text-black text-sm bg-gray-300 px-6 py-3 font-medium rounded-md" @click="viewVehicleDetails(getVehicleFormData.id)"> Skip </button>
-     <button type="button" class="text-black text-sm bg-sh-green-500 px-6 py-3 font-medium rounded-md" @click="submitFinalForm"> Submit </button>
+     <button type="button" class="text-black text-sm bg-sh-green-500 px-6 py-3 font-medium rounded-md" @click="submitFinalForm"> Submit</button>
     </div>
   </form>
 </template>

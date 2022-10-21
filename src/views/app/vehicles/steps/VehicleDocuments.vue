@@ -53,7 +53,7 @@
     </main>
     <div class="flex justify-end items-center space-x-5 pt-5">
      <button type="button" class="text-black text-sm bg-gray-300 px-6 py-3 font-medium rounded-md" @click.prevent="$emit('goBack')">Previous</button>
-     <button type="button" class="text-black text-sm bg-sh-green-500 px-6 py-3 font-medium rounded-md" @click="saveForm" :disabled="savingVehicleDocuments"> {{savingVehicleDocuments ? 'Saving' : 'Next'}} </button>
+     <button type="button" class="text-black text-sm bg-sh-green-500 px-6 py-3 font-medium rounded-md" @click="saveForm" :disabled="savingVehicleDocuments">{{savingVehicleDocuments ? 'Saving' : 'Next'}} <spinner v-if="savingVehicleDocuments"></spinner> </button>
     </div>
   </form>
 </template>

@@ -188,6 +188,7 @@
                 :disabled="v$.form.$invalid || processing"
                 :class="v$.form.$invalid || processing ?
                 'cursor-not-allowed text-grays-black-5 bg-grays-black-7' : 'bg-sh-green-500 font-medium'">
+                <spinner v-if="processing"></spinner>
                 {{ processing ? 'Updating' : 'Update' }}
               </button>
             </div>
