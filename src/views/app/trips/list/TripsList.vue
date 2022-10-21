@@ -146,13 +146,14 @@ export default defineComponent({
       errorLoading: false,
       headers: [
         { label: 'Date', key: 'createdAt'},
+        { label: 'Route Code', key: 'routeCode' },
         { label: 'Pickup', key: 'pickup'},
         { label: 'Destination', key: 'dropoff'},
         { label: 'Driver', key: 'driver' },
-        { label: 'Route Code', key: 'routeCode' },
+        { label: 'Passengers', key: 'passengersCount' },
         { label: 'Start Time', key: 'startTime' },
         { label: 'End Time', key: 'endTime' },
-        { label: 'Passengers', key: 'passengersCount' },
+        { label: 'Revenue', key: 'revenue' },
       ],
       items: []
     };
@@ -227,7 +228,8 @@ export default defineComponent({
           routeCode: trip.metadata.routeCode,
           startTime: moment(trip.metadata.startTime).format('LT'),
           endTime: moment(trip.metadata.endTime).format('LT'),
-          passengersCount: trip.passengersCount
+          passengersCount: trip.passengersCount,
+          revenue: trip.partnersRevenue
         });
       });
       return newTrips;
@@ -243,7 +245,8 @@ export default defineComponent({
           routeCode: trip.route.route_code,
           startTime: moment(trip.start_trip).format('LL'),
           endTime: moment(trip.end_trip).format('LL'),
-          passengersCount: trip.passengers_count
+          passengersCount: trip.passengers_count,
+          revenue: 'N/A'
         });
       });
       return newTrips;

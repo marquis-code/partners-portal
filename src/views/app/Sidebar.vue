@@ -108,20 +108,11 @@
     </div>
 
     <div
-      class="
-        flex flex-row
-        justify-between
-        items-center
-        py-2
-        cursor-pointer
-        space-x-3
-        rounded-xl
-        bg-green-200
-        w-10/12
-      "
+      @click="logout"
+      class="flex flex-row justify-between items-center py-2 cursor-pointer space-x-3 rounded-xl bg-green-200 w-10/12"
       :class="isSidebarFolded ? 'p-1' : 'px-3 '"
     >
-      <div class="flex flex-row items-center" @click="logout">
+      <div class="flex flex-row items-center">
         <img
           src="@/assets/images/avatar-placeholder.svg"
           class="w-10 h-10 mr-2"
