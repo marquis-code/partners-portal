@@ -9,10 +9,9 @@
         class="hidden"
       />
     </form>
-    <div
-      v-if="!fileUploaded && !uploadStatus"
-      class="space-y-2 w-full relative"
-    >
+
+    <!-- This shows when a file is yet to be uploaded -->
+    <div v-if="!fileUploaded && !uploading && !uploadStatus" class="space-y-2 w-full relative">
       <div
         class="
           py-8
@@ -30,8 +29,9 @@
         <p class="text-xs text-gray-400">or drag and drop</p>
       </div>
     </div>
+    <!-- This shows when a file has been uploaded -->
     <div
-      v-else
+      v-if="fileUploaded && !uploading || uploadStatus"
       class="
         p-4
         ring-1 ring-gray-300
@@ -66,15 +66,20 @@
       </div>
     </div>
     <p
-      v-if="fileUploaded || uploadStatus"
+      v-if="fileUploaded && !uploading"
       @click="$refs.avatar.click()"
       class="text-sh-purple-700 font-medium text-sm mb-4"
     >
       Change Document
     </p>
+    <!-- This shows in the process of uploading the image to s3 -->
+    <div v-if="uploading">
+      <Spinner />
+    </div>
   </div>
 </template>
 <script lang="ts">
+import Spinner from './layout/Spinner.vue';
 import { defineComponent } from '@vue/runtime-core';
 interface UploadOptions {
   mimeTypes: string; // e.g *, image/jpg, pdf ...
@@ -85,6 +90,7 @@ export default defineComponent({
   name: 'ImageUpload',
   props: {
     field: String,
+    uploading: Boolean,
     uploadStatus: Boolean
   },
   data() {
@@ -106,10 +112,14 @@ export default defineComponent({
         this.fileName = this.existingImage.name;
         this.fileSize = this.existingImage.size;
       }
+      console.log(newVal)
+      console.log(this.fileName)
+      console.log(this.fileSize);
     }
   },
   methods: {
     uploadFile(event: any) {
+      console.log('working');
       if (this.isFileSizeOk(event.target.files[0].size)) {
         this.selectedFile = event.target.files[0];
         this.fileSize = (event.target.files[0].size / 1000000)
@@ -119,14 +129,20 @@ export default defineComponent({
         this.fileName = event.target.files[0].name;
         if (event.target.files[0].type === 'application/pdf') {
           this.uploadType = 'pdf';
-        } else this.uploadType = 'image';
+        } else {
+          this.uploadType = 'image';
+        }
         this.$emit('fileSelected', this.selectedFile);
-      } else this.$toast.warning('File must be less than 10 MB');
+      } else {
+        this.$toast.warning('File must be less than 10 MB');
+      }
     },
     isFileSizeOk(fileSizeInBytes: number): boolean {
       if (fileSizeInBytes > 10000000) {
         return false;
-      } else return true;
+      } else {
+        return true;
+      }
     },
     removeFile() {
       this.selectedFile = {};
@@ -135,7 +151,8 @@ export default defineComponent({
       this.fileSize = '';
       this.$emit('fileRemoved');
     }
-  }
+  },
+  components: { Spinner }
 });
 </script>
 <style scoped>

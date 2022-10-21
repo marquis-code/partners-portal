@@ -73,7 +73,6 @@
             :error-loading="errorLoading"
             :items="tableData"
             :fields="headers"
-            @rowClicked="viewDriverDetails"
           >
             <template v-slot:routes="{ item }">
               <span v-if="item.routes">
@@ -322,11 +321,6 @@ export default defineComponent({
     },
     fetchDrivers() {
       this.loading = true;
-      // const params = {
-      //   related: 'driver',
-      //   status: this.filters.status,
-      //   metadata: true
-      // };
       this.$axios
         .get(
           `/v1/partners/${this.userSessionData.activeContext.partner.account_sid}/drivers`
@@ -339,12 +333,6 @@ export default defineComponent({
           this.loading = false;
         });
     },
-    // viewDriverDetails(driver: any) {
-    //   this.$router.push({
-    //     name: 'driver.detail.info',
-    //     params: { driverId: driver.id }
-    //   });
-    // },
     handleDriver(eachDriver: any) {
       this.showDropdown = !this.showDropdown;
       this.selectedDriverId = eachDriver.id;

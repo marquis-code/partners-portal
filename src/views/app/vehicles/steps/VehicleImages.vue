@@ -47,7 +47,7 @@ export default defineComponent({
       const multipleDocumentList = this.convertImageObjectToList(multipleDocumentObjects);
       this.uploadTos3andGetDocumentUrlList(multipleDocumentList, type);
     },
-    removeFiles(type: any) {
+    removeFiles (type: any) {
       if (type === 'interior') {
         this.interiorImages = []
       }
@@ -55,7 +55,7 @@ export default defineComponent({
         this.exteriorImages = []
       }
     },
-    uploadTos3andGetDocumentUrlList(multipleImages: Array<File>, type: string) {
+    uploadTos3andGetDocumentUrlList (multipleImages: Array<File>, type: string) {
       this.uploadingFile = true;
       multipleImages.forEach(async file => {
         try {
@@ -77,7 +77,7 @@ export default defineComponent({
       this.uploadingFile = false;
       this.$toast.success(`${type} images uploaded`)
     },
-    convertImageObjectToList(imageObject: any) {
+    convertImageObjectToList (imageObject: any) {
       const imageList = [];
       for (const key in imageObject) {
         if (imageObject[key].size) {
@@ -86,13 +86,13 @@ export default defineComponent({
       }
       return imageList;
     },
-    viewVehicleDetails(id : number) {
+    viewVehicleDetails (id : number) {
       this.$router.push({
         name: 'vehicle.detail.info',
         params: {vehicleId: id}
       });
     },
-    async submitFinalForm() {
+    async submitFinalForm () {
       this.submittingFinalForm = true;
       try {
         await this.$axios.post(`/v1/partners/${this.partnerContext.partner.id}/vehicle/${this.getVehicleFormData.id}/vehicle-images`, {
@@ -118,7 +118,7 @@ export default defineComponent({
       }
     },
   },
-  data() {
+  data () {
     return {
       submittingFinalForm: false,
       uploadingFile: false,
