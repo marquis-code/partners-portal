@@ -75,7 +75,7 @@
             @rowClicked="viewTripDetails"
           >
             <template v-slot:driver="{ item }">
-              <span v-if="item.driver.id" class="text-sm text-black">
+              <span v-if="item.driver?.id" class="text-sm text-black">
                 {{ item.driver.fname }} {{ item.driver.lname }}
               </span>
               <span v-else class="text-sm text-grays-black-6" >
@@ -160,7 +160,7 @@ export default defineComponent({
         metadata: true
       };
       this.$axios
-        .get(`/v1/partner/${this.partnerContext.partner.id}/vehicles`, {
+        .get(`/v1/partner/${this.partnerContext.partner?.id}/vehicles`, {
           params
         })
         .then((res) => {
@@ -174,7 +174,7 @@ export default defineComponent({
     viewTripDetails (vehicle: any) {
       this.$router.push({
         name: 'vehicle.detail.info',
-        params: { vehicleId: vehicle.id }
+        params: { vehicleId: vehicle?.id }
       });
     }
   }
