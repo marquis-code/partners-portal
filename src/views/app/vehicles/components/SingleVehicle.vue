@@ -49,7 +49,7 @@
             class="underline text-indigo-600 text-xs"
             @click="showAssignDriverModal"
           >
-            Select a Driver
+            Assign a Driver
           </p>
         </div>
         <div class="flex justify-between items-center py-6">
@@ -192,6 +192,7 @@ import { mapGetters } from 'vuex';
 import AppModal from '@/components/Modals/AppModal.vue';
 import Notification from '../../../../components/Notification.vue';
 import Spinner from '@/components/layout/Spinner.vue';
+import { axiosInstance } from '@/plugins/axios';
 
 export default defineComponent({
   emits: ['vehicleUpdated'],
@@ -236,11 +237,12 @@ export default defineComponent({
       this.assigningDriver = true;
       try {
         const response = await this.$axios.put(
-          `/v1/partners/${this.userSessionData.activeContext.partner.account_sid}/driver/${this.selectedDriverId}/vehicle-assignment?status=assign`,
+          `/v1/partners/${this.userSessionData.activeContext.partner.id}/driver/${this.selectedDriverId}/vehicle-assignments?status=assign`,
           {
             vehicle_id: this.vehicleData.id
           }
         );
+        await this.updateVehicleInfo(this.vehicleData.id);
         this.nextAssignStep();
       } catch (error: any) {
         this.$toast.warning(
@@ -249,6 +251,15 @@ export default defineComponent({
         );
       } finally {
         this.assigningDriver = false;
+      }
+    },
+    async updateVehicleInfo (vehicleId: number) {
+      try {
+        const response = await axiosInstance.get(`/v1/vehicles/${vehicleId}`);
+        await this.$store.dispatch('vehicle/setVehicleData', response.data);
+        this.$toast.success("Vehicle Informaion ")
+      } finally {
+        console.log('done')
       }
     },
     editVehicle() {
