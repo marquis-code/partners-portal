@@ -39,7 +39,7 @@
                 bottom-0
                 right-7
                 h-36
-                w-40
+                w-44
                 z-50
                 rounded-md
                 shadow-md
@@ -63,6 +63,7 @@
                 >Edit</a
               >
               <a
+                v-if="!vehicleData.driver"
                 href="#"
                 @click="assignDriver(vehicleData)"
                 class="
@@ -74,6 +75,20 @@
                   pl-2
                 "
                 >Assign Driver</a
+              >
+              <a
+                v-else
+                href="#"
+                @click="unassignDriver(vehicleData)"
+                class="
+                  text-gray-500
+                  cursor-pointer
+                  hover:bg-black hover:text-white
+                  rounded-md
+                  p-2
+                  pl-2
+                "
+                >Unassign Driver</a
               >
               <a
                 href="#"

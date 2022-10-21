@@ -39,17 +39,24 @@
           <div class="flex justify-start space-x-2">
             <img class="h-5 w-5" src="@/assets/images/driversIcon.svg" />
             <div class="">
-              <p class="font-medium text-xs" v-if="singleVehicleData.driver">
-                Assigned driver
-              </p>
-              <p class="font-medium text-xs" v-else>No driver</p>
+              <div class="font-medium text-xs">
+                <p class="font-medium text-xs">Assigned Driver</p>
+                <p v-if="singleVehicleData.driver" class="font-light text-xs">{{singleVehicleData.driver.fname}} {{singleVehicleData.driver.lname}}</p>
+                <p class="font-light text-xs" v-else>No driver</p>
+              </div>
             </div>
           </div>
           <p
+            v-if="!singleVehicleData.driver"
             class="underline text-indigo-600 text-xs"
             @click="showAssignDriverModal"
-          >
-            Assign a Driver
+          >Assign a Driver
+          </p>
+          <p
+            v-else
+            class="underline text-indigo-600 text-xs"
+            @click="showUnassignDriverModal"
+          >Remove Driver
           </p>
         </div>
         <div class="flex justify-between items-center py-6">
@@ -149,7 +156,7 @@
               :disabled="assigningDriver"
               class="rounded-lg bg-sh-green-500 w-32 md:w-40 py-2"
               :class="
-                assigningDriver || !selectedDriverId
+                assigningDriver
                   ? 'bg-sh-green-100'
                   : 'bg-sh-green-500'
               "
@@ -182,6 +189,55 @@
           </button>
         </div>
       </app-modal>
+      <app-modal :modal-active="unassignDriverModal">
+        <div v-if="unassignStep === 0" class="pb-5 px-5 text-center">
+          <img src="@/assets/icons/question.svg" class="mx-auto mb-7" />
+          <p class="mb-2 font-bold font-lg">Unassign Driver</p>
+          <p class="mb-14">Are you sure you want to continue?</p>
+          <div class="flex flex-row justify-between bottom-0 w-full">
+            <button
+              @click="cancelUnassignment"
+              class="border border-sh-grey-400 rounded-lg w-32 md:w-40 py-2"
+            >
+              Cancel
+            </button>
+            <button
+              :disabled="unassigningDriver"
+              class="rounded-lg bg-sh-green-500 w-32 md:w-40 py-2"
+              :class="
+                unassigningDriver
+                  ? 'bg-sh-green-100'
+                  : 'bg-sh-green-500'
+              "
+              @click="unassignDriverToThisVehicle"
+            >
+              {{ unassigningDriver ? 'Processing' : 'Continue' }}
+            </button>
+          </div>
+        </div>
+        <div v-if="unassignStep === 1" class="pb-5 px-5 text-center">
+          <img src="@/assets/icons/success.svg" class="mx-auto mb-7" />
+          <p class="mb-2 font-bold font-lg">Driver unassigned successfully</p>
+          <p class="mb-14">
+            You have successfully unassigned this driver to this vehicle.
+          </p>
+          <button
+            class="
+              bg-sh-green-500
+              w-full
+              text-black-5 text-xs
+              font-medium
+              w-full
+              py-3
+              rounded-lg
+              mt-3
+            "
+            @click="finishUnassignment"
+          >
+            Dismiss
+          </button>
+        </div>
+      </app-modal>
     </section>
   </div>
 </template>
@@ -199,14 +255,17 @@ export default defineComponent({
   props: {
     singleVehicleData: Object
   },
-  data() {
+  data () {
     return {
       assignStep: 0,
+      unassignStep: 0,
       assignDriverModal: false,
+      unassignDriverModal: false,
       assigningDriver: false,
+      unassigningDriver: false,
       selectedDriverId: null,
       vehiclePartnersDrivers: [],
-      fetchingVehiclePartnersDriver: false
+      fetchingVehiclePartnersDriver: false,
     };
   },
   computed: {
@@ -216,31 +275,44 @@ export default defineComponent({
       userSessionData: 'auth/userSessionData'
     })
   },
-  created() {
+  created () {
     this.fetchVehiclePartnerDrivers();
   },
   methods: {
-    nextAssignStep() {
+    nextAssignStep () {
       this.assignStep += 1;
     },
-    cancelAssignment() {
+    nextUnassignStep () {
+      this.unassignStep += 1;
+    },
+    cancelAssignment () {
       this.assignDriverModal = false;
       this.assignStep = 0;
       this.selectedDriverId = null;
     },
-    finishAssignment() {
+    finishAssignment () {
       this.assignDriverModal = false;
       this.assignStep = 0;
       this.selectedDriverId = null;
     },
-    async assignDriverToThisVehicle() {
+    cancelUnassignment () {
+      this.unassignDriverModal = false;
+      this.unassignStep = 0;
+      this.selectedDriverId = null;
+    },
+    finishUnassignment () {
+      this.unassignDriverModal = false;
+      this.unassignStep = 0;
+      this.selectedDriverId = null;
+    },
+    async assignDriverToThisVehicle () {
       this.assigningDriver = true;
       try {
         const response = await this.$axios.put(
-          `/v1/partners/${this.userSessionData.activeContext.partner.id}/driver/${this.selectedDriverId}/vehicle-assignments?status=assign`,
-          {
-            vehicle_id: this.vehicleData.id
-          }
+            `/v1/partners/${this.userSessionData.activeContext.partner.id}/drivers/${this.selectedDriverId}/vehicle-assignments?status=assign`,
+            {
+              vehicle_id: this.vehicleData.id
+            }
         );
         await this.updateVehicleInfo(this.vehicleData.id);
         this.nextAssignStep();
@@ -253,6 +325,26 @@ export default defineComponent({
         this.assigningDriver = false;
       }
     },
+    async unassignDriverToThisVehicle () {
+      this.unassigningDriver = true;
+      try {
+        const response = await this.$axios.put(
+            `/v1/partners/${this.userSessionData.activeContext.partner.id}/drivers/${this.selectedDriverId}/vehicle-assignments?status=unassign`,
+            {
+              vehicle_id: this.vehicleData.id
+            }
+        );
+        await this.updateVehicleInfo(this.vehicleData.id);
+        this.nextUnassignStep();
+      } catch (error: any) {
+        this.$toast.warning(
+          error.response.data.message ||
+            'Error occurred while assigning this driver'
+        );
+      } finally {
+        this.unassigningDriver = false;
+      }
+    },
     async updateVehicleInfo (vehicleId: number) {
       try {
         const response = await axiosInstance.get(`/v1/vehicles/${vehicleId}`);
@@ -262,20 +354,24 @@ export default defineComponent({
         console.log('done')
       }
     },
-    editVehicle() {
+    editVehicle () {
       this.$router.push({
         name: 'EditVehicle',
         params: { vehicleId: this.vehicleData.id }
       });
     },
-    selectThisDriver(driver: any) {
+    selectThisDriver (driver: any) {
       // console.log(id)
-      this.selectedDriverId = driver.id;
+      this.selectedDriverId = driver.driver_id;
     },
-    showAssignDriverModal() {
+    showAssignDriverModal () {
       this.assignDriverModal = true;
     },
-    fetchVehiclePartnerDrivers() {
+    showUnassignDriverModal () {
+      this.unassignDriverModal = true;
+      this.selectedDriverId = this.singleVehicleData?.driver?.id;
+    },
+    fetchVehiclePartnerDrivers () {
       this.fetchingVehiclePartnersDriver = true;
       this.$axios
         .get(
