@@ -35,11 +35,16 @@
             >Trips</router-link
           >
         </template>
-
         <template #breadcrumbs>
           <div class="flex justify-between items-center">
             <div class="flex items-center space-x-2 py-3">
-              <p class="text-gray-400 text-sm">Drivers management</p>
+              <router-link
+                :to="{
+                  name: 'drivers.list'
+                }"
+                class="text-gray-400 text-sm hover:text-gray-900"
+                >Drivers management</router-link
+              >
               <img src="@/assets/images/breadcrumbs.svg" />
               <span>{{ driverData?.fname }}</span>
               <span>{{ driverData?.lname }}</span>
