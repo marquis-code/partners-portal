@@ -29,7 +29,6 @@
           src="@/assets/images/userIcon.svg"
         />
         <input
-          readonly
           @change="handleProfileUpload"
           class="hidden"
           type="file"
@@ -198,7 +197,6 @@
                 >Residential address</label
               >
               <input
-                readonly
                 type="text"
                 v-model="v$.form.residential_address.$model"
                 class="
@@ -228,7 +226,6 @@
                 >Date of birth</label
               >
               <input
-                readonly
                 type="date"
                 v-model="v$.form.dob.$model"
                 class="
@@ -300,7 +297,6 @@
                   >Expiry date
                 </label>
                 <input
-                 readonly
                   type="date"
                   v-model="v$.form.expiry_date.$model"
                   class="
@@ -335,6 +331,7 @@
                 :uploadStatus="isUploaded"
                 @fileSelected="fileSelected"
                 @fileRemoved="handleFileRemoval"
+                :uploading="uploadingFile"
               ></image-upload>
             </div>
           </section>
@@ -424,6 +421,7 @@ export default defineComponent({
   },
   data() {
     return {
+      docId: null,
       fetchingDriver: false,
       format,
       uploadingFile: false,
@@ -455,11 +453,15 @@ export default defineComponent({
   computed: {
     ...mapGetters({
       userSessionData: 'auth/userSessionData',
-      user: 'auth/user'
+      user: 'auth/user',
+      getDriverData: 'driver/getDriverData',
+      driverData: 'driver/getDriverData'
     })
   },
   created() {
     this.loadDriver();
+    console.log(this.userSessionData);
+    console.log(this.getDriverData, 'here');
   },
   methods: {
     handleFileRemoval() {
@@ -477,6 +479,7 @@ export default defineComponent({
       this.$axios
         .get(`/v1/drivers/${this.$route.params.driverId}`)
         .then((res) => {
+          this.docId = res.data.documents[0].id;
           const result = this.getUploadedFileUrlFromStringifiedArray(
             res.data.documents[0].files
           );
@@ -493,7 +496,7 @@ export default defineComponent({
           this.form.dob = res.data.dob;
           this.form.license_number = res.data.documents[0].registration_number;
           this.form.expiry_date = res.data.documents[0].expiry_date;
-          this.form.files = JSON.parse(res.data.documents[0].files)[0];
+          this.form.files = [JSON.parse(res.data.documents[0].files)[0]];
           this.form.avatar = res.data.avatar;
           this.profilePreview = res.data.avatar;
           this.documentId = res.data.documents[0].id;
@@ -525,16 +528,16 @@ export default defineComponent({
           phone: this.form.phone,
           email: this.form.email,
           residential_address: this.form.residential_address,
-          dob: this.format(this.form.dob as any, 'yyyy-MM-dd'),
+          dob: this.form.dob,
           license_number: this.form.license_number,
           files: this.form.files,
           avatar: this.form.avatar,
           document_type: 'drivers_license',
+          document_id: this.docId,
           password: 'shuttlers'
         };
-
-        const response = await this.$axios.patch(
-          `/v1/partners/${this.userSessionData.activeContext.partner.account_sid}/drivers/${this.user.id}`, //  Endpoint to update driver
+        await this.$axios.patch(
+          `/v1/partners/${this.userSessionData.activeContext.partner.account_sid}/drivers/${this.$route.params.driverId}`, //  Endpoint to update driver
           payload
         );
         this.openModal();
@@ -542,6 +545,7 @@ export default defineComponent({
         this.closeModal();
         this.$toast.success('Drivers details was successfully updated');
       } catch (err) {
+        console.log(err);
         const errorMessage = extractErrorMessage(
           err,
           null,
@@ -556,7 +560,7 @@ export default defineComponent({
       const imageDbUrl = (await this.uploadTos3andGetDocumentUrl(
         selectedImage
       )) as string;
-      //  this.form.files.push(imageDbUrl)
+      // this.form.files.push(imageDbUrl);
     },
 
     async handleProfileUpload(e: any) {

@@ -25,12 +25,12 @@
     >
       <div class="flex justify-center items-center flex-col space-y-2 pb-5">
         <img
-          v-if="profilePreview"
+          v-if="profilePreview && !uploadingProfile"
           class="h-14 w-14 rounded-full object-cover"
           :src="profilePreview"
         />
         <img
-          v-if="!profilePreview"
+          v-if="!profilePreview && !uploadingProfile"
           class="h-16 w-16"
           src="@/assets/images/userIcon.svg"
         />
@@ -43,7 +43,10 @@
         <label
           for="profile"
           class="text-indigo-700 text-sm font-medium cursor-pointer"
-          >Click to upload image</label
+          :class="[uploadingProfile ? 'opacity-25 cursor-not-allowed' : '']"
+          >{{
+            uploadingProfile ? 'Uploading...' : 'Click to upload image'
+          }}</label
         >
       </div>
       <div>
@@ -326,7 +329,10 @@
               <p class="font-medium text-gray-600 text-xs">
                 Upload drivers license document (pdf, jpg, png)
               </p>
-              <image-upload @fileSelected="fileSelected"></image-upload>
+              <image-upload
+                :uploading="uploadingFile"
+                @fileSelected="fileSelected"
+              ></image-upload>
             </div>
           </section>
 
@@ -404,6 +410,7 @@ export default defineComponent({
     return {
       format,
       uploadingFile: false,
+      uploadingProfile: false,
       v$: useVuelidate(),
       showModal: false,
       profilePreview: '',
@@ -504,14 +511,33 @@ export default defineComponent({
       this.form.files.push(imageDbUrl);
     },
 
+    // async handleProfileUpload(e: any) {
+    //   const selectedProfile = e.target.files[0];
+    //   this.uploadingProfile = true
+    //   this.profilePreview = URL.createObjectURL(selectedProfile);
+    //   const response = await this.uploadTos3andGetDocumentUrl(selectedProfile);
+    //   if (response) {
+    //     this.uploadingFile = false
+    //     this.$toast.success('Profile picture was uploaded successfully');
+    //   }
+    //   this.form.avatar = response;
+    // },
+
     async handleProfileUpload(e: any) {
       const selectedProfile = e.target.files[0];
-      this.profilePreview = URL.createObjectURL(selectedProfile);
-      const response = await this.uploadTos3andGetDocumentUrl(selectedProfile);
-      if (response) {
-        this.$toast.success('Profile picture was uploaded successfully');
-      }
-      this.form.avatar = response;
+      this.uploadingProfile = true;
+      await this.uploadTos3andGetDocumentUrl(selectedProfile)
+        .then((res) => {
+          this.form.avatar = res;
+          this.profilePreview = URL.createObjectURL(selectedProfile);
+          this.$toast.success('Profile picture was uploaded successfully');
+        })
+        .catch(() => {
+          this.$toast.error('Something went wrong while uploading profile');
+        })
+        .finally(() => {
+          this.uploadingProfile = false;
+        });
     },
 
     async uploadTos3andGetDocumentUrl(file: any) {
