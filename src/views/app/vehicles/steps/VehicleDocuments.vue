@@ -203,6 +203,7 @@ export default defineComponent({
     async saveForm () {
       this.savingVehicleDocuments = true;
       this.removeDocumentTypeItemFromCityDocuments();
+      this.removeLoadingTypeItemFromVehicleDocuments();
       this.changeVehicleDocumentsExpiryDatesToTimeStamp();
       const newPayload = this.removeDocumentsWithoutFiles();
       console.log(newPayload);
@@ -286,6 +287,12 @@ export default defineComponent({
     removeDocumentTypeItemFromCityDocuments () {
       this.payload.city_documents = this.payload.city_documents.map(doc => {
         delete doc.document_type;
+        return doc;
+      })
+    },
+    removeLoadingTypeItemFromVehicleDocuments () {
+      this.payload.vehicle_documents = this.payload.vehicle_documents.map(doc => {
+        delete doc.loading;
         return doc;
       })
     },
