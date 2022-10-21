@@ -219,10 +219,10 @@ export default defineComponent<any, any, any>({
     };
   },
   watch: {
-    "form.registration_number"() {
+    "form.registration_number" () {
       if (this.checkPlateNumberFormat(this.form.registration_number)) {
         this.validPlateNumber = true;
-      } else{
+      } else {
         this.validPlateNumber = false;
       }
     }
@@ -252,15 +252,15 @@ export default defineComponent<any, any, any>({
     this.form.partner_id = this.partnerContext?.partner?.id;
   },
   methods: {
-    selectThisCity(city: any) {
+    selectThisCity (city: any) {
       const cityId = city.city.id
       this.form.city_ids = [cityId]
     },
-    uppercase($event: any) {
+    uppercase ($event: any) {
       this.form.registration_number = this.form.registration_number.toUpperCase();
       this.getKeyStroke($event)
     },
-    getKeyStroke($event: any) {
+    getKeyStroke ($event: any) {
       const pressedKey = ($event.key)
       console.log(1)
       if (pressedKey === 'Backspace' && this.form.registration_number.length === 3) {
@@ -272,7 +272,7 @@ export default defineComponent<any, any, any>({
         console.log(0)
       }
     },
-    checkPlateNumberFormat(plateNumber: string): boolean {
+    checkPlateNumberFormat (plateNumber: string): boolean {
       if (/^[a-zA-Z]{3}-[0-9]{3}[a-zA-Z]{2}$/gi.test(plateNumber)) {
         return true
       } else {

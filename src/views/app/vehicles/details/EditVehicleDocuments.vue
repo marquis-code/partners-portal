@@ -17,7 +17,7 @@
         </template>
       </PageActionHeader>
     </template>
-    <main v-if="edit_document_type" class="space-y-16 bg-white py-8 lg:w-10/12 mx-auto">
+    <main v-if="edit_document_type" class="space-y-16 bg-white py-8 lg:w-10/12">
       <div
         class="
           flex

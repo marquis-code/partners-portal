@@ -187,7 +187,7 @@ export default defineComponent({
         this.$toast.error(errorMessage);
       }
     },
-    async getVehicleCityId() {
+    async getVehicleCityId () {
       try {
         const response = await this.$axios.get(`/v1/vehicles/${this.getVehicleFormData.id}`);
         return response.data.cities[0].id
@@ -252,7 +252,7 @@ export default defineComponent({
         this.$toast.success(`${this.payload.vehicle_documents[index].document_type} uploaded`);
       }
     },
-    async uploadTos3andGetDocumentUrl(file) {
+    async uploadTos3andGetDocumentUrl (file) {
       try {
         const formData = new FormData();
         formData.append('file', file);
@@ -266,7 +266,7 @@ export default defineComponent({
         console.log('uploading')
       }
     },
-    changeVehicleDocumentsExpiryDatesToTimeStamp() {
+    changeVehicleDocumentsExpiryDatesToTimeStamp () {
       this.payload.vehicle_documents = this.payload.vehicle_documents.map(doc => {
         if (doc.expiry_date && moment(doc.expiry_date).isValid()) {
           doc.expiry_date = moment(doc.expiry_date).format('YYYY-MM-DD HH:mm:ss');
@@ -274,7 +274,7 @@ export default defineComponent({
         return doc
       });
     },
-    removeDocumentsWithoutFiles() {
+    removeDocumentsWithoutFiles () {
       const cityDocumentsWithFiles = this.payload.city_documents.filter(doc => {
         return doc.files.length > 0;
       });
@@ -283,7 +283,7 @@ export default defineComponent({
       });
       return {city_documents: cityDocumentsWithFiles, vehicle_documents: vehicleDocumentsWithFiles};
     },
-    removeDocumentTypeItemFromCityDocuments() {
+    removeDocumentTypeItemFromCityDocuments () {
       this.payload.city_documents = this.payload.city_documents.map(doc => {
         delete doc.document_type;
         return doc;
