@@ -4,9 +4,6 @@
       <div class="dashboard-name text-xl font-medium">
         Dashboard
       </div>
-      <!-- <div class="header-buttons flex flex-row">
-        <img class="ml-2 md:ml-9" src="@/assets/images/notification-present.svg">
-      </div> -->
     </div>
     <hr class="mt-5 mb-0 hidden">
     <div class="bottom-part hidden">
