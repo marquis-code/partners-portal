@@ -75,11 +75,11 @@
             @rowClicked="viewTripDetails"
           >
             <template v-slot:driver="{ item }">
-              <span v-if="item.driver">
+              <span v-if="item.driver.id" class="text-sm text-black">
                 {{ item.driver.fname }} {{ item.driver.lname }}
               </span>
-              <span class="text-sm text-grays-black-6" v-else>
-                No driver assigned</span
+              <span v-else class="text-sm text-grays-black-6" >
+                N/A</span
               >
             </template>
 
@@ -137,8 +137,7 @@ export default defineComponent({
         { label: 'Plate No', key: 'registration_number' },
         { label: 'Type', key: 'type' },
         { label: 'Capacity', key: 'seats' },
-        { label: 'Driver', key: 'driver' },
-        { label: 'Actions', key: 'actions' }
+        { label: 'Driver', key: 'driver' }
       ],
       items: []
     };

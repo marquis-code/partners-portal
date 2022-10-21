@@ -16,15 +16,6 @@
       "
     >
       <div class="space-y-10 lg:p-8 p-7">
-        <div class="flex justify-between items-center">
-          <p class="text-sm">Vehicle Information</p>
-          <router-link
-            to="documents"
-            class="rounded-md text-green-500 text-xs ring-1 ring-green-500 p-2"
-          >
-            Upload vehicle documents
-          </router-link>
-        </div>
         <main class="flex flex-col space-y-2 justify-center items-center">
           <img src="@/assets/images/car.svg" />
           <h1 class="font-medium">
@@ -82,7 +73,7 @@
             </div>
           </div>
           <p @click="editVehicle" class="underline text-indigo-600 text-xs">
-            Change capacity
+            <!-- Change capacity -->
           </p>
         </div>
         <div class="flex justify-between items-center py-6">

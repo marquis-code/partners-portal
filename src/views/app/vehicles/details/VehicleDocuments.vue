@@ -12,11 +12,11 @@
           <span v-if="item.status==='not uploaded'" class="text-yellow-700">Not uploaded</span>
         </template>
         <template v-slot:actions="{item}">
-          <span v-if="!item.actions.docUrl"></span>
-          <span v-else>
+          <span v-if="item.actions.docUrl">
             <span @click="showImage(item.actions.docUrl)" class="text-blue-500 mr-4">View</span>
-            <span @click="goToUpdateDocumentView(item.actions.docId)" class="text-orange-500">Update</span>
+            <span @click="goToUpdateDocumentView(item.actions.docId, item)" class="text-orange-500">Update</span>
           </span>
+          <span v-else @click="goToUpdateDocumentView(0, item)" class="text-orange-500">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Update</span>
         </template>
       </app-table>
       <vue-easy-lightbox
@@ -93,7 +93,8 @@ export default defineComponent({
     onShow () {
       this.visibleRef = true;
     },
-    goToUpdateDocumentView(docId: number) {
+    goToUpdateDocumentView(docId: number, doc: any) {
+      localStorage.setItem('DOC_TO_UPDATE', doc)
       this.$router.push({
         name: 'EditVehicleDocument',
         params: {
