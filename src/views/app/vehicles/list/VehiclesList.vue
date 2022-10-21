@@ -76,7 +76,7 @@
           >
             <template v-slot:driver="{ item }">
               <span v-if="item.driver">
-                {{ item.driver.name || '' }}
+                {{ item.driver.fname }} {{ item.driver.lname }}
               </span>
               <span class="text-sm text-grays-black-6" v-else>
                 No driver assigned</span
