@@ -55,7 +55,7 @@
             <p class="text-sm text-black">{{ fileName }}</p>
             <p class="text-sm text-gray-400">{{ fileSize }} MB</p>
           </div>
-          <img src="@/assets/images/bin.svg" />
+          <!-- <img src="@/assets/images/bin.svg" /> -->
         </div>
         <div
           class="doc-info-and-delete flex flex-row justify-between items-center"
