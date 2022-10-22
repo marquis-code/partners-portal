@@ -3,7 +3,7 @@ import HomeView from "@/views/app/HomeView.vue";
 import Dashboard from "@/views/app/Dashboard.vue";
 import UserSelection from "@/views/app/OrganizationSelection.vue";
 import Vehicles from "@/views/app/vehicles/Vehicles.vue";
-import Earnings from "@/views/app/Earnings.vue";
+import Earnings from "@/views/app/earnings/Earning.vue";
 import Trips from "@/views/app/Trips.vue";
 import Settings from "@/views/app/Settings.vue";
 import {loadRouteComponent} from "@/utils/route-helper.util";
@@ -194,10 +194,22 @@ export const AppRoutes: Array<RouteRecordRaw> = [
         path: '/earnings',
         name: 'earnings',
         component: Earnings,
+        redirect: 'earnings.information',
         meta: {
           title: 'Earnings',
-          requiresAuth: false
-        }
+          requiresAuth: true,
+        },
+        children: [
+          {
+            path: '',
+            name: 'earnings.information',
+            component: loadRouteComponent('app/earnings/views/EarningInformation'),
+            meta: {
+              title: 'Earnings',
+              requiresAuth: true,
+            },
+          }
+        ]
       },
       {
         path: '/trips',

@@ -81,8 +81,14 @@
                 <template v-else>
                   <slot name="no-items">
                     <tr>
-                      <td :colspan="fields.length" class="py-3 text-center">
-                        No data available
+                      <td :colspan="fields.length" class="py-3 text-center h-[40vh] items-center">
+                        <div class="w-full flex flex-col items-center justify-center">
+                          <img class="items-center" src="@/assets/icons/no-table-data.svg"/>
+                          <p>No data available.</p>
+                        </div>
+                        <!-- <tr>
+                          <td></td>
+                        </tr> -->
                       </td>
                     </tr>
                   </slot>
