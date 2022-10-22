@@ -37,7 +37,7 @@
               cursor-pointer
             "
             active-class="text-black border-b-sh-green-500 border-b-2"
-            :to="`/drivers/details/${driverData?.id}/trips`"
+            to="#"
             >Manifest</router-link
           >
         </template>
@@ -47,7 +47,7 @@
             <div class="flex items-center space-x-2 py-3">
               <router-link
                 :to="{
-                  name: 'trips'
+                  name: 'trips.list'
                 }"
                 class="text-gray-400 text-sm hover:text-gray-900"
                 >Trips</router-link
@@ -98,25 +98,10 @@
             <div class="flex items-center justify-between pt-4">
               <div class="space-y-1">
                 <p class="text-sm font-medium">Route</p>
-                <div class="flex space-x-2">
-                  <img src="@/assets/images/location.svg" />
-                  <div class="space-y-5">
-                    <p class="font-light text-gray-400 text-sm">
-                      {{
-                        trip?.route?.destination
-                          ? trip?.route?.pickup?.slice(0, 20) + '...'
-                          : 'N/A'
-                      }}
-                    </p>
-                    <p class="font-light text-gray-400 text-sm">
-                      {{
-                        trip?.route?.destination
-                          ? trip?.route?.destination?.slice(0, 20) + '...'
-                          : 'N/A'
-                      }}
-                    </p>
-                  </div>
-                </div>
+                <trip-history
+                  :pickup="trip?.route?.pickup"
+                  :destination="trip?.route?.destination"
+                ></trip-history>
               </div>
               <p class="text-indigo-500 underline text-xs">View manifest</p>
             </div>
@@ -251,13 +236,15 @@ import Spinner from '@/components/layout/Spinner';
 import PageActionHeader from '@/components/PageActionHeader';
 import { extractErrorMessage } from '@/utils/helper';
 import Map from '@/views/app/Map.vue';
+import TripHistory from '@/components/TripHistory.vue';
 export default {
   name: 'DriverDetailsIndex',
   components: {
     PageActionHeader,
     Spinner,
     PageLayout,
-    Map
+    Map,
+    TripHistory
   },
   computed: {
     ...mapGetters({

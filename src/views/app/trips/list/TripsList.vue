@@ -70,25 +70,10 @@
             @rowClicked="viewTripDetails"
           >
             <template v-slot:route="{ item }">
-              <div class="flex space-x-2">
-                <img src="@/assets/images/location.svg" />
-                <div class="space-y-5">
-                  <p class="font-light text-gray-400 text-sm">
-                    {{
-                      item?.route?.pickup
-                        ? item?.route?.pickup?.slice(0, 20) + '...'
-                        : 'N/A'
-                    }}
-                  </p>
-                  <p class="font-light text-gray-400 text-sm">
-                    {{
-                      item?.route?.pickup
-                        ? item?.route?.destination?.slice(0, 20) + '...'
-                        : 'N/A'
-                    }}
-                  </p>
-                </div>
-              </div>
+              <trip-history
+              :pickup="item?.route?.pickup"
+              :destination="item?.route?.destination"
+              ></trip-history>
             </template>
             <template v-slot:revenue="{ item }">
               <p class="flex justify-center items-center text-center">
@@ -109,18 +94,18 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import AppTable from '@/components/AppTable.vue';
-// import DownloadButton from '@/components/DownloadButton.vue';
 import { mapGetters } from 'vuex';
-// import PageActionHeader from '@/components/PageActionHeader.vue';
 import PageLayout from '@/components/layout/PageLayout.vue';
 import OptionsDropdown from '@/components/OptionsDropdown.vue';
+import TripHistory from '@/components/TripHistory.vue';
 import moment from 'moment';
 export default defineComponent({
   name: 'DriversList',
   components: {
     PageLayout,
     // PageActionHeader,
-    AppTable
+    AppTable,
+    TripHistory
     /* DownloadButton */
   },
   created() {

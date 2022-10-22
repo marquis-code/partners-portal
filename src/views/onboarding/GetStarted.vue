@@ -40,13 +40,17 @@
 
       <main class="w-full px-7">
         <keep-alive>
-          <component
-            @companySignUpSuccessful="handleCompanyData"
-            @goBack="goBack()"
-            @kycCompleted="redirectToCitySelection"
-            :is="steps[currentStep].component"
-            :partnersFormData="partnersFormData[steps[currentStep].label]"
-          />
+          <transition name="fade" mode="out-in">
+            <div :key="currentStep">
+              <component
+                @companySignUpSuccessful="handleCompanyData"
+                @goBack="goBack()"
+                @kycCompleted="redirectToCitySelection"
+                :is="steps[currentStep].component"
+                :partnersFormData="partnersFormData[steps[currentStep].label]"
+              />
+            </div>
+          </transition>
         </keep-alive>
         <div class="flex justify-end mt-10 lg:mt-0"></div>
       </main>
@@ -71,10 +75,10 @@ export default defineComponent({
     OnboardingLayout,
     FormContainer
   },
-  created () {
+  created() {
     this.initializePageState();
   },
-  data () {
+  data() {
     return {
       currentStep: 0,
       routeType: '',
@@ -110,19 +114,19 @@ export default defineComponent({
     })
   },
   methods: {
-    next () {
+    next() {
       this.currentStep += 1;
     },
-    goBack (): void {
+    goBack(): void {
       this.currentStep = 0;
     },
-    redirectToCitySelection () {
+    redirectToCitySelection() {
       this.$router.push('/city-selection');
     },
-    handleCompanyData () {
+    handleCompanyData() {
       this.currentStep = 1;
     },
-    initializePageState () {
+    initializePageState() {
       if (this.$route.query.type === 'company' && !this.contextOrg) {
         this.currentStep = 0;
         this.routeType = 'company';
@@ -136,5 +140,14 @@ export default defineComponent({
 });
 </script>
 
-<style>
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.6s ease-in;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
 </style>
