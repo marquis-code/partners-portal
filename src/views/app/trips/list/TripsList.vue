@@ -85,9 +85,6 @@
         >
       </div>
       <div class="space-y-5 ring-1 ring-gray-50 shadow-sm rounded-sm bg-white">
-        <!--    <div class="flex items-center justify-end p-5">-->
-        <!--      <download-button></download-button>-->
-        <!--    </div>-->
         <div>
           <app-table
             :loading="loading"
@@ -96,15 +93,29 @@
             :fields="headers"
             @rowClicked="viewTripDetails"
           >
-            <template v-slot:metadata="{ item }">
-              <span v-if="item" class="font-light text-sm text-gray-type-3">
-                {{ item.fname || '' }}
-                {{ item.lname || '' }}
-              </span>
+            <template v-slot:route="{ item }">
+              <div class="flex space-x-2">
+                <img src="@/assets/images/location.svg" />
+                <div class="space-y-5">
+                  <p class="font-light text-gray-400 text-sm">
+                    {{
+                      item?.route?.pickup
+                        ? item?.route?.pickup?.slice(0, 20) + '...'
+                        : 'N/A'
+                    }}
+                  </p>
+                  <p class="font-light text-gray-400 text-sm">
+                    {{
+                      item?.route?.pickup
+                        ? item?.route?.destination?.slice(0, 20) + '...'
+                        : 'N/A'
+                    }}
+                  </p>
+                </div>
+              </div>
             </template>
-
-            <template v-slot:actions="">
-              <img src="@/assets/icons/more_options.svg" />
+            <template v-slot:revenue="{ item }">
+              <p class="flex justify-center items-center text-center">{{ item?.revenue?.cost_of_supply ? `'₦'${item?.revenue?.cost_of_supply}` : 'N/A'}}</p>
             </template>
           </app-table>
         </div>
@@ -146,13 +157,13 @@ export default defineComponent({
       errorLoading: false,
       headers: [
         { label: 'Date', key: 'createdAt' },
-        { label: 'Pickup', key: 'pickup' },
-        { label: 'Destination', key: 'dropoff' },
-        { label: 'Driver', key: 'driver' },
+        { label: 'Route', key: 'route' },
         { label: 'Route Code', key: 'routeCode' },
+        { label: 'Driver', key: 'driver' },
         { label: 'Start Time', key: 'startTime' },
         { label: 'End Time', key: 'endTime' },
-        { label: 'Passengers', key: 'passengersCount' }
+        { label: 'Passengers', key: 'passengersCount' },
+        { label: 'Expected earning', key: 'revenue' }
       ],
       items: []
     };
@@ -163,8 +174,9 @@ export default defineComponent({
     })
   },
   watch: {
-    'filters.status'() {
-      this.fetchPartnerTripsFromRevenue();
+    'filters.status'(value) {
+      this.filters.status = value;
+      // this.fetchPartnerTripsFromRevenue();
     }
   },
   methods: {
@@ -172,6 +184,7 @@ export default defineComponent({
       this.filters.status = value;
       this.fetchPartnerTripsFromRevenue();
     },
+
     async fetchPartnerTripsFromRevenue() {
       this.loading = true;
       const params = {
@@ -179,27 +192,22 @@ export default defineComponent({
         status: this.filters.status,
         metadata: true
       };
-      if (
-        params.status === 'active-trips' ||
-        params.status === 'inactive-trips'
-      ) {
-        this.$axios
-          .get(
-            `/v1/partners/${this.partnerContext.partner.id}/${params.status}?metadata=${params.metadata}`
-          )
-          .then((res) => {
-            console.log(res.data.result);
-            const trips = this.transformActiveOrUpcomingTrips(res.data.data);
-            this.tableData = trips;
-            this.totalRecords = res.data.metadata?.total;
-          })
-          .catch((err) => {
-            this.$toast.error(err.response.data.message || 'An error occured');
-          })
-          .finally(() => {
-            this.loading = false;
-          });
-      }
+      this.$axios
+        .get(
+          `/v1/partners/${this.partnerContext.partner.id}/${params.status}?metadata=${params.metadata}`
+        )
+        .then((res) => {
+          const trips = this.transformActiveOrUpcomingTrips(res.data.data);
+          this.tableData = trips;
+          this.totalRecords = res.data.metadata?.total;
+        })
+        .catch((err) => {
+          this.$toast.error(err.response.data.message || 'An error occured');
+        })
+        .finally(() => {
+          this.loading = false;
+        });
+
       if (params.status === 'completed-trips') {
         this.$axios
           .get(
@@ -207,7 +215,6 @@ export default defineComponent({
             `cost-revenue/v1/partners/${this.partnerContext.partner.id}/revenues`
           )
           .then((res) => {
-            console.log(res.data.result);
             const trips = this.transformedTrips(res.data.result);
             this.tableData = trips;
             this.totalRecords = res.data.metadata?.total;
@@ -220,10 +227,11 @@ export default defineComponent({
           });
       }
     },
-    viewTripDetails(vehicle: any) {
+    viewTripDetails(trip: any) {
+      console.log('clicked', trip);
       this.$router.push({
-        name: 'vehicle.detail.info',
-        params: { vehicleId: vehicle.id }
+        name: 'trips.detail.info',
+        params: { tripId: trip.id }
       });
     },
     getFormattedDate(date: any) {
@@ -240,23 +248,27 @@ export default defineComponent({
           routeCode: trip.metadata.routeCode,
           startTime: moment(trip.metadata.startTime).format('LT'),
           endTime: moment(trip.metadata.endTime).format('LT'),
-          passengersCount: trip.passengersCount
+          passengersCount: trip.passengersCount,
+          revenue: trip.partnersRevenue
         });
       });
       return newTrips;
     },
+
     transformActiveOrUpcomingTrips(payload: Array<any>) {
       const newTrips: any = [];
       payload.forEach((trip) => {
+        console.log(trip);
         newTrips.push({
           createdAt: moment(trip.created_at).format('LL'),
-          pickup: trip.route.pickup,
-          dropoff: trip.route.dropoff,
           driver: trip.driver.fname + ' ' + trip.driver.lname,
           routeCode: trip.route.route_code,
           startTime: moment(trip.start_trip).format('LL'),
           endTime: moment(trip.end_trip).format('LL'),
-          passengersCount: trip.passengers_count
+          passengersCount: trip.passengers_count,
+          revenue: trip.cost_of_supply,
+          id: trip.id,
+          route: trip.route
         });
       });
       return newTrips;
@@ -265,5 +277,4 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

@@ -3,8 +3,9 @@
     class="
       z-0
       w-full
-      lg:w-4/12
-      md:w-7/12
+      lg:w-7/12
+      md:w-11/12
+      xl:w-6/12
       ring-1 ring-gray-50
       rounded-md
       bg-white
@@ -49,8 +50,8 @@
             <p class="font-medium text-sm">Assigned vehicle</p>
             <p class="font-light text-xs">
               {{
-                driverData.assigned_vehicle
-                  ? driverData.assigned_vehicle
+                driverData.vehicle
+                  ?  driverData.vehicle.brand +" "+ driverData.vehicle.name
                   : 'N/A'
               }}
             </p>
@@ -65,7 +66,9 @@
             <p class="font-medium text-sm">License number</p>
             <p class="font-light text-xs">
               {{
-                driverData.license_number ? driverData.license_number : 'N/A'
+                 driverData.documents[0].registeration_number
+                  ? driverData.documents[0].registeration_number
+                  : 'N/A'
               }}
             </p>
           </div>

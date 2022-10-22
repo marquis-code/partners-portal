@@ -137,6 +137,25 @@ export const AppRoutes: Array<RouteRecordRaw> = [
             }
           },
           {
+            path: ':vehicleId/edit',
+            name: 'EditVehicle',
+            component: loadRouteComponent('app/vehicles/EditVehicle'),
+            meta: {
+              title: 'Edit Vehicle',
+              requiresAuth: true
+            }
+          },
+          {
+            path: ':vehicleId/edit/document/:documentId',
+            name: 'EditVehicleDocument',
+            props: true,
+            component: loadRouteComponent('app/vehicles/details/EditVehicleDocuments'),
+            meta: {
+              title: 'Edit Vehicle Document',
+              requiresAuth: true
+            }
+          },
+          {
             path: 'details/:vehicleId',
             component: loadRouteComponent('app/vehicles/details/VehicleDetailsIndex'),
             props: true,
@@ -176,7 +195,7 @@ export const AppRoutes: Array<RouteRecordRaw> = [
                   title: 'Vehicle Details',
                   requiresAuth: true
                 },
-              },
+              }
             ]
           },
         ]
@@ -205,6 +224,16 @@ export const AppRoutes: Array<RouteRecordRaw> = [
             component: loadRouteComponent('app/trips/list/TripsList'),
             meta: {
               title: 'Trips',
+              requiresAuth: true
+            }
+          },
+          {
+            path: 'details/:tripId',
+            component: loadRouteComponent('app/trips/details/SingleTrip'),
+            name: 'trips.detail.info',
+            props: true,
+            meta: {
+              title: 'Trip Details',
               requiresAuth: true
             }
           }

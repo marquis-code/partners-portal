@@ -6,7 +6,6 @@
         <div class="space-y-2 w-full">
           <label class="text-xs font-medium text-grays-black-5">Vehicle brand</label>
           <v-select
-            @input="console.log($event)"
             @option:selected="onCarBrandChanged($event)"
             class="form-group"
             :options="vehicleBrands"
@@ -30,7 +29,6 @@
           <label class="text-xs font-medium text-grays-black-5">Vehicle Model</label>
           <v-select
             :disabled="fetchingModels"
-            @input="console.log($event)"
             @option:selected="onCarModelChanged($event)"
             class="form-group"
             :options="vehicleModels"
@@ -96,7 +94,7 @@
         </span>
         </div>
         <div class="space-y-2 w-full">
-          <label class="text-xs font-medium text-grays-black-5">Capacity (Includes drivers seat)</label>
+          <label class="text-xs font-medium text-grays-black-5">Passenger capacity (Includes drivers seat)</label>
           <input
             type="number"
             min="2"
@@ -115,15 +113,13 @@
       </section>
       <section class="lg:flex justify-start lg:space-x-10 items-start">
         <div class="space-y-2 w-full lg:w-6/12">
-          <label class="text-xs font-medium text-grays-black-5">Cities</label>
+          <label class="text-xs font-medium text-grays-black-5">City of operation</label>
           <v-select
             :disabled="fetchingModels"
             @input="console.log($event)"
-            v-model="v$.form.city_ids.$model"
             class="form-group"
-            :reduce="(option) => option.city.id"
+            @option:selected="selectThisCity($event)"
             :options="cities"
-            :multiple="true"
             label="id"
             required>
             <template v-slot:option="model">
@@ -141,12 +137,23 @@
         </span>
         </div>
         <div class="space-y-2 w-full lg:w-6/12 pt-5 lg:pt-0">
-          <label class="text-xs font-medium text-grays-black-5">Registration Number</label>
+          <label class="text-xs font-medium text-grays-black-5 flex flex-row">
+            Plate Number
+            <span class="tooltip ml-3">
+              <img src="@/assets/icons/info.svg" class="boarder-2">
+              <span class="tooltiptext shadow-lg text-left">example: <br> ABC-123XY </span>
+            </span>
+          </label>
           <input
-            type="tel"
+            autocapitalize="characters"
+            id="plate-number"
+            type="text"
+            maxlength="9"
             v-model="v$.form.registration_number.$model"
+            @keyup="uppercase($event)"
             class=" text-xs border-none outline-none w-full rounded-md p-3 placeholder-gray-500 placeholder-opacity-25 ring-1 ring-gray-300"
-            placeholder="Enter your company's phone number"/>
+          />
+          <span class="text-sm font-light text-red-500" v-if="!validPlateNumber && form.registration_number.length > 0" >Incorrect Plate Number Format</span>
           <span class="text-sm font-light text-red-500"
             v-if="v$.form.registration_number.$dirty && v$.form.registration_number.required.$invalid">
             This field is required
@@ -188,16 +195,18 @@ export default defineComponent<any, any, any>({
   data () {
     return {
       v$: useVuelidate(),
+      validPlateNumber: false,
       form: {
         brand: '',
         name: '',
         // type: 'Sedan',
         year: '',
         seats: '',
-        city_ids: '',
+        city_ids: [],
         registration_number: '',
         partner_id: ''
       },
+      dashAdded: false,
       fetchingModels: false,
       cities: [],
       vehicleYears: [],
@@ -208,6 +217,15 @@ export default defineComponent<any, any, any>({
       loading: false,
 
     };
+  },
+  watch: {
+    "form.registration_number" () {
+      if (this.checkPlateNumberFormat(this.form.registration_number)) {
+        this.validPlateNumber = true;
+      } else {
+        this.validPlateNumber = false;
+      }
+    }
   },
   validations () {
     return {
@@ -234,11 +252,38 @@ export default defineComponent<any, any, any>({
     this.form.partner_id = this.partnerContext?.partner?.id;
   },
   methods: {
+    selectThisCity (city: any) {
+      const cityId = city.city.id
+      this.form.city_ids = [cityId]
+    },
+    uppercase ($event: any) {
+      this.form.registration_number = this.form.registration_number.toUpperCase();
+      this.getKeyStroke($event)
+    },
+    getKeyStroke ($event: any) {
+      const pressedKey = ($event.key)
+      console.log(1)
+      if (pressedKey === 'Backspace' && this.form.registration_number.length === 3) {
+        console.log('Do nothing')
+      } else if (this.form.registration_number.length === 3) {
+        this.form.registration_number += '-'
+        this.dashAdded = true
+      } else {
+        console.log(0)
+      }
+    },
+    checkPlateNumberFormat (plateNumber: string): boolean {
+      if (/^[a-zA-Z]{3}-[0-9]{3}[a-zA-Z]{2}$/gi.test(plateNumber)) {
+        return true
+      } else {
+        return false
+      }
+    },
     fetchPageData () {
       this.loading = true;
       this.vehicleYears = this.getYearsFrom('1980');
       this.cities = this.partnerContext.supportedCities;
-      this.$axios.get('/v1/vehicle-makes').then((r: AxiosResponse) => {
+      this.$axios.get('/v1/vehicle-makes?limit=1000').then((r: AxiosResponse) => {
         this.vehicleBrands = r.data.data || [];
       })
         .catch((e: any) => {
@@ -271,6 +316,10 @@ export default defineComponent<any, any, any>({
     },
     async saveForm () {
       this.v$.form.$touch();
+      if (!this.validPlateNumber) {
+        this.$toast.warning("Plate number must be in the right format");
+        return
+      }
       if (this.processing || this.v$.form.$errors.length) {
         return;
       }
@@ -301,7 +350,7 @@ export default defineComponent<any, any, any>({
         this.vehicleModels = this.vehicleModelMap.get(brandId);
       } else {
         try {
-          const vehicleModelsResponse = await this.$axios.get(`v1/vehicle-makes/${brandId}/vehicle-models`);
+          const vehicleModelsResponse = await this.$axios.get(`v1/vehicle-makes/${brandId}/vehicle-models?limit=1000`);
           this.vehicleModels = vehicleModelsResponse.data.data;
         } catch (e) {
           this.$toast.error(extractErrorMessage(e, null, 'An error occurred!'));
@@ -325,5 +374,28 @@ select {
   &:invalid, &[value=""], &[value=null] {
     color: #D3DCE6 !important;
   }
+}
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 250px;
+  background-color: white;
+  color: #667085;
+  border-radius: 6px;
+  padding: 5px;
+  padding-top: 0px;
+
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
 }
 </style>

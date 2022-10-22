@@ -10,6 +10,7 @@
       <page-action-header>
         <template #action>
           <button
+            @click="toggleDropdown"
             class="
               bg-sh-green-500
               font-medium
@@ -25,8 +26,84 @@
               w-full
             "
           >
-            Actions
+          <span>Actions</span>
+          <span class="material-icons">
+            expand_more
+          </span>
           </button>
+          <div
+              v-if="showDropdown"
+              class="
+                absolute
+                top-36
+                bottom-0
+                right-7
+                h-36
+                w-44
+                z-50
+                rounded-md
+                shadow-md
+                flex flex-col
+                bg-white
+                px-5
+              "
+            >
+              <a
+                href="#"
+                @click="editVehicle"
+                class="
+                  text-gray-500
+                  cursor-pointer
+                  hover:bg-black hover:text-white
+                  rounded-md
+                  p-2
+                  pl-2
+                  mt-3
+                "
+                >Edit</a
+              >
+              <a
+                v-if="!vehicleData.driver"
+                href="#"
+                @click="assignDriver(vehicleData)"
+                class="
+                  text-gray-500
+                  cursor-pointer
+                  hover:bg-black hover:text-white
+                  rounded-md
+                  p-2
+                  pl-2
+                "
+                >Assign Driver</a
+              >
+              <a
+                v-else
+                href="#"
+                @click="unassignDriver(vehicleData)"
+                class="
+                  text-gray-500
+                  cursor-pointer
+                  hover:bg-black hover:text-white
+                  rounded-md
+                  p-2
+                  pl-2
+                "
+                >Unassign Driver</a
+              >
+              <a
+                href="#"
+                @click="removeVehicle(vehicleData)"
+                class="
+                  text-red-500
+                  cursor-pointer
+                  hover:bg-red-500 hover:text-white
+                  rounded-md
+                  p-2
+                  pl-2
+                "
+                >Remove</a
+              >
+            </div>
         </template>
 
         <template #tabs>
@@ -93,7 +170,6 @@
 import PageLayout from '../../../../components/layout/PageLayout';
 import { mapGetters } from 'vuex';
 import Spinner from '../../../../components/layout/Spinner';
-import { extractErrorMessage } from '../../../../utils/helper';
 import PageActionHeader from '../../../../components/PageActionHeader';
 export default {
   name: 'VehicleDetailsIndex',
@@ -108,17 +184,38 @@ export default {
       isLoading: 'vehicle/getVehicleLoading'
     })
   },
-  data() {
+  data () {
     return {
-      loading: true
+      loading: true,
+      showDropdown: false
     };
   },
-  created() {
+  created () {
     this.$store
       .dispatch('vehicle/fetchVehicleInfo', this.$attrs.vehicleId)
       .finally(() => {
         this.loading = false;
       });
+  },
+  methods: {
+    toggleDropdown () {
+      this.showDropdown = !this.showDropdown;
+    },
+    editVehicle () {
+      this.$router.push({
+        name: 'EditVehicle',
+        params: { vehicleId: this.$attrs.vehicleId }
+      });
+      this.showDropdown = false;
+    },
+    assignDriver (item) {
+      console.log(item);
+      this.showDropdown = false;
+    },
+    removeVehicle (item) {
+      console.log(item);
+      this.showDropdown = false;
+    },
   }
 };
 </script>

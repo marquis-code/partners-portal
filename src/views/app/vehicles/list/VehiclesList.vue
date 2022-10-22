@@ -38,7 +38,7 @@
             cursor-pointer
           "
           :class="
-            this.filters.status === 'active'
+            filters.status === 'active'
               ? 'text-black border-b-sh-green-500'
               : 'text-sh-grey-500 border-b-transparent'
           "
@@ -57,7 +57,7 @@
             cursor-pointer
           "
           :class="
-            this.filters.status === 'inactive'
+            filters.status === 'inactive'
               ? 'text-black border-b-sh-green-500'
               : 'text-sh-grey-500 border-b-transparent'
           "
@@ -75,11 +75,11 @@
             @rowClicked="viewTripDetails"
           >
             <template v-slot:driver="{ item }">
-              <span v-if="item.driver">
-                {{ item.driver.name || '' }}
+              <span v-if="item.driver?.id" class="text-sm text-black">
+                {{ item.driver.fname }} {{ item.driver.lname }}
               </span>
-              <span class="text-sm text-grays-black-6" v-else>
-                No driver assigned</span
+              <span v-else class="text-sm text-grays-black-6" >
+                N/A</span
               >
             </template>
 
@@ -111,7 +111,6 @@ import AppTable from '@/components/AppTable.vue';
 import { mapGetters } from 'vuex';
 import PageActionHeader from '@/components/PageActionHeader.vue';
 import PageLayout from '@/components/layout/PageLayout.vue';
-import OptionsDropdown from '@/components/OptionsDropdown.vue';
 export default defineComponent({
   name: 'VehiclesList',
   components: {
@@ -119,10 +118,10 @@ export default defineComponent({
     PageActionHeader,
     AppTable
   },
-  created() {
+  created () {
     this.fetchVehicles();
   },
-  data() {
+  data () {
     return {
       filters: {
         status: 'active',
@@ -138,8 +137,7 @@ export default defineComponent({
         { label: 'Plate No', key: 'registration_number' },
         { label: 'Type', key: 'type' },
         { label: 'Capacity', key: 'seats' },
-        { label: 'Driver', key: 'driver' },
-        { label: 'Actions', key: 'actions' }
+        { label: 'Driver', key: 'driver' }
       ],
       items: []
     };
@@ -150,11 +148,11 @@ export default defineComponent({
     })
   },
   methods: {
-    setStatusFilter(value: string) {
+    setStatusFilter (value: string) {
       this.filters.status = value;
       this.fetchVehicles();
     },
-    fetchVehicles() {
+    fetchVehicles () {
       this.loading = true;
       const params = {
         related: 'driver',
@@ -162,7 +160,7 @@ export default defineComponent({
         metadata: true
       };
       this.$axios
-        .get(`/v1/partner/${this.partnerContext.partner.id}/vehicles`, {
+        .get(`/v1/partner/${this.partnerContext.partner?.id}/vehicles`, {
           params
         })
         .then((res) => {
@@ -173,10 +171,10 @@ export default defineComponent({
           this.loading = false;
         });
     },
-    viewTripDetails(vehicle: any) {
+    viewTripDetails (vehicle: any) {
       this.$router.push({
         name: 'vehicle.detail.info',
-        params: { vehicleId: vehicle.id }
+        params: { vehicleId: vehicle?.id }
       });
     }
   }

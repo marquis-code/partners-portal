@@ -52,6 +52,7 @@
         <div class="space-y-2 w-full">
           <label class="text-xs font-medium text-grays-black-5">{{ getDocumentLabel }}</label>
           <input
+            maxlength="11"
             type="text"
             v-model="v$.identityForm.document.document_id.$model"
             class="
@@ -123,7 +124,11 @@
             etc)</label
           >
 <!--          TODO: Review for a more scalable approach-->
-          <image-upload @fileSelected="selectFile($event)" @fileRemoved="removeFile()"></image-upload>
+          <image-upload
+            @fileSelected="selectFile($event)"
+            @fileRemoved="removeFile()"
+          >
+          </image-upload>
         </div>
       </section>
     </form>
@@ -205,8 +210,9 @@
          'cursor-not-allowed text-grays-black-5 bg-grays-black-7' : 'bg-sh-green-500 font-medium'"
           @click.prevent="saveAddressForm();"
         >
-          {{loading ? 'Saving' : 'Next'}}
-          <img class="ml-2" src="@/assets/images/arrow.svg" />
+          {{!loading ? 'Save' : ''}}
+          <img v-if="!loading" class="ml-2" src="@/assets/images/arrow.svg" />
+          <Spinner v-if="loading"/>
         </button>
       </div>
     </div>
@@ -222,10 +228,11 @@ import {required} from '@vuelidate/validators';
 import { extractErrorMessage } from '@/utils/helper';
 import useVuelidate from "@vuelidate/core";
 import {UserData} from "@/models/user-session.model";
+import Spinner from '@/components/layout/Spinner.vue';
 
 export default defineComponent<any, any, any>({
   name: 'KycInformation',
-  components: { Datepicker, ImageUpload },
+  components: { Datepicker, ImageUpload, Spinner },
   data () {
     return {
       v$: useVuelidate(),
@@ -260,12 +267,14 @@ export default defineComponent<any, any, any>({
         {
           key: 'nin',
           label: 'NIN',
-          desc: 'National Identification Number'
+          desc: 'National Identification Number',
+          maxLength: 11
         },
         {
           key: 'bvn',
           label: 'BVN',
-          desc: 'Bank Verification Number'
+          desc: 'Bank Verification Number',
+          maxLength: 11
         },
         /*        {
           key: 'drivers-license',
@@ -346,8 +355,7 @@ export default defineComponent<any, any, any>({
     uploadFile () {
       this.file = this.$refs.avatar.files[0];
       const reader = new FileReader();
-      reader.addEventListener('load', (fileLoadedEvent) => {
-        const avatar = fileLoadedEvent.target?.result;
+      reader.addEventListener('load', () => {
         this.uploadingAvatar = true;
       });
       reader.readAsDataURL(this.file);
@@ -384,7 +392,6 @@ export default defineComponent<any, any, any>({
         this.loading = true;
         const formData = new FormData();
         formData.append('file', this.file);
-
         const response = await this.$axios.post(`/v1/upload/identity/files`, formData);
         if (response.data?.files?.length) {
           this.addressForm.document.files = [response.data.files[0].Location];

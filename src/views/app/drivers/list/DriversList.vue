@@ -73,7 +73,6 @@
             :error-loading="errorLoading"
             :items="tableData"
             :fields="headers"
-            @rowClicked="viewDriverDetails"
           >
             <template v-slot:routes="{ item }">
               <span v-if="item.routes">
@@ -169,6 +168,65 @@
         </div>
       </div>
     </div>
+    <app-modal :modalActive="showInfoModal">
+      <div class="flex flex-col justify-center items-center py-3">
+        <img src="@/assets/images/infoCheck.svg" />
+        <div class="space-y-3 pb-16 pt-5">
+          <h1 class="text-center font-medium">Remove driver?</h1>
+          <p class="text-gray-400 text-center">
+            Are you sure you want to continue?
+          </p>
+        </div>
+        <div class="flex items-center justify-between space-x-5 w-11/12">
+          <button
+            @click="handleHideInfoModal()"
+            class="
+              text-black
+              bg-white
+              ring-1 ring-gray-500
+              rounded-md
+              p-2
+              cursor-pointer
+              w-full
+              font-medium
+            "
+          >
+            Cancel
+          </button>
+          <button
+            @click="proceed"
+            class="
+              text-white
+              bg-red-dark
+              w-full
+              rounded-md
+              p-2
+              cursor-pointer
+              font-medium
+            "
+          >
+            Remove
+          </button>
+        </div>
+      </div>
+    </app-modal>
+    <app-modal :modalActive="showSuccessModal">
+      <div class="flex flex-col justify-center items-center py-3">
+        <img src="@/assets/images/successCheck.svg" />
+        <div class="space-y-3 pb-16 pt-5">
+          <h1 class="text-center font-medium">Driver removed</h1>
+          <p class="text-gray-400 text-center">
+            You have successfully removed this driver.
+          </p>
+        </div>
+        <button
+          @click="handleHideSuccessModal()"
+          class="text-black bg-sh-green-500 rounded-md p-2 w-11/12 font-medium"
+        >
+          Dismiss
+        </button>
+      </div>
+    </app-modal>
   </page-layout>
 </template>
 
@@ -178,13 +236,16 @@ import AppTable from '@/components/AppTable.vue';
 import { mapGetters } from 'vuex';
 import PageActionHeader from '@/components/PageActionHeader.vue';
 import PageLayout from '@/components/layout/PageLayout.vue';
+import AppModal from '@/components/Modals/AppModal.vue';
+import { extractErrorMessage } from '@/utils/helper';
 import OptionsDropdown from '@/components/OptionsDropdown.vue';
 export default defineComponent({
   name: 'DriversList',
   components: {
     PageLayout,
     PageActionHeader,
-    AppTable
+    AppTable,
+    AppModal
   },
   created() {
     this.fetchDrivers();
@@ -198,9 +259,12 @@ export default defineComponent({
         status: 'active',
         search: ''
       },
+      showInfoModal: false,
+      showSuccessModal: false,
       selectedDriverId: null,
       showDropdown: false,
       loading: false,
+      modalLoading: false,
       tableData: [],
       totalRecords: null,
       errorLoading: false,
@@ -220,18 +284,43 @@ export default defineComponent({
       userSessionData: 'auth/userSessionData'
     })
   },
+  mounted() {
+    console.log(this.partnerContext);
+  },
   methods: {
+    async proceed() {
+      this.modalLoading = true;
+      console.log('proceeding....', this.selectedDriverId);
+      await this.$axios
+        .delete(
+          `/v1/partners/${this.partnerContext.partner.id}/drivers/${this.selectedDriverId}`
+        )
+        .then((res) => {
+          console.log(res);
+          this.modalLoading = false;
+          this.handleHideInfoModal();
+          this.handleShowSuccessModal();
+          this.fetchDrivers();
+        })
+        .catch((err) => {
+          const errorMessage = extractErrorMessage(
+            err,
+            null,
+            'Oops! An error occurred, please try again.'
+          );
+          this.$toast.error(errorMessage);
+        })
+        .finally(() => {
+          this.modalLoading = false;
+          this.handleHideInfoModal();
+        });
+    },
     setStatusFilter(value: string) {
       this.filters.status = value;
       this.fetchDrivers();
     },
     fetchDrivers() {
       this.loading = true;
-      // const params = {
-      //   related: 'driver',
-      //   status: this.filters.status,
-      //   metadata: true
-      // };
       this.$axios
         .get(
           `/v1/partners/${this.userSessionData.activeContext.partner.account_sid}/drivers`
@@ -244,12 +333,6 @@ export default defineComponent({
           this.loading = false;
         });
     },
-    // viewDriverDetails(driver: any) {
-    //   this.$router.push({
-    //     name: 'driver.detail.info',
-    //     params: { driverId: driver.id }
-    //   });
-    // },
     handleDriver(eachDriver: any) {
       this.showDropdown = !this.showDropdown;
       this.selectedDriverId = eachDriver.id;
@@ -283,10 +366,21 @@ export default defineComponent({
       });
       return newTableData;
     },
-    async removeDriver() {
-      // const response = await this.$axios.delete(
-      //   `/v1/partner/${this.selectedDriverId}/vehicle_drivers`
-      // )
+    removeDriver() {
+      this.handleShowInfoModal();
+      this.showDropdown = false;
+    },
+    handleShowInfoModal() {
+      this.showInfoModal = true;
+    },
+    handleShowSuccessModal() {
+      this.showSuccessModal = true;
+    },
+    handleHideInfoModal() {
+      this.showInfoModal = false;
+    },
+    handleHideSuccessModal() {
+      this.showSuccessModal = false;
     }
   }
 });
