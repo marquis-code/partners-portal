@@ -1,6 +1,56 @@
 <template>
   <page-layout page-title="Dashboard">
     <div>
+      <div class="flex space-x-2 lg:space-x-3 items-center">
+        <div
+          v-if="step !== 0"
+          class="flex items-center space-x-1"
+          :class="
+            step === 0 ? 'text-grays-black-2' : 'text-grays-black-6'
+          "
+        >
+          <span
+            class="text-white rounded-full w-5 text-center text-xs"
+            :class="step === 0 ? 'bg-grays-black-2' : 'bg-grays-black-7'"
+            >1</span
+          >
+          <p class="lg:text-base text-sm">Document upload</p>
+        </div>
+        <p
+          v-if="step !== 0"
+          class="h-0.5 w-6 lg:w-20 bg-gray-500"
+        ></p>
+        <div
+          v-if="step === 0 || 1"
+          class="flex items-center space-x-1"
+          :class="
+            step === 1 ? 'text-grays-black-2' : 'text-grays-black-6'
+          "
+        >
+          <span
+            class="text-white rounded-full w-5 text-center text-xs"
+            :class="step === 1 ? 'bg-grays-black-2' : 'bg-grays-black-7'"
+          >
+            {{ step === 2 ? 2 : 1 }}</span
+          >
+          <p class="lg:text-base text-sm">Shareholders</p>
+        </div>
+        <div
+          v-if="step === 3"
+          class="flex items-center space-x-1"
+          :class="
+            step === 3 ? 'text-grays-black-2' : 'text-grays-black-6'
+          "
+        >
+          <span
+            class="text-white rounded-full w-5 text-center text-xs"
+            :class="step === 3 ? 'bg-grays-black-2' : 'bg-grays-black-7'"
+          >
+            {{ step === 3 ? 2 : 1 }}</span
+          >
+          <p class="lg:text-base text-sm">Shareholders</p>
+        </div>
+      </div>
       <div v-if="step === 1" class="h-full p-10 bg-white">
         <div class="mt-2">
           <div class="flex flex-row">
