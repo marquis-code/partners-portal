@@ -66,7 +66,7 @@
             :loading="loading"
             :error-loading="errorLoading"
             :items="tableData"
-            :fields="headers"
+            :fields="filters.status === 'completed-trips' ? completedTripsHeaders : activeAndUpcomingTripsHeaders"
             @rowClicked="viewTripDetails"
           >
             <template v-slot:route="{ item }">
@@ -91,7 +91,13 @@
               </div>
             </template>
             <template v-slot:revenue="{ item }">
-              <p class="flex justify-center items-center text-center">{{ item?.revenue?.cost_of_supply ? `'₦'${item?.revenue?.cost_of_supply}` : 'N/A'}}</p>
+              <p class="flex justify-center items-center text-center">
+                {{
+                  item?.revenue?.cost_of_supply
+                    ? `'₦'${item?.revenue?.cost_of_supply}`
+                    : 'N/A'
+                }}
+              </p>
             </template>
           </app-table>
         </div>
@@ -124,14 +130,14 @@ export default defineComponent({
     return {
       result: [],
       filters: {
-        status: 'active-trips',
-        search: ''
+        status: 'active-trips' as string,
+        search: '' as string
       },
       loading: false,
       tableData: [] as Array<any>,
       totalRecords: null,
       errorLoading: false,
-      headers: [
+      activeAndUpcomingTripsHeaders: [
         { label: 'Date', key: 'createdAt' },
         { label: 'Route', key: 'route' },
         { label: 'Route Code', key: 'routeCode' },
@@ -140,7 +146,18 @@ export default defineComponent({
         { label: 'End Time', key: 'endTime' },
         { label: 'Passengers', key: 'passengersCount' },
         { label: 'Expected earning', key: 'revenue' }
-      ],
+      ] as Array<any>,
+
+      completedTripsHeaders: [
+        { label: 'Date', key: 'createdAt' },
+        { label: 'Route', key: 'route' },
+        { label: 'Route Code', key: 'routeCode' },
+        { label: 'Driver', key: 'driver' },
+        { label: 'Start Time', key: 'startTime' },
+        { label: 'End Time', key: 'endTime' },
+        { label: 'Passengers', key: 'passengersCount' },
+        { label: 'Revenue', key: 'revenue' }
+      ] as Array<any>,
       items: []
     };
   },
@@ -148,6 +165,12 @@ export default defineComponent({
     ...mapGetters({
       partnerContext: 'auth/activeContext'
     })
+    // tableHeaders () {
+    //   const statusValue = this.filters.status;
+    //   return statusValue === 'active-trips' || statusValue === 'upcoming-trips'
+    //     ? this.activeAndUpcomingTripsHeaders
+    //     : this.completedTripsHeaders;
+    // }
   },
   watch: {
     'filters.status'(value) {
