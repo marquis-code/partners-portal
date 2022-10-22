@@ -170,6 +170,7 @@
           :class="v$.form.$invalid || processing ?
           'cursor-not-allowed text-grays-black-5 bg-grays-black-7' : 'bg-sh-green-500 font-medium'">
           {{ processing ? 'Saving' : 'Next' }}
+           <spinner v-if="processing"></spinner>
           <img v-if="!processing" class="ml-2" src="@/assets/images/arrow.svg" />
         </button>
       </div>

@@ -20,6 +20,7 @@
           class="h-14 w-14 rounded-full object-cover"
           :src="profilePreview"
         />
+        <spinner v-if="uploadingProfile"></spinner>
         <img
           v-if="!profilePreview && !uploadingProfile"
           class="h-16 w-16"
@@ -349,7 +350,8 @@
               "
             >
               {{ processing ? 'Saving' : 'Submit' }}
-              <img class="ml-2" src="@/assets/images/arrow.svg" />
+              <spinner v-if="processing"></spinner>
+              <img v-if="!processing" class="ml-2" src="@/assets/images/arrow.svg" />
             </button>
           </div>
         </form>
@@ -385,6 +387,7 @@ import { mapGetters } from 'vuex';
 import { extractErrorMessage } from '@/utils/helper';
 import { format } from 'date-fns';
 import PageLayout from '@/components/layout/PageLayout.vue';
+import Spinner from '@/components/layout/Spinner.vue';
 import PageActionHeader from '@/components/PageActionHeader.vue';
 import AppModal from '@/components/Modals/AppModal.vue';
 
@@ -395,7 +398,8 @@ export default defineComponent({
     ImageUpload,
     PageLayout,
     PageActionHeader,
-    AppModal
+    AppModal,
+    Spinner
   },
   data() {
     return {
