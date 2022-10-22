@@ -1,29 +1,5 @@
 <template>
   <page-layout page-title="Trips">
-    <!-- <template #actionsPane>
-      <page-action-header>
-        <template #action>
-          <router-link
-            to="drivers/add-driver"
-            class="
-              bg-sh-green-500
-              font-medium
-              border-none
-              outline-none
-              px-4
-              py-2
-              rounded-md
-              text-sm
-              flex
-              justify-center
-              items-center
-              w-full
-            "
-            >Add Drivers</router-link
-          >
-        </template>
-      </page-action-header>
-    </template> -->
     <div>
       <div class="flex items-center pb-2">
         <span
@@ -176,7 +152,6 @@ export default defineComponent({
   watch: {
     'filters.status'(value) {
       this.filters.status = value;
-      // this.fetchPartnerTripsFromRevenue();
     }
   },
   methods: {
@@ -211,7 +186,6 @@ export default defineComponent({
       if (params.status === 'completed-trips') {
         this.$axios
           .get(
-            // `/v1/partners/${this.partnerContext.partner.id}/${params.status}?metadata=${params.metadata}`
             `cost-revenue/v1/partners/${this.partnerContext.partner.id}/revenues`
           )
           .then((res) => {
@@ -228,7 +202,6 @@ export default defineComponent({
       }
     },
     viewTripDetails(trip: any) {
-      console.log('clicked', trip);
       this.$router.push({
         name: 'trips.detail.info',
         params: { tripId: trip.id }
@@ -258,13 +231,12 @@ export default defineComponent({
     transformActiveOrUpcomingTrips(payload: Array<any>) {
       const newTrips: any = [];
       payload.forEach((trip) => {
-        console.log(trip);
         newTrips.push({
           createdAt: moment(trip.created_at).format('LL'),
           driver: trip.driver.fname + ' ' + trip.driver.lname,
           routeCode: trip.route.route_code,
-          startTime: moment(trip.start_trip).format('LL'),
-          endTime: moment(trip.end_trip).format('LL'),
+          startTime: moment(trip.start_trip).format('h:mm a'),
+          endTime: moment(trip.end_trip).format('h:mm a'),
           passengersCount: trip.passengers_count,
           revenue: trip.cost_of_supply,
           id: trip.id,
