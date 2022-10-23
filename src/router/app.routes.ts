@@ -253,6 +253,16 @@ export const AppRoutes: Array<RouteRecordRaw> = [
               title: 'Trip Details',
               requiresAuth: true
             }
+          },
+          {
+            path: 'details/mainfest/:tripId',
+            component: loadRouteComponent('app/trips/details/TripManifest'),
+            name: 'trips.manifest.info',
+            props: true,
+            meta: {
+              title: 'Trip Details',
+              requiresAuth: true
+            }
           }
         ]
       },

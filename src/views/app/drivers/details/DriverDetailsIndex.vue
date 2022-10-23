@@ -19,6 +19,7 @@
           >
             Drivers information</router-link
           >
+
           <router-link
             class="
               text-sm
@@ -171,9 +172,6 @@
               {{ item.seats }} Seaters - {{ item.brand }} {{ item.name }} -
               {{ item.registration_number }}
             </template>
-            <!-- <template v-slot:selected-option="item">
-              {{ item.driver.fname }} {{ item.driver.lname }}
-            </template> -->
           </v-select>
         </div>
         <div

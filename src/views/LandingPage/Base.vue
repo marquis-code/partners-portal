@@ -38,10 +38,10 @@
           </carousel>
         </div>
       </section>
-      <router-view v-slot="{Component}">
-         <transition name="fade" mode="out-in">
-             <Component :is="Component" />
-         </transition>
+      <router-view v-slot="{ Component }">
+        <transition name="fade" mode="out-in">
+          <Component :is="Component" />
+        </transition>
       </router-view>
     </div>
   </section>
@@ -104,13 +104,13 @@ export default defineComponent({
   }
 }
 
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0
-}
-
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.5s ease-out;
+  transition: opacity 0.4s ease-out;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>

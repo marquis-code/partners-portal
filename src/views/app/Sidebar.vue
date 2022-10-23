@@ -109,7 +109,17 @@
 
     <div
       @click="logout"
-      class="flex flex-row justify-between items-center py-2 cursor-pointer space-x-3 rounded-xl bg-green-200 w-10/12"
+      class="
+        flex flex-row
+        justify-between
+        items-center
+        py-2
+        cursor-pointer
+        space-x-3
+        rounded-xl
+        bg-green-200
+        w-10/12
+      "
       :class="isSidebarFolded ? 'p-1' : 'px-3 '"
     >
       <div class="flex flex-row items-center">
@@ -148,7 +158,7 @@ export default defineComponent({
           ]
         },
         {
-          sectionTitle: 'SYSTEM',
+          // sectionTitle: 'SYSTEM',
           menus: [
             // {title: 'Settings', icon: 'settings', selected: false}
           ]

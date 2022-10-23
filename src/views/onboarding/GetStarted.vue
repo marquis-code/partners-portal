@@ -40,17 +40,15 @@
 
       <main class="w-full px-7">
         <keep-alive>
-          <transition name="fade" mode="out-in">
-            <div :key="currentStep">
-              <component
-                @companySignUpSuccessful="handleCompanyData"
-                @goBack="goBack()"
-                @kycCompleted="redirectToCitySelection"
-                :is="steps[currentStep].component"
-                :partnersFormData="partnersFormData[steps[currentStep].label]"
-              />
-            </div>
-          </transition>
+          <div :key="currentStep">
+            <component
+              @companySignUpSuccessful="handleCompanyData"
+              @goBack="goBack()"
+              @kycCompleted="redirectToCitySelection"
+              :is="steps[currentStep].component"
+              :partnersFormData="partnersFormData[steps[currentStep].label]"
+            />
+          </div>
         </keep-alive>
         <div class="flex justify-end mt-10 lg:mt-0"></div>
       </main>
@@ -141,13 +139,4 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.6s ease-in;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
 </style>
