@@ -1,10 +1,14 @@
 <template>
   <div class="w-full">
-    <Notification
-      type="action"
-      message="You have documents left to upload"
-      actionRequired="true"
-    />
+    <Transition>
+      <Notification
+        v-if="haspendingDocuments"
+        type="action"
+        message="You have documents left to upload"
+        actionRequired="true"
+        @click="viewVehicleDocuments"
+      />
+    </Transition>
     <section
       class="
         lg:w-4/12
@@ -257,10 +261,12 @@ export default defineComponent({
       selectedDriverId: null,
       vehiclePartnersDrivers: [],
       fetchingVehiclePartnersDriver: false,
+      haspendingDocuments: false
     };
   },
   computed: {
     ...mapGetters({
+      partnerContext: 'auth/activeContext',
       vehicleData: 'vehicle/getVehicleData',
       isLoading: 'vehicle/getVehicleLoading',
       userSessionData: 'auth/userSessionData'
@@ -268,6 +274,7 @@ export default defineComponent({
   },
   created () {
     this.fetchVehiclePartnerDrivers();
+    this.checkIfVehicleHasPendingDocuments();
   },
   mounted() {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -278,6 +285,27 @@ export default defineComponent({
     });
   },
   methods: {
+    viewVehicleDocuments () {
+      this.$router.push({
+        name: 'vehicle.detail.documents'
+      })
+    },
+    checkIfVehicleHasPendingDocuments() {
+      this.$axios
+        .get(
+          `v1/partners/${this.partnerContext.partner.id}/vehicle/${this.vehicleData.id}/vehicle-documents`
+        )
+        .then((r) => {
+          const vehicleDocuments: any[] = r.data.vehicleDocuments || [];
+          for (let index = 0; index < vehicleDocuments.length; index++) {
+            const element = vehicleDocuments[index];
+            if (element.documents === null) {
+              this.haspendingDocuments = true;
+              return 0
+            }
+          }
+        })
+    },
     nextAssignStep () {
       this.assignStep += 1;
     },
@@ -393,4 +421,13 @@ export default defineComponent({
 </script>
 
 <style>
+.v-enter-active,
+.v-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
+}
 </style>

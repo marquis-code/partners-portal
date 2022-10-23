@@ -127,8 +127,6 @@ export default defineComponent({
         partner_id: null,
         files: '',
         document_type: '',
-        verified_at: null,
-        verified_by: null,
         status: '',
         document_slug: '',
         vehicle_id: null,
@@ -177,13 +175,12 @@ export default defineComponent({
       // open the modal
       this.showDocumentUpdateModal = true;
       // initialize the docs to update
+      console.log(doc);
       const mainDoc = doc.documents?.[0];
       this.docToUpdate.id = mainDoc.id;
       this.docToUpdate.partner_id = mainDoc.partner_id;
       this.docToUpdate.files = mainDoc.files[0];
       this.docToUpdate.document_type = mainDoc.document_type
-      this.docToUpdate.verified_at = mainDoc.verified_at
-      this.docToUpdate.verified_by = mainDoc.verified_by
       this.docToUpdate.status = mainDoc.status
       this.docToUpdate.document_slug = mainDoc.document_slug
       this.docToUpdate.vehicle_id = mainDoc.vehicle_id
@@ -194,8 +191,6 @@ export default defineComponent({
         partner_id: this.docToUpdate.partner_id,
         files: [this.docToUpdate.files],
         document_type: this.docToUpdate.document_type,
-        verified_at: new Date().toISOString(),
-        verified_by: 'admin',
         status: this.docToUpdate.status,
         document_slug: this.docToUpdate.document_slug,
         vehicle_id: this.docToUpdate.vehicle_id,
