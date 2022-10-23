@@ -530,7 +530,6 @@ export default defineComponent({
       this.form.email = this.userSessionData.user.email;
     },
     handleFileRemoval () {
-      this.form.files = [];
       this.isUploaded = false;
     },
     openModal () {
@@ -589,7 +588,6 @@ export default defineComponent({
       const imageDbUrl = (await this.uploadTos3andGetDocumentUrl(
         selectedImage
       )) as string;
-      // this.form.files.push(imageDbUrl);
     },
     async handleProfileUpload (e: any) {
       const selectedProfile = e.target.files[0];

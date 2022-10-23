@@ -179,7 +179,6 @@ export default defineComponent({
       this.form.company_type = this.userSessionData.associatedOrganizations[0].partner.company_type;
     },
     handleFileRemoval () {
-      this.form.files = [];
       this.isUploaded = false;
     },
     openModal () {
@@ -220,14 +219,12 @@ export default defineComponent({
       const imageDbUrl = (await this.uploadTos3andGetDocumentUrl(
         selectedImage
       )) as string;
-      // this.form.files.push(imageDbUrl);
     },
     async handleProfileUpload (e: any) {
       const selectedProfile = e.target.files[0];
       this.uploadingProfile = true;
       await this.uploadTos3andGetDocumentUrl(selectedProfile)
         .then((res) => {
-          this.form.avatar = res;
           this.profilePreview = URL.createObjectURL(selectedProfile);
           this.$toast.success('Profile picture was uploaded successfully');
         })
