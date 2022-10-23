@@ -568,7 +568,7 @@ export default defineComponent({
         name: '',
         share_amount: 0
       });
-    }
+    },
   }
 });
 </script>

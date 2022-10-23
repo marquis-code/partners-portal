@@ -175,7 +175,6 @@ export default defineComponent({
       // open the modal
       this.showDocumentUpdateModal = true;
       // initialize the docs to update
-      console.log(doc);
       const mainDoc = doc.documents?.[0];
       this.docToUpdate.id = mainDoc.id;
       this.docToUpdate.partner_id = mainDoc.partner_id;
@@ -196,7 +195,6 @@ export default defineComponent({
         vehicle_id: this.docToUpdate.vehicle_id,
         expiry_date: this.docToUpdate.expiry_date
       }
-      console.log(payload)
       this.savingForm = true;
       try {
         await this.$axios.patch(
@@ -204,7 +202,8 @@ export default defineComponent({
           {...payload}
         );
         this.$toast.success(`${this.docToUpdate.document_type} updated`);
-        this.$router.go(0);
+        this.showDocumentUpdateModal = false;
+        this.fetchAllDocuments();
       } catch (error) {
         this.$toast.warning('Unable to update this document, Please try again');
       } finally {
@@ -230,8 +229,6 @@ export default defineComponent({
         this.$toast.warning(
           'An error occured while uploading your file, please try again'
         );
-      } finally {
-        console.log('uploading');
       }
     },
     async selectThisNewDocument($event: any) {
@@ -318,7 +315,6 @@ export default defineComponent({
     structureDocumentTable(documentResponseResponse: Array<any>): [] {
       const newDocumentsList: any = [];
       documentResponseResponse.forEach((doc) => {
-        console.log(doc)
         const docProp = doc?.documents?.[0] || {};
         newDocumentsList.push({
           type: doc.document_type,
