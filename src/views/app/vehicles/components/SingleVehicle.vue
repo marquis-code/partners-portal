@@ -135,6 +135,7 @@
             Assign Driver
           </button>
         </div>
+        <Transition>
         <div v-if="assignStep === 1" class="pb-5 px-5 text-center">
           <img src="@/assets/icons/question.svg" class="mx-auto mb-7" />
           <p class="mb-2 font-bold font-lg">Assign driver?</p>
@@ -160,6 +161,7 @@
             </button>
           </div>
         </div>
+        </Transition>
         <div v-if="assignStep === 2" class="pb-5 px-5 text-center">
           <img src="@/assets/icons/success.svg" class="mx-auto mb-7" />
           <p class="mb-2 font-bold font-lg">Driver assigned successfully</p>
@@ -280,8 +282,17 @@ export default defineComponent({
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     emitter.on("vehicles:assign-driver", () => {
-      console.log("Heere")
       this.showAssignDriverModal();
+    });
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    emitter.on("vehicles:unassign-driver", () => {
+      this.showUnassignDriverModal();
+    });
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    emitter.on("vehicles:edit-vehicle", () => {
+      this.editVehicle();
     });
   },
   methods: {

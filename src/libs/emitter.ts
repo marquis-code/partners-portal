@@ -1,7 +1,9 @@
 import mitt from 'mitt'
 
 type Events = {
-  "drivers:assign-driver": string;
+  "vehicles:assign-driver": string;
+  "vehicles:unassign-driver": string;
+  "vehicles:edit-vehicle": string;
   "drivers:edit-driver": string;
 };
 

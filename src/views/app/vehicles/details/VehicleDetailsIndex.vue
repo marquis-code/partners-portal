@@ -203,14 +203,15 @@ export default {
       this.showDropdown = !this.showDropdown;
     },
     editVehicle () {
-      this.$router.push({
-        name: 'EditVehicle',
-        params: { vehicleId: this.$attrs.vehicleId }
-      });
+      emitter.emit("vehicles:edit-vehicle");
       this.showDropdown = false;
     },
     assignDriver (item) {
       emitter.emit("vehicles:assign-driver", item?.id);
+      this.showDropdown = false;
+    },
+    unassignDriver (item) {
+      emitter.emit("vehicles:unassign-driver", item?.id);
       this.showDropdown = false;
     },
     removeVehicle (item) {
