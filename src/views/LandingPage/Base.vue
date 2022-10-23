@@ -38,7 +38,11 @@
           </carousel>
         </div>
       </section>
-      <router-view />
+      <router-view v-slot="{ Component }">
+        <transition name="fade" mode="out-in">
+          <Component :is="Component" />
+        </transition>
+      </router-view>
     </div>
   </section>
 </template>
@@ -98,5 +102,15 @@ export default defineComponent({
       }
     }
   }
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.4s ease-out;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>

@@ -21,7 +21,7 @@
               cursor-pointer
             "
             active-class="text-black border-b-sh-green-500 border-b-2"
-            to="information"
+            to="#"
           >
             Trip information</router-link
           >
@@ -37,7 +37,7 @@
               cursor-pointer
             "
             active-class="text-black border-b-sh-green-500 border-b-2"
-            to="#"
+            :to="{name:'trips.manifest.info', params: {trip : trip.id}}"
             >Manifest</router-link
           >
         </template>
@@ -232,7 +232,6 @@
 import PageLayout from '@/components/layout/PageLayout';
 import { mapGetters } from 'vuex';
 import Spinner from '@/components/layout/Spinner';
-// import { extractErrorMessage } from '../../../../utils/helper';
 import PageActionHeader from '@/components/PageActionHeader';
 import { extractErrorMessage } from '@/utils/helper';
 import Map from '@/views/app/Map.vue';
@@ -266,6 +265,7 @@ export default {
       await this.$axios
         .get(`/v1/trips/${this.$route.params.tripId}`)
         .then((res) => {
+          console.log(res.data);
           this.trip = res.data;
         })
         .catch((err) => {
