@@ -158,9 +158,9 @@ export default defineComponent({
           ]
         },
         {
-          // sectionTitle: 'SYSTEM',
+          sectionTitle: 'SYSTEM',
           menus: [
-            // {title: 'Settings', icon: 'settings', selected: false}
+            {title: 'Settings', icon: 'settings', selected: false}
           ]
         }
       ]

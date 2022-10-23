@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full py-2 bg-white h-16 border-t border-t-grays-black-700">
+  <div class="w-full pt-2 bg-white border-t border-t-grays-black-700">
     <div class="flex justify-between items-end">
       <div>
         <slot name="tabs"></slot>

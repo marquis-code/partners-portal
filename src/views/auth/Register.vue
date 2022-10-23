@@ -4,7 +4,7 @@
     <div class="relative px-6 mt-20 py-3 pb-6 text-dark-type-4 max-w-xl lg:max-w-2xl mx-auto  z-10 bg-white rounded-lg " style="margin-top: 80px">
       <div class>
         <div class="text-sh-grey-900 font-bold text-lg lg:text-2xl text-center">
-          Vehicle Partner Sign up
+         Create a Shuttlers Account
         </div>
       </div>
       <div class="mt-2">
@@ -154,40 +154,6 @@
             </div>
           </div>
         </div>
-
-        <div class="mt-6">
-          <label class="text-xs font-medium" for="city">Your City</label>
-          <div class="mt-2">
-            <select
-              class="
-              w-full
-              h-12
-              px-3
-              py-4
-              text-xs
-              font-medium
-              outline-none
-              placeholder-label-type-1
-              rounded-lg
-              border border-solid border-gray-type-9
-              focus:outline-none
-            "
-              v-model="form.city_id"
-              name="city"
-              id="city"
-            >
-              <option :value="s.city.id" v-for="s in cities" :key="s.id">
-                {{ s.city.name }}
-              </option>
-            </select>
-            <div
-              class="text-xs text-red-400"
-              v-if="v$.form.city_id.required.$invalid && v$.form.city_id.$error"
-            >
-              Please select a city
-            </div>
-          </div>
-        </div>
         <div class="mt-6">
           <label class="text-xs font-medium" for="password-register"
           >Password</label
@@ -304,8 +270,6 @@ export default defineComponent({
         lname: "",
         phone: "",
         password: "",
-        city: null,
-        city_id: null,
       },
       errorMessage: "",
       captchaInitialized: false,
@@ -349,9 +313,6 @@ export default defineComponent({
           required,
           validName,
         },
-        city_id: {
-          required,
-        },
         phone: {
           required,
           phoneNumber,
@@ -363,9 +324,6 @@ export default defineComponent({
         },
       }
     }
-  },
-  created () {
-    this.fetchCities();
   },
   async mounted () {
     try {
@@ -384,17 +342,6 @@ export default defineComponent({
     }
   },
   methods: {
-    fetchCities () {
-      this.loadingData = true;
-      this.$axios.get('/v1/city').then(res => {
-        this.cities = res.data.data;
-        if (this.cities.length) {
-          this.form.city_id = (this.cities[0] as any).city.id;
-        }
-      }).finally(() => {
-        this.loadingData = false;
-      });
-    },
     async getCaptchaToken () {
       if (hasRecaptchaKey()) {
         try {
@@ -429,7 +376,6 @@ export default defineComponent({
       this.processing = true;
       this.errorMessage = '';
       const payload = { ...this.form };
-      console.log({payload});
       try {
         // const captchaResponse: any = await this.verifyCaptcha();
         // if (captchaResponse.data.success) {
