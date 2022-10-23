@@ -1,5 +1,4 @@
 <template>
-  <!-- <main class="container mx-auto h-screen w-screen flex justify-center flex-col items-center space-y-3"> -->
   <form class="space-y-5 ">
     <div class="flex flex-col space-y-5">
       <div class="flex flex-col space-y-2">
@@ -18,11 +17,11 @@
           Invalid email</span>
       </div>
 
-      <div class="flex flex-col space-y-2 mt-6">
+      <div class="flex flex-col space-y-2 mt-6 relative">
         <label class="text-grays-black-5 font-medium text-sm">Password</label>
         <input
           v-model="v$.form.password.$model"
-          type="password"
+          :type="showPassword ? 'text' : 'password'"
           :class="v$.form.password.$dirty && v$.form.password.$error? 'ring-red-500': 'ring-sh-grey-300'"
           class="py-3 px-5 border-none placeholder:text-grays-black-7
            outline-none ring-1 text-sm rounded-md placeholder-opacity-50"
@@ -31,21 +30,23 @@
         <span
           class="text-sm font-light text-red-500"
           v-if="v$.form.password.$dirty && v$.form.password.$error">Invalid password</span>
+
+           <span @click="toggleShow" class="absolute top-7 right-3 cursor-pointer text-sm font-medium" :class="[showPassword ? 'text-green-500' : 'text-red-500']">{{showPassword ? "Hide" : "Show"}}</span>
       </div>
 
       <div class="flex justify-end mt-4">
         <a :href="forgotPasswordLink" class="text-grays-black-3 text-end text-xs font-medium">Forgot Password ?</a>
       </div>
-
       <button
-        @click="submitForm()"
-        type="button"
-        :disabled="v$.form.email.$invalid || v$.form.password.$invalid || processing"
-        :class="v$.form.password.$invalid || v$.form.email.$invalid || processing ?
-         'cursor-not-allowed text-grays-black-5 bg-grays-black-7' : 'bg-sh-green-500 font-medium'"
-        class=" border-none outline-none py-3 rounded-md text-sm flex justify-center items-center w-full mt-8">
-        Login
-        <img class="ml-2" src="@/assets/images/arrow.svg" />
+      :class="v$.form.password.$invalid || v$.form.email.$invalid || processing ?
+      'cursor-not-allowed text-grays-black-5 bg-grays-black-7' : 'bg-sh-green-500 font-medium'"
+      @click="submitForm()"
+      type="button"
+      :disabled="v$.form.email.$invalid || v$.form.password.$invalid || processing"
+      class="flex justify-center items-center w-full p-3 rounded-md border-none outline-none text-sm mt-8">
+         {{processing ? 'Loading' : 'Login'}}
+        <spinner v-if="processing" class="w-5 ml-2 mx-0"></spinner>
+        <img v-if="!processing" class="ml-2" src="@/assets/images/arrow.svg" />
       </button>
 
       <div class="flex justify-center items-center space-x-2 text-sm md:text-base font-medium">
@@ -65,10 +66,12 @@ import LoginMixin from "@/mixins/LoginMixin";
 import {LoginResponse} from "@/models/login-response.model";
 import {AxiosResponse} from "axios";
 import {extractErrorMessage} from "@/utils/helper";
+import Spinner from '@/components/layout/Spinner.vue';
 // import useVuelidate from "@vuelidate/core";
 
 export default defineComponent({
   name: 'EmailLogin',
+  components: {Spinner},
   // setup: () => ({ v$: useVuelidate() }),
   mixins: [LoginMixin],
   emits: ['goToSignUp'],
@@ -78,6 +81,7 @@ export default defineComponent({
         email: '',
         password: ''
       },
+      showPassword: false,
       processing: false
     };
   },
@@ -90,6 +94,9 @@ export default defineComponent({
     };
   },
   methods: {
+    toggleShow() {
+      this.showPassword = !this.showPassword;
+    },
     ...mapActions('auth', ['setSessionData']),
     async submitForm () {
       this.v$.form.$touch();
