@@ -1,7 +1,7 @@
 <template>
   <div class="bg-gray-50 w-full min-h-screen">
     <div>
-      <div class="w-full px-3 md:px-7 py-2 bg-white">
+      <div class="w-full px-3 md:px-7 pt-2 bg-white">
         <div class="top-part flex flex-row justify-between items-center py-3">
           <div class="dashboard-name text-xl font-medium">
             {{ pageTitle }}

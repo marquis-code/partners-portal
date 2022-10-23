@@ -279,6 +279,15 @@ export const AppRoutes: Array<RouteRecordRaw> = [
           {
             path: '',
             name: 'settings.edit.partner',
+            component: loadRouteComponent('app/settings/EditPartnerInfo'),
+            meta: {
+              title: 'Edit Partner Information',
+              requiresAuth: true
+            }
+          },
+          {
+            path: 'company',
+            name: 'settings.edit.partner.company',
             component: loadRouteComponent('app/settings/EditCompanyInfo'),
             meta: {
               title: 'Edit Partner Information',
@@ -286,11 +295,11 @@ export const AppRoutes: Array<RouteRecordRaw> = [
             }
           },
           {
-            path: '/company',
-            name: 'settings.edit.partner.company',
-            component: loadRouteComponent('app/settings/EditCompanyInfo'),
+            path: 'accounts',
+            name: 'settings.edit.settlemet.account',
+            component: loadRouteComponent('app/settings/SettlementAccount'),
             meta: {
-              title: 'Edit Partner Information',
+              title: 'Settlement Account Information',
               requiresAuth: true
             }
           }

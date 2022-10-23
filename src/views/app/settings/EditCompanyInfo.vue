@@ -221,6 +221,7 @@ import PageLayout from '@/components/layout/PageLayout.vue';
 import PageActionHeader from '@/components/PageActionHeader.vue';
 import Spinner from '@/components/layout/Spinner.vue';
 import AppModal from '@/components/Modals/AppModal.vue';
+import emitter from '@/libs/emitter';
 
 interface Company {
   company_name?: string;
@@ -276,6 +277,19 @@ export default defineComponent({
     this.setCurrentCompanyDetails();
     // console.log(this.userSessionData);
     // console.log(this.getDriverData, 'here');
+  },
+  mounted() {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    emitter.on("settings:go-to-profile", () => {
+      this.$router.push('/settings')
+    });
+    emitter.on("settings:go-to-company", () => {
+      this.$router.push('/settings/company')
+    });
+    emitter.on("settings:go-to-settlement", () => {
+      this.$router.push('/settings/accounts')
+    });
   },
   methods: {
     setCurrentCompanyDetails () {
