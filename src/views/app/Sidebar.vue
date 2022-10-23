@@ -190,9 +190,6 @@ export default defineComponent({
     toggleSidebar() {
       this.isSidebarFolded = !this.isSidebarFolded;
     },
-    sideBarNavigationClicked() {
-      console.log('You clicked');
-    },
     checkScreen() {
       this.windowWidth = window.innerWidth;
       if (this.windowWidth <= 768) {
