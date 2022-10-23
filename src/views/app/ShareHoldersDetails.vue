@@ -493,7 +493,7 @@ export default defineComponent({
       this.loading = true;
       try {
         await this.$axios.post(
-          `/v1/partners/${this.partnerContext.partner.id}/corporate-documents`,
+          `/v1/partners/${this.partnerContext.partner.account_sid}/corporate-documents`,
           {...incPayload}
         );
         await this.$axios.post(

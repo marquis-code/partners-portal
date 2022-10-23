@@ -5,7 +5,7 @@ import UserSelection from "@/views/app/OrganizationSelection.vue";
 import Vehicles from "@/views/app/vehicles/Vehicles.vue";
 import Earnings from "@/views/app/Earnings.vue";
 import Trips from "@/views/app/Trips.vue";
-import Settings from "@/views/app/Settings.vue";
+import Settings from "@/views/app/settings/Settings.vue";
 import {loadRouteComponent} from "@/utils/route-helper.util";
 import Drivers from "@/views/app/drivers/Drivers.vue";
 
@@ -270,10 +270,22 @@ export const AppRoutes: Array<RouteRecordRaw> = [
         path: '/settings',
         name: 'settings',
         component: Settings,
+        redirect: 'settings.edit.partner',
         meta: {
           title: 'Settings',
-          requiresAuth: false
-        }
+          requiresAuth: true
+        },
+        children: [
+          {
+            path: '',
+            name: 'settings.edit.partner',
+            component: loadRouteComponent('app/settings/EditPartnerInfo'),
+            meta: {
+              title: 'Edit Partner Information',
+              requiresAuth: true
+            }
+          }
+        ]
       }
     ]
   },
