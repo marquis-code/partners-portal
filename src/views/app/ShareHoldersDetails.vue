@@ -366,7 +366,6 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import PageLayout from '@/components/layout/PageLayout.vue';
-import AppModal from '@/components/Modals/AppModal.vue';
 import ImageUpload from '@/components/ImageUpload.vue';
 import AppTable from '@/components/AppTable.vue';
 import { mapGetters } from 'vuex';
@@ -386,8 +385,8 @@ export default defineComponent({
       uploadingInc: false,
       uploadingMem: false,
       uploadingToS3: false,
-      incorporationCertificateUrl: [],
-      mermorandumUrl: [],
+      incorporationCertificateUrl: [] as string[],
+      mermorandumUrl: [] as string[],
       allDocumentsUploaded: false,
       stakeholders: [
         {
@@ -415,13 +414,11 @@ export default defineComponent({
   watch: {
     // Step 1 watchers
     incorporationCertificateUrl () {
-      console.log('change 1');
       if (this.incorporationCertificateUrl[0] && this.mermorandumUrl[0]) {
         this.allDocumentsUploaded = true;
       }
     },
     mermorandumUrl () {
-      console.log('change 2');
       if (this.incorporationCertificateUrl[0] && this.mermorandumUrl[0]) {
         this.allDocumentsUploaded = true;
       }
@@ -434,7 +431,7 @@ export default defineComponent({
   },
   methods: {
     // functions for step 1, uploading the company documents
-    async selectThisDocument ($event, type: string) {
+    async selectThisDocument ($event: any, type: string) {
       const fileHolder = $event;
       if (type === 'IncorporationCertificate') {
         this.uploadingInc = true;
@@ -442,7 +439,7 @@ export default defineComponent({
       if (type === 'Mermorandum') {
         this.uploadingMem = true;
       }
-      const fileUrl = await this.uploadTos3andGetDocumentUrl(fileHolder);
+      const fileUrl: string = await this.uploadTos3andGetDocumentUrl(fileHolder);
       if (type === 'IncorporationCertificate') {
         this.incorporationCertificateUrl = [];
         this.incorporationCertificateUrl.push(fileUrl);
@@ -459,7 +456,7 @@ export default defineComponent({
     removeFile () {
       this.incorporationCertificateUrl = [];
     },
-    async uploadTos3andGetDocumentUrl (file) {
+    async uploadTos3andGetDocumentUrl (file:any) {
       try {
         const formData = new FormData();
         formData.append('file', file);
