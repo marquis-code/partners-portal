@@ -1,29 +1,5 @@
 <template>
   <page-layout page-title="Trips">
-    <!-- <template #actionsPane>
-      <page-action-header>
-        <template #action>
-          <router-link
-            to="drivers/add-driver"
-            class="
-              bg-sh-green-500
-              font-medium
-              border-none
-              outline-none
-              px-4
-              py-2
-              rounded-md
-              text-sm
-              flex
-              justify-center
-              items-center
-              w-full
-            "
-            >Add Drivers</router-link
-          >
-        </template>
-      </page-action-header>
-    </template> -->
     <div>
       <div class="flex items-center pb-2">
         <span
@@ -38,11 +14,11 @@
             cursor-pointer
           "
           :class="
-            this.filters.status === 'active'
+            this.filters.status === 'active-trips'
               ? 'text-black border-b-sh-green-500'
               : 'text-sh-grey-500 border-b-transparent'
           "
-          @click="setStatusFilter('active')"
+          @click="setStatusFilter('active-trips')"
           >Active</span
         >
         <span
@@ -57,11 +33,11 @@
             cursor-pointer
           "
           :class="
-            this.filters.status === 'upcoming'
+            this.filters.status === 'upcoming-trips'
               ? 'text-black border-b-sh-green-500'
               : 'text-sh-grey-500 border-b-transparent'
           "
-          @click="setStatusFilter('upcoming')"
+          @click="setStatusFilter('upcoming-trips')"
           >Upcoming</span
         >
         <span
@@ -76,35 +52,37 @@
             cursor-pointer
           "
           :class="
-            this.filters.status === 'completed'
+            this.filters.status === 'completed-trips'
               ? 'text-black border-b-sh-green-500'
               : 'text-sh-grey-500 border-b-transparent'
           "
-          @click="setStatusFilter('completed')"
+          @click="setStatusFilter('completed-trips')"
           >Completed</span
         >
       </div>
       <div class="space-y-5 ring-1 ring-gray-50 shadow-sm rounded-sm bg-white">
-        <!--    <div class="flex items-center justify-end p-5">-->
-        <!--      <download-button></download-button>-->
-        <!--    </div>-->
         <div>
           <app-table
             :loading="loading"
             :error-loading="errorLoading"
             :items="tableData"
-            :fields="headers"
+            :fields="filters.status === 'completed-trips' ? completedTripsHeaders : activeAndUpcomingTripsHeaders"
             @rowClicked="viewTripDetails"
           >
-            <template v-slot:metadata="{ item }">
-              <span v-if="item" class="font-light text-sm text-gray-type-3">
-                {{ item.fname || '' }}
-                {{ item.lname || '' }}
-              </span>
+            <template v-slot:route="{ item }">
+              <trip-history
+              :pickup="item?.route?.pickup"
+              :destination="item?.route?.destination"
+              ></trip-history>
             </template>
-
-            <template v-slot:actions="">
-              <img src="@/assets/icons/more_options.svg" />
+            <template v-slot:revenue="{ item }">
+              <p class="flex justify-center items-center text-center">
+                {{
+                  item?.revenue?.cost_of_supply
+                    ? `'₦'${item?.revenue?.cost_of_supply}`
+                    : 'N/A'
+                }}
+              </p>
             </template>
           </app-table>
         </div>
@@ -116,18 +94,18 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import AppTable from '@/components/AppTable.vue';
-// import DownloadButton from '@/components/DownloadButton.vue';
 import { mapGetters } from 'vuex';
-// import PageActionHeader from '@/components/PageActionHeader.vue';
 import PageLayout from '@/components/layout/PageLayout.vue';
 import OptionsDropdown from '@/components/OptionsDropdown.vue';
+import TripHistory from '@/components/TripHistory.vue';
 import moment from 'moment';
 export default defineComponent({
   name: 'DriversList',
   components: {
     PageLayout,
     // PageActionHeader,
-    AppTable
+    AppTable,
+    TripHistory
     /* DownloadButton */
   },
   created() {
@@ -137,24 +115,34 @@ export default defineComponent({
     return {
       result: [],
       filters: {
-        status: 'active',
-        search: ''
+        status: 'active-trips' as string,
+        search: '' as string
       },
       loading: false,
       tableData: [] as Array<any>,
       totalRecords: null,
       errorLoading: false,
-      headers: [
-        { label: 'Date', key: 'createdAt'},
+      activeAndUpcomingTripsHeaders: [
+        { label: 'Date', key: 'createdAt' },
+        { label: 'Route', key: 'route' },
         { label: 'Route Code', key: 'routeCode' },
-        { label: 'Pickup', key: 'pickup'},
-        { label: 'Destination', key: 'dropoff'},
         { label: 'Driver', key: 'driver' },
-        { label: 'Passengers', key: 'passengersCount' },
         { label: 'Start Time', key: 'startTime' },
         { label: 'End Time', key: 'endTime' },
-        { label: 'Revenue', key: 'revenue' },
-      ],
+        { label: 'Passengers', key: 'passengersCount' },
+        { label: 'Expected earning', key: 'revenue' }
+      ] as Array<any>,
+
+      completedTripsHeaders: [
+        { label: 'Date', key: 'createdAt' },
+        { label: 'Route', key: 'route' },
+        { label: 'Route Code', key: 'routeCode' },
+        { label: 'Driver', key: 'driver' },
+        { label: 'Start Time', key: 'startTime' },
+        { label: 'End Time', key: 'endTime' },
+        { label: 'Passengers', key: 'passengersCount' },
+        { label: 'Revenue', key: 'revenue' }
+      ] as Array<any>,
       items: []
     };
   },
@@ -162,64 +150,77 @@ export default defineComponent({
     ...mapGetters({
       partnerContext: 'auth/activeContext'
     })
+    // tableHeaders () {
+    //   const statusValue = this.filters.status;
+    //   return statusValue === 'active-trips' || statusValue === 'upcoming-trips'
+    //     ? this.activeAndUpcomingTripsHeaders
+    //     : this.completedTripsHeaders;
+    // }
+  },
+  watch: {
+    'filters.status'(value) {
+      this.filters.status = value;
+    }
   },
   methods: {
     setStatusFilter(value: string) {
       this.filters.status = value;
       this.fetchPartnerTripsFromRevenue();
     },
-    fetchPartnerTripsFromRevenue() {
+
+    async fetchPartnerTripsFromRevenue() {
       this.loading = true;
       const params = {
         related: 'trips',
         status: this.filters.status,
         metadata: true
       };
-      if (params.status === 'active' || params.status === 'upcoming') {
+      this.$axios
+        .get(
+          `/v1/partners/${this.partnerContext.partner.id}/${params.status}?metadata=${params.metadata}`
+        )
+        .then((res) => {
+          const trips = this.transformActiveOrUpcomingTrips(res.data.data);
+          this.tableData = trips;
+          this.totalRecords = res.data.metadata?.total;
+        })
+        .catch((err) => {
+          this.$toast.error(err.response.data.message || 'An error occured');
+        })
+        .finally(() => {
+          this.loading = false;
+        });
+
+      if (params.status === 'completed-trips') {
         this.$axios
-          .get(`/v1/trips/${params.status}?limit=10&page=1&${this.partnerContext.partner.id}=30`)
+          .get(
+            `cost-revenue/v1/partners/${this.partnerContext.partner.id}/revenues`
+          )
           .then((res) => {
-            console.log(res.data.result);
-            const trips = this.transformActiveOrUpcomingTrips(res.data.data);
+            const trips = this.transformedTrips(res.data.result);
             this.tableData = trips;
             this.totalRecords = res.data.metadata?.total;
           })
-          .catch(err => {
-            this.$toast.error(err.response.data.message || "An error occured")
-          })
-          .finally(() => {
-            this.loading = false;
-          });
-      }
-      if (params.status === 'completed') {
-        this.$axios
-          .get(`cost-revenue/v1/partners/${this.partnerContext.partner.id}/revenues`)
-          .then((res) => {
-            console.log(res.data.result);
-            const trips = this.transformedTrips(res.data.result)
-            this.tableData = trips;
-            this.totalRecords = res.data.metadata?.total;
-          })
-          .catch(err => {
-            this.$toast.error(err.response.data.message || "An error occured")
+          .catch((err) => {
+            this.$toast.error(err.response.data.message || 'An error occured');
           })
           .finally(() => {
             this.loading = false;
           });
       }
     },
-    viewTripDetails(vehicle: any) {
+    viewTripDetails(trip: any) {
       this.$router.push({
-        name: 'vehicle.detail.info',
-        params: { vehicleId: vehicle.id }
+        name: 'trips.detail.info',
+        params: { tripId: trip.id }
       });
     },
     getFormattedDate(date: any) {
       return moment(date).format('LL');
     },
-    transformedTrips(payload: Array<any>): any [] {
-      const newTrips: any = []
-      payload.forEach(trip => {
+    transformedTrips(payload: Array<any>): any[] {
+      const newTrips: any = [];
+      payload.forEach((trip) => {
         newTrips.push({
           createdAt: moment(trip.createdAt).format('LL'),
           pickup: trip.metadata.pickup,
@@ -234,19 +235,20 @@ export default defineComponent({
       });
       return newTrips;
     },
+
     transformActiveOrUpcomingTrips(payload: Array<any>) {
-      const newTrips: any = []
-      payload.forEach(trip => {
+      const newTrips: any = [];
+      payload.forEach((trip) => {
         newTrips.push({
           createdAt: moment(trip.created_at).format('LL'),
-          pickup: trip.route.pickup,
-          dropoff: trip.route.dropoff,
           driver: trip.driver.fname + ' ' + trip.driver.lname,
           routeCode: trip.route.route_code,
-          startTime: moment(trip.start_trip).format('LL'),
-          endTime: moment(trip.end_trip).format('LL'),
+          startTime: moment(trip.start_trip).format('h:mm a'),
+          endTime: moment(trip.end_trip).format('h:mm a'),
           passengersCount: trip.passengers_count,
-          revenue: 'N/A'
+          revenue: trip.cost_of_supply,
+          id: trip.id,
+          route: trip.route
         });
       });
       return newTrips;
@@ -255,5 +257,4 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

@@ -45,10 +45,14 @@
           py-3
           font-medium
           rounded-md
+          flex
+          justify-center
+          items-center
         "
         @click="submitFinalForm"
       >
-        Submit
+        {{ submittingFinalForm ? 'Saving' : 'Submit' }}
+        <spinner class="ml-1" v-if="submittingFinalForm"></spinner>
       </button>
     </div>
   </form>
@@ -59,8 +63,9 @@ import { defineComponent } from 'vue';
 import MultipleImageUpload from '@/components/MultipleImageUpload.vue';
 import { mapGetters } from 'vuex';
 import { extractErrorMessage } from '@/utils/helper';
+import Spinner from '@/components/layout/Spinner.vue';
 export default defineComponent({
-  components: { MultipleImageUpload },
+  components: { MultipleImageUpload, Spinner },
   computed: {
     ...mapGetters({
       vehicleFormData: 'vehicle/getVehicleData',
