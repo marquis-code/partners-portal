@@ -24,7 +24,7 @@
         </template> -->
       </page-action-header>
     </template>
-    <div v-if="fetchingDriver">
+    <div v-if="fetchingPartner">
       <spinner></spinner>
     </div>
     <main class="md:w-9/12 p-5 lg:p-14 bg-white ring-1 ring-gray-100">
@@ -464,7 +464,7 @@ export default defineComponent({
   data () {
     return {
       docId: null,
-      fetchingDriver: false,
+      fetchingPartner: false,
       format,
       uploadingFile: false,
       v$: useVuelidate(),
