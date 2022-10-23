@@ -45,7 +45,6 @@
         h-24
         space-x-4
       "
-      @click="removeFile"
     >
       <img v-if="uploadType === 'pdf'" src="@/assets/images/pdfUploaded.svg" />
       <img v-else src="@/assets/images/imageUploaded.svg" />
