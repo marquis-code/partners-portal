@@ -398,6 +398,12 @@ export default defineComponent({
         params: { vehicleId: this.vehicleData.id }
       });
     },
+    // async deleteVehicle () {
+    //   try {
+    //     const response = await axiosInstance.get(``)
+    //   } catch (error) {
+    //   }
+    // },
     selectThisDriver (driver: any) {
       // console.log(id)
       this.selectedDriverId = driver.driver_id;
