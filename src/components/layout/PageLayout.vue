@@ -20,9 +20,6 @@
           <slot />
         </div>
       </transition>
-      <!-- <transition name="fade" mode="out-in">
-          <slot></slot>
-      </transition> -->
     </div>
   </div>
 </template>

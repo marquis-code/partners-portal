@@ -1,10 +1,14 @@
 <template>
   <div class="w-full">
-    <Notification
-      type="action"
-      message="You have documents left to upload"
-      actionRequired="true"
-    />
+    <Transition>
+      <Notification
+        v-if="haspendingDocuments"
+        type="action"
+        message="You have documents left to upload"
+        actionRequired="true"
+        @click="viewVehicleDocuments"
+      />
+    </Transition>
     <section
       class="
         lg:w-4/12
@@ -106,7 +110,6 @@
               >Assign Driver</label
             >
             <v-select
-              @input="console.log($event)"
               @option:selected="selectThisDriver($event)"
               class="form-group mb-3"
               :options="vehiclePartnersDrivers"
@@ -132,6 +135,7 @@
             Assign Driver
           </button>
         </div>
+        <Transition>
         <div v-if="assignStep === 1" class="pb-5 px-5 text-center">
           <img src="@/assets/icons/question.svg" class="mx-auto mb-7" />
           <p class="mb-2 font-bold font-lg">Assign driver?</p>
@@ -159,6 +163,7 @@
             </button>
           </div>
         </div>
+        </Transition>
         <div v-if="assignStep === 2" class="pb-5 px-5 text-center">
           <img src="@/assets/icons/success.svg" class="mx-auto mb-7" />
           <p class="mb-2 font-bold font-lg">Driver assigned successfully</p>
@@ -241,6 +246,7 @@ import AppModal from '@/components/Modals/AppModal.vue';
 import Notification from '../../../../components/Notification.vue';
 import Spinner from '@/components/layout/Spinner.vue';
 import { axiosInstance } from '@/plugins/axios';
+import emitter from '@/libs/emitter'
 
 export default defineComponent({
 
@@ -259,10 +265,12 @@ export default defineComponent({
       selectedDriverId: null,
       vehiclePartnersDrivers: [],
       fetchingVehiclePartnersDriver: false,
+      haspendingDocuments: false
     };
   },
   computed: {
     ...mapGetters({
+      partnerContext: 'auth/activeContext',
       vehicleData: 'vehicle/getVehicleData',
       isLoading: 'vehicle/getVehicleLoading',
       userSessionData: 'auth/userSessionData'
@@ -270,8 +278,47 @@ export default defineComponent({
   },
   created () {
     this.fetchVehiclePartnerDrivers();
+    this.checkIfVehicleHasPendingDocuments();
+  },
+  mounted() {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    emitter.on("vehicles:assign-driver", () => {
+      this.showAssignDriverModal();
+    });
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    emitter.on("vehicles:unassign-driver", () => {
+      this.showUnassignDriverModal();
+    });
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    emitter.on("vehicles:edit-vehicle", () => {
+      this.editVehicle();
+    });
   },
   methods: {
+    viewVehicleDocuments () {
+      this.$router.push({
+        name: 'vehicle.detail.documents'
+      })
+    },
+    checkIfVehicleHasPendingDocuments() {
+      this.$axios
+        .get(
+          `v1/partners/${this.partnerContext.partner.id}/vehicle/${this.vehicleData.id}/vehicle-documents`
+        )
+        .then((r) => {
+          const vehicleDocuments: any[] = r.data.vehicleDocuments || [];
+          for (let index = 0; index < vehicleDocuments.length; index++) {
+            const element = vehicleDocuments[index];
+            if (element.documents === null) {
+              this.haspendingDocuments = true;
+              return 0
+            }
+          }
+        })
+    },
     nextAssignStep () {
       this.assignStep += 1;
     },
@@ -353,6 +400,12 @@ export default defineComponent({
         params: { vehicleId: this.vehicleData.id }
       });
     },
+    // async deleteVehicle () {
+    //   try {
+    //     const response = await axiosInstance.get(``)
+    //   } catch (error) {
+    //   }
+    // },
     selectThisDriver (driver: any) {
       // console.log(id)
       this.selectedDriverId = driver.driver_id;
@@ -387,4 +440,13 @@ export default defineComponent({
 </script>
 
 <style>
+.v-enter-active,
+.v-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
+}
 </style>

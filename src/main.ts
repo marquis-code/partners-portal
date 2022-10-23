@@ -5,6 +5,7 @@ import router from './router'
 import store from './store'
 import PluginService from './services/plugin.service';
 import VueEasyLightbox from 'vue-easy-lightbox'
+import emitter from './libs/emitter'
 
 // Global Styles
 import './assets/scss/styles.scss';
@@ -16,6 +17,7 @@ import {AppInitializerService} from "@/services/app-initializer.service";
 new AppInitializerService(router, store, axiosInstance).initialize()
   .finally(() => {
     const app = createApp(App);
+    app.config.globalProperties.emitter = emitter;
     PluginService.registerPlugins(app)
       .use(axios)
       .use(store)

@@ -41,7 +41,6 @@
         items-center
         cursor-pointer
         w-full
-        md:w-1/2
         h-24
         space-x-4
       "
