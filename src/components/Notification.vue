@@ -9,7 +9,7 @@
       <button v-if="actionRequired" @click="uploadDocument" class="p-4 p-2 bg-gray-100 rounded-lg font-medium mr-2 text-xs md:text-base">
         Upload vehicle document
       </button>
-      <img src="@/assets/icons/white-cancel.svg" @click="closeNotificaition">
+      <img src="@/assets/icons/white-cancel.svg">
     </div>
   </div>
 </template>
@@ -33,9 +33,6 @@ export default defineComponent({
     closeNotificaition () {
       this.showNotification = false
     },
-    uploadDocument () {
-      alert("Here")
-    }
   }
 });
 </script>

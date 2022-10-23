@@ -36,6 +36,23 @@ export const AppRoutes: Array<RouteRecordRaw> = [
         }
       },
       {
+        path: '/dashboard/company-kyc',
+        name: 'dashboard.company-kyc',
+        component: loadRouteComponent('app/ShareHoldersDetails'),
+        meta: {
+          title: 'Dashboard'
+        }
+      },
+      {
+        path: '/dashboard/start-kyc',
+        name: 'dashboard.start-kyc',
+        component: loadRouteComponent('app/KycInformationView'),
+        meta: {
+          title: 'Dashboard'
+        },
+        props: true
+      },
+      {
         path: '/drivers',
         name: 'drivers',
         component: Drivers,
