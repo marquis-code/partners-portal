@@ -1,94 +1,52 @@
 <template>
-  <div class="app">
-    <!-- <button type="button" @click="changeData">Change data</button> -->
-
-    <apexcharts
+  <div class="">
+    <div class="flex justify-between items-center">
+      <h1 class="text-gray-400 font-medium">Overview</h1>
+    </div>
+    <apexchart
       type="bar"
+      height="350"
       :options="chartOptions"
       :series="series"
-    ></apexcharts>
+    ></apexchart>
   </div>
 </template>
 
-<script>
-import VueApexCharts from 'vue-apexcharts';
-// import ApexCharts from 'apexcharts';
-
-export default {
-  name: 'Chart',
+<script lang="ts">
+import { defineComponent } from '@vue/runtime-core';
+import VueApexCharts from 'vue3-apexcharts';
+export default defineComponent({
+  name: 'BarChart',
   components: {
-    apexcharts: VueApexCharts
+    apexchart: VueApexCharts
   },
-  data: function () {
+  data() {
     return {
-      secondData: [
+      series: [
         {
-          name: 'Series1',
-          data: [51, 42, 109, 38, 47]
-        },
-        {
-          name: 'Series2',
-          data: [56, 90, 12, 32, 44]
-        },
-        {
-          name: 'Series3',
-          data: [22, 43, 21, 100, 56]
+          name: 'trips',
+          data: [
+            100, 200, 300, 400, 500, 600, 700, 800, 900, 10000, 100, 200, 300,
+            400, 500, 600, 700, 800, 900
+          ]
         }
       ],
-      Secondcategories: ['2015', '2016', '2017', '2018', '2019']
-    };
-  },
-
-  // methods: {
-  //   async changeData() {
-  //     ApexCharts.exec('chart1', 'updateOptions', {
-  //       xaxis: {
-  //         categories: this.Secondcategories
-  //       }
-  //     });
-
-  //     ApexCharts.exec('chart1', 'updateSeries', [
-  //       {
-  //         data: this.secondData
-  //       }
-  //     ]);
-  //   }
-  // },
-
-  computed: {
-    series: function () {
-      return [
-        {
-          name: 'series1',
-          data: [31, 40, 28, 51, 42, 109, 100, 38, 47, 58, 77, 84]
-        },
-        {
-          name: 'series2',
-          data: [100, 87, 12, 31, 42, 64, 55, 20, 97, 28, 37, 104]
-        },
-        {
-          name: 'Series3',
-          data: [44, 55, 41, 64, 22, 43, 21, 80, 22, 100, 56, 70]
-        }
-      ];
-    },
-    chartOptions: function () {
-      return {
-        dataLabels: {
-          enabled: false
-        },
+      chartOptions: {
         chart: {
-          id: 'chart1',
+          height: 350,
+          type: 'bar',
           toolbar: {
             show: false
           }
         },
-        stroke: {
-          width: 0.2,
-          colors: ['#74fb00'],
-          curve: 'smooth'
+        plotOptions: {
+          bar: {
+            borderRadius: 10,
+            dataLabels: {
+              position: 'top' // top, center, bottom
+            }
+          }
         },
-
         dropShadow: {
           enabled: true,
           top: 0,
@@ -96,7 +54,6 @@ export default {
           blur: 3,
           opacity: 0.5
         },
-
         theme: {
           monochrome: {
             enabled: true,
@@ -114,25 +71,92 @@ export default {
             }
           }
         },
+        dataLabels: {
+          enabled: true,
+          formatter: function (val: number) {
+            return val + '%';
+          },
+          offsetY: -20,
+          style: {
+            fontSize: '12px',
+            colors: ['#304758']
+          }
+        },
 
         xaxis: {
           categories: [
-            'Jan',
-            'Feb',
-            'Mar',
-            'Apr',
-            'May',
-            'Jun',
-            'Jul',
-            'Aug',
-            'Sep',
-            'Oct',
-            'Nov',
-            'Dec'
-          ]
+            'Sep 1',
+            'Sep 2',
+            'Sep 3',
+            'Sep 4',
+            'Sep 5',
+            'Sep 6',
+            'Sep 7',
+            'Sep 8',
+            'Sep 9',
+            'Sep 10',
+            'Sep 11',
+            'Sep 12',
+            'Sep 13',
+            'Sep 14',
+            'Sep 15',
+            'Sep 16',
+            'Sep 17',
+            'Sep 18',
+            'Sep 19'
+          ],
+          position: 'right'
+          // axisBorder: {
+          //   show: false
+          // },
+          // axisTicks: {
+          //   show: false
+          // },
+          // crosshairs: {
+          //   fill: {
+          //     type: 'gradient',
+          //     gradient: {
+          //       colorFrom: '#D8E3F0',
+          //       colorTo: '#BED1E6',
+          //       stops: [0, 100],
+          //       opacityFrom: 0.4,
+          //       opacityTo: 0.5
+          //     }
+          //   }
+          // },
+          // tooltip: {
+          //   enabled: true
+          // }
+        },
+        yaxis: {
+          // categories: [0, 50, 100, 150, 600],
+          // axisBorder: {
+          //   show: false
+          // },
+          // axisTicks: {
+          //   show: false
+          // },
+          // labels: {
+          //   show: false,
+          //   formatter: function (val: number) {
+          //     return val + '%';
+          //   }
+          // }
         }
-      };
-    }
+        // title: {
+        //   text: 'Monthly Inflation in Argentina, 2002',
+        //   floating: true,
+        //   offsetY: 330,
+        //   align: 'center',
+        //   style: {
+        //     color: '#444'
+        //   }
+        // }
+      }
+    };
   }
-};
+});
 </script>
+
+<style>
+</style>

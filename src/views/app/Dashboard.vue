@@ -37,8 +37,7 @@
       <drivers></drivers>
       <trips></trips>
     </section>
-    <section class="bg-white rounded-md shadow-sm">
-      <h1 class="text-gray-400 font-medium">Overview</h1>
+    <section class="bg-white rounded-md shadow-sm  space-y-4 p-10 mt-12 ring-1 ring-gray-50">
       <div id="barchart">
          <chart></chart>
       </div>
