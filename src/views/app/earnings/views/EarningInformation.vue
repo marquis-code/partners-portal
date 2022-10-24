@@ -1,6 +1,6 @@
 <template>
   <main>
-    <page-layout page-title="Earning">
+    <page-layout page-title="Earnings">
       <template #breadcrumbs>
         <page-action-header>
           <template #tabs>

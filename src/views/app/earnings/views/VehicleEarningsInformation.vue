@@ -1,6 +1,6 @@
 <template>
   <main>
-    <page-layout page-title="Earning">
+    <page-layout page-title="Earnings">
       <template #breadcrumbs>
         <div class="flex items-center space-x-3 py-3">
           <router-link
