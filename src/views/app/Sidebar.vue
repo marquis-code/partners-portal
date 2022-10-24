@@ -153,8 +153,8 @@ export default defineComponent({
             { title: 'Dashboard', icon: 'home', selected: true },
             { title: 'Vehicles', icon: 'directions_car', selected: false },
             { title: 'Drivers', icon: 'group', selected: false },
-            { title: 'Trips', icon: 'route', selected: false }
-            // {title: 'Earnings', icon: 'payments', selected: false}
+            { title: 'Trips', icon: 'route', selected: false },
+            {title: 'Earnings', icon: 'payments', selected: false}
           ]
         },
         {
