@@ -2,7 +2,7 @@
   <page-layout page-title="Company ShareHolder KYC">
     <div class="h-full p-10 bg-white">
       <main class="space-y-5">
-        <p class="text-center">Kindly input all appropraite information for <span class="text-bold">Ahmed Hassani {{id}}</span></p>
+        <p class="text-center">Kindly input all appropraite information for <span class="text-bold">{{identityForm.document.fname}} {{identityForm.document.lname}}</span></p>
         <div class="flex justify-center items-center space-x-4">
           <p :class="activeView === 0 ? 'text-grays-black-2' : 'text-grays-black-6'" class="text-sm">
             Identity verification
@@ -43,6 +43,7 @@
                 <option value="" hidden>Select a document type</option>
                 <option
                   v-for="(identity, index) in identificationOptions"
+                  :selected="index===0"
                   :value="identity.key"
                   :key="index">
                   {{ identity.label }}
@@ -138,7 +139,7 @@
 
         <div class="flex justify-end">
           <div class="flex items-center space-x-5">
-            <button
+            <!-- <button
               class="
                 rounded-md
                 w-32
@@ -154,7 +155,7 @@
               @click="$router.push({name: 'dashboard.company-kyc'})"
             >
               Go back
-            </button>
+            </button> -->
             <button
               class="
                 rounded-md
@@ -172,12 +173,13 @@
             'cursor-not-allowed text-grays-black-5 bg-grays-black-7' : 'bg-sh-green-500 font-medium'"
               @click.prevent="saveIdentityForm()"
             >
+            <Spinner v-if="loading"/>
               {{loading ? 'Saving' : 'Next'}}
               <img class="ml-2" src="@/assets/images/arrow.svg" />
             </button>
           </div>
           <div class="flex space-x-5" v-if="activeView === 1">
-            <button
+            <!-- <button
               class="
                 rounded-md
                 w-32
@@ -194,7 +196,7 @@
               :disabled="loading"
               @click.prevent="previous()">
               Go back
-            </button>
+            </button> -->
             <button
               class="
                 rounded-md
@@ -246,6 +248,7 @@ export default defineComponent<any, any, any>({
       identityForm: {
         user: {
           document_owner_id: null,
+          user_id: null,
           partner_type: null
         },
         document: {
@@ -259,6 +262,7 @@ export default defineComponent<any, any, any>({
       addressForm: {
         user: {
           document_owner_id: null,
+          user_id: null,
           partner_type: null
         },
         document: {
@@ -308,6 +312,7 @@ export default defineComponent<any, any, any>({
       identityForm: {
         user: {
           document_owner_id: { required },
+          user_id: { required },
           partner_type: { required },
         },
         document: {
@@ -321,6 +326,7 @@ export default defineComponent<any, any, any>({
       addressForm: {
         user: {
           document_owner_id: { required },
+          user_id: { required },
           partner_type: { required }
         },
         document: {
@@ -330,13 +336,13 @@ export default defineComponent<any, any, any>({
     };
   },
   created () {
-    this.setPageState();
     this.setFormDefaults();
   },
   computed: {
     ...mapGetters({
       user: 'auth/user',
-      contextOrganization: 'auth/activeContext'
+      contextOrganization: 'auth/activeContext',
+      partnerContext: 'auth/activeContext'
     }),
     getDocumentLabel () {
       if (this.activeView === 0) {
@@ -346,15 +352,42 @@ export default defineComponent<any, any, any>({
     }
   },
   methods: {
-    setFormDefaults () {
-      const user: UserData = this.user;
-      this.identityForm.user.document_owner_id = user.id;
-      this.identityForm.user.partner_type = this.$route.query.type === 'individual' ? 'individual' : 'business';
-      this.identityForm.document.fname = user.fname;
-      this.identityForm.document.lname = user.lname;
+    async checkIfIdentityKYCHasBeenDone () {
+      try {
+        console.log(1)
+      } catch (err: any) {
+        console.log(err)
+        const errorMessage = extractErrorMessage(err, null, 'Oops! An error occurred, please try again.');
+        this.$toast.error(errorMessage);
+      }
+    },
+    async checkIfAddressKYCHasBeenDone () {
+      try {
+        console.log(1)
+      } catch (err: any) {
+        console.log(err)
+        const errorMessage = extractErrorMessage(err, null, 'Oops! An error occurred, please try again.');
+        this.$toast.error(errorMessage);
+      }
+    },
+    async setFormDefaults () {
+      try {
+        const response = await this.$axios.get(`/v1/partner-share-holders/${this.id}`);
+        const user = response.data;
+        this.identityForm.user.document_owner_id = user.id;
+        this.identityForm.user.user_id = "" + user.id;
+        this.identityForm.user.partner_type = 'business';
+        this.identityForm.document.fname = user.fname;
+        this.identityForm.document.lname = user.lname;
 
-      this.addressForm.user.document_owner_id = user.id;
-      this.addressForm.user.partner_type = this.$route.query.type === 'individual' ? 'individual' : 'business';
+        this.addressForm.user.document_owner_id = user.id;
+        this.addressForm.user.user_id = "" + user.id;
+        this.addressForm.user.partner_type = 'business';
+      } catch (err: any) {
+        console.log(err)
+        const errorMessage = extractErrorMessage(err, null, 'Oops! An error occurred, please try again.');
+        this.$toast.error(errorMessage);
+      }
     },
     previous () {
       this.activeView -= 1;
@@ -377,9 +410,9 @@ export default defineComponent<any, any, any>({
       }
       try {
         this.loading = true;
-        await this.$axios.post(`/v1/partners/${this.contextOrganization.account_sid}/identity-verification`, this.identityForm);
-        await this.$store.dispatch('auth/refreshActiveContext', this.user.id);
-        this.activeView += 1;
+        await this.$axios.post(`/v1/partners/${this.partnerContext.partner.id}/shareholders/${this.id}/identity-verification`, this.identityForm);
+        this.$toast.success('Shareholder Identity KYC completed')
+        this.activeView = 1;
       } catch (err) {
         const errorMessage = extractErrorMessage(err, null, 'Oops! An error occurred, please try again.');
         this.$toast.error(errorMessage);
@@ -403,27 +436,16 @@ export default defineComponent<any, any, any>({
         if (response.data?.files?.length) {
           this.addressForm.document.files = [response.data.files[0].Location];
         }
-        await this.$axios.post(`/v1/partners/${this.contextOrganization.account_sid}/address-verification`, this.addressForm);
-        await this.$store.dispatch('auth/refreshActiveContext', this.user.id);
+        await this.$axios.post(`/v1/partners/${this.partnerContext.partner.id}/shareholders/${this.id}/address-verification`, this.addressForm);
+        this.$toast.success('Shareholder Address KYC completed');
         setTimeout(() => {
-          this.$router.push({name: 'citySelection'});
+          this.$router.push({name: 'dashboard.company-kyc'});
         }, 200);
       } catch (err) {
         const errorMessage = extractErrorMessage(err, null, 'Oops! An error occurred, please try again.');
         this.$toast.error(errorMessage);
       } finally {
         this.loading = false;
-      }
-    },
-    setPageState () {
-      if (!this.contextOrganization) {
-        this.$router.push({name: 'PartnerSignUp'});
-        return;
-      }
-      const identityFormStatus = this.contextOrganization.onboardingState?.identity;
-      if (this.contextOrganization && (identityFormStatus === 'completed')) {
-        this.activeView = 0;
-        this.addressProgress = true;
       }
     },
     selectFile ($event: File) {
