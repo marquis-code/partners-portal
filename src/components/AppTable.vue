@@ -81,8 +81,14 @@
                 <template v-else>
                   <slot name="no-items">
                     <tr>
-                      <td :colspan="fields.length" class="py-3 text-center">
-                        No data available
+                      <td :colspan="fields.length" class="py-3 text-center h-[40vh] items-center">
+                        <div class="w-full flex flex-col items-center justify-center">
+                          <img class="items-center" src="@/assets/icons/no-table-data.svg"/>
+                          <p>No data available.</p>
+                        </div>
+                        <!-- <tr>
+                          <td></td>
+                        </tr> -->
                       </td>
                     </tr>
                   </slot>
@@ -208,7 +214,7 @@ import {defineComponent} from "vue";
 import Spinner from "@/components/layout/Spinner";
 
 export default defineComponent({
-  components: {Spinner},
+  components: { Spinner },
   props: {
     items: {
       type: Array
@@ -237,7 +243,7 @@ export default defineComponent({
     }
   },
   emits: ['pageChange', 'sizeChange', 'rowClicked'],
-  data () {
+  data() {
     return {
       pagination: {
         itemsPerPage: 10,
@@ -263,7 +269,7 @@ export default defineComponent({
       // console.log({ value, old });
     }
   },
-  created () {
+  created() {
     this.initDefaultOptions(this.extraOptions);
   },
   computed: {
@@ -306,7 +312,7 @@ export default defineComponent({
     }
   },
   methods: {
-    handleRowClick (item) {
+    handleRowClick(item) {
       this.$emit('rowClicked', item);
     },
     initDefaultOptions (options) {

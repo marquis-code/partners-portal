@@ -292,12 +292,12 @@
                 <span
                   class="text-sm text-black"
                   :class="
-                    item.status === 'Pending'
+                    item.status === 'pending'
                       ? 'text-orange-500'
                       : 'text-sh-green-500'
                   "
                 >
-                  {{ item.status === 'Pending' ? 'Pending' : 'Submitted' }}
+                  {{ item.status === 'pending' ? 'Pending' : 'Submitted' }}
                 </span>
               </template>
               <template v-slot:action="{ item }">
@@ -308,8 +308,9 @@
                     text-sh-purple-700
                     rounded-lg
                   "
+                  @click="proceedToCoperateKYC(item.action)"
                 >
-                  Verify KYC {{ item.action }}
+                  Verify KYC
                 </button>
               </template>
             </AppTable>
@@ -429,6 +430,9 @@ export default defineComponent({
       partnerContext: 'auth/activeContext'
     })
   },
+  created () {
+    this.checkIfShareHoldersHaveBeenProvided()
+  },
   methods: {
     // functions for step 1, uploading the company documents
     async selectThisDocument ($event: any, type: string) {
@@ -509,6 +513,30 @@ export default defineComponent({
         this.loading = false;
       }
     },
+    async checkIfDocuumentsHaveBeenProvided () {
+      try {
+        const response = await this.$axios.get(`/v1/partners/${this.partnerContext.partner.id}/corporate-documents`);
+        if (response.data.data.length > 0) {
+          this.step = 1;
+        }
+      } catch (error) {
+        this.$toast.warning('An error occured, Please refresh this page ')
+      }
+    },
+    async checkIfShareHoldersHaveBeenProvided () {
+      try {
+        const response = await this.$axios.get(`/v1/partners/${this.partnerContext.partner.account_sid}/share-holders`);
+        // console.log(response.data.data)
+        if (response.data.data.length > 0) {
+          this.tableData = this.structureShareSholders(response.data.data);
+          this.step = 2;
+        } else {
+          await this.checkIfDocuumentsHaveBeenProvided()
+        }
+      } catch (error) {
+        this.$toast.warning('An error occured, Please refresh this page ')
+      }
+    },
     // functionos for step two: adding stake holders
     removeStakeHolder (index: number) {
       if (index !== 0) {
@@ -527,6 +555,8 @@ export default defineComponent({
               ...payload
             })
           }
+          this.checkIfShareHoldersHaveBeenProvided()
+          // this.step += 1;
         } catch (error) {
           this.$toast.warning('An error occured');
         }
@@ -569,6 +599,21 @@ export default defineComponent({
         share_amount: 0
       });
     },
+    // functions for step 3
+    structureShareSholders (shareholderslist: any[]) {
+      const stakeholders = shareholderslist.map(stake => {
+        return {
+          name: stake.fname + ' ' + stake.lname,
+          percent: stake.share_amount || '',
+          status: 'pending',
+          action: stake.id
+        }
+      });
+      return stakeholders;
+    },
+    proceedToCoperateKYC (shareholderId: number) {
+      this.$router.push({name: 'dashboard.start-kyc', params: {id: `${shareholderId}`}})
+    }
   }
 });
 </script>

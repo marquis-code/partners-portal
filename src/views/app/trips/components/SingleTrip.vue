@@ -1,71 +1,4 @@
 <template>
-  <page-layout
-    :page-title="
-      !loading && trip?.route
-        ? `${trip?.route?.route_code} . ${trip?.route?.itineraries[0]?.departure_time}`
-        : 'Trip Information'
-    "
-  >
-    <template #actionsPane>
-      <page-action-header>
-        <template #tabs>
-          <router-link
-            class="
-              text-sm
-              font-medium
-              leading-6
-              pb-2
-              pt-1
-              px-2
-              border-b
-              cursor-pointer
-            "
-            active-class="text-black border-b-sh-green-500 border-b-2"
-            to="#"
-          >
-            Trip information</router-link
-          >
-          <router-link
-            class="
-              text-sm
-              font-medium
-              leading-6
-              pb-2
-              pt-1
-              px-2
-              border-b
-              cursor-pointer
-            "
-            active-class="text-black border-b-sh-green-500 border-b-2"
-            :to="{name:'trips.manifest.info', params: {trip : trip.id}}"
-            >Manifest</router-link
-          >
-        </template>
-
-        <template #breadcrumbs>
-          <div class="flex justify-between items-center">
-            <div class="flex items-center space-x-2 py-3">
-              <router-link
-                :to="{
-                  name: 'trips.list'
-                }"
-                class="text-gray-400 text-sm hover:text-gray-900"
-                >Trips</router-link
-              >
-              <img src="@/assets/images/breadcrumbs.svg" />
-              <span
-                >{{ trip?.route?.route_code }} .
-                {{ trip?.route?.itineraries[0]?.departure_time }}</span
-              >
-            </div>
-          </div>
-        </template>
-      </page-action-header>
-    </template>
-    <div v-if="loading || isLoading">
-      <spinner></spinner>
-    </div>
-    <template v-else>
       <main class="relative">
         <Map class="h-screen" />
         <section
@@ -224,62 +157,19 @@
           </div>
         </section>
       </main>
-    </template>
-  </page-layout>
 </template>
 
 <script>
-import PageLayout from '@/components/layout/PageLayout';
-import { mapGetters } from 'vuex';
-import Spinner from '@/components/layout/Spinner';
-import PageActionHeader from '@/components/PageActionHeader';
-import { extractErrorMessage } from '@/utils/helper';
 import Map from '@/views/app/Map.vue';
 import TripHistory from '@/components/TripHistory.vue';
 export default {
   name: 'DriverDetailsIndex',
   components: {
-    PageActionHeader,
-    Spinner,
-    PageLayout,
     Map,
     TripHistory
   },
-  computed: {
-    ...mapGetters({
-      partnerContext: 'auth/activeContext'
-    })
-  },
-  data() {
-    return {
-      loading: false,
-      trip: {}
-    };
-  },
-  created() {
-    this.fetchVehicles();
-  },
-  methods: {
-    async fetchVehicles() {
-      this.loading = true;
-      await this.$axios
-        .get(`/v1/trips/${this.$route.params.tripId}`)
-        .then((res) => {
-          console.log(res.data);
-          this.trip = res.data;
-        })
-        .catch((err) => {
-          const errorMessage = extractErrorMessage(
-            err,
-            null,
-            'Oops! An error occurred, please try again.'
-          );
-          this.$toast.error(errorMessage);
-        })
-        .finally(() => {
-          this.loading = false;
-        });
-    }
+  props: {
+    trip: Object
   }
 };
 </script>
