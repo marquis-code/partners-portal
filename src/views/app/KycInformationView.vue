@@ -2,7 +2,7 @@
   <page-layout page-title="Company ShareHolder KYC">
     <div class="h-full p-10 bg-white">
       <main class="space-y-5">
-        <p class="text-center">Kindly input all appropraite information for <span class="text-bold">Ahmed Hassani</span></p>
+        <p class="text-center">Kindly input all appropraite information for <span class="text-bold">Ahmed Hassani {{id}}</span></p>
         <div class="flex justify-center items-center space-x-4">
           <p :class="activeView === 0 ? 'text-grays-black-2' : 'text-grays-black-6'" class="text-sm">
             Identity verification
@@ -237,6 +237,9 @@ import Spinner from '@/components/layout/Spinner.vue';
 
 export default defineComponent<any, any, any>({
   components: { Datepicker, ImageUpload, Spinner, PageLayout },
+  props: {
+    id: String
+  },
   data () {
     return {
       v$: useVuelidate(),
