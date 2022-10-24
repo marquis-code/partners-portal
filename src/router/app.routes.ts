@@ -44,7 +44,7 @@ export const AppRoutes: Array<RouteRecordRaw> = [
         }
       },
       {
-        path: '/dashboard/start-kyc',
+        path: '/dashboard/start-kyc/:id',
         name: 'dashboard.start-kyc',
         component: loadRouteComponent('app/KycInformationView'),
         meta: {
