@@ -214,7 +214,7 @@ import {defineComponent} from "vue";
 import Spinner from "@/components/layout/Spinner";
 
 export default defineComponent({
-  components: {Spinner},
+  components: { Spinner },
   props: {
     items: {
       type: Array
@@ -243,7 +243,7 @@ export default defineComponent({
     }
   },
   emits: ['pageChange', 'sizeChange', 'rowClicked'],
-  data () {
+  data() {
     return {
       pagination: {
         itemsPerPage: 10,
@@ -269,7 +269,7 @@ export default defineComponent({
       // console.log({ value, old });
     }
   },
-  created () {
+  created() {
     this.initDefaultOptions(this.extraOptions);
   },
   computed: {
@@ -312,7 +312,7 @@ export default defineComponent({
     }
   },
   methods: {
-    handleRowClick (item) {
+    handleRowClick(item) {
       this.$emit('rowClicked', item);
     },
     initDefaultOptions (options) {

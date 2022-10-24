@@ -27,7 +27,7 @@
       <p class="relative text-[13px] text-[#575A65]">{{desc}}</p>
     </div>
     <div class="truncate">
-      <p class="font-bold text-[19px]">{{value}}</p>
+      <p class="font-bold text-[19px]">{{val}}</p>
     </div>
   </div>
     <div class="
@@ -51,6 +51,14 @@ import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'EarningsDataCard',
+  beforeMount() {
+    this.val = this.formater
+      ? this.formater(this.value)
+      : this.value;
+    if (this.currency) {
+      this.val = this.currency + ' ' + this.val;
+    }
+  },
   props: {
     isRouteable: Boolean,
     desc: String,
@@ -59,9 +67,13 @@ export default defineComponent({
     bottomDesc: String,
     bottomDescValue: String,
     isLoading: Boolean,
+    formater: Function,
+    currency: String,
   },
   data() {
-    return {};
+    return {
+      val: ''
+    };
   }
 })
 </script>

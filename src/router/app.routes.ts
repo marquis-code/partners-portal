@@ -232,10 +232,20 @@ export const AppRoutes: Array<RouteRecordRaw> = [
             name: 'earnings.information',
             component: loadRouteComponent('app/earnings/views/EarningInformation'),
             meta: {
-              title: 'Earnings',
+              title: 'Earnings-Information',
               requiresAuth: true,
             },
-          }
+          },
+          {
+            path: '/earnings/vehicle-information/:id',
+            name: 'earnings.vehicleInformation',
+            component: loadRouteComponent('app/earnings/views/VehicleEarningsInformation'),
+            meta: {
+              title: 'Vehicle-Earnings-Information',
+              requiresAuth: true,
+            },
+          },
+
         ]
       },
       {
