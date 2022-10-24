@@ -4,9 +4,9 @@
       <page-action-header>
         <template #breadcrumbs>
           <TabContainer>
-            <TabItem :title="'Profile Information'" @click="showProfilePage"/>
-            <TabItem :title="'Company Information'" @click="showCompanyInfo"/>
-            <TabItem :title="'Settlement Account'" @click="showAccountsPage"/>
+            <TabItem :title="'Profile Information'" :to="{name: 'settings.edit.partner'}"/>
+            <TabItem :title="'Company Information'" :to="{name: 'settings.edit.partner.company'}"/>
+            <TabItem :title="'Settlement Account'" :to="{name: 'settings.edit.settlemet.account'}"/>
           </TabContainer>
         </template>
         </page-action-header>
