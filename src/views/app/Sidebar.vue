@@ -147,11 +147,11 @@ export default defineComponent({
         {
           sectionTitle: 'GENERAL',
           menus: [
-
             { title: 'Dashboard', routeName: 'dashboard', icon: 'home', selected: true },
             { title: 'Vehicles', routeName: 'vehicles.list', icon: 'directions_car', selected: false },
             { title: 'Drivers', routeName: 'drivers.list', icon: 'group', selected: false },
             { title: 'Trips', routeName: 'trips.list', icon: 'route', selected: false },
+            { title: 'Routes', icon: 'route', selected: false },
             // {title: 'Earnings', icon: 'payments', selected: false}
             { title: 'Earnings', routeName: 'earnings.information', icon: 'payments', selected: false}
           ]
