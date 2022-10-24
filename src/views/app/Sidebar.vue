@@ -171,7 +171,6 @@ export default defineComponent({
               icon: 'route',
               selected: false
             },
-            // {title: 'Earnings', icon: 'payments', selected: false}
             {
               title: 'Earnings',
               routeName: 'earnings.information',
