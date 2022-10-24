@@ -154,6 +154,7 @@ export default defineComponent({
             { title: 'Vehicles', icon: 'directions_car', selected: false },
             { title: 'Drivers', icon: 'group', selected: false },
             { title: 'Trips', icon: 'route', selected: false },
+            { title: 'Routes', icon: 'route', selected: false },
             {title: 'Earnings', icon: 'payments', selected: false}
           ]
         },

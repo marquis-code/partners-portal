@@ -5,6 +5,7 @@ import UserSelection from "@/views/app/OrganizationSelection.vue";
 import Vehicles from "@/views/app/vehicles/Vehicles.vue";
 import Earnings from "@/views/app/earnings/Earning.vue";
 import Trips from "@/views/app/Trips.vue";
+import Routes from "@/views/app/Routes.vue";
 import Settings from "@/views/app/settings/Settings.vue";
 import {loadRouteComponent} from "@/utils/route-helper.util";
 import Drivers from "@/views/app/drivers/Drivers.vue";
@@ -286,6 +287,35 @@ export const AppRoutes: Array<RouteRecordRaw> = [
               requiresAuth: true
             }
           }
+        ]
+      },
+      {
+        path: '/routes',
+        name: 'routees',
+        component: Routes,
+        meta: {
+          title: 'Routes',
+          requiresAuth: true
+        },
+        children: [
+          {
+            path: '',
+            name: 'routes.list',
+            component: loadRouteComponent('app/routes/list/RouteList'),
+            meta: {
+              title: 'Routes',
+              requiresAuth: true
+            }
+          },
+          {
+            path: '/details/:routeId',
+            name: 'routes.detail.info',
+            component: loadRouteComponent('app/routes/detail/SingleRoute'),
+            meta: {
+              title: 'Route Detail',
+              requiresAuth: true
+            }
+          },
         ]
       },
       {
