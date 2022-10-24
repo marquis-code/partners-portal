@@ -1,6 +1,7 @@
 "use strict";
 import { App } from 'vue';
 import axios from "axios";
+import {Token} from "@/models/login-response.model";
 // Full config:  https://github.com/axios/axios#request-config
 // axios.defaults.baseURL = process.env.baseURL || process.env.apiUrl || '';
 // axios.defaults.headers.common['Authorization'] = AUTH_TOKEN;
@@ -25,8 +26,8 @@ export const axiosInstance = axios.create(config);
   }
 ); */
 
-export const setAuthorization = (token: string) => {
-  axiosInstance.defaults.headers.common.Authorization = `Bearer ${token}`;
+export const setAuthorization = (token: Token) => {
+  axiosInstance.defaults.headers.common.Authorization = `Bearer ${token.token}`;
 }
 
 export const removeAuthorization = () => {
