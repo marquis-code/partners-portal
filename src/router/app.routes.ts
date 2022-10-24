@@ -5,7 +5,7 @@ import UserSelection from "@/views/app/OrganizationSelection.vue";
 import Vehicles from "@/views/app/vehicles/Vehicles.vue";
 import Earnings from "@/views/app/earnings/Earning.vue";
 import Trips from "@/views/app/Trips.vue";
-import Settings from "@/views/app/Settings.vue";
+import Settings from "@/views/app/settings/Settings.vue";
 import {loadRouteComponent} from "@/utils/route-helper.util";
 import Drivers from "@/views/app/drivers/Drivers.vue";
 
@@ -34,6 +34,23 @@ export const AppRoutes: Array<RouteRecordRaw> = [
         meta: {
           title: 'Dashboard'
         }
+      },
+      {
+        path: '/dashboard/company-kyc',
+        name: 'dashboard.company-kyc',
+        component: loadRouteComponent('app/ShareHoldersDetails'),
+        meta: {
+          title: 'Dashboard'
+        }
+      },
+      {
+        path: '/dashboard/start-kyc',
+        name: 'dashboard.start-kyc',
+        component: loadRouteComponent('app/KycInformationView'),
+        meta: {
+          title: 'Dashboard'
+        },
+        props: true
       },
       {
         path: '/drivers',
@@ -146,6 +163,16 @@ export const AppRoutes: Array<RouteRecordRaw> = [
             }
           },
           {
+            path: ':vehicleId/edit/document/:documentId',
+            name: 'EditVehicleDocument',
+            props: true,
+            component: loadRouteComponent('app/vehicles/details/EditVehicleDocuments'),
+            meta: {
+              title: 'Edit Vehicle Document',
+              requiresAuth: true
+            }
+          },
+          {
             path: 'details/:vehicleId',
             component: loadRouteComponent('app/vehicles/details/VehicleDetailsIndex'),
             props: true,
@@ -228,6 +255,26 @@ export const AppRoutes: Array<RouteRecordRaw> = [
               title: 'Trips',
               requiresAuth: true
             }
+          },
+          {
+            path: 'details/:tripId',
+            component: loadRouteComponent('app/trips/details/SingleTrip'),
+            name: 'trips.detail.info',
+            props: true,
+            meta: {
+              title: 'Trip Details',
+              requiresAuth: true
+            }
+          },
+          {
+            path: 'details/mainfest/:tripId',
+            component: loadRouteComponent('app/trips/details/TripManifest'),
+            name: 'trips.manifest.info',
+            props: true,
+            meta: {
+              title: 'Trip Details',
+              requiresAuth: true
+            }
           }
         ]
       },
@@ -235,10 +282,40 @@ export const AppRoutes: Array<RouteRecordRaw> = [
         path: '/settings',
         name: 'settings',
         component: Settings,
+        redirect: 'settings.edit.partner',
         meta: {
           title: 'Settings',
-          requiresAuth: false
-        }
+          requiresAuth: true
+        },
+        children: [
+          {
+            path: '',
+            name: 'settings.edit.partner',
+            component: loadRouteComponent('app/settings/EditPartnerInfo'),
+            meta: {
+              title: 'Edit Partner Information',
+              requiresAuth: true
+            }
+          },
+          {
+            path: 'company',
+            name: 'settings.edit.partner.company',
+            component: loadRouteComponent('app/settings/EditCompanyInfo'),
+            meta: {
+              title: 'Edit Partner Information',
+              requiresAuth: true
+            }
+          },
+          {
+            path: 'accounts',
+            name: 'settings.edit.settlemet.account',
+            component: loadRouteComponent('app/settings/SettlementAccount'),
+            meta: {
+              title: 'Settlement Account Information',
+              requiresAuth: true
+            }
+          }
+        ]
       }
     ]
   },

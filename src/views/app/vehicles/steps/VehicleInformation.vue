@@ -6,7 +6,6 @@
         <div class="space-y-2 w-full">
           <label class="text-xs font-medium text-grays-black-5">Vehicle brand</label>
           <v-select
-            @input="console.log($event)"
             @option:selected="onCarBrandChanged($event)"
             class="form-group"
             :options="vehicleBrands"
@@ -30,7 +29,6 @@
           <label class="text-xs font-medium text-grays-black-5">Vehicle Model</label>
           <v-select
             :disabled="fetchingModels"
-            @input="console.log($event)"
             @option:selected="onCarModelChanged($event)"
             class="form-group"
             :options="vehicleModels"
@@ -96,7 +94,7 @@
         </span>
         </div>
         <div class="space-y-2 w-full">
-          <label class="text-xs font-medium text-grays-black-5">Capacity (Includes drivers seat)</label>
+          <label class="text-xs font-medium text-grays-black-5">Passenger capacity (Includes drivers seat)</label>
           <input
             type="number"
             min="2"
@@ -119,11 +117,9 @@
           <v-select
             :disabled="fetchingModels"
             @input="console.log($event)"
-            v-model="v$.form.city_ids.$model"
             class="form-group"
-            :reduce="(option) => option.city.id"
+            @option:selected="selectThisCity($event)"
             :options="cities"
-            :multiple="true"
             label="id"
             required>
             <template v-slot:option="model">
@@ -174,6 +170,7 @@
           :class="v$.form.$invalid || processing ?
           'cursor-not-allowed text-grays-black-5 bg-grays-black-7' : 'bg-sh-green-500 font-medium'">
           {{ processing ? 'Saving' : 'Next' }}
+           <spinner v-if="processing"></spinner>
           <img v-if="!processing" class="ml-2" src="@/assets/images/arrow.svg" />
         </button>
       </div>
@@ -206,7 +203,7 @@ export default defineComponent<any, any, any>({
         // type: 'Sedan',
         year: '',
         seats: '',
-        city_ids: '',
+        city_ids: [],
         registration_number: '',
         partner_id: ''
       },
@@ -223,10 +220,10 @@ export default defineComponent<any, any, any>({
     };
   },
   watch: {
-    "form.registration_number"() {
+    "form.registration_number" () {
       if (this.checkPlateNumberFormat(this.form.registration_number)) {
         this.validPlateNumber = true;
-      } else{
+      } else {
         this.validPlateNumber = false;
       }
     }
@@ -256,11 +253,15 @@ export default defineComponent<any, any, any>({
     this.form.partner_id = this.partnerContext?.partner?.id;
   },
   methods: {
-    uppercase($event: any) {
+    selectThisCity (city: any) {
+      const cityId = city.city.id
+      this.form.city_ids = [cityId]
+    },
+    uppercase ($event: any) {
       this.form.registration_number = this.form.registration_number.toUpperCase();
       this.getKeyStroke($event)
     },
-    getKeyStroke($event: any) {
+    getKeyStroke ($event: any) {
       const pressedKey = ($event.key)
       console.log(1)
       if (pressedKey === 'Backspace' && this.form.registration_number.length === 3) {
@@ -272,7 +273,7 @@ export default defineComponent<any, any, any>({
         console.log(0)
       }
     },
-    checkPlateNumberFormat(plateNumber: string): boolean {
+    checkPlateNumberFormat (plateNumber: string): boolean {
       if (/^[a-zA-Z]{3}-[0-9]{3}[a-zA-Z]{2}$/gi.test(plateNumber)) {
         return true
       } else {

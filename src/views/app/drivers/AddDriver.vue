@@ -16,12 +16,13 @@
     <main class="md:w-9/12 p-5 lg:p-14 bg-white ring-1 ring-gray-100">
       <div class="flex justify-center items-center flex-col space-y-2 pb-5">
         <img
-          v-if="profilePreview"
+          v-if="profilePreview && !uploadingProfile"
           class="h-14 w-14 rounded-full object-cover"
           :src="profilePreview"
         />
+        <spinner v-if="uploadingProfile"></spinner>
         <img
-          v-if="!profilePreview"
+          v-if="!profilePreview && !uploadingProfile"
           class="h-16 w-16"
           src="@/assets/images/userIcon.svg"
         />
@@ -34,7 +35,10 @@
         <label
           for="profile"
           class="text-indigo-700 text-sm font-medium cursor-pointer"
-          >Click to upload image</label
+          :class="[uploadingProfile ? 'opacity-25 cursor-not-allowed' : '']"
+          >{{
+            uploadingProfile ? 'Uploading...' : 'Click to upload image'
+          }}</label
         >
       </div>
       <div>
@@ -317,7 +321,10 @@
               <p class="font-medium text-gray-600 text-xs">
                 Upload drivers license document (pdf, jpg, png)
               </p>
-              <image-upload @fileSelected="fileSelected"></image-upload>
+              <image-upload
+                :uploading="uploadingFile"
+                @fileSelected="fileSelected"
+              ></image-upload>
             </div>
           </section>
 
@@ -343,12 +350,30 @@
               "
             >
               {{ processing ? 'Saving' : 'Submit' }}
-              <img class="ml-2" src="@/assets/images/arrow.svg" />
+              <spinner v-if="processing"></spinner>
+              <img v-if="!processing" class="ml-2" src="@/assets/images/arrow.svg" />
             </button>
           </div>
         </form>
       </div>
     </main>
+    <app-modal :modalActive="showModal">
+      <div class="flex flex-col justify-center items-center py-3">
+        <img src="@/assets/images/successCheck.svg" />
+        <div class="space-y-3 pb-16 pt-5">
+          <h1 class="text-center font-medium">Driver created</h1>
+          <p class="text-gray-400 text-center">
+            You have successfully created a driver
+          </p>
+        </div>
+        <button
+          @click="closeModal"
+          class="text-black bg-sh-green-500 rounded-md p-2 w-11/12 font-medium"
+        >
+          Dismiss
+        </button>
+      </div>
+    </app-modal>
   </page-layout>
 </template>
 
@@ -362,7 +387,9 @@ import { mapGetters } from 'vuex';
 import { extractErrorMessage } from '@/utils/helper';
 import { format } from 'date-fns';
 import PageLayout from '@/components/layout/PageLayout.vue';
+import Spinner from '@/components/layout/Spinner.vue';
 import PageActionHeader from '@/components/PageActionHeader.vue';
+import AppModal from '@/components/Modals/AppModal.vue';
 
 export default defineComponent({
   name: 'AddDriver',
@@ -370,14 +397,17 @@ export default defineComponent({
     Datepicker,
     ImageUpload,
     PageLayout,
-    PageActionHeader
+    PageActionHeader,
+    AppModal,
+    Spinner
   },
   data() {
     return {
       format,
       uploadingFile: false,
+      uploadingProfile: false,
       v$: useVuelidate(),
-      displayModal: false,
+      showModal: false,
       profilePreview: '',
       form: {
         fname: '',
@@ -417,6 +447,12 @@ export default defineComponent({
     })
   },
   methods: {
+    openModal() {
+      this.showModal = true;
+    },
+    closeModal() {
+      this.showModal = false;
+    },
     async saveForm() {
       this.v$.form.$touch();
       if (this.processing || this.v$.form.$errors.length) {
@@ -443,10 +479,12 @@ export default defineComponent({
           `/v1/partners/${this.userSessionData.activeContext.account_sid}/drivers`,
           payload
         );
+        this.openModal();
         this.$router.push({
           name: 'driver.detail.info',
           params: { driverId: response.data.driver_id }
         });
+        this.closeModal();
       } catch (err) {
         const errorMessage = extractErrorMessage(
           err,
@@ -468,14 +506,33 @@ export default defineComponent({
       this.form.files.push(imageDbUrl);
     },
 
+    // async handleProfileUpload(e: any) {
+    //   const selectedProfile = e.target.files[0];
+    //   this.uploadingProfile = true
+    //   this.profilePreview = URL.createObjectURL(selectedProfile);
+    //   const response = await this.uploadTos3andGetDocumentUrl(selectedProfile);
+    //   if (response) {
+    //     this.uploadingFile = false
+    //     this.$toast.success('Profile picture was uploaded successfully');
+    //   }
+    //   this.form.avatar = response;
+    // },
+
     async handleProfileUpload(e: any) {
       const selectedProfile = e.target.files[0];
-      this.profilePreview = URL.createObjectURL(selectedProfile);
-      const response = await this.uploadTos3andGetDocumentUrl(selectedProfile);
-      if (response) {
-        this.$toast.success('Profile picture was uploaded successfully');
-      }
-      this.form.avatar = response;
+      this.uploadingProfile = true;
+      await this.uploadTos3andGetDocumentUrl(selectedProfile)
+        .then((res) => {
+          this.form.avatar = res;
+          this.profilePreview = URL.createObjectURL(selectedProfile);
+          this.$toast.success('Profile picture was uploaded successfully');
+        })
+        .catch(() => {
+          this.$toast.error('Something went wrong while uploading profile');
+        })
+        .finally(() => {
+          this.uploadingProfile = false;
+        });
     },
 
     async uploadTos3andGetDocumentUrl(file: any) {

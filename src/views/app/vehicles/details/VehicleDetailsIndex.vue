@@ -39,7 +39,7 @@
                 bottom-0
                 right-7
                 h-36
-                w-40
+                w-44
                 z-50
                 rounded-md
                 shadow-md
@@ -63,6 +63,7 @@
                 >Edit</a
               >
               <a
+                v-if="!vehicleData.driver"
                 href="#"
                 @click="assignDriver(vehicleData)"
                 class="
@@ -74,6 +75,20 @@
                   pl-2
                 "
                 >Assign Driver</a
+              >
+              <a
+                v-else
+                href="#"
+                @click="unassignDriver(vehicleData)"
+                class="
+                  text-gray-500
+                  cursor-pointer
+                  hover:bg-black hover:text-white
+                  rounded-md
+                  p-2
+                  pl-2
+                "
+                >Unassign Driver</a
               >
               <a
                 href="#"
@@ -155,8 +170,8 @@
 import PageLayout from '../../../../components/layout/PageLayout';
 import { mapGetters } from 'vuex';
 import Spinner from '../../../../components/layout/Spinner';
-import { extractErrorMessage } from '../../../../utils/helper';
 import PageActionHeader from '../../../../components/PageActionHeader';
+import emitter from '@/libs/emitter'
 export default {
   name: 'VehicleDetailsIndex',
   components: {
@@ -170,13 +185,13 @@ export default {
       isLoading: 'vehicle/getVehicleLoading'
     })
   },
-  data() {
+  data () {
     return {
       loading: true,
       showDropdown: false
     };
   },
-  created() {
+  created () {
     this.$store
       .dispatch('vehicle/fetchVehicleInfo', this.$attrs.vehicleId)
       .finally(() => {
@@ -184,21 +199,22 @@ export default {
       });
   },
   methods: {
-    toggleDropdown() {
+    toggleDropdown () {
       this.showDropdown = !this.showDropdown;
     },
-    editVehicle() {
-      this.$router.push({
-        name: 'EditVehicle',
-        params: { vehicleId: this.$attrs.vehicleId }
-      });
+    editVehicle () {
+      emitter.emit("vehicles:edit-vehicle");
       this.showDropdown = false;
     },
-    assignDriver(item) {
-      console.log(item);
+    assignDriver (item) {
+      emitter.emit("vehicles:assign-driver", item?.id);
       this.showDropdown = false;
     },
-    removeVehicle(item) {
+    unassignDriver (item) {
+      emitter.emit("vehicles:unassign-driver", item?.id);
+      this.showDropdown = false;
+    },
+    removeVehicle (item) {
       console.log(item);
       this.showDropdown = false;
     },

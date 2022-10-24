@@ -4,9 +4,20 @@
       <page-action-header>
         <template #breadcrumbs>
           <div class="flex items-center space-x-3 py-3">
-            <p class="text-gray-400 text-sm">Dashboard</p>
+            <router-link
+              :to="{ name: 'drivers.list' }"
+              class="text-gray-400 text-sm hover:text-gray-900"
+              >Dashboard</router-link
+            >
             <img src="@/assets/images/breadcrumbs.svg" />
-            <p class="text-gray-400 text-sm">Drivers management</p>
+            <router-link
+              :to="{
+                name: 'driver.detail.info',
+                params: { driverId: this.$route.params.driverId }
+              }"
+              class="text-gray-400 text-sm hover:text-gray-900"
+              >Drivers management</router-link
+            >
             <img src="@/assets/images/breadcrumbs.svg" />
             <p class="text-gray-900 text-sm">Edit driver</p>
           </div>
@@ -16,20 +27,17 @@
     <div v-if="fetchingDriver">
       <spinner></spinner>
     </div>
-      <main class="md:w-9/12 p-5 lg:p-14 bg-white ring-1 ring-gray-100">
-    <!-- <main
-      v-else
-      class="container mx-auto p-5 lg:p-14 bg-white ring-1 ring-gray-100"
-    > -->
+    <main class="md:w-9/12 p-5 lg:p-14 bg-white ring-1 ring-gray-100">
       <div class="flex justify-center items-center flex-col space-y-2 pb-5">
         <img
-          v-if="profilePreview"
+          v-if="profilePreview && !uploadingProfile"
           class="h-14 w-14 rounded-full object-cover"
           :src="profilePreview"
         />
+        <spinner v-if="uploadingProfile"></spinner>
         <img
-          v-if="!profilePreview"
-          class="h-14 w-14"
+          v-if="!profilePreview && !uploadingProfile"
+          class="h-16 w-16"
           src="@/assets/images/userIcon.svg"
         />
         <input
@@ -41,7 +49,10 @@
         <label
           for="profile"
           class="text-indigo-700 text-sm font-medium cursor-pointer"
-          >Click to upload image</label
+          :class="[uploadingProfile ? 'opacity-25 cursor-not-allowed' : '']"
+          >{{
+            uploadingProfile ? 'Uploading...' : 'Click to upload image'
+          }}</label
         >
       </div>
       <div>
@@ -223,7 +234,8 @@
               <label class="text-xs font-medium text-grays-black-5"
                 >Date of birth</label
               >
-              <datepicker
+              <input
+                type="date"
                 v-model="v$.form.dob.$model"
                 class="
                   text-xs
@@ -242,7 +254,7 @@
                 class="text-xs font-light text-red-500"
                 v-if="v$.form.dob.$dirty && v$.form.dob.required.$invalid"
               >
-                Please provide your drivers address
+                Please provide your drivers date of birth
               </span>
             </div>
           </section>
@@ -293,7 +305,8 @@
                 <label class="text-xs font-medium text-grays-black-5"
                   >Expiry date
                 </label>
-                <datepicker
+                <input
+                  type="date"
                   v-model="v$.form.expiry_date.$model"
                   class="
                     text-xs
@@ -323,7 +336,12 @@
               <p class="font-medium text-gray-600 text-xs">
                 Upload drivers license document (pdf, jpg, png)
               </p>
-              <image-upload @fileSelected="fileSelected"></image-upload>
+              <image-upload
+                :uploadStatus="isUploaded"
+                @fileSelected="fileSelected"
+                @fileRemoved="handleFileRemoval"
+                :uploading="uploadingFile"
+              ></image-upload>
             </div>
           </section>
 
@@ -349,19 +367,36 @@
               "
             >
               {{ processing ? 'Saving' : 'Update' }}
-              <img class="ml-2" src="@/assets/images/arrow.svg" />
+              <spinner v-if="processing"></spinner>
+              <img v-if="!processing" class="ml-2" src="@/assets/images/arrow.svg" />
             </button>
           </div>
         </form>
       </div>
     </main>
+    <app-modal :modalActive="showModal">
+      <div class="flex flex-col justify-center items-center py-3">
+        <img src="@/assets/images/successCheck.svg" />
+        <div class="space-y-3 pb-16 pt-5">
+          <h1 class="text-center font-medium">Driver details modified</h1>
+          <p class="text-gray-400 text-center">
+            You have successfully modified this drivers details
+          </p>
+        </div>
+        <button
+          @click="closeModal"
+          class="text-black bg-sh-green-500 rounded-md p-2 w-11/12 font-medium"
+        >
+          Dismiss
+        </button>
+      </div>
+    </app-modal>
   </page-layout>
 </template>
 
 <script lang="ts">
 import ImageUpload from '@/components/ImageUpload.vue';
 import { defineComponent } from 'vue';
-import Datepicker from 'vue3-datepicker';
 import useVuelidate from '@vuelidate/core';
 import { email, required } from '@vuelidate/validators';
 import { mapGetters } from 'vuex';
@@ -370,6 +405,7 @@ import { format } from 'date-fns';
 import PageLayout from '@/components/layout/PageLayout.vue';
 import PageActionHeader from '@/components/PageActionHeader.vue';
 import Spinner from '@/components/layout/Spinner.vue';
+import AppModal from '@/components/Modals/AppModal.vue';
 
 interface Driver {
   fname?: string;
@@ -387,22 +423,26 @@ interface Driver {
 export default defineComponent({
   name: 'AddDriver',
   components: {
-    Datepicker,
     ImageUpload,
     PageActionHeader,
     PageLayout,
-    Spinner
+    Spinner,
+    AppModal
   },
   data() {
     return {
+      docId: null,
       fetchingDriver: false,
       format,
       uploadingFile: false,
       v$: useVuelidate(),
-      displayModal: false,
+      showModal: false,
       profilePreview: '',
       form: {} as Driver,
-      processing: false
+      processing: false,
+      documentId: null,
+      isUploaded: false,
+      uploadingProfile: false
     };
   },
   validations() {
@@ -424,29 +464,53 @@ export default defineComponent({
   computed: {
     ...mapGetters({
       userSessionData: 'auth/userSessionData',
-      user: 'auth/user'
+      user: 'auth/user',
+      getDriverData: 'driver/getDriverData',
+      driverData: 'driver/getDriverData'
     })
   },
   created() {
     this.loadDriver();
+    console.log(this.userSessionData);
+    console.log(this.getDriverData, 'here');
   },
   methods: {
-    async loadDriver() {
+    handleFileRemoval() {
+      this.form.files = [];
+      this.isUploaded = false;
+    },
+    openModal() {
+      this.showModal = true;
+    },
+    closeModal() {
+      this.showModal = false;
+    },
+    loadDriver() {
       this.fetchingDriver = true;
-      await this.$axios
+      this.$axios
         .get(`/v1/drivers/${this.$route.params.driverId}`)
         .then((res) => {
+          this.docId = res.data.documents[0].id;
+          const result = this.getUploadedFileUrlFromStringifiedArray(
+            res.data.documents[0].files
+          );
+          if (result.length > 1) {
+            this.isUploaded = true;
+          } else {
+            this.isUploaded = false;
+          }
           this.form.fname = res.data.fname;
           this.form.lname = res.data.lname;
           this.form.phone = res.data.phone;
           this.form.email = res.data.email;
           this.form.residential_address = res.data.residential_address;
           this.form.dob = res.data.dob;
-          this.form.license_number = res.data.license_number;
-          this.form.expiry_date = res.data.expiry_date;
-          this.form.files = res.data.files;
+          this.form.license_number = res.data.documents[0].registration_number;
+          this.form.expiry_date = res.data.documents[0].expiry_date;
+          this.form.files = [JSON.parse(res.data.documents[0].files)[0]];
           this.form.avatar = res.data.avatar;
           this.profilePreview = res.data.avatar;
+          this.documentId = res.data.documents[0].id;
         })
         .catch((err) => {
           console.log(err);
@@ -454,6 +518,13 @@ export default defineComponent({
         .finally(() => {
           this.fetchingDriver = false;
         });
+    },
+    getUploadedFileUrlFromStringifiedArray(stringifiedArray: any) {
+      const parsedArray = JSON.parse(stringifiedArray);
+      if (parsedArray.length > 0) {
+        return parsedArray[0];
+      }
+      return null;
     },
     async updateDriver() {
       this.v$.form.$touch();
@@ -468,22 +539,24 @@ export default defineComponent({
           phone: this.form.phone,
           email: this.form.email,
           residential_address: this.form.residential_address,
-          dob: this.format(this.form.dob as any, 'yyyy-MM-dd'),
+          dob: this.form.dob,
           license_number: this.form.license_number,
-          expiry_date: this.format(this.form.dob as any, 'yyyy-MM-dd HH:mm:ss'),
           files: this.form.files,
           avatar: this.form.avatar,
           document_type: 'drivers_license',
+          document_id: this.docId,
           password: 'shuttlers'
         };
-        const response = await this.$axios.post(
-          `/v1/partners/${this.userSessionData.activeContext.account_sid}/drivers`, //  Endpoint to update driver
+        await this.$axios.patch(
+          `/v1/partners/${this.userSessionData.activeContext.partner.account_sid}/drivers/${this.$route.params.driverId}`, //  Endpoint to update driver
           payload
         );
-        console.log(response);
-        this.$toast.success('Drivers details was successfully updated');
+        this.openModal();
         this.$router.push({ name: 'drivers.list' });
+        this.closeModal();
+        this.$toast.success('Drivers details was successfully updated');
       } catch (err) {
+        console.log(err);
         const errorMessage = extractErrorMessage(
           err,
           null,
@@ -498,15 +571,23 @@ export default defineComponent({
       const imageDbUrl = (await this.uploadTos3andGetDocumentUrl(
         selectedImage
       )) as string;
-      //  this.form.files.push(imageDbUrl)
+      // this.form.files.push(imageDbUrl);
     },
-
     async handleProfileUpload(e: any) {
       const selectedProfile = e.target.files[0];
-      this.profilePreview = URL.createObjectURL(selectedProfile);
-      this.form.avatar = await this.uploadTos3andGetDocumentUrl(
-        selectedProfile
-      );
+      this.uploadingProfile = true;
+      await this.uploadTos3andGetDocumentUrl(selectedProfile)
+        .then((res) => {
+          this.form.avatar = res;
+          this.profilePreview = URL.createObjectURL(selectedProfile);
+          this.$toast.success('Profile picture was uploaded successfully');
+        })
+        .catch(() => {
+          this.$toast.error('Something went wrong while uploading profile');
+        })
+        .finally(() => {
+          this.uploadingProfile = false;
+        });
     },
 
     async uploadTos3andGetDocumentUrl(file: any) {
