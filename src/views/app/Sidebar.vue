@@ -71,7 +71,7 @@
                 'justify-center': isSidebarFolded,
                 'justify-between pl-5': !isSidebarFolded
               }"
-              :to="{name: menu.routeName}"
+              :to="{ name: menu.routeName }"
             >
               <div class="flex flex-row items-center text-gray-500">
                 <span
@@ -81,20 +81,14 @@
                   }"
                   >{{ menu.icon }}</span
                 >
-                <span
-                  class="font-sm sidemenu-icon-label"
-                >
+                <span class="font-sm sidemenu-icon-label">
                   {{ isSidebarFolded ? '' : menu.title }}
                 </span>
               </div>
               <div>
                 <div
                   class="h-5 w-1 sidebar-active-status"
-                  :class="
-                   !isSidebarFolded
-                      ? ''
-                      : 'hidden'
-                  "
+                  :class="!isSidebarFolded ? '' : 'hidden'"
                 ></div>
               </div>
             </router-link>
@@ -147,19 +141,53 @@ export default defineComponent({
         {
           sectionTitle: 'GENERAL',
           menus: [
-            { title: 'Dashboard', routeName: 'dashboard', icon: 'home', selected: true },
-            { title: 'Vehicles', routeName: 'vehicles.list', icon: 'directions_car', selected: false },
-            { title: 'Drivers', routeName: 'drivers.list', icon: 'group', selected: false },
-            { title: 'Trips', routeName: 'trips.list', icon: 'route', selected: false },
-            { title: 'Routes', icon: 'route', selected: false },
-            // {title: 'Earnings', icon: 'payments', selected: false}
-            { title: 'Earnings', routeName: 'earnings.information', icon: 'payments', selected: false}
+            {
+              title: 'Dashboard',
+              routeName: 'dashboard',
+              icon: 'home',
+              selected: true
+            },
+            {
+              title: 'Vehicles',
+              routeName: 'vehicles.list',
+              icon: 'directions_car',
+              selected: false
+            },
+            {
+              title: 'Drivers',
+              routeName: 'drivers.list',
+              icon: 'group',
+              selected: false
+            },
+            {
+              title: 'Trips',
+              routeName: 'trips.list',
+              icon: 'map',
+              selected: false
+            },
+            {
+              title: 'Routes',
+              routeName: 'routes.list',
+              icon: 'route',
+              selected: false
+            },
+            {
+              title: 'Earnings',
+              routeName: 'earnings.information',
+              icon: 'payments',
+              selected: false
+            }
           ]
         },
         {
           sectionTitle: 'SYSTEM',
           menus: [
-            {title: 'Settings', routeName: 'settings.edit.partner', icon: 'settings', selected: false}
+            {
+              title: 'Settings',
+              routeName: 'settings.edit.partner',
+              icon: 'settings',
+              selected: false
+            }
           ]
         }
       ]
@@ -209,14 +237,15 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
-  .router-link-active {
-    @apply bg-black
-  }
+.router-link-active {
+  @apply bg-black;
+}
 
-  .router-link-active .sidemenu-icon, .router-link-active .sidemenu-icon-label {
-      @apply text-white
-    }
-    .router-link-active .sidebar-active-status {
-      @apply bg-sh-green-500;
-    }
+.router-link-active .sidemenu-icon,
+.router-link-active .sidemenu-icon-label {
+  @apply text-white;
+}
+.router-link-active .sidebar-active-status {
+  @apply bg-sh-green-500;
+}
 </style>
