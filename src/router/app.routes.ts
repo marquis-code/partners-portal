@@ -369,7 +369,8 @@ export const AppRoutes: Array<RouteRecordRaw> = [
             meta: {
               title: 'Route Detail',
               requiresAuth: true
-            }
+            },
+            props: true
           },
         ]
       },
