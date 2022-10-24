@@ -96,17 +96,14 @@ import { defineComponent } from 'vue';
 import AppTable from '@/components/AppTable.vue';
 import { mapGetters } from 'vuex';
 import PageLayout from '@/components/layout/PageLayout.vue';
-import OptionsDropdown from '@/components/OptionsDropdown.vue';
 import TripHistory from '@/components/TripHistory.vue';
 import moment from 'moment';
 export default defineComponent({
   name: 'DriversList',
   components: {
     PageLayout,
-    // PageActionHeader,
     AppTable,
     TripHistory
-    /* DownloadButton */
   },
   created() {
     this.fetchPartnerTripsFromRevenue();
@@ -150,12 +147,6 @@ export default defineComponent({
     ...mapGetters({
       partnerContext: 'auth/activeContext'
     })
-    // tableHeaders () {
-    //   const statusValue = this.filters.status;
-    //   return statusValue === 'active-trips' || statusValue === 'upcoming-trips'
-    //     ? this.activeAndUpcomingTripsHeaders
-    //     : this.completedTripsHeaders;
-    // }
   },
   watch: {
     'filters.status'(value) {
@@ -212,7 +203,7 @@ export default defineComponent({
     },
     viewTripDetails(trip: any) {
       this.$router.push({
-        name: 'trips.detail.info',
+        name: 'trip.detail.info',
         params: { tripId: trip.id }
       });
     },

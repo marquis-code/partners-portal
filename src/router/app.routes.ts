@@ -249,10 +249,51 @@ export const AppRoutes: Array<RouteRecordRaw> = [
 
         ]
       },
+      // {
+      //   path: '/trips',
+      //   name: 'trips',
+      //   component: Trips,
+      //   meta: {
+      //     title: 'Trips',
+      //     requiresAuth: true
+      //   },
+      //   children: [
+      //     {
+      //       path: '',
+      //       name: 'trips.list',
+      //       component: loadRouteComponent('app/trips/list/TripsList'),
+      //       meta: {
+      //         title: 'Trips',
+      //         requiresAuth: true
+      //       }
+      //     },
+      //     {
+      //       path: 'details/:tripId',
+      //       component: loadRouteComponent('app/trips/details/SingleTrip'),
+      //       name: 'trips.detail.info',
+      //       props: true,
+      //       meta: {
+      //         title: 'Trip Details',
+      //         requiresAuth: true
+      //       }
+      //     },
+      //     {
+      //       path: 'details/mainfest/:tripId',
+      //       component: loadRouteComponent('app/trips/details/TripManifest'),
+      //       name: 'trips.manifest.info',
+      //       props: true,
+      //       meta: {
+      //         title: 'Trip Details',
+      //         requiresAuth: true
+      //       }
+      //     }
+      //   ]
+      // },
       {
         path: '/trips',
         name: 'trips',
         component: Trips,
+        redirect: 'trips.list',
         meta: {
           title: 'Trips',
           requiresAuth: true
@@ -265,28 +306,42 @@ export const AppRoutes: Array<RouteRecordRaw> = [
             meta: {
               title: 'Trips',
               requiresAuth: true
-            }
+            },
           },
           {
             path: 'details/:tripId',
-            component: loadRouteComponent('app/trips/details/SingleTrip'),
-            name: 'trips.detail.info',
+            component: loadRouteComponent('app/trips/details/TripsDetailsIndex'),
             props: true,
             meta: {
               title: 'Trip Details',
               requiresAuth: true
-            }
+            },
+            children: [
+              {
+                path: '',
+                name: 'trip.detail',
+                redirect: 'information'
+              },
+              {
+                path: 'information',
+                name: 'trip.detail.info',
+                component: loadRouteComponent('app/trips/details/TripInfo'),
+                meta: {
+                  title: 'Trip Details',
+                  requiresAuth: true
+                },
+              },
+              {
+                path: 'manifest',
+                name: 'trip.detail.manifest',
+                component: loadRouteComponent('app/trips/details/TripManifest'),
+                meta: {
+                  title: 'Trip Manifest',
+                  requiresAuth: true
+                },
+              }
+            ]
           },
-          {
-            path: 'details/mainfest/:tripId',
-            component: loadRouteComponent('app/trips/details/TripManifest'),
-            name: 'trips.manifest.info',
-            props: true,
-            meta: {
-              title: 'Trip Details',
-              requiresAuth: true
-            }
-          }
         ]
       },
       {
@@ -342,7 +397,7 @@ export const AppRoutes: Array<RouteRecordRaw> = [
             name: 'settings.edit.partner.company',
             component: loadRouteComponent('app/settings/EditCompanyInfo'),
             meta: {
-              title: 'Edit Partner Information',
+              title: 'Edit Company Information',
               requiresAuth: true
             }
           },

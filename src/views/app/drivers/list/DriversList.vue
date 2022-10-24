@@ -39,7 +39,7 @@
             cursor-pointer
           "
           :class="
-            this.filters.status === 'active'
+            filters.status === 'active'
               ? 'text-black border-b-sh-green-500'
               : 'text-sh-grey-500 border-b-transparent'
           "
@@ -58,12 +58,12 @@
             cursor-pointer
           "
           :class="
-            this.filters.status === 'inactive'
+            filters.status === 'inactive'
               ? 'text-black border-b-sh-green-500'
               : 'text-sh-grey-500 border-b-transparent'
           "
           @click="setStatusFilter('inactive')"
-          >InActive</span
+          >Inactive</span
         >
       </div>
       <div class="space-y-5 ring-1 ring-gray-50 shadow-sm rounded-sm bg-white">
