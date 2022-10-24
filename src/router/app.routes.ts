@@ -312,7 +312,7 @@ export const AppRoutes: Array<RouteRecordRaw> = [
             name: 'settings.edit.partner.company',
             component: loadRouteComponent('app/settings/EditCompanyInfo'),
             meta: {
-              title: 'Edit Partner Information',
+              title: 'Edit Company Information',
               requiresAuth: true
             }
           },
