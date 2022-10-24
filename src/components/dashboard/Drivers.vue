@@ -11,7 +11,7 @@
   >
     <img src="@/assets/images/driver.svg" />
     <p class="text-grays-black-4">Total Drivers</p>
-    <h1 class="text-sh-grey-900 font-bold">1</h1>
+    <h1 class="text-sh-grey-900 font-bold">200</h1>
     <div class="bg-grays-black-7 w-full h-0.5"></div>
     <div class="flex space-x-3 items-center">
       <img src="@/assets/images/addDriverIcon.svg" />
