@@ -53,8 +53,32 @@
       </div>
     </section>
     <section class="flex space-x-28 mt-12">
-      <div class="w-1/2 bg-white shadow-md rounded-md"></div>
-      <div class="w-1/2 bg-white shadow-md rounded-md"><ratings></ratings></div>
+      <div
+        class="
+          w-1/2
+          bg-white
+          shadow-md
+          rounded-md
+          flex
+          justify-center
+          items-center
+        "
+      >
+        <pie-chart></pie-chart>
+      </div>
+      <div
+        class="
+          w-1/2
+          bg-white
+          shadow-md
+          rounded-md
+          flex
+          justify-center
+          items-center
+        "
+      >
+        <ratings></ratings>
+      </div>
     </section>
   </page-layout>
 </template>
@@ -68,6 +92,7 @@ import Vehicles from '@/components/dashboard/Vehicles.vue';
 import Trips from '@/components/dashboard/Trips.vue';
 import Drivers from '@/components/dashboard/Drivers.vue';
 import Ratings from '@/components/dashboard/Ratings.vue';
+import PieChart from '@/components/dashboard/PieChart.vue';
 import Chart from '@/components/dashboard/Chart.vue';
 import CheckList from '@/components/CheckList.vue';
 import { extractErrorMessage } from '@/utils/helper';
@@ -80,7 +105,8 @@ export default defineComponent({
     Drivers,
     Vehicles,
     Chart,
-    Ratings
+    Ratings,
+    PieChart
   },
   data() {
     return {

@@ -1,16 +1,5 @@
 <template>
-  <main
-    class="
-      rounded-md
-      shadow-sm
-      ring-1 ring-gray-100
-      p-10
-      flex
-      justify-between
-      items-center
-      space-x-6
-    "
-  >
+  <main class="p-10 flex justify-between items-center space-x-6">
     <div class="flex justify-center items-center flex-col space-y-3">
       <p class="text-sm text-gray-400">Ratings count</p>
       <div class="flex items-center space-x-2">
