@@ -37,10 +37,24 @@
       <drivers></drivers>
       <trips></trips>
     </section>
-    <section class="bg-white rounded-md shadow-sm  space-y-4 p-10 mt-12 ring-1 ring-gray-50">
+    <section
+      class="
+        bg-white
+        rounded-md
+        shadow-sm
+        space-y-4
+        p-10
+        mt-12
+        ring-1 ring-gray-50
+      "
+    >
       <div id="barchart">
-         <chart></chart>
+        <chart></chart>
       </div>
+    </section>
+    <section class="flex space-x-28 mt-12">
+      <div class="w-1/2 bg-white shadow-md rounded-md"></div>
+      <div class="w-1/2 bg-white shadow-md rounded-md"><ratings></ratings></div>
     </section>
   </page-layout>
 </template>
@@ -53,6 +67,7 @@ import Earnings from '@/components/dashboard/Earnings.vue';
 import Vehicles from '@/components/dashboard/Vehicles.vue';
 import Trips from '@/components/dashboard/Trips.vue';
 import Drivers from '@/components/dashboard/Drivers.vue';
+import Ratings from '@/components/dashboard/Ratings.vue';
 import Chart from '@/components/dashboard/Chart.vue';
 import CheckList from '@/components/CheckList.vue';
 import { extractErrorMessage } from '@/utils/helper';
@@ -64,7 +79,8 @@ export default defineComponent({
     Trips,
     Drivers,
     Vehicles,
-    Chart
+    Chart,
+    Ratings
   },
   data() {
     return {
