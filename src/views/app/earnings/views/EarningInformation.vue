@@ -86,12 +86,12 @@
             :fields="headers"
             @rowClicked="viewTableDetails"
           >
-            <template v-slot:metadata="{ item }">
+            <!-- <template v-slot:metadata="{ item }">
               <span v-if="item" class="font-light text-sm text-gray-type-3">
                 {{ item.fname || '' }}
                 {{ item.lname || '' }}
               </span>
-            </template>
+            </template> -->
 
             <template v-slot:actions="">
               <img src="@/assets/icons/more_options.svg" />
@@ -109,8 +109,26 @@ import { defineComponent } from 'vue';
 import PageLayout from '@/components/layout/PageLayout.vue';
 import PageActionHeader from '@/components/PageActionHeader.vue';
 import EarningsDataCard from '@/views/app/earnings/components/EarningsDataCard.vue';
+import EarningsTableDataCard from '@/views/app/earnings/components/EarningsTableDataCard.vue';
 import AppTable from '@/components/AppTable.vue';
 import moment from 'moment';
+import TableEarnings from '@/models/table-earnings-data';
+
+const dummyEarning: Array<TableEarnings> = [
+  {
+    id: '',
+    date: '',
+    route: {
+      from: '',
+      to: '',
+    },
+    routeCode: '',
+    driver: '',
+    vehicle: '',
+    deductions: '',
+    netIncome: '',
+  }
+];
 export default defineComponent({
   name: 'EarningInformation',
   components: {
@@ -118,6 +136,7 @@ export default defineComponent({
     PageLayout,
     PageActionHeader,
     AppTable,
+    // EarningsTableDataCard,
   },
   computed: {
     changedFilterSortBy(nv) {
@@ -141,7 +160,7 @@ export default defineComponent({
         { label: 'Deductions', key: 'deductions' },
         { label: 'Net Income', key: 'netIncome' },
       ],
-      earnings: [],
+      earnings: dummyEarning as Array<TableEarnings>,
       viewTableDetails() {
         // sd
       },
