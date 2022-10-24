@@ -1,48 +1,28 @@
 <template>
-  <main class="p-10 flex justify-between items-center space-x-6">
-    <div class="flex justify-center items-center flex-col space-y-3">
-      <p class="text-sm text-gray-400">Ratings count</p>
-      <div class="flex items-center space-x-2">
-        <h1 class="font-bold">0.0</h1>
-        <p
-          class="
-            text-sh-purple-700
-            bg-indigo-300
-            rounded-full
-            w-7
-            h-7
-            flex
-            justify-center
-            items-center
-            text-center text-xs
-          "
-        >
-          0%
-        </p>
-      </div>
-      <small class="text-xs text-gray-400"
-        >Growth in ratings for this month</small
-      >
-    </div>
-    <div class="h-full w-0.5 bg-gray-200"></div>
-    <div class="flex justify-center items-center flex-col space-y-3">
-      <p class="text-sm text-gray-400">Average ratings</p>
-      <div class="flex items-center space-x-2">
-        <h1 class="font-bold">0.0</h1>
-        <div class="flex items-center">
-          <img src="@/assets/images/ratingStar.svg" />
-          <img src="@/assets/images/ratingStar.svg" />
-          <img src="@/assets/images/ratingStar.svg" />
-          <img src="@/assets/images/ratingStar.svg" />
-          <img src="@/assets/images/ratingStar.svg" />
-        </div>
-      </div>
-      <small class="text-xs text-gray-400">Average ratings this month</small>
+  <main
+    class="
+      rounded-md
+      ring-1 ring-gray-200
+      bg-grays-white
+      p-6
+      space-y-5
+      shadow-sm
+    "
+  >
+    <img src="@/assets/images/overallRatings.svg" />
+    <p class="text-grays-black-4">Overall ratings</p>
+    <h1 class="text-sh-grey-900">4.5/5</h1>
+    <div class="bg-grays-black-7 w-full h-0.5"></div>
+    <div class="flex space-x-2 items-center">
+      <img src="@/assets/images/ratingHike.svg" />
+      <span class="text-sh-purple-700 text-sm"><span class="text-green-500">200,000</span> ratings in total</span>
     </div>
   </main>
 </template>
+
 <script>
 export default {};
 </script>
+
 <style>
 </style>

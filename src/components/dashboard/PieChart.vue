@@ -1,11 +1,11 @@
 <template>
-  <div id="chart" class="bg-white space-x-6 pl-3 pt-3">
+  <div id="chart" class="bg-white p-4 lg:space-x-6 lg:space-y-4 space-y-2 lg:p-6 rounded-md shadow-md lg:w-5/12 mt-7">
     <div class="flex justify-between items-center">
       <h1 class="text-gray-400 font-medium text-sm">Drivers Compliance</h1>
     </div>
     <apexchart
       width="400"
-      height="300"
+      height="250"
       type="donut"
       :options="chartOptions"
       :series="series"

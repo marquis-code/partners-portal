@@ -1,28 +1,58 @@
 <template>
   <page-layout page-title="Welcome">
-    <div class="py-7 px-16 bg-white grid grid-cols-2 gap-4">
-      <div class="left-side mr-16 border-r border-gray-200 pr-6">
+    <div
+      class="
+        p-6
+        lg:py-7 lg:px-16
+        bg-white
+        grid grid-cols-1
+        lg:grid-cols-2
+        gap-4
+        space-y-5
+      "
+    >
+      <div class="left-side lg:mr-16 lg:border-r border-gray-200 lg:pr-6">
         <p class="text-sm text-gray-500 mb-7">Complete your profile</p>
         <div class="flex flex-col">
-          <CheckList :item="`Identity verification`" :done="true" />
-          <CheckList :item="`Address verification`" :done="true" />
           <CheckList
+            class="text-xs md:text-base"
+            :item="`Identity verification`"
+            :done="true"
+          />
+          <CheckList
+            class="text-xs md:text-base"
+            :item="`Address verification`"
+            :done="true"
+          />
+          <CheckList
+            class="text-xs md:text-base"
             :item="`Upload company documents`"
             :done="false"
             @click="goToCompanyDocUpload"
           />
-          <CheckList :item="`Add a Driver (Optional)`" :done="false" />
-          <CheckList :item="`Add a vehicle`" :done="false" />
-          <CheckList :item="`Settlement Account details`" :done="false" />
+          <CheckList
+            class="text-xs md:text-base"
+            :item="`Add a Driver (Optional)`"
+            :done="false"
+          />
+          <CheckList
+            class="text-xs md:text-base"
+            :item="`Add a vehicle`"
+            :done="false"
+          />
+          <CheckList
+            class="text-xs md:text-base"
+            :item="`Settlement Account details`"
+            :done="false"
+          />
         </div>
       </div>
-      <!-- <div class="seperator w-0.5 h-20 bg-gray-100"></div> -->
       <div class="right-side flex flex-row justify-center items-center">
         <div class="">
           <p class="text-2xl font-medium">
             Welcome {{ partnerContext.partner.company_name }}
           </p>
-          <p>
+          <p class="text-sm md:text-base">
             You’re doing well,
             <span class="text-sh-purple-700 underline">3 of 5</span> steps to be
             completed
@@ -31,12 +61,13 @@
       </div>
     </div>
     <h1 class="font-medium text-gray-800 py-5">Overview</h1>
-    <section class="grid grid-cols-4 gap-6">
+    <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       <earnings></earnings>
       <vehicles></vehicles>
       <drivers></drivers>
-      <trips></trips>
+      <ratings></ratings>
     </section>
+
     <section
       class="
         bg-white
@@ -52,34 +83,7 @@
         <chart></chart>
       </div>
     </section>
-    <section class="flex space-x-28 mt-12">
-      <div
-        class="
-          w-1/2
-          bg-white
-          shadow-md
-          rounded-md
-          flex
-          justify-center
-          items-center
-        "
-      >
-        <pie-chart></pie-chart>
-      </div>
-      <div
-        class="
-          w-1/2
-          bg-white
-          shadow-md
-          rounded-md
-          flex
-          justify-center
-          items-center
-        "
-      >
-        <ratings></ratings>
-      </div>
-    </section>
+    <pie-chart></pie-chart>
   </page-layout>
 </template>
 
@@ -89,7 +93,6 @@ import { mapGetters } from 'vuex';
 import PageLayout from '@/components/layout/PageLayout.vue';
 import Earnings from '@/components/dashboard/Earnings.vue';
 import Vehicles from '@/components/dashboard/Vehicles.vue';
-import Trips from '@/components/dashboard/Trips.vue';
 import Drivers from '@/components/dashboard/Drivers.vue';
 import Ratings from '@/components/dashboard/Ratings.vue';
 import PieChart from '@/components/dashboard/PieChart.vue';
@@ -101,7 +104,6 @@ export default defineComponent({
     PageLayout,
     CheckList,
     Earnings,
-    Trips,
     Drivers,
     Vehicles,
     Chart,

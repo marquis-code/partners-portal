@@ -1,5 +1,5 @@
 <template>
-  <div class="">
+  <div class="overflow-x-auto">
     <div class="flex justify-between items-center">
       <h1 class="text-gray-400 font-medium">Trips</h1>
     </div>
