@@ -181,6 +181,7 @@ export default defineComponent({
         )
         .then((res) => {
           const trips = this.transformActiveOrUpcomingTrips(res.data.data);
+          console.log(trips);
           this.tableData = trips;
           this.totalRecords = res.data.metadata?.total;
         })
