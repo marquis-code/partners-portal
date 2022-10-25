@@ -238,11 +238,29 @@ export const AppRoutes: Array<RouteRecordRaw> = [
             },
           },
           {
+            path: '/earnings/cost-configuration',
+            name: 'earnings.cost-configuration',
+            component: loadRouteComponent('app/earnings/views/CostConfiguration'),
+            meta: {
+              title: 'Earnings-Cost-Configuration',
+              requiresAuth: true,
+            },
+          },
+          {
             path: '/earnings/vehicle-information/:id',
             name: 'earnings.vehicleInformation',
             component: loadRouteComponent('app/earnings/views/VehicleEarningsInformation'),
             meta: {
               title: 'Vehicle-Earnings-Information',
+              requiresAuth: true,
+            },
+          },
+          {
+            path: '/earnings/cost-configuration/vehicle/:id',
+            name: 'earnings.vehicle-cost-configuration',
+            component: loadRouteComponent('app/earnings/views/VehicleCostConfiguration'),
+            meta: {
+              title: 'Vehicle-Cost-Configuration',
               requiresAuth: true,
             },
           },
