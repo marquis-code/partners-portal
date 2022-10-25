@@ -129,5 +129,7 @@ export default defineComponent({
 </script>
 
 <style>
-.apexcharts-bar-area:hover { fill: #20E682 !important; }
+.apexcharts-bar-area:hover {
+  fill: #20e682 !important;
+}
 </style>
