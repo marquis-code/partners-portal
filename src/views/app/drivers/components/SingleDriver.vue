@@ -36,7 +36,7 @@
           }}{{ driverData.lname.slice(0, 1) }}</span
         >
       </main>
-      <p class="font-light text-gray-600 text-center">
+      <p class="font-medium text-gray-600 text-center">
         {{ driverData?.fname }} {{ driverData?.lname }}
       </p>
     </div>
@@ -73,7 +73,7 @@
         </div>
         <router-link
           :to="{ name: 'EditDriver', params: { driverId: driverData.id } }"
-          class="underline text-indigo-600 text-sm"
+          class="underline text-indigo-600 text-sm hover:text-sh-green-500 hover:decoration-sh-green-500"
           >Update drivers licence</router-link
         >
       </div>
@@ -87,7 +87,7 @@
             </p>
           </div>
         </div>
-        <router-link to="trips" class="underline text-indigo-600 text-xs"
+        <router-link to="trips" class="underline text-indigo-600 text-xs hover:text-sh-green-500 hover:decoration-sh-green-500"
           >View all</router-link
         >
       </div>
@@ -103,7 +103,7 @@
         </div>
         <router-link
           :to="{ name: 'EditDriver', params: { driverId: driverData.id } }"
-          class="underline text-indigo-600 text-xs"
+          class="underline text-indigo-600 text-xs hover:text-sh-green-500 hover:decoration-sh-green-500"
           >Change email</router-link
         >
       </div>
@@ -119,7 +119,7 @@
         </div>
         <router-link
           :to="{ name: 'EditDriver', params: { driverId: driverData.id } }"
-          class="underline text-indigo-600 text-xs cursor-pointer"
+          class="underline text-indigo-600 text-xs cursor-pointer  hover:text-sh-green-500 hover:decoration-sh-green-500"
           >Change phone</router-link
         >
       </div>

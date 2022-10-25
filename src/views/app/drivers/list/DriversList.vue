@@ -106,7 +106,39 @@
               >
             </template>
 
-            <template v-slot:driver="{ item }">
+            <template v-slot:email="{ item }">
+              <router-link
+                class="
+                  text-gray-800
+                  hover:underline
+                  hover:decoration-sh-green-500
+                  hover:text-sh-green-500
+                "
+                :to="{
+                  name: 'driver.detail.info',
+                  params: { driverId: item.id }
+                }"
+                >{{ item?.email ?? 'N/A' }}</router-link
+              >
+            </template>
+
+            <template v-slot:phone="{ item }">
+              <router-link
+                class="
+                  text-gray-800
+                  hover:underline
+                  hover:decoration-sh-green-500
+                  hover:text-sh-green-500
+                "
+                :to="{
+                  name: 'driver.detail.info',
+                  params: { driverId: item.id }
+                }"
+                >{{ item?.phone ?? 'N/A' }}</router-link
+              >
+            </template>
+
+            <template v-slot:name="{ item }">
               <span
                 v-if="item"
                 class="font-light flex items-center text-sm text-gray-type-3"
@@ -131,61 +163,39 @@
                   >
                 </span>
                 <router-link
-                  class="text-sh-green-700 pr-1 cursor-pointer"
+                  class="
+                    text-gray-800
+                    hover:underline
+                    font-medium
+                    hover:decoration-sh-green-500 hover:text-sh-green-500
+                  "
                   :to="{
                     name: 'driver.detail.info',
                     params: { driverId: item.id }
                   }"
-                  >{{ item.fname || '' }}</router-link
-                >
-                <router-link
-                  class="text-sh-green-700 cursor-pointer"
-                  :to="{
-                    name: 'driver.detail.info',
-                    params: { driverId: item.id }
-                  }"
-                  >{{ item.lname || '' }}</router-link
+                  >{{ item?.name ?? 'N/A' }}</router-link
                 >
               </span>
             </template>
 
             <template v-slot:actions="{ item }">
-              <img
-                class=""
-                @click="handleDriver(item)"
-                src="@/assets/icons/more_options.svg"
-              />
+              <div class="flex items-center space-x-3">
+                <router-link
+                  :to="{
+                    name: 'EditDriver',
+                    params: { driverId: item.id }
+                  }"
+                  @click="editDriver"
+                  class="font-medium text-gray-800"
+                >
+                  Edit
+                </router-link>
+                <p @click="removeDriver(item)" class="font-medium text-red-500">
+                  Remove
+                </p>
+              </div>
             </template>
           </app-table>
-          <div
-            v-if="showDropdown"
-            id="dropdown"
-            class="
-              z-50
-              ring-1 ring-gray-50
-              rounded-md
-              bg-white
-              flex
-              py-4
-              justify-start
-              flex-col
-              items-start
-              w-24
-              h-20
-              absolute
-              top-24
-              shadow-md
-              right-0
-              bottom-0
-            "
-          >
-            <p @click="editDriver" class="text-gray-500 pl-3 cursor-pointer">
-              Edit
-            </p>
-            <p @click="removeDriver" class="text-red-500 pl-3 cursor-pointer">
-              Remove
-            </p>
-          </div>
         </div>
       </div>
     </div>
@@ -291,7 +301,7 @@ export default defineComponent({
       totalRecords: null,
       errorLoading: false,
       headers: [
-        { label: 'Driver', key: 'driver' },
+        { label: 'Driver', key: 'name' },
         { label: 'Email', key: 'email' },
         { label: 'Route Assigned', key: 'itenararies' },
         { label: 'Phone Number', key: 'phone' },
@@ -310,8 +320,8 @@ export default defineComponent({
     console.log(this.partnerContext);
   },
   methods: {
-    searchFetchDrivers () {
-      console.log('search drivers')
+    searchFetchDrivers() {
+      console.log('search drivers');
     },
     async proceed() {
       this.modalLoading = true;
@@ -373,6 +383,7 @@ export default defineComponent({
       apiFormData.forEach((eachDriver) => {
         newTableData.push({
           id: eachDriver.driver.id,
+          name: eachDriver.driver.fname + ' ' + eachDriver.driver.lname,
           fname: eachDriver.driver.fname,
           lname: eachDriver.driver.lname,
           phone: eachDriver.driver.phone,
