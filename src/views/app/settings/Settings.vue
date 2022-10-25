@@ -3,14 +3,29 @@
     <template #actionsPane>
       <page-action-header>
         <template #breadcrumbs>
-          <TabContainer>
-            <TabItem :title="'Profile Information'" :to="{name: 'settings.edit.partner'}"/>
-            <TabItem :title="'Company Information'" :to="{name: 'settings.edit.partner.company'}"/>
-            <TabItem :title="'Settlement Account'" :to="{name: 'settings.edit.settlemet.account'}"/>
-          </TabContainer>
+          <main class="overflow-x-auto w-full">
+            <TabContainer>
+              <TabItem
+                :title="'Profile Information'"
+                :to="{ name: 'settings.edit.partner' }"
+              />
+              <TabItem
+                :title="'Company Information'"
+                :to="{ name: 'settings.edit.partner.company' }"
+              />
+              <TabItem
+                :title="'Settlement Account'"
+                :to="{ name: 'settings.edit.settlemet.account' }"
+              />
+              <TabItem
+                :title="'Role Management'"
+                :to="{ name: 'settings.edit.role.management' }"
+              />
+            </TabContainer>
+          </main>
         </template>
-        </page-action-header>
-      </template>
+      </page-action-header>
+    </template>
     <main>
       <router-view />
     </main>
@@ -29,7 +44,7 @@ export default {
     PageActionHeader,
     TabContainer,
     TabItem
-  },
+  }
 };
 </script>
 

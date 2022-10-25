@@ -411,7 +411,15 @@ export const AppRoutes: Array<RouteRecordRaw> = [
               requiresAuth: true
             }
           },
-
+          {
+            path: 'roles',
+            name: 'settings.edit.role.management',
+            component: loadRouteComponent('app/settings/RoleManagement'),
+            meta: {
+              title: 'Role Management',
+              requiresAuth: true
+            }
+          }
         ]
       },
       {
