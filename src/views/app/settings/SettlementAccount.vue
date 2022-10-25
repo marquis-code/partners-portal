@@ -1,35 +1,26 @@
 <template>
-  <!-- <page-layout page-title="Settlement Accounts"> -->
-    <!-- <template #actionsPane>
-      <page-action-header>
-        <template #action>
-          <router-link
-            to="settings/company"
-            class="
-              bg-sh-green-500
-              font-medium
-              border-none
-              outline-none
-              px-6
-              py-2
-              rounded-md
-              text-sm
-              flex
-              justify-center
-              items-center
-              text-gray-900
-              w-full
-            "
-            >Add Account</router-link
-          >
-        </template>
-      </page-action-header>
-    </template> -->
     <div v-if="fetchingCompanyInfo">
       <spinner></spinner>
     </div>
     <main class="w-full p-5 lg:p-14 bg-white ring-1 ring-gray-100">
       <div class="space-y-5 ring-1 ring-gray-50 shadow-sm rounded-sm bg-white">
+      <router-link
+          :to="{name:'settings.add.settlemet.account'}"
+          class="
+            bg-sh-green-500
+            font-medium
+            border-none
+            outline-none
+            px-4
+            py-2
+            rounded-md
+            text-sm
+            justify-center
+            items-center
+            inline-block
+          "
+          >Add account</router-link
+        >
       <app-table
         :loading="gettingAccounts"
         :error-loading="errorLoading"
@@ -45,24 +36,99 @@
           </span>
         </template>
         <template v-slot:actions="{ item }">
-          <span v-if="item.is_default" class="text-sm">Assign</span>
+          <span v-if="item.is_default" class="text-sm" @click="showConfirmationModal = true">Assign</span>
           <span v-else class="text-sm">Unassign</span>
-          <span class="text-red-500 ml-2 text-sm">Remove</span>
+          <span class="text-red-500 ml-2 text-sm" @click="showRemoveConfirmationModal = true">Remove</span>
         </template>
       </app-table>
     </div>
     </main>
-    <app-modal :modalActive="showModal">
+    <app-modal :modalActive="showSuccessModal">
       <div class="flex flex-col justify-center items-center py-3">
         <img src="@/assets/images/successCheck.svg" />
         <div class="space-y-3 pb-16 pt-5">
-          <h1 class="text-center font-medium">Company information updated</h1>
+          <h1 class="text-center font-medium">Settlement account assigned</h1>
           <p class="text-gray-400 text-center">
-            Your company information has been updated.
+            Your settlement account is ready.
           </p>
         </div>
         <button
-          @click="closeModal"
+          @click="showSuccessModal = false"
+          class="text-black bg-sh-green-500 rounded-md p-2 w-11/12 font-medium"
+        >
+          Dismiss
+        </button>
+      </div>
+    </app-modal>
+    <app-modal :modalActive="showConfirmationModal">
+      <div class="pb-5 px-5 text-center">
+          <img src="@/assets/icons/question.svg" class="mx-auto mb-7" />
+          <p class="mb-2 font-bold font-lg">Assign account?</p>
+          <p class="mb-14">Are you sure you want to continue?</p>
+          <div class="flex flex-row justify-between bottom-0 w-full">
+            <button
+              @click="showConfirmationModal = false"
+              class="border border-sh-grey-400 rounded-lg w-32 md:w-40 py-2"
+            >
+              Cancel
+            </button>
+
+            <button
+              :disabled="loading"
+              class="rounded-lg bg-sh-green-500 w-32 md:w-40 py-2"
+              :class="
+                loading
+                  ? 'bg-sh-green-100'
+                  : 'bg-sh-green-500'
+              "
+              @click="assignThisAccount"
+            >
+              {{ loading ? 'Processing' : 'Continue' }}
+              <spinner v-if="loading"></spinner>
+            </button>
+          </div>
+        </div>
+    </app-modal>
+    <app-modal :modalActive="showRemoveConfirmationModal">
+      <div class="pb-5 px-5 text-center">
+          <img src="@/assets/icons/question.svg" class="mx-auto mb-7" />
+          <p class="mb-2 font-bold font-lg">Remove account?</p>
+          <p class="mb-14">Are you sure you want to continue?</p>
+          <div class="flex flex-row justify-between bottom-0 w-full">
+            <button
+              @click="showRemoveConfirmationModal = false"
+              class="border border-sh-grey-400 rounded-lg w-32 md:w-40 py-2"
+            >
+              Cancel
+            </button>
+
+            <button
+              :disabled="loading"
+              class="rounded-lg bg-red-500 text-white w-32 md:w-40 py-2"
+              :class="
+                loading
+                  ? 'bg-sh-green-100'
+                  : 'bg-sh-green-500'
+              "
+              @click="removeThisAccount"
+            >
+              {{ loading ? 'Processing' : 'Remove' }}
+              <spinner v-if="loading"></spinner>
+            </button>
+          </div>
+        </div>
+    </app-modal>
+    <app-modal :modalActive="showRemoveSuccessModal">
+      <div class="flex flex-col justify-center items-center py-3">
+        <img src="@/assets/images/successCheck.svg" />
+        <div class="space-y-3 pb-16 pt-5">
+          <h1 class="text-center font-medium">Account removed</h1>
+          <p class="text-gray-400 text-center">
+            You have successfully removed an account.
+          </p>
+        </div>
+        <button
+          @click="showRemoveSuccessModal = false"
           class="text-black bg-sh-green-500 rounded-md p-2 w-11/12 font-medium"
         >
           Dismiss
@@ -79,12 +145,9 @@ import { email, required } from '@vuelidate/validators';
 import { mapGetters } from 'vuex';
 import { extractErrorMessage } from '@/utils/helper';
 import { format } from 'date-fns';
-import PageLayout from '@/components/layout/PageLayout.vue';
-import PageActionHeader from '@/components/PageActionHeader.vue';
 import Spinner from '@/components/layout/Spinner.vue';
 import AppModal from '@/components/Modals/AppModal.vue';
 import AppTable from '@/components/AppTable.vue';
-import emitter from '@/libs/emitter';
 interface Company {
   company_name?: string;
   rc_number?: string;
@@ -106,6 +169,11 @@ export default defineComponent({
       docId: null,
       gettingAccounts: false,
       errorLoading: false,
+      showSuccessModal: false,
+      showConfirmationModal: false,
+      showRemoveConfirmationModal: false,
+      showRemoveSuccessModal: false,
+      loading: false,
       tableData: [{
         entity_type: "partner",
         account_number: "2367131666",
@@ -157,20 +225,12 @@ export default defineComponent({
     // console.log(this.userSessionData);
     // console.log(this.getDriverData, 'here');
   },
-  mounted() {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    emitter.on("settings:go-to-profile", () => {
-      this.$router.push('/settings')
-    });
-    emitter.on("settings:go-to-company", () => {
-      this.$router.push('/settings/company')
-    });
-    emitter.on("settings:go-to-settlement", () => {
-      this.$router.push('/settings/accounts')
-    });
-  },
   methods: {
+    assignThisAccount () {
+      this.showConfirmationModal = false;
+      this.showSuccessModal = true;
+      // API call to assign an account
+    },
     setCurrentCompanyDetails () {
       console.log(this.userSessionData);
       this.form.company_name = this.userSessionData.associatedOrganizations[0].partner.company_name;
@@ -194,67 +254,12 @@ export default defineComponent({
       }
       return null;
     },
-    async updatePartnerCompanyInfo () {
-      this.v$.form.$touch();
-      if (this.processing || this.v$.form.$errors.length) {
-        return;
-      }
-      this.processing = true;
-      try {
-        console.log('I am here')
-        this.$toast.success('Drivers details was successfully updated');
-      } catch (err) {
-        console.log(err);
-        const errorMessage = extractErrorMessage(
-          err,
-          null,
-          'Oops! An error occurred, please try again.'
-        );
-        this.$toast.error(errorMessage);
-      } finally {
-        this.processing = false;
-      }
-    },
-    async fileSelected (selectedImage: any) {
-      const imageDbUrl = (await this.uploadTos3andGetDocumentUrl(
-        selectedImage
-      )) as string;
-    },
-    async handleProfileUpload (e: any) {
-      const selectedProfile = e.target.files[0];
-      this.uploadingProfile = true;
-      await this.uploadTos3andGetDocumentUrl(selectedProfile)
-        .then((res) => {
-          this.profilePreview = URL.createObjectURL(selectedProfile);
-          this.$toast.success('Profile picture was uploaded successfully');
-        })
-        .catch(() => {
-          this.$toast.error('Something went wrong while uploading profile');
-        })
-        .finally(() => {
-          this.uploadingProfile = false;
-        });
-    },
-
-    async uploadTos3andGetDocumentUrl (file: any) {
-      this.uploadingFile = true;
-      try {
-        const formData = new FormData();
-        formData.append('file', file);
-        const response = await this.$axios.post(
-          `/v1/upload/identity/files`,
-          formData
-        );
-        if (response.data?.files?.length) {
-          return response.data.files[0].Location;
-        }
-      } catch (error) {
-        this.$toast.warning(
-          'An error occured while uploading your file, please try again'
-        );
-      } finally {
-        this.uploadingFile = false;
-      }
+    removeThisAccount () {
+      this.loading = true;
+      this.showRemoveConfirmationModal = false;
+      this.showRemoveSuccessModal = true;
+      // API call for removing acconut
+      this.loading = false;
     }
   }
 });

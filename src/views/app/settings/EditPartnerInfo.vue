@@ -59,6 +59,7 @@
                   p-3
                   placeholder-gray-500 placeholder-opacity-25
                   ring-1 ring-gray-300
+                  bg-sh-grey-100
                 "
                 placeholder="Enter your first name"
               />
@@ -86,6 +87,7 @@
                   p-3
                   placeholder-gray-500 placeholder-opacity-25
                   ring-1 ring-gray-300
+                  bg-sh-grey-100
                 "
                 placeholder="Enter your last name"
               />
@@ -112,6 +114,7 @@
                 >Phone number</label
               >
               <input
+                readonly
                 type="tel"
                 v-model="v$.form.phone.$model"
                 class="
@@ -124,6 +127,7 @@
                   p-3
                   placeholder-gray-500 placeholder-opacity-25
                   ring-1 ring-gray-300
+                  bg-sh-grey-100
                 "
                 placeholder="Enter phone number"
               />
@@ -158,6 +162,7 @@
                   p-3
                   placeholder-gray-500 placeholder-opacity-25
                   ring-1 ring-gray-300
+                  bg-sh-grey-100
                 "
                 placeholder="Enter email address"
               />
@@ -184,6 +189,7 @@
                 >Residential address</label
               >
               <input
+                readonly
                 type="text"
                 v-model="v$.form.residential_address.$model"
                 class="
@@ -195,6 +201,7 @@
                   p-3
                   placeholder-gray-500 placeholder-opacity-25
                   ring-1 ring-gray-300
+                  bg-sh-grey-100
                 "
                 placeholder="Enter drivers address"
               />
@@ -240,6 +247,7 @@
                     p-3
                     placeholder-gray-500 placeholder-opacity-25
                     ring-1 ring-gray-300
+                    bg-sh-grey-100
                   "
                   placeholder="Select date of dirth"
                 />
@@ -268,6 +276,7 @@
                     p-3
                     placeholder-gray-500 placeholder-opacity-25
                     ring-1 ring-gray-300
+                    bg-sh-grey-100
                   "
                   placeholder="Enter drivers address"
                 />
@@ -309,6 +318,7 @@
                     p-3
                     placeholder-gray-500 placeholder-opacity-25
                     ring-1 ring-gray-300
+                    bg-sh-grey-100
                   "
                   placeholder="Enter license number"
                 />
@@ -339,6 +349,7 @@
                     p-3
                     placeholder-gray-500 placeholder-opacity-25
                     ring-1 ring-gray-300
+                    bg-sh-grey-100
                   "
                   placeholder="Enter Document number"
                 />
@@ -498,7 +509,6 @@ export default defineComponent({
   },
   methods: {
     setCurrentDetails () {
-      console.log(this.userSessionData);
       this.form.fname = this.userSessionData.user.fname;
       this.form.lname = this.userSessionData.user.lname;
       this.form.phone = this.userSessionData.user.phone;

@@ -33,6 +33,7 @@
                   p-3
                   placeholder-gray-500 placeholder-opacity-25
                   ring-1 ring-gray-300
+                  bg-sh-grey-100
                 "
                 placeholder="Enter your first name"
               />
@@ -60,6 +61,7 @@
                   p-3
                   placeholder-gray-500 placeholder-opacity-25
                   ring-1 ring-gray-300
+                  bg-sh-grey-100
                 "
                 placeholder=""
               />
@@ -98,6 +100,7 @@
                   p-3
                   placeholder-gray-500 placeholder-opacity-25
                   ring-1 ring-gray-300
+                  bg-sh-grey-100
                 "
                 placeholder=""
               />
@@ -125,6 +128,7 @@
                   p-3
                   placeholder-gray-500 placeholder-opacity-25
                   ring-1 ring-gray-300
+                  bg-sh-grey-100
                 "
                 placeholder=""
               />

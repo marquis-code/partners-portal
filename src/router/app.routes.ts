@@ -410,7 +410,16 @@ export const AppRoutes: Array<RouteRecordRaw> = [
               title: 'Settlement Account Information',
               requiresAuth: true
             }
-          }
+          },
+          {
+            path: 'accounts/add',
+            name: 'settings.add.settlemet.account',
+            component: loadRouteComponent('app/settings/AddSettlementAccount'),
+            meta: {
+              title: 'Settlement Account Information',
+              requiresAuth: true
+            }
+          },
         ]
       }
     ]
