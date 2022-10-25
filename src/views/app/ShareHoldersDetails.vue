@@ -1,6 +1,9 @@
 <template>
   <page-layout page-title="Dashboard">
-    <div class="h-full p-10 bg-white">
+    <div v-if="checkLoading" class="py-10 text-center">
+      <Spinner></Spinner>
+    </div>
+    <div class="h-full p-10 bg-white" v-else>
       <!-- Breadcrumb like  -->
       <div class="flex justify-center space-x-2 lg:space-x-3 items-center">
         <div
@@ -389,6 +392,7 @@ export default defineComponent({
       incorporationCertificateUrl: [] as string[],
       mermorandumUrl: [] as string[],
       allDocumentsUploaded: false,
+      checkLoading: false,
       stakeholders: [
         {
           name: '',
@@ -524,6 +528,7 @@ export default defineComponent({
       }
     },
     async checkIfShareHoldersHaveBeenProvided () {
+      this.checkLoading = true
       try {
         const response = await this.$axios.get(`/v1/partners/${this.partnerContext.partner.account_sid}/share-holders`);
         // console.log(response.data.data)
@@ -535,6 +540,8 @@ export default defineComponent({
         }
       } catch (error) {
         this.$toast.warning('An error occured, Please refresh this page ')
+      } finally {
+        this.checkLoading = false
       }
     },
     // functionos for step two: adding stake holders
@@ -580,7 +587,7 @@ export default defineComponent({
       const newPayload = this.stakeholders.map(stake => {
         return {
           fname: stake?.name?.split(" ")[0],
-          lname: stake?.name?.split(" ")[1],
+          lname: stake?.name?.split(" ")[1] || '-',
           share_amount: stake.share_amount
         }
       });
