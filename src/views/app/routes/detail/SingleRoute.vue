@@ -97,19 +97,22 @@
               <div class="flex space-x-2">
                 <p class="text-sm font-medium">Days available</p>
               </div>
-              <p class="text-sm">{{getDaysCount(routeDetails.route.route_availability_days).length === 7 ? 'Everyday' :  getDays(getDaysCount(routeDetails.route.route_availability_days))}}</p>
+              <p class="text-sm">{{
+              getDaysCount(routeDetails.route.route_availability_days).length === 7 ? 'Everyday' :
+              getDays(getDaysCount(routeDetails.route.route_availability_days))
+              }}</p>
             </div>
             <div class="flex justify-between items-center pt-4">
               <div class="flex space-x-2">
                 <p class="text-sm font-medium">Availability</p>
               </div>
-              <p class="text-sm">Public</p>
+              <p class="text-sm">{{routeDetails?.route?.visibility}}</p>
             </div>
             <div class="flex justify-between items-center pt-4">
               <div class="flex space-x-2">
                 <p class="text-sm font-medium">City</p>
               </div>
-              <p class="text-sm">Lagos</p>
+              <p class="text-sm">{{routeDetails?.route.city?.name || "N/A"}}</p>
             </div>
           </div>
         </section>
@@ -159,11 +162,11 @@ export default {
       return days
     },
     getDays (daysList) {
-      const days = ''
+      let days = ''
       for (let index = 0; index < daysList.length; index++) {
         const element = daysList[index];
         // eslint-disable-next-line no-const-assign
-        days = element + ' '
+        days += element + ', '
       }
       return days
     },
