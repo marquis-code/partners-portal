@@ -5,7 +5,7 @@
     <main class="w-full p-5 lg:p-14 bg-white ring-1 ring-gray-100">
       <div class="space-y-5 ring-1 ring-gray-50 shadow-sm rounded-sm bg-white">
       <router-link
-          :to="{name:'settings.add.settlemet.account'}"
+          :to="{name:'add.settlemet.account'}"
           class="
             bg-sh-green-500
             font-medium

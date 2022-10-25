@@ -1,4 +1,5 @@
 <template>
+  <page-layout page-title="Add Settlement Account">
   <div>
     <main class="md:w-9/12 p-5 lg:p-14 bg-white ring-1 ring-gray-100">
       <div>
@@ -174,7 +175,7 @@
           </p>
         </div>
         <button
-          @click="showSuccessModal = false"
+          @click="closeSuccessModal"
           class="text-black bg-sh-green-500 rounded-md p-2 w-11/12 font-medium"
         >
           Dismiss
@@ -182,6 +183,7 @@
       </div>
     </app-modal>
   </div>
+</page-layout>
 </template>
 
 <script lang="ts">
@@ -193,6 +195,7 @@ import { extractErrorMessage } from '@/utils/helper';
 import { format } from 'date-fns';
 import Spinner from '@/components/layout/Spinner.vue';
 import AppModal from '@/components/Modals/AppModal.vue';
+import PageLayout from '@/components/layout/PageLayout.vue';
 
 interface Account {
   bank_name?: string;
@@ -203,7 +206,8 @@ interface Account {
 export default defineComponent({
   components: {
     Spinner,
-    AppModal
+    AppModal,
+    PageLayout
   },
   data() {
     return {
@@ -240,6 +244,10 @@ export default defineComponent({
       this.processing = false
       this.showSuccessModal = true
     },
+    closeSuccessModal () {
+      this.showSuccessModal = false;
+      this.$router.push({name: 'settings.edit.settlemet.account'})
+    }
   }
 });
 </script>
