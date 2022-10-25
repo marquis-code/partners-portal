@@ -2,33 +2,35 @@
     <div v-if="fetchingAccounts">
       <Spinner></Spinner>
     </div>
+    <div class="flex flex-row p-4 justify-end">
+      <router-link
+      :to="{name:'add.settlement.account'}"
+      class="
+        bg-sh-green-500
+        font-medium
+        border-none
+        outline-none
+        px-4
+        py-2
+        rounded-md
+        text-sm
+        justify-center
+        items-center
+        inline-block
+      "
+      >Add account</router-link
+    >
+    </div>
     <main class="w-full p-5 lg:p-14 bg-white ring-1 ring-gray-100">
       <div class="space-y-5 ring-1 ring-gray-50 shadow-sm rounded-sm bg-white">
-      <router-link
-          :to="{name:'add.settlemet.account'}"
-          class="
-            bg-sh-green-500
-            font-medium
-            border-none
-            outline-none
-            px-4
-            py-2
-            rounded-md
-            text-sm
-            justify-center
-            items-center
-            inline-block
-          "
-          >Add account</router-link
-        >
       <app-table
         :loading="gettingAccounts"
         :error-loading="errorLoading"
         :items="tableData"
         :fields="headers"
       >
-        <template v-slot:is_default="{ item }">
-          <span class="text-sm text-sh-green-700" v-if="item.is_default === 1">
+        <template v-slot:isDefault="{ item }">
+          <span class="text-sm text-sh-green-700" v-if="item.isDefault">
             Assigned
           </span>
           <span class="text-sm text-grays-black-6" v-else>
@@ -36,8 +38,7 @@
           </span>
         </template>
         <template v-slot:actions="{ item }">
-          <span v-if="item.is_default === 0" class="text-sm" @click="startAccountAssignment(item)">Assign</span>
-          <span v-else class="text-sm">Unassign</span>
+          <span v-if="!item.isDefault" class="text-sm" @click="startAccountAssignment(item)">Assign</span>
           <span class="text-red-500 ml-2 text-sm" @click="showRemoveConfirmationModal = true">Remove</span>
         </template>
       </app-table>
@@ -66,8 +67,8 @@
               "
               @click="assignAsDefault"
             >
-              {{ loading ? 'Processing' : 'Continue' }}
               <Spinner v-if="loading"></Spinner>
+              {{ loading ? 'Processing' : 'Continue' }}
             </button>
           </div>
         </div>
@@ -148,13 +149,6 @@ import { format } from 'date-fns';
 import Spinner from '@/components/layout/Spinner.vue';
 import AppModal from '@/components/Modals/AppModal.vue';
 import AppTable from '@/components/AppTable.vue';
-interface Company {
-  company_name?: string;
-  rc_number?: string;
-  company_address?: string;
-  company_type?: string;
-  files?: string
-}
 
 export default defineComponent({
   components: {
@@ -177,10 +171,10 @@ export default defineComponent({
       tableData: [],
       currentAccountId: null,
       headers: [
-        { label: 'Account Number', key: 'account_number' },
-        { label: 'Bank Name', key: 'bank_name' },
-        { label: 'Account Name', key: 'account_name' },
-        { label: 'Assigned Account', key: 'is_default' },
+        { label: 'Account Number', key: 'accountNumber' },
+        { label: 'Bank Name', key: 'bankName' },
+        { label: 'Account Name', key: 'accountName' },
+        { label: 'Assigned Account', key: 'isDefault' },
         { label: 'Actions', key: 'actions' }
       ],
       fetchingAccounts: false,
@@ -189,20 +183,26 @@ export default defineComponent({
       v$: useVuelidate(),
       showModal: false,
       profilePreview: '',
-      form: {} as Company,
+      form: {
+        accountNumber: '',
+        bankName: '',
+        accountName: '',
+        isDefault: null
+      },
+      selectedAccountId: null,
       processing: false,
       documentId: null,
       isUploaded: false,
-      uploadingProfile: false
+      uploadingProfile: false,
     };
   },
   validations () {
     return {
       form: {
-        company_name: { required },
-        rc_number: { required },
-        company_address: { required },
-        company_type: { required, email }
+        accountNumber: { required },
+        bankName: { required },
+        accountName: { required },
+        isDefault: { required }
       }
     };
   },
@@ -217,12 +217,13 @@ export default defineComponent({
   },
   created () {
     this.fetchSettlementAccounts();
-    // console.log(this.userSessionData);
-    // console.log(this.getDriverData, 'here');
   },
   methods: {
     startAccountAssignment (item: any) {
-      this.currentAccountId = item.id;
+      this.selectedAccountId = item.id;
+      this.form.accountName = item.accountName;
+      this.form.accountNumber = item.accountNumber;
+      this.form.bankName = item.bankName;
       this.showConfirmationModal = true
     },
     async fetchSettlementAccounts () {
@@ -230,8 +231,8 @@ export default defineComponent({
       // API call to assign an account
       this.fetchingAccounts = true
       try {
-        const response = await this.$axios.get(`/v1/partners/${this.partnerContext.partner.account_sid}/settlement-accounts`);
-        this.tableData = response.data.data;
+        const response = await this.$axios.get(`/cost-revenue/v1/settlement-accounts?partnerId=${this.partnerContext.partner.account_sid}`);
+        this.tableData = response.data;
       } catch (error) {
         const errorMessage = extractErrorMessage(
           error,
@@ -243,16 +244,17 @@ export default defineComponent({
         this.fetchingAccounts = false;
       }
     },
-    async assignAsDefault (account:any) {
+    async assignAsDefault () {
       // API call to make an account a default
       this.loading = true
       try {
-        await this.$axios.patch(`/v1/partners/${this.partnerContext.partner.account_sid}/settlement-accounts/${this.currentAccountId}`, {
+        await this.$axios.patch(`/cost-revenue/v1/settlement-accounts/${this.selectedAccountId}`, {
           ...this.form,
-          is_default: true
+          isDefault: true
         });
-        const response = await this.$axios.get(`/v1/partners/${this.partnerContext.partner.account_sid}/settlement-accounts`);
-        this.tableData = response.data.data;
+        const response = await this.$axios.get(`/cost-revenue/v1/settlement-accounts?partnerId=${this.partnerContext.partner.account_sid}`);
+        this.tableData = response.data;
+        this.showConfirmationModal = false;
       } catch (error) {
         const errorMessage = extractErrorMessage(
           error,
@@ -262,8 +264,6 @@ export default defineComponent({
         this.$toast.error(errorMessage);
       } finally {
         this.loading = false;
-        this.showConfirmationModal = false;
-        this.showSuccessModal = true
       }
     },
     handleFileRemoval () {
@@ -273,7 +273,7 @@ export default defineComponent({
       this.showModal = true;
     },
     closeModal () {
-      this.showModal = false;
+      this.showSuccessModal = true
     },
     getUploadedFileUrlFromStringifiedArray (stringifiedArray: any) {
       const parsedArray = JSON.parse(stringifiedArray);

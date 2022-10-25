@@ -19,7 +19,7 @@
                   >Bank Name</label
                 >
                 <select
-                  v-model="form.bank_name"
+                  v-model="form.bankName"
                   id="bank"
                   class="
                     text-xs
@@ -59,8 +59,8 @@
                 <span
                   class="text-xs font-light text-red-500"
                   v-if="
-                    v$.form.bank_name.$dirty &&
-                    v$.form.bank_name.required.$invalid
+                    v$.form.bankName.$dirty &&
+                    v$.form.bankName.required.$invalid
                   "
                 >
                   This field must be provided
@@ -71,9 +71,9 @@
                   >Account Number</label
                 >
                 <input
-                  type="number"
+                  type="text"
                   maxlength="10"
-                  v-model="v$.form.account_number.$model"
+                  v-model="v$.form.accountNumber.$model"
                   class="
                     text-xs
                     border-none
@@ -89,8 +89,8 @@
                 <span
                   class="text-xs font-light text-red-500"
                   v-if="
-                    v$.form.account_number.$dirty &&
-                    v$.form.account_number.required.$invalid
+                    v$.form.accountNumber.$dirty &&
+                    v$.form.accountNumber.required.$invalid
                   "
                 >
                   This field must be provided
@@ -112,8 +112,8 @@
                   >Account Name</label
                 >
                 <input
-                  type="email"
-                  v-model="v$.form.account_name.$model"
+                  type="text"
+                  v-model="v$.form.accountName.$model"
                   class="
                     text-xs
                     border-none
@@ -129,8 +129,8 @@
                 <span
                   class="text-xs font-light text-red-500"
                   v-if="
-                    v$.form.account_name.$dirty &&
-                    v$.form.account_name.required.$invalid
+                    v$.form.accountName.$dirty &&
+                    v$.form.accountName.required.$invalid
                   "
                 >
                   This field must be provided
@@ -205,11 +205,12 @@ import AppModal from '@/components/Modals/AppModal.vue';
 import PageLayout from '@/components/layout/PageLayout.vue';
 
 interface Account {
-  bank_name?: string;
-  account_number?: string;
-  account_name?: string;
-  entity_type?: string;
-  is_default?: boolean
+  bankName?: string;
+  accountNumber?: string;
+  accountName?: string;
+  partnerId?: string;
+  entityType?: string;
+  isDefault?: boolean
 }
 
 export default defineComponent({
@@ -224,8 +225,7 @@ export default defineComponent({
       v$: useVuelidate(),
       showModal: false,
       form: {
-        entity_type: 'partner',
-        is_default: false
+        isDefault: false
       } as Account,
       processing: false,
       showSuccessModal: false
@@ -234,9 +234,9 @@ export default defineComponent({
   validations() {
     return {
       form: {
-        bank_name: { required },
-        account_number: { required },
-        account_name: { required }
+        bankName: { required },
+        accountNumber: { required },
+        accountName: { required }
       },
     };
   },
@@ -250,14 +250,17 @@ export default defineComponent({
     })
   },
   created () {
-    // this.AddNewAccount()
+    this.setPartnerId()
   },
   methods: {
+    setPartnerId () {
+      this.form.partnerId = this.partnerContext.partner.account_sid
+    },
     async AddNewAccount() {
       this.processing = true
       try {
-        const response = await this.$axios.post(`/v1/partners/${this.partnerContext.partner.account_sid}/settlement-accounts`, {...this.form});
-        console.log(response.data);
+        await this.$axios.post(`/cost-revenue/v1/settlement-accounts`, {...this.form});
+        this.showSuccessModal = true
       } catch (error) {
         const errorMessage = extractErrorMessage(
           error,
@@ -265,13 +268,13 @@ export default defineComponent({
           'Oops! An error occurred, please try again.'
         );
         this.$toast.error(errorMessage);
+      } finally {
+        this.processing = false
       }
-      this.processing = false
-      this.showSuccessModal = true
     },
     closeSuccessModal () {
       this.showSuccessModal = false;
-      this.$router.push({name: 'settings.edit.settlemet.account'})
+      this.$router.push({name: 'settings.edit.settlement.account'})
     }
   }
 });
