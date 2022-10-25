@@ -44,17 +44,6 @@ export default {
     PageActionHeader,
     TabContainer,
     TabItem
-  },
-  methods: {
-    showProfilePage() {
-      emitter.emit('settings:go-to-profile');
-    },
-    showCompanyInfo() {
-      emitter.emit('settings:go-to-company');
-    },
-    showAccountsPage() {
-      emitter.emit('settings:go-to-settlement');
-    }
   }
 };
 </script>

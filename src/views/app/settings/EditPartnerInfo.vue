@@ -1,29 +1,4 @@
 <template>
-  <!-- <page-layout page-title="Settings">
-    <template #actionsPane>
-      <page-action-header> -->
-        <!-- <template #breadcrumbs>
-          <div class="flex items-center space-x-3 py-3">
-            <router-link
-              :to="{ name: 'drivers.list' }"
-              class="text-gray-400 text-sm hover:text-gray-900"
-              >Dashboard</router-link
-            >
-            <img src="@/assets/images/breadcrumbs.svg" />
-            <router-link
-              :to="{
-                name: 'driver.detail.info',
-                params: { driverId: this.$route.params.driverId }
-              }"
-              class="text-gray-400 text-sm hover:text-gray-900"
-              >Drivers management</router-link
-            >
-            <img src="@/assets/images/breadcrumbs.svg" />
-            <p class="text-gray-900 text-sm">Edit driver</p>
-          </div>
-        </template> -->
-      <!-- </page-action-header>
-    </template> -->
     <div v-if="fetchingPartner">
       <spinner></spinner>
     </div>
@@ -84,6 +59,7 @@
                   p-3
                   placeholder-gray-500 placeholder-opacity-25
                   ring-1 ring-gray-300
+                  bg-sh-grey-100
                 "
                 placeholder="Enter your first name"
               />
@@ -111,6 +87,7 @@
                   p-3
                   placeholder-gray-500 placeholder-opacity-25
                   ring-1 ring-gray-300
+                  bg-sh-grey-100
                 "
                 placeholder="Enter your last name"
               />
@@ -137,6 +114,7 @@
                 >Phone number</label
               >
               <input
+                readonly
                 type="tel"
                 v-model="v$.form.phone.$model"
                 class="
@@ -149,6 +127,7 @@
                   p-3
                   placeholder-gray-500 placeholder-opacity-25
                   ring-1 ring-gray-300
+                  bg-sh-grey-100
                 "
                 placeholder="Enter phone number"
               />
@@ -183,6 +162,7 @@
                   p-3
                   placeholder-gray-500 placeholder-opacity-25
                   ring-1 ring-gray-300
+                  bg-sh-grey-100
                 "
                 placeholder="Enter email address"
               />
@@ -209,6 +189,7 @@
                 >Residential address</label
               >
               <input
+                readonly
                 type="text"
                 v-model="v$.form.residential_address.$model"
                 class="
@@ -220,6 +201,7 @@
                   p-3
                   placeholder-gray-500 placeholder-opacity-25
                   ring-1 ring-gray-300
+                  bg-sh-grey-100
                 "
                 placeholder="Enter drivers address"
               />
@@ -265,6 +247,7 @@
                     p-3
                     placeholder-gray-500 placeholder-opacity-25
                     ring-1 ring-gray-300
+                    bg-sh-grey-100
                   "
                   placeholder="Select date of dirth"
                 />
@@ -293,6 +276,7 @@
                     p-3
                     placeholder-gray-500 placeholder-opacity-25
                     ring-1 ring-gray-300
+                    bg-sh-grey-100
                   "
                   placeholder="Enter drivers address"
                 />
@@ -334,6 +318,7 @@
                     p-3
                     placeholder-gray-500 placeholder-opacity-25
                     ring-1 ring-gray-300
+                    bg-sh-grey-100
                   "
                   placeholder="Enter license number"
                 />
@@ -364,6 +349,7 @@
                     p-3
                     placeholder-gray-500 placeholder-opacity-25
                     ring-1 ring-gray-300
+                    bg-sh-grey-100
                   "
                   placeholder="Enter Document number"
                 />
@@ -523,7 +509,6 @@ export default defineComponent({
   },
   methods: {
     setCurrentDetails () {
-      console.log(this.userSessionData);
       this.form.fname = this.userSessionData.user.fname;
       this.form.lname = this.userSessionData.user.lname;
       this.form.phone = this.userSessionData.user.phone;
