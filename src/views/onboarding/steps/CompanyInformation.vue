@@ -261,9 +261,9 @@ export default defineComponent({
       try {
         const payload = {
           ...this.form,
-          mode: 'company'
+          mode: 'business'
         };
-        const response = await this.$axios.post('/v1/partners', { mode: 'individual'});
+        const response = await this.$axios.post('/v1/partners', { ...payload});
         if (response.data) {
           await this.$store.dispatch('auth/refreshActiveContext', this.user.id);
           this.$emit('companySignUpSuccessful');
