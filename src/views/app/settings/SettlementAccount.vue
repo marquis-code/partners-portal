@@ -1,7 +1,4 @@
 <template>
-  <div v-if="fetchingAccounts">
-    <Spinner></Spinner>
-  </div>
   <div class="flex flex-row p-4 justify-end">
     <router-link
       :to="{ name: 'add.settlement.account' }"
@@ -24,7 +21,7 @@
   <main class="w-full p-5 lg:p-14 bg-white ring-1 ring-gray-100">
     <div class="space-y-5 ring-1 ring-gray-50 shadow-sm rounded-sm bg-white">
       <app-table
-        :loading="gettingAccounts"
+        :loading="fetchingAccounts"
         :error-loading="errorLoading"
         :items="tableData"
         :fields="headers"
@@ -68,7 +65,7 @@
               ml-2
               text-sm
             "
-            @click="showRemoveConfirmationModal = true"
+            @click="setItemToRemoveAndOpenModal(item)"
             >Remove</span
           >
         </template>
@@ -141,12 +138,12 @@
 
         <button
           :disabled="loading"
-          class="rounded-lg bg-red-500 text-white w-32 md:w-40 py-2"
+          class="rounded-lg bg-red-500 text-white w-32 md:w-40 py-2 flex flex-row justify-center"
           :class="loading ? 'bg-sh-green-100' : 'bg-sh-green-500'"
           @click="removeThisAccount"
         >
-          {{ loading ? 'Processing' : 'Remove' }}
           <Spinner v-if="loading"></Spinner>
+          {{ loading ? 'Processing' : 'Remove' }}
         </button>
       </div>
     </div>
@@ -202,6 +199,7 @@ export default defineComponent({
       loading: false,
       tableData: [],
       currentAccountId: null,
+      accountToRemoveId: null,
       headers: [
         { label: 'Account Number', key: 'accountNumber' },
         { label: 'Bank Name', key: 'bankName' },
@@ -251,6 +249,10 @@ export default defineComponent({
     this.fetchSettlementAccounts();
   },
   methods: {
+    setItemToRemoveAndOpenModal (item: any) {
+      this.accountToRemoveId = item.id
+      this.showRemoveConfirmationModal = true;
+    },
     startAccountAssignment (item: any) {
       this.selectedAccountId = item.id;
       this.form.accountName = item.accountName;
@@ -321,12 +323,26 @@ export default defineComponent({
       }
       return null;
     },
-    removeThisAccount () {
-      this.loading = true;
-      this.showRemoveConfirmationModal = false;
-      this.showRemoveSuccessModal = true;
-      // API call for removing acconut
-      this.loading = false;
+    async removeThisAccount () {
+      try {
+        this.loading = true;
+        await this.$axios.delete(`/cost-revenue/v1/settlement-accounts/${this.accountToRemoveId}`);
+        const response = await this.$axios.get(
+          `/cost-revenue/v1/settlement-accounts?partnerId=${this.partnerContext.partner.account_sid}`
+        );
+        this.tableData = response.data;
+        this.showRemoveConfirmationModal = false;
+        this.showRemoveSuccessModal = true;
+      } catch (error) {
+        const errorMessage = extractErrorMessage(
+          error,
+          null,
+          'Oops! An error occurred, please try again.'
+        );
+        this.$toast.error(errorMessage);
+      } finally {
+        this.loading = false;
+      }
     }
   }
 });
