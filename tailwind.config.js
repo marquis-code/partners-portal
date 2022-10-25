@@ -73,6 +73,9 @@ module.exports = {
         },
         'sh-purple': {
           700: "#4848ED"
+        },
+        'sh-yellow': {
+          800: "#CBAF02"
         }
       }
     }
