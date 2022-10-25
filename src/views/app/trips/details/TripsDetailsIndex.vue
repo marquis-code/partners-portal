@@ -9,47 +9,23 @@
     <template #actionsPane>
       <page-action-header>
         <template #tabs>
-          <router-link
-            class="
-              text-sm
-              font-medium
-              leading-6
-              pb-2
-              pt-1
-              px-2
-              border-b
-              cursor-pointer
-            "
-            active-class="text-black border-b-sh-green-500 border-b-2"
-            to="information"
-          >
-            Trip information</router-link
-          >
-
-          <router-link
-            class="
-              text-sm
-              font-medium
-              leading-6
-              pb-2
-              pt-1
-              px-2
-              border-b
-              cursor-pointer
-            "
-            active-class="text-black border-b-sh-green-500 border-b-2"
-            :to="{
-              name: 'trip.detail.manifest'
-            }"
-            >Manifest</router-link
-          >
+          <TabContainer>
+            <TabItem
+              :title="'Trip Information'"
+              :to="{ name: 'trip.detail.info' }"
+            />
+            <TabItem
+              :title="'Manifest'"
+              :to="{ name: 'trip.detail.manifest' }"
+            />
+          </TabContainer>
         </template>
         <template #breadcrumbs>
           <div class="flex justify-between items-center">
             <div class="flex items-center space-x-2 py-3">
               <router-link
                 :to="{
-                  name: 'trip.detail.info'
+                  name: 'trips.list'
                 }"
                 class="text-gray-400 text-sm hover:text-gray-900"
                 >Trips</router-link
@@ -81,12 +57,16 @@ import { mapGetters } from 'vuex';
 import Spinner from '@/components/layout/Spinner';
 import PageActionHeader from '@/components/PageActionHeader';
 import { extractErrorMessage } from '@/utils/helper';
+import TabContainer from '@/components/tab/TabContainer.vue';
+import TabItem from '@/components/tab/TabItem.vue';
 export default {
   name: 'DriverDetailsIndex',
   components: {
     PageActionHeader,
     Spinner,
-    PageLayout
+    PageLayout,
+    TabContainer,
+    TabItem
   },
   computed: {
     ...mapGetters({
@@ -109,7 +89,6 @@ export default {
       await this.$axios
         .get(`/v1/trips/${this.$route.params.tripId}`)
         .then((res) => {
-          console.log(res.data);
           this.trip = res.data;
         })
         .catch((err) => {

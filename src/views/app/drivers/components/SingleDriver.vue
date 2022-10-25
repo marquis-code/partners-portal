@@ -37,7 +37,7 @@
         >
       </main>
       <p class="font-light text-gray-600 text-center">
-        {{ driverData.fname }} {{ driverData.lname }}
+        {{ driverData?.fname }} {{ driverData?.lname }}
       </p>
     </div>
     <hr class="mb-0" />
@@ -66,9 +66,7 @@
             <p class="font-medium text-sm">License number</p>
             <p class="font-light text-xs">
               {{
-                 driverData.documents[0].registeration_number
-                  ? driverData.documents[0].registeration_number
-                  : 'N/A'
+                 driverData?.documents[0]?.registeration_number ?? 'N/A'
               }}
             </p>
           </div>

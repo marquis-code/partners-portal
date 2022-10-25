@@ -3,38 +3,13 @@
     <template #actionsPane>
       <page-action-header>
         <template #tabs>
-          <router-link
-            class="
-              text-sm
-              font-medium
-              leading-6
-              pb-2
-              pt-1
-              px-2
-              border-b
-              cursor-pointer
-            "
-            active-class="text-black border-b-sh-green-500 border-b-2"
-            to="information"
-          >
-            Drivers information</router-link
-          >
-
-          <router-link
-            class="
-              text-sm
-              font-medium
-              leading-6
-              pb-2
-              pt-1
-              px-2
-              border-b
-              cursor-pointer
-            "
-            active-class="text-black border-b-sh-green-500 border-b-2"
-            :to="`/drivers/details/${driverData?.id}/trips`"
-            >Trips</router-link
-          >
+          <TabContainer>
+            <TabItem
+              :title="'Drivers information'"
+              :to="{ name: 'driver.detail.info' }"
+            />
+            <TabItem :title="'Trips'" :to="{ name: 'driver.detail.trips' }" />
+          </TabContainer>
         </template>
         <template #breadcrumbs>
           <div class="flex justify-between items-center">
@@ -56,7 +31,7 @@
                 relative
                 mb-4
                 bg-sh-green-500
-                py-1
+                py-2
                 px-6
                 rounded-md
                 flex
@@ -66,7 +41,7 @@
                 cursor-pointer
               "
             >
-              <p class="font-bold text-gray-900">Actions</p>
+              <p class="font-medium text-gray-900">Actions</p>
               <img src="@/assets/images/arrowDown.svg" />
             </div>
             <div
@@ -405,13 +380,17 @@ import Spinner from '@/components/layout/Spinner';
 import { extractErrorMessage } from '../../../../utils/helper';
 import PageActionHeader from '@/components/PageActionHeader';
 import AppModal from '@/components/Modals/AppModal.vue';
+import TabContainer from '@/components/tab/TabContainer.vue';
+import TabItem from '@/components/tab/TabItem.vue';
 export default {
   name: 'DriverDetailsIndex',
   components: {
     PageActionHeader,
     Spinner,
     PageLayout,
-    AppModal
+    AppModal,
+    TabContainer,
+    TabItem
   },
   computed: {
     ...mapGetters({
