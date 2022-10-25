@@ -15,7 +15,7 @@
               />
               <TabItem
                 :title="'Settlement Account'"
-                :to="{ name: 'settings.edit.settlemet.account' }"
+                :to="{ name: 'settings.edit.settlement.account' }"
               />
               <TabItem
                 :title="'Role Management'"

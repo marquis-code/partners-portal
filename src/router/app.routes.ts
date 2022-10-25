@@ -382,7 +382,7 @@ export const AppRoutes: Array<RouteRecordRaw> = [
           },
           {
             path: 'accounts',
-            name: 'settings.edit.settlemet.account',
+            name: 'settings.edit.settlement.account',
             component: loadRouteComponent('app/settings/SettlementAccount'),
             meta: {
               title: 'Settlement Account Information',
@@ -402,7 +402,7 @@ export const AppRoutes: Array<RouteRecordRaw> = [
       },
       {
         path: 'add-account',
-        name: 'add.settlemet.account',
+        name: 'add.settlement.account',
         component: loadRouteComponent('app/settings/AddSettlementAccount'),
         meta: {
           title: 'Settlement Account Information',
