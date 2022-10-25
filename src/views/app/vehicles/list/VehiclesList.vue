@@ -67,6 +67,27 @@
       </div>
       <div class="space-y-5 ring-1 ring-gray-50 shadow-sm rounded-sm bg-white">
         <div>
+          <!-- Search Box  -->
+          <div class="flex flex-row justify-between px-6 py-4 w-full">
+            <div class="flex flex-row justify-start w-full">
+              <span class="material-icons mr-4">search</span>
+              <input
+                v-model.trim="search"
+                class="
+                  list-search
+                  w-full
+                  box-border
+                  w-4/5
+                  h-8
+                  focus:outline-none
+                "
+                type="search"
+                placeholder="Search"
+                @keyup.enter.prevent="searchFetchVehicles()"
+              />
+            </div>
+          </div>
+          <!-- End of search box -->
           <app-table
             :loading="loading"
             :error-loading="errorLoading"
@@ -95,9 +116,9 @@
               <span v-else>Not Available</span>
             </template>
 
-            <template v-slot:actions="">
+            <!-- <template v-slot:actions="">
               <img src="@/assets/icons/more_options.svg" />
-            </template>
+            </template> -->
           </app-table>
         </div>
       </div>
@@ -127,6 +148,7 @@ export default defineComponent({
         status: 'active',
         search: ''
       },
+      search: '',
       loading: false,
       tableData: [],
       totalRecords: null,
@@ -148,6 +170,9 @@ export default defineComponent({
     })
   },
   methods: {
+    searchFetchVehicles () {
+      console.log('search')
+    },
     setStatusFilter (value: string) {
       this.filters.status = value;
       this.fetchVehicles();
