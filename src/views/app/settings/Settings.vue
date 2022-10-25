@@ -4,13 +4,26 @@
       <page-action-header>
         <template #breadcrumbs>
           <TabContainer>
-            <TabItem :title="'Profile Information'" :to="{name: 'settings.edit.partner'}"/>
-            <TabItem :title="'Company Information'" :to="{name: 'settings.edit.partner.company'}"/>
-            <TabItem :title="'Settlement Account'" :to="{name: 'settings.edit.settlemet.account'}"/>
+            <TabItem
+              :title="'Profile Information'"
+              :to="{ name: 'settings.edit.partner' }"
+            />
+            <TabItem
+              :title="'Company Information'"
+              :to="{ name: 'settings.edit.partner.company' }"
+            />
+            <TabItem
+              :title="'Settlement Account'"
+              :to="{ name: 'settings.edit.settlemet.account' }"
+            />
+            <TabItem
+              :title="'Role Management'"
+              :to="{ name: 'settings.edit.role.management' }"
+            />
           </TabContainer>
         </template>
-        </page-action-header>
-      </template>
+      </page-action-header>
+    </template>
     <main>
       <router-view />
     </main>
@@ -31,15 +44,15 @@ export default {
     TabItem
   },
   methods: {
-    showProfilePage () {
-      emitter.emit("settings:go-to-profile");
+    showProfilePage() {
+      emitter.emit('settings:go-to-profile');
     },
-    showCompanyInfo () {
-      emitter.emit("settings:go-to-company");
+    showCompanyInfo() {
+      emitter.emit('settings:go-to-company');
     },
-    showAccountsPage () {
-      emitter.emit("settings:go-to-settlement");
-    },
+    showAccountsPage() {
+      emitter.emit('settings:go-to-settlement');
+    }
   }
 };
 </script>

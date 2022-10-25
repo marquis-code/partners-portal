@@ -409,6 +409,15 @@ export const AppRoutes: Array<RouteRecordRaw> = [
               title: 'Settlement Account Information',
               requiresAuth: true
             }
+          },
+          {
+            path: 'roles',
+            name: 'settings.edit.role.management',
+            component: loadRouteComponent('app/settings/RoleManagement'),
+            meta: {
+              title: 'Role Management',
+              requiresAuth: true
+            }
           }
         ]
       }
