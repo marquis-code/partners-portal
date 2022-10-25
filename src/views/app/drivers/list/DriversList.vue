@@ -7,7 +7,7 @@
             to="drivers/add-driver"
             class="
               bg-sh-green-500
-              font-medium
+              font-light
               border-none
               outline-none
               px-6
