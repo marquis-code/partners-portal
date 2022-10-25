@@ -1,11 +1,13 @@
 <template>
-  <div class="overflow-x-auto">
+  <div :class="[]" class="w-">
     <div class="flex justify-between items-center">
       <h1 class="text-gray-400 font-medium">Trips</h1>
     </div>
     <apexchart
+      class="w-full overflow-x-auto"
       type="bar"
       height="350"
+      :width="this.series[0].data.length * 35"
       :options="chartOptions"
       :series="series"
     ></apexchart>
@@ -26,8 +28,9 @@ export default defineComponent({
         {
           name: 'trips',
           data: [
-            100, 200, 300, 400, 500, 600, 700, 800, 900, 10000, 100, 200, 300,
-            400, 500, 600, 700, 800, 900
+            100, 200, 300, 400, 500, 600, 700, 800, 900, 100, 200, 300, 400,
+            500, 600, 700, 800, 900, 100, 200, 300, 400, 500, 600, 700, 800,
+            900, 100, 200, 300
           ]
         }
       ],
@@ -103,55 +106,21 @@ export default defineComponent({
             'Sep 16',
             'Sep 17',
             'Sep 18',
-            'Sep 19'
+            'Sep 19',
+            'Sep 20',
+            'Sep 21',
+            'Sep 22',
+            'Sep 23',
+            'Sep 24',
+            'Sep 25',
+            'Sep 26',
+            'Sep 27',
+            'Sep 28',
+            'Sep 29',
+            'Sep 30'
           ],
           position: 'right'
-          // axisBorder: {
-          //   show: false
-          // },
-          // axisTicks: {
-          //   show: false
-          // },
-          // crosshairs: {
-          //   fill: {
-          //     type: 'gradient',
-          //     gradient: {
-          //       colorFrom: '#D8E3F0',
-          //       colorTo: '#BED1E6',
-          //       stops: [0, 100],
-          //       opacityFrom: 0.4,
-          //       opacityTo: 0.5
-          //     }
-          //   }
-          // },
-          // tooltip: {
-          //   enabled: true
-          // }
-        },
-        yaxis: {
-          // categories: [0, 50, 100, 150, 600],
-          // axisBorder: {
-          //   show: false
-          // },
-          // axisTicks: {
-          //   show: false
-          // },
-          // labels: {
-          //   show: false,
-          //   formatter: function (val: number) {
-          //     return val + '%';
-          //   }
-          // }
         }
-        // title: {
-        //   text: 'Monthly Inflation in Argentina, 2002',
-        //   floating: true,
-        //   offsetY: 330,
-        //   align: 'center',
-        //   style: {
-        //     color: '#444'
-        //   }
-        // }
       }
     };
   }
