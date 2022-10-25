@@ -106,7 +106,8 @@
               <div class="flex space-x-2">
                 <p class="text-sm font-medium">Availability</p>
               </div>
-              <p class="text-sm">{{routeDetails?.route?.visibility}}</p>
+              <p v-if="routeDetails?.route?.visibility === 'private'" class="text-sm bg-black text-white px-2 py-1 rounded-2xl">private</p>
+              <p v-if="routeDetails?.route?.visibility === 'public'" class="text-sm bg-sh-green-700 text-white px-2 py-1 rounded-2xl">public</p>
             </div>
             <div class="flex justify-between items-center pt-4">
               <div class="flex space-x-2">
