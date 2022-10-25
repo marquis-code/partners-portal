@@ -484,7 +484,7 @@ export default defineComponent({
       this.selectedDropDown = dropDownId;
     },
     // adding yet to be added document
-    async addYetToBeAddedDocument($event: any) {
+    async addYetToBeAddedDocument ($event: any) {
       const fileHolder = $event;
       this.uploadingDoc = true;
       const fileUrl = await this.uploadTos3andGetDocumentUrl(fileHolder);
@@ -497,7 +497,7 @@ export default defineComponent({
         `${this.docToAdd.document_type} uploaded`
       );
     },
-    removeYetToBeAddedDocument() {
+    removeYetToBeAddedDocument () {
       this.docToAdd.files = ''
     }
   }
