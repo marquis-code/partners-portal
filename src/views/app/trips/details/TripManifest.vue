@@ -1,16 +1,10 @@
 <template>
-  <main class="w-5/12 bg-white rounded-md shadow-md py-8 space-y-2">
+  <main class="lg:w-5/12 bg-white rounded-md shadow-md py-8 space-y-2">
     <div class="flex items-center space-x-2 pl-8">
       <img src="@/assets/images/blackDot.svg" />
       <p class="text-sm font-medium">No of stops: 4</p>
     </div>
-    <div
-      class="
-        flex
-        justify-start
-        items-start
-      "
-    >
+    <div class="flex justify-start items-start">
       <div>
         <img src="@/assets/images/locator.svg" />
       </div>
@@ -57,7 +51,7 @@ export default defineComponent({
       await this.$axios
         .get(`/routes/200/users`)
         .then((res) => {
-          console.log(res);
+          // console.log(res);
           // this.manifest = res.data;
         })
         .catch((err) => {

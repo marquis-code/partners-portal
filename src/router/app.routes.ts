@@ -249,46 +249,6 @@ export const AppRoutes: Array<RouteRecordRaw> = [
 
         ]
       },
-      // {
-      //   path: '/trips',
-      //   name: 'trips',
-      //   component: Trips,
-      //   meta: {
-      //     title: 'Trips',
-      //     requiresAuth: true
-      //   },
-      //   children: [
-      //     {
-      //       path: '',
-      //       name: 'trips.list',
-      //       component: loadRouteComponent('app/trips/list/TripsList'),
-      //       meta: {
-      //         title: 'Trips',
-      //         requiresAuth: true
-      //       }
-      //     },
-      //     {
-      //       path: 'details/:tripId',
-      //       component: loadRouteComponent('app/trips/details/SingleTrip'),
-      //       name: 'trips.detail.info',
-      //       props: true,
-      //       meta: {
-      //         title: 'Trip Details',
-      //         requiresAuth: true
-      //       }
-      //     },
-      //     {
-      //       path: 'details/mainfest/:tripId',
-      //       component: loadRouteComponent('app/trips/details/TripManifest'),
-      //       name: 'trips.manifest.info',
-      //       props: true,
-      //       meta: {
-      //         title: 'Trip Details',
-      //         requiresAuth: true
-      //       }
-      //     }
-      //   ]
-      // },
       {
         path: '/trips',
         name: 'trips',

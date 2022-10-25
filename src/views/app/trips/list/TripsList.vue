@@ -66,20 +66,27 @@
             :loading="loading"
             :error-loading="errorLoading"
             :items="tableData"
-            :fields="filters.status === 'completed-trips' ? completedTripsHeaders : activeAndUpcomingTripsHeaders"
+            :fields="
+              filters.status === 'completed-trips'
+                ? completedTripsHeaders
+                : activeAndUpcomingTripsHeaders
+            "
             @rowClicked="viewTripDetails"
           >
             <template v-slot:route="{ item }">
               <trip-history
-              :pickup="item?.route?.pickup"
-              :destination="item?.route?.destination"
+                :pickup="item?.route?.pickup"
+                :destination="item?.route?.destination"
               ></trip-history>
             </template>
+            <template v-slot:endTime="{ item }">
+               <span class="font-light">{{item.endTime == "Invalid date" ? 'N/A' : item.endTime}}</span>
+            </template>
             <template v-slot:revenue="{ item }">
-              <p class="flex justify-center items-center text-center">
+              <p class="flex justify-center items-center font-light text-center">
                 {{
-                  item?.revenue?.cost_of_supply
-                    ? `'₦'${item?.revenue?.cost_of_supply}`
+                  item?.revenue
+                    ? `₦${item?.revenue}`
                     : 'N/A'
                 }}
               </p>
@@ -162,7 +169,7 @@ export default defineComponent({
     async fetchPartnerTripsFromRevenue() {
       this.loading = true;
       const params = {
-        related: 'trips',
+        related: 'driver,vehicle',
         status: this.filters.status,
         metadata: true
       };
@@ -171,6 +178,7 @@ export default defineComponent({
           `/v1/partners/${this.partnerContext.partner.id}/${params.status}?metadata=${params.metadata}`
         )
         .then((res) => {
+          console.log(res);
           const trips = this.transformActiveOrUpcomingTrips(res.data.data);
           console.log(trips);
           this.tableData = trips;
@@ -231,6 +239,7 @@ export default defineComponent({
     transformActiveOrUpcomingTrips(payload: Array<any>) {
       const newTrips: any = [];
       payload.forEach((trip) => {
+        console.log(trip);
         newTrips.push({
           createdAt: moment(trip.created_at).format('LL'),
           driver: trip.driver.fname + ' ' + trip.driver.lname,

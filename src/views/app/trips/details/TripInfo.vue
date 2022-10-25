@@ -1,10 +1,8 @@
 <template>
   <div class="relative">
     <div class="w-full relative rounded-sm shadow-sm">
-      <single-trip
-        :trip="tripInformation"
-        class="absolute"
-      ></single-trip>
+      <!-- <single-trip :tripData="tripInfo" class="absolute"></single-trip> -->
+      <singleTrip :tripData="tripInfo" class="absolute" />
     </div>
   </div>
 </template>
@@ -21,7 +19,7 @@ export default defineComponent({
   },
   data() {
     return {
-      tripInformation: null,
+      tripInfo: {},
       loading: false
     };
   },
@@ -34,8 +32,8 @@ export default defineComponent({
       await this.$axios
         .get(`/v1/trips/${this.$route.params.tripId}`)
         .then((res) => {
-          console.log(res.data);
-          this.tripInformation = res.data;
+          console.log(res.data, 'fetched data');
+          this.tripInfo = res.data;
         })
         .catch((err) => {
           const errorMessage = extractErrorMessage(

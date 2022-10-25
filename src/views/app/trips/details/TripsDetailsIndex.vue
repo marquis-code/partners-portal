@@ -109,7 +109,6 @@ export default {
       await this.$axios
         .get(`/v1/trips/${this.$route.params.tripId}`)
         .then((res) => {
-          console.log(res.data);
           this.trip = res.data;
         })
         .catch((err) => {
