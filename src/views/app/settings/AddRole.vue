@@ -1,5 +1,6 @@
 <template>
   <main class="md:w-9/12 p-10 lg:w-9/12 bg-white">
+    <p class="text-sm text-gray-400 pb-3">Add New Member</p>
     <form class="space-y-3 lg:space-y-7">
       <section
         class="
@@ -57,6 +58,7 @@
               Select staffs role
             </option>
             <option value="owner">Owner</option>
+            <option value="super-admin">Super Admin</option>
             <option value="admin">Admin</option>
             <option value="member">Member</option>
           </select>
@@ -72,7 +74,7 @@
       <div class="space-x-5 flex justify-end items-center pt-10">
         <button
           type="button"
-          @click="createPartnerRoles()"
+          @click="createPartnerRoles"
           class="
             rounded-md
             w-32
@@ -92,11 +94,6 @@
         >
           {{ processing ? 'Saving' : 'Proceed' }}
           <spinner v-if="processing"></spinner>
-          <img
-            v-if="!processing"
-            class="ml-2"
-            src="@/assets/images/arrow.svg"
-          />
         </button>
       </div>
     </form>
@@ -112,7 +109,7 @@
         </p>
       </div>
       <button
-        @click="closeModal"
+        @click="goToMembersView"
         class="text-black bg-sh-green-500 rounded-md p-2 w-11/12 font-medium"
       >
         Dismiss
@@ -140,7 +137,7 @@ export default defineComponent({
     Spinner,
     AppModal
   },
-  data() {
+  data () {
     return {
       v$: useVuelidate(),
       showModal: false,
@@ -148,7 +145,8 @@ export default defineComponent({
       processing: false
     };
   },
-  validations() {
+  emits: ['reloadPage'],
+  validations () {
     return {
       form: {
         email: { required, email },
@@ -164,24 +162,27 @@ export default defineComponent({
     })
   },
   methods: {
-    openModal() {
+    goToMembersView () {
+      this.showModal = false;
+      this.$router.push({name: 'settings.edit.role.management'})
+    },
+    openModal () {
       this.showModal = true;
     },
-    closeModal() {
+    closeModal () {
       this.showModal = false;
       this.$emit('reloadPage');
     },
-    async createPartnerRoles() {
+    async createPartnerRoles () {
       this.v$.form.$touch();
       if (this.processing || this.v$.form.$errors.length) {
         return;
       }
       this.processing = true;
       try {
+        await this.$axios.post(`/v1/partners/${this.partnerContext.partner.account_sid}/member-invitations`, {...this.form})
         this.showModal = true;
-        // this.$toast.success('New Partner role was successfully created');
       } catch (err) {
-        console.log(err);
         const errorMessage = extractErrorMessage(
           err,
           null,

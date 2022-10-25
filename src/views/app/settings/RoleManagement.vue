@@ -24,7 +24,7 @@
     class="space-y-5 shadow-sm rounded-sm bg-white w-full"
   >
     <app-table
-      :loading="gettingAccounts"
+      :loading="fetchingMembers"
       :error-loading="errorLoading"
       :items="tableData"
       :fields="headers"
@@ -40,9 +40,9 @@
       <template v-slot:actions="{ item }">
         <span
           @click="handleRoleDelete(item)"
-          v-if="item"
+          v-if="item && item.admin_class == 'owner'"
           class="text-sm text-red-500"
-          >Remove</span
+          >Remove {{item.admin_class}}</span
         >
       </template>
     </app-table>
@@ -141,6 +141,8 @@ import Spinner from '@/components/layout/Spinner.vue';
 import AppModal from '@/components/Modals/AppModal.vue';
 import AppTable from '@/components/AppTable.vue';
 import AddRole from '@/views/app/settings/AddRole.vue';
+import { getUserReadableDate } from '@/utils/dateFormatters';
+import { extractErrorMessage } from '@/utils/helper';
 
 export default defineComponent({
   components: {
@@ -154,6 +156,7 @@ export default defineComponent({
       modalStatus: 'success',
       activeView: 'role_table',
       errorLoading: false,
+      fetchingMembers: false,
       tableData: [
         {
           id: 1,
@@ -189,15 +192,54 @@ export default defineComponent({
   },
   created() {
     this.activeView = 'role_table';
+    this.fetchPartnerMembers();
   },
 
   methods: {
+    async fetchPartnerMembers() {
+      try {
+        this.fetchingMembers = true;
+        const response = await this.$axios.get(
+          `/v1/partners/${this.partnerContext.partner.account_sid}/members`
+        );
+        this.tableData = this.structureData(response.data.data);
+      } catch (error) {
+        const errorMessage = extractErrorMessage(
+          error,
+          null,
+          'Oops! An error occurred, please try again.'
+        );
+        this.$toast.error(errorMessage);
+      } finally {
+        this.fetchingMembers = false;
+      }
+    },
     async handleRoleDelete(item: any) {
       this.modalStatus = 'warning';
       this.selectedIndividual = item;
       console.log(item);
       this.showModal = true;
       // await this.$axios.delete(`/v1/delete${item.id}`);
+    },
+    structureData(memberList: any) {
+      const newMemberList: any[] = memberList.map(
+        (member: {
+          user: { fname: any; lname: any; email: any };
+          role: any;
+          created_at: string;
+          id: any;
+        }) => {
+          return {
+            fname: member?.user?.fname,
+            lname: member?.user?.lname,
+            admin_class: member?.role,
+            email: member?.user?.email,
+            created_at: getUserReadableDate(member?.created_at),
+            actions: member?.id
+          };
+        }
+      );
+      return newMemberList;
     },
     handleViewChange() {
       this.activeView = 'add_role';
