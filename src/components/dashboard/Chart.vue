@@ -1,5 +1,5 @@
 <template>
-  <div :class="[]" class="w-">
+  <div>
     <div class="flex justify-between items-center">
       <h1 class="text-gray-400 font-medium">Trips</h1>
     </div>
@@ -75,7 +75,7 @@ export default defineComponent({
           }
         },
         dataLabels: {
-          enabled: true,
+          enabled: false,
           formatter: function (val: number) {
             return val + '%';
           },
