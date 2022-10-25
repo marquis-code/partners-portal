@@ -20,7 +20,7 @@
             ? 'bg-sh-green-100 ring-1 ring-sh-green-500'
             : 'bg-sh-grey-50 ring-1 ring-gray-300'
         ]"
-        class="p-6 py-9 rounded-md space-y-3 cursor-pointer max-w-xs mr-8"
+        class="p-6 py-9 rounded-md space-y-3 cursor-pointer max-w-xs mr-0 md:mr-8 mb-10"
       >
         <img src="@/assets/images/shuttle.svg" />
         <h1 class="text-sh-grey-900 font-bold">{{ title }}</h1>
