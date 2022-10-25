@@ -162,13 +162,13 @@ export default defineComponent({
             {
               title: 'Trips',
               routeName: 'trips.list',
-              icon: 'map',
+              icon: 'route',
               selected: false
             },
             {
               title: 'Routes',
               routeName: 'routes.list',
-              icon: 'route',
+              icon: 'location_on',
               selected: false
             },
             {
