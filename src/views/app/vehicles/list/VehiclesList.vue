@@ -96,12 +96,22 @@
             @rowClicked="viewTripDetails"
           >
             <template v-slot:driver="{ item }">
-              <span v-if="item.driver?.id" class="text-sm text-black">
-                {{ item.driver.fname }} {{ item.driver.lname }}
-              </span>
-              <span v-else class="text-sm text-grays-black-6" >
-                N/A</span
+              <router-link
+                class="
+                  hover:underline
+                  hover:decoration-sh-green-500
+                  hover:text-sh-green-500
+                  text-sm text-black
+                "
+                :to="{
+                  name: 'driver.detail.info',
+                  params: { driverId: item.driver.id }
+                }"
+                v-if="item.driver?.id"
               >
+                {{ item.driver.fname }} {{ item.driver.lname }}
+              </router-link>
+              <span v-else class="text-sm text-grays-black-6"> N/A</span>
             </template>
 
             <template v-slot:type="{ item }">
@@ -111,14 +121,98 @@
                   src="@/assets/icons/sedan.svg"
                 />
                 <img v-else src="@/assets/icons/bus.svg" />
-                <span class="ml-1">{{ item.type }}</span>
+                <router-link
+                  :to="{
+                    name: 'vehicle.detail.info',
+                    params: { vehicleId: item.id }
+                  }"
+                  class="
+                    ml-1
+                    hover:underline
+                    hover:decoration-sh-green-500
+                    hover:text-sh-green-500
+                  "
+                  >{{ item.type }}</router-link
+                >
               </span>
               <span v-else>Not Available</span>
             </template>
 
-            <!-- <template v-slot:actions="">
-              <img src="@/assets/icons/more_options.svg" />
-            </template> -->
+            <template v-slot:registration_number="{ item }">
+              <span v-if="item.registration_number">
+                <router-link
+                  :to="{
+                    name: 'vehicle.detail.info',
+                    params: { vehicleId: item.id }
+                  }"
+                  class="
+                    ml-1
+                    hover:underline
+                    hover:decoration-sh-green-500
+                    hover:text-sh-green-500
+                  "
+                  >{{ item.registration_number }}</router-link
+                >
+              </span>
+              <span v-else>N/A</span>
+            </template>
+
+            <template v-slot:brand="{ item }">
+              <span v-if="item.brand">
+                <router-link
+                  :to="{
+                    name: 'vehicle.detail.info',
+                    params: { vehicleId: item.id }
+                  }"
+                  class="
+                    ml-1
+                    hover:underline
+                    hover:decoration-sh-green-500
+                    hover:text-sh-green-500
+                  "
+                  >{{ item.brand }}</router-link
+                >
+              </span>
+              <span v-else>N/A</span>
+            </template>
+
+            <template v-slot:name="{ item }">
+              <span v-if="item.name">
+                <router-link
+                  :to="{
+                    name: 'vehicle.detail.info',
+                    params: { vehicleId: item.id }
+                  }"
+                  class="
+                    ml-1
+                    hover:underline
+                    hover:decoration-sh-green-500
+                    hover:text-sh-green-500
+                  "
+                  >{{ item.name }}</router-link
+                >
+              </span>
+              <span v-else>N/A</span>
+            </template>
+
+            <template v-slot:seats="{ item }">
+              <span v-if="item.seats">
+                <router-link
+                  :to="{
+                    name: 'vehicle.detail.info',
+                    params: { vehicleId: item.id }
+                  }"
+                  class="
+                    ml-1
+                    hover:underline
+                    hover:decoration-sh-green-500
+                    hover:text-sh-green-500
+                  "
+                  >{{ item.seats }}</router-link
+                >
+              </span>
+              <span v-else>N/A</span>
+            </template>
           </app-table>
         </div>
       </div>
@@ -139,10 +233,10 @@ export default defineComponent({
     PageActionHeader,
     AppTable
   },
-  created () {
+  created() {
     this.fetchVehicles();
   },
-  data () {
+  data() {
     return {
       filters: {
         status: 'active',
@@ -170,14 +264,14 @@ export default defineComponent({
     })
   },
   methods: {
-    searchFetchVehicles () {
-      console.log('search')
+    searchFetchVehicles() {
+      console.log('search');
     },
-    setStatusFilter (value: string) {
+    setStatusFilter(value: string) {
       this.filters.status = value;
       this.fetchVehicles();
     },
-    fetchVehicles () {
+    fetchVehicles() {
       this.loading = true;
       const params = {
         related: 'driver',
@@ -195,12 +289,6 @@ export default defineComponent({
         .finally(() => {
           this.loading = false;
         });
-    },
-    viewTripDetails (vehicle: any) {
-      this.$router.push({
-        name: 'vehicle.detail.info',
-        params: { vehicleId: vehicle?.id }
-      });
     }
   }
 });
