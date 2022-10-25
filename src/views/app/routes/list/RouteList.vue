@@ -5,22 +5,25 @@
         <div>
           <!-- Search Box  -->
           <div class="flex flex-row justify-between px-6 py-4 w-full">
-              <div
-                class="flex flex-row justify-start w-full"
-              >
-                <span
-                  class="material-icons mr-4"
-                >search</span>
-                <input
-                  v-model.trim="search"
-                  class="list-search w-full box-border w-4/5 h-8 focus:outline-none"
-                  type="search"
-                  placeholder="Search"
-                  @keyup.enter.prevent="fetchUsers(true)"
-                />
-              </div>
+            <div class="flex flex-row justify-start w-full">
+              <span class="material-icons mr-4">search</span>
+              <input
+                v-model.trim="search"
+                class="
+                  list-search
+                  w-full
+                  box-border
+                  w-4/5
+                  h-8
+                  focus:outline-none
+                "
+                type="search"
+                placeholder="Search"
+                @keyup.enter.prevent="fetchUsers(true)"
+              />
             </div>
-            <!-- End of search box -->
+          </div>
+          <!-- End of search box -->
           <app-table
             :loading="loading"
             :error-loading="errorLoading"
@@ -31,15 +34,15 @@
           >
             <template v-slot:route="{ item }">
               <trip-history
-                :pickup="item?.route?.pickup"
-                :destination="item?.route?.destination"
+                :pickup="item?.route.pickup"
+                :destination="item?.route.destination"
               ></trip-history>
             </template>
-            <template v-slot:revenue="{ item }">
+            <template v-slot:cost="{ item }">
               <p class="flex justify-center items-center text-center">
                 {{
-                  item?.revenue?.cost_of_supply
-                    ? `'₦'${item?.revenue?.cost_of_supply}`
+                  item
+                    ? `₦ ${item.cost}`
                     : 'N/A'
                 }}
               </p>
@@ -58,6 +61,7 @@ import { mapGetters } from 'vuex';
 import PageLayout from '@/components/layout/PageLayout.vue';
 import OptionsDropdown from '@/components/OptionsDropdown.vue';
 import TripHistory from '@/components/TripHistory.vue';
+import { extractErrorMessage } from '@/utils/helper';
 import moment from 'moment';
 export default defineComponent({
   name: 'RoutesList',
@@ -68,168 +72,26 @@ export default defineComponent({
     TripHistory
     /* DownloadButton */
   },
-  created() {
+  created () {
     this.fetchPartnerRoutes();
   },
-  data() {
+  props: {
+    routeId: String
+  },
+  data () {
     return {
       result: [],
       search: '',
       loading: false,
       headers: [
         { label: 'Route Code', key: 'route_code' },
-        { label: 'Route', key: 'pickup' },
+        { label: 'Route', key: 'route' },
         { label: 'Start Time', key: 'start_time' },
         { label: 'Driver Assigned', key: 'driver_assigned' },
         { label: 'Vehicle Assigned', key: 'vehicle' },
         { label: 'Cost', key: 'cost' }
       ],
-      tableData: [
-        {
-          route_code: 'IKR104',
-          pickup: 'Lekki Phase 1',
-          destination: 'Ojota Brigdge',
-          start_time: '8:45am',
-          driver_assigned: 'Daniel Sumah',
-          vehicle: '28 seater - Toyota coaster:ABC - 123DE',
-          cost: '900',
-        },
-        {
-          route_code: 'IKR104',
-          pickup: 'Lekki Phase 1',
-          destination: 'Ojota Brigdge',
-          start_time: '8:45am',
-          driver_assigned: 'Daniel Sumah',
-          vehicle: '28 seater - Toyota coaster:ABC - 123DE',
-          cost: '900',
-        },
-        {
-          route_code: 'IKR104',
-          pickup: 'Lekki Phase 1',
-          destination: 'Ojota Brigdge',
-          start_time: '8:45am',
-          driver_assigned: 'Daniel Sumah',
-          vehicle: '28 seater - Toyota coaster:ABC - 123DE',
-          cost: '900',
-        },
-        {
-          route_code: 'IKR104',
-          pickup: 'Lekki Phase 1',
-          destination: 'Ojota Brigdge',
-          start_time: '8:45am',
-          driver_assigned: 'Daniel Sumah',
-          vehicle: '28 seater - Toyota coaster:ABC - 123DE',
-          cost: '900',
-        },
-        {
-          route_code: 'IKR104',
-          pickup: 'Lekki Phase 1',
-          destination: 'Ojota Brigdge',
-          start_time: '8:45am',
-          driver_assigned: 'Daniel Sumah',
-          vehicle: '28 seater - Toyota coaster:ABC - 123DE',
-          cost: '900',
-        },
-        {
-          route_code: 'IKR104',
-          pickup: 'Lekki Phase 1',
-          destination: 'Ojota Brigdge',
-          start_time: '8:45am',
-          driver_assigned: 'Daniel Sumah',
-          vehicle: '28 seater - Toyota coaster:ABC - 123DE',
-          cost: '900',
-        },
-        {
-          route_code: 'IKR104',
-          pickup: 'Lekki Phase 1',
-          destination: 'Ojota Brigdge',
-          start_time: '8:45am',
-          driver_assigned: 'Daniel Sumah',
-          vehicle: '28 seater - Toyota coaster:ABC - 123DE',
-          cost: '900',
-        },
-        {
-          route_code: 'IKR104',
-          pickup: 'Lekki Phase 1',
-          destination: 'Ojota Brigdge',
-          start_time: '8:45am',
-          driver_assigned: 'Daniel Sumah',
-          vehicle: '28 seater - Toyota coaster:ABC - 123DE',
-          cost: '900',
-        },
-        {
-          route_code: 'IKR104',
-          pickup: 'Lekki Phase 1',
-          destination: 'Ojota Brigdge',
-          start_time: '8:45am',
-          driver_assigned: 'Daniel Sumah',
-          vehicle: '28 seater - Toyota coaster:ABC - 123DE',
-          cost: '900',
-        },
-        {
-          route_code: 'IKR104',
-          pickup: 'Lekki Phase 1',
-          destination: 'Ojota Brigdge',
-          start_time: '8:45am',
-          driver_assigned: 'Daniel Sumah',
-          vehicle: '28 seater - Toyota coaster:ABC - 123DE',
-          cost: '900',
-        },
-        {
-          route_code: 'IKR104',
-          pickup: 'Lekki Phase 1',
-          destination: 'Ojota Brigdge',
-          start_time: '8:45am',
-          driver_assigned: 'Daniel Sumah',
-          vehicle: '28 seater - Toyota coaster:ABC - 123DE',
-          cost: '900',
-        },
-        {
-          route_code: 'IKR104',
-          pickup: 'Lekki Phase 1',
-          destination: 'Ojota Brigdge',
-          start_time: '8:45am',
-          driver_assigned: 'Daniel Sumah',
-          vehicle: '28 seater - Toyota coaster:ABC - 123DE',
-          cost: '900',
-        },
-        {
-          route_code: 'IKR104',
-          pickup: 'Lekki Phase 1',
-          destination: 'Ojota Brigdge',
-          start_time: '8:45am',
-          driver_assigned: 'Daniel Sumah',
-          vehicle: '28 seater - Toyota coaster:ABC - 123DE',
-          cost: '900',
-        },
-        {
-          route_code: 'IKR104',
-          pickup: 'Lekki Phase 1',
-          destination: 'Ojota Brigdge',
-          start_time: '8:45am',
-          driver_assigned: 'Daniel Sumah',
-          vehicle: '28 seater - Toyota coaster:ABC - 123DE',
-          cost: '900',
-        },
-        {
-          route_code: 'IKR104',
-          pickup: 'Lekki Phase 1',
-          destination: 'Ojota Brigdge',
-          start_time: '8:45am',
-          driver_assigned: 'Daniel Sumah',
-          vehicle: '28 seater - Toyota coaster:ABC - 123DE',
-          cost: '900',
-        },
-        {
-          route_code: 'IKR104',
-          pickup: 'Lekki Phase 1',
-          destination: 'Ojota Brigdge',
-          start_time: '8:45am',
-          driver_assigned: 'Daniel Sumah',
-          vehicle: '28 seater - Toyota coaster:ABC - 123DE',
-          cost: '900',
-        },
-      ] as Array<any>,
+      tableData: [] as Array<any>,
       totalRecords: null,
       errorLoading: false,
       items: [],
@@ -242,22 +104,48 @@ export default defineComponent({
     })
   },
   methods: {
-    fetchUsers (status: boolean) {
-      console.log(1)
-    },
-    async fetchPartnerRoutes() {
+    async fetchPartnerRoutes () {
       // this.loading = true;
       // call routes api call
-      setTimeout(() => {
-        // this.loading = true;
-      }, 5000)
+      this.loading = true;
+      try {
+        const response = await this.$axios.get(
+          `/v1/partners/${this.partnerContext.partner.id}/routes?page=1&limit=20`
+        );
+        console.log(this.tableData)
+        this.tableData = this.structureRouteFromResponse(response.data.data);
+      } catch (error) {
+        const errorMessage = extractErrorMessage(
+          error,
+          null,
+          'Oops! An error occurred, please try again.'
+        );
+        this.$toast.error(errorMessage);
+      } finally {
+        this.loading = false;
+      }
     },
-    viewRouteDetails(route: any) {
+    viewRouteDetails (route: any) {
       this.$router.push({
         name: 'routes.detail.info',
-        params: { routeId: 1 }
+        params: { routeId: route.routeId }
       });
     },
+    structureRouteFromResponse (routeList : any[]) {
+      const newRoute: any[] = routeList.map(route => {
+        return {
+          route_code: route.route.route_code,
+          route: route?.route,
+          destination: route?.route.destination,
+          start_time: route.route_itinerary.trip_time,
+          driver_assigned: route?.driver?.fname + ' ' + route?.driver?.lname,
+          vehicle: "" + route.vehicle.seats + ' seater - ' + route.vehicle.brand + " " + route.vehicle.name + " " + route.vehicle.registration_number,
+          cost: route.cost_of_supply,
+          routeId: "" + route.id
+        };
+      });
+      return newRoute;
+    }
   }
 });
 </script>

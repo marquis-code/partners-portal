@@ -1,6 +1,6 @@
 <template>
   <page-layout
-    :page-title="`Ketu, Ikeja • Muritala Mohammed Airport, Lagos state`"
+    :page-title="`${routeDetails?.route?.pickup || ''} to ${routeDetails?.route?.destination || ''}`"
   >
     <template #actionsPane>
       <page-action-header>
@@ -12,11 +12,11 @@
                   name: 'trips.list'
                 }"
                 class="text-gray-400 text-sm hover:text-gray-900"
-                >Trips</a
+                >Routes</a
               >
               <img src="@/assets/images/breadcrumbs.svg" />
               <span
-                > Test</span
+                > {{routeDetails?.route?.route_code || ''}}</span
               >
             </div>
           </div>
@@ -54,17 +54,17 @@
               space-y-4
             "
           >
-            <h1>Trip Information</h1>
+            <h1>Route Information</h1>
 
             <div class="flex items-center justify-between pt-4">
               <div class="space-y-1">
                 <p class="text-sm font-medium">Route</p>
                 <trip-history
-                  :pickup="`Ketu, Ikeja along, Lagos state`"
-                  :destination="`Muritala Mohammed Airport Ikeja, Lagos state`"
+                  :pickup="routeDetails.route.pickup"
+                  :destination="routeDetails.route.destination"
                 ></trip-history>
               </div>
-              <p class="bg-sh-grey-100 px-2.5 py-1 rounded-2xl text-xs">IKR104</p>
+              <p class="bg-sh-grey-100 px-2.5 py-1 rounded-2xl text-xs">{{routeDetails?.route?.route_code}}</p>
             </div>
 
             <div class="flex justify-between items-center pt-4">
@@ -73,8 +73,8 @@
               </div>
               <router-link
                 class="text-indigo-500 underline text-xs"
-                :to="`/driver/1`"
-                >Daniel Sumh</router-link
+                :to="`/drivers/details/${routeDetails.driver.id}/information`"
+                >{{routeDetails.driver.fname || ''}} {{routeDetails.driver.lname || ''}}</router-link
               >
             </div>
             <div class="flex justify-between items-center pt-4">
@@ -83,7 +83,7 @@
               </div>
               <router-link
                 class="text-indigo-500 underline text-xs"
-                :to="`/vehicle/1`"
+                :to="`/vehicle/${routeDetails?.vehicle_id}`"
                 >28 seater - Toyota coaster:ABC - 123DE</router-link
               >
             </div>
@@ -91,13 +91,13 @@
               <div class="flex space-x-2">
                 <p class="text-sm font-medium">Cost</p>
               </div>
-              <p class="text-sm">NGN 950</p>
+              <p class="text-sm">NGN {{routeDetails.cost_of_supply}}</p>
             </div>
             <div class="flex justify-between items-center pt-4">
               <div class="flex space-x-2">
                 <p class="text-sm font-medium">Days available</p>
               </div>
-              <p class="text-sm">Everyday</p>
+              <p class="text-sm">{{getDaysCount(routeDetails.route.route_availability_days).length === 7 ? 'Everyday' :  getDays(getDaysCount(routeDetails.route.route_availability_days))}}</p>
             </div>
             <div class="flex justify-between items-center pt-4">
               <div class="flex space-x-2">
@@ -135,27 +135,54 @@ export default {
     // Map,
     TripHistory
   },
+  props: {
+    routeId: Number || String
+  },
   computed: {
     ...mapGetters({
       partnerContext: 'auth/activeContext'
     })
   },
-  data() {
+  data () {
     return {
       loading: false,
       trip: {},
-      tripDetails: {}
+      routeDetails: {},
     };
   },
   created() {
-    this.fetchVehicles();
+    this.fetchPartnerRouteDetails();
   },
   methods: {
-    async fetchVehicles() {
+    getDaysCount (stringifiedList) {
+      const days = JSON.parse(stringifiedList);
+      return days
+    },
+    getDays (daysList) {
+      const days = ''
+      for (let index = 0; index < daysList.length; index++) {
+        const element = daysList[index];
+        // eslint-disable-next-line no-const-assign
+        days = element + ' '
+      }
+      return days
+    },
+    async fetchPartnerRouteDetails () {
       this.loading = true;
-      this.tripDetails = {}
-      this.loading = false;
-    }
+      try {
+        const response = await this.$axios.get(`/v1/partners/${this.partnerContext.partner.id}/routes/${this.routeId}`);
+        this.routeDetails = response.data;
+      } catch (error) {
+        const errorMessage = extractErrorMessage(
+          error,
+          null,
+          'Oops! An error occurred, please try again.'
+        );
+        this.$toast.error(errorMessage);
+      } finally {
+        this.loading = false;
+      }
+    },
   }
 };
 </script>
