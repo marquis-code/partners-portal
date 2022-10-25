@@ -2,9 +2,26 @@
   <div v-if="fetchingRoles">
     <spinner></spinner>
   </div>
+  <div class="flex justify-end items-end pb-3">
+    <button
+      v-if="activeView !== 'add_role'"
+      @click="handleViewChange"
+      class="
+        text-black text-sm
+        bg-sh-green-500
+        rounded-md
+        shadow-sm
+        px-5
+        py-2
+        mt-5
+      "
+    >
+      Add Role
+    </button>
+  </div>
   <main
     v-if="activeView === 'role_table'"
-    class="space-y-5 shadow-sm rounded-sm bg-white"
+    class="space-y-5 shadow-sm rounded-sm bg-white w-full"
   >
     <app-table
       :loading="gettingAccounts"
@@ -29,23 +46,12 @@
         >
       </template>
     </app-table>
-    <!-- </div> -->
   </main>
-  <add-role v-if="activeView === 'add_role'"></add-role>
-  <button
-    @click="handleViewChange"
-    class="
-      text-black text-sm
-      bg-sh-green-500
-      rounded-md
-      shadow-sm
-      px-5
-      py-2
-      mt-5
-    "
-  >
-    Add Role
-  </button>
+  <add-role
+    @reloadPage="reloadPage"
+    v-if="activeView === 'add_role'"
+  ></add-role>
+
   <app-modal :modalActive="showModal">
     <div
       v-if="modalStatus === 'success'"
@@ -69,15 +75,55 @@
       v-if="modalStatus === 'warning'"
       class="flex flex-col justify-center items-center py-3"
     >
+      <img src="@/assets/images/infoCheck.svg" />
+      <div class="space-y-3 pb-16 pt-5">
+        <h1 class="text-center font-medium text-lg">
+          Delete {{ selectedIndividual?.admin_class }}
+        </h1>
+        <p class="text-gray-400 text-center">
+          Are you sure you want to continue?
+        </p>
+      </div>
+      <div class="flex justify-between items-center w-full space-x-10">
+        <button
+          @click="showModal = false"
+          class="
+            text-black
+            bg-white
+            ring-1 ring-gray-300
+            rounded-md
+            p-2
+            w-11/12
+            font-medium
+          "
+        >
+          Cancel
+        </button>
+        <button
+          @click="proceed"
+          class="text-white bg-red-500 rounded-md p-2 w-11/12 font-medium"
+        >
+          Continue
+        </button>
+      </div>
+    </div>
+
+    <div
+      v-if="modalStatus === 'warning-success'"
+      class="flex flex-col justify-center items-center py-3"
+    >
       <img src="@/assets/images/successCheck.svg" />
       <div class="space-y-3 pb-16 pt-5">
-        <h1 class="text-center font-medium">Company information updated</h1>
+        <h1 class="text-center font-medium">
+          {{ selectedIndividual?.admin_class }} has been removed
+        </h1>
         <p class="text-gray-400 text-center">
-          Your company information has been updated.
+          You have successfully removed an
+          {{ selectedIndividual?.admin_class }}.
         </p>
       </div>
       <button
-        @click="closeModal"
+        @click="closeWarningSuccess"
         class="text-black bg-sh-green-500 rounded-md p-2 w-11/12 font-medium"
       >
         Dismiss
@@ -130,7 +176,8 @@ export default defineComponent({
       fetchingRoles: false,
       format,
       showModal: false,
-      processing: false
+      processing: false,
+      selectedIndividual: {}
     };
   },
   computed: {
@@ -147,12 +194,23 @@ export default defineComponent({
   methods: {
     async handleRoleDelete(item: any) {
       this.modalStatus = 'warning';
+      this.selectedIndividual = item;
       console.log(item);
       this.showModal = true;
       // await this.$axios.delete(`/v1/delete${item.id}`);
     },
     handleViewChange() {
       this.activeView = 'add_role';
+    },
+    reloadPage() {
+      this.activeView = 'role_table';
+      // this.fetchRoles();
+    },
+    proceed() {
+      this.modalStatus = 'warning-success';
+    },
+    closeWarningSuccess() {
+      this.showModal = false;
     }
   }
 });

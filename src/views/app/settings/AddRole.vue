@@ -169,6 +169,7 @@ export default defineComponent({
     },
     closeModal() {
       this.showModal = false;
+      this.$emit('reloadPage');
     },
     async createPartnerRoles() {
       this.v$.form.$touch();
@@ -177,7 +178,6 @@ export default defineComponent({
       }
       this.processing = true;
       try {
-        console.log('I am here');
         this.showModal = true;
         // this.$toast.success('New Partner role was successfully created');
       } catch (err) {
