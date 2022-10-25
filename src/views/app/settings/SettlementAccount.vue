@@ -1,6 +1,6 @@
 <template>
-    <div v-if="fetchingCompanyInfo">
-      <spinner></spinner>
+    <div v-if="fetchingAccounts">
+      <Spinner></Spinner>
     </div>
     <main class="w-full p-5 lg:p-14 bg-white ring-1 ring-gray-100">
       <div class="space-y-5 ring-1 ring-gray-50 shadow-sm rounded-sm bg-white">
@@ -28,38 +28,21 @@
         :fields="headers"
       >
         <template v-slot:is_default="{ item }">
-          <span class="text-sm text-sh-green-700" v-if="item.is_default">
+          <span class="text-sm text-sh-green-700" v-if="item.is_default === 1">
             Assigned
           </span>
           <span class="text-sm text-grays-black-6" v-else>
-            No route assigned
+            Not assigned
           </span>
         </template>
         <template v-slot:actions="{ item }">
-          <span v-if="item.is_default" class="text-sm" @click="showConfirmationModal = true">Assign</span>
+          <span v-if="item.is_default === 0" class="text-sm" @click="startAccountAssignment(item)">Assign</span>
           <span v-else class="text-sm">Unassign</span>
           <span class="text-red-500 ml-2 text-sm" @click="showRemoveConfirmationModal = true">Remove</span>
         </template>
       </app-table>
     </div>
     </main>
-    <app-modal :modalActive="showSuccessModal">
-      <div class="flex flex-col justify-center items-center py-3">
-        <img src="@/assets/images/successCheck.svg" />
-        <div class="space-y-3 pb-16 pt-5">
-          <h1 class="text-center font-medium">Settlement account assigned</h1>
-          <p class="text-gray-400 text-center">
-            Your settlement account is ready.
-          </p>
-        </div>
-        <button
-          @click="showSuccessModal = false"
-          class="text-black bg-sh-green-500 rounded-md p-2 w-11/12 font-medium"
-        >
-          Dismiss
-        </button>
-      </div>
-    </app-modal>
     <app-modal :modalActive="showConfirmationModal">
       <div class="pb-5 px-5 text-center">
           <img src="@/assets/icons/question.svg" class="mx-auto mb-7" />
@@ -81,13 +64,30 @@
                   ? 'bg-sh-green-100'
                   : 'bg-sh-green-500'
               "
-              @click="assignThisAccount"
+              @click="assignAsDefault"
             >
               {{ loading ? 'Processing' : 'Continue' }}
-              <spinner v-if="loading"></spinner>
+              <Spinner v-if="loading"></Spinner>
             </button>
           </div>
         </div>
+    </app-modal>
+    <app-modal :modalActive="showSuccessModal">
+      <div class="flex flex-col justify-center items-center py-3">
+        <img src="@/assets/images/successCheck.svg" />
+        <div class="space-y-3 pb-16 pt-5">
+          <h1 class="text-center font-medium">Settlement account assigned</h1>
+          <p class="text-gray-400 text-center">
+            Your settlement account is ready.
+          </p>
+        </div>
+        <button
+          @click="showSuccessModal = false"
+          class="text-black bg-sh-green-500 rounded-md p-2 w-11/12 font-medium"
+        >
+          Dismiss
+        </button>
+      </div>
     </app-modal>
     <app-modal :modalActive="showRemoveConfirmationModal">
       <div class="pb-5 px-5 text-center">
@@ -113,7 +113,7 @@
               @click="removeThisAccount"
             >
               {{ loading ? 'Processing' : 'Remove' }}
-              <spinner v-if="loading"></spinner>
+              <Spinner v-if="loading"></Spinner>
             </button>
           </div>
         </div>
@@ -174,13 +174,8 @@ export default defineComponent({
       showRemoveConfirmationModal: false,
       showRemoveSuccessModal: false,
       loading: false,
-      tableData: [{
-        entity_type: "partner",
-        account_number: "2367131666",
-        bank_name: "zenith bank",
-        account_name: "Prince Ita",
-        is_default: true
-      }],
+      tableData: [],
+      currentAccountId: null,
       headers: [
         { label: 'Account Number', key: 'account_number' },
         { label: 'Bank Name', key: 'bank_name' },
@@ -188,7 +183,7 @@ export default defineComponent({
         { label: 'Assigned Account', key: 'is_default' },
         { label: 'Actions', key: 'actions' }
       ],
-      fetchingCompanyInfo: false,
+      fetchingAccounts: false,
       format,
       uploadingFile: false,
       v$: useVuelidate(),
@@ -221,22 +216,55 @@ export default defineComponent({
     })
   },
   created () {
-    this.setCurrentCompanyDetails();
+    this.fetchSettlementAccounts();
     // console.log(this.userSessionData);
     // console.log(this.getDriverData, 'here');
   },
   methods: {
-    assignThisAccount () {
-      this.showConfirmationModal = false;
-      this.showSuccessModal = true;
-      // API call to assign an account
+    startAccountAssignment (item: any) {
+      this.currentAccountId = item.id;
+      this.showConfirmationModal = true
     },
-    setCurrentCompanyDetails () {
-      console.log(this.userSessionData);
-      this.form.company_name = this.userSessionData.associatedOrganizations[0].partner.company_name;
-      this.form.rc_number = this.userSessionData.associatedOrganizations[0].partner.rc_number;
-      this.form.company_address = this.userSessionData.associatedOrganizations[0].partner.company_address;
-      this.form.company_type = this.userSessionData.associatedOrganizations[0].partner.company_type;
+    async fetchSettlementAccounts () {
+      // this.showConfirmationModal = false;
+      // API call to assign an account
+      this.fetchingAccounts = true
+      try {
+        const response = await this.$axios.get(`/v1/partners/${this.partnerContext.partner.account_sid}/settlement-accounts`);
+        this.tableData = response.data.data;
+      } catch (error) {
+        const errorMessage = extractErrorMessage(
+          error,
+          null,
+          'Oops! An error occurred, please try again.'
+        );
+        this.$toast.error(errorMessage);
+      } finally {
+        this.fetchingAccounts = false;
+      }
+    },
+    async assignAsDefault (account:any) {
+      // API call to make an account a default
+      this.loading = true
+      try {
+        await this.$axios.patch(`/v1/partners/${this.partnerContext.partner.account_sid}/settlement-accounts/${this.currentAccountId}`, {
+          ...this.form,
+          is_default: true
+        });
+        const response = await this.$axios.get(`/v1/partners/${this.partnerContext.partner.account_sid}/settlement-accounts`);
+        this.tableData = response.data.data;
+      } catch (error) {
+        const errorMessage = extractErrorMessage(
+          error,
+          null,
+          'Oops! An error occurred, please try again.'
+        );
+        this.$toast.error(errorMessage);
+      } finally {
+        this.loading = false;
+        this.showConfirmationModal = false;
+        this.showSuccessModal = true
+      }
     },
     handleFileRemoval () {
       this.isUploaded = false;
