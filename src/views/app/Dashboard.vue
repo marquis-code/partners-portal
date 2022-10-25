@@ -75,13 +75,12 @@
         shadow-sm
         space-y-4
         p-10
+        pb-0
         mt-12
         ring-1 ring-gray-50
       "
     >
-      <div id="barchart">
         <chart></chart>
-      </div>
     </section>
     <pie-chart></pie-chart>
   </page-layout>
