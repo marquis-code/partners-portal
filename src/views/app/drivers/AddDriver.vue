@@ -6,7 +6,9 @@
           <div class="flex items-center space-x-3 py-2">
             <router-link to="/" class="text-gray-400">Dashboard</router-link>
             <img src="@/assets/images/breadcrumbs.svg" />
-            <router-link to="/drivers" class="text-gray-400">Drivers</router-link>
+            <router-link to="/drivers" class="text-gray-400"
+              >Drivers</router-link
+            >
             <img src="@/assets/images/breadcrumbs.svg" />
             <p class="text-gray-900">Add driver</p>
           </div>
@@ -351,7 +353,11 @@
             >
               {{ processing ? 'Saving' : 'Submit' }}
               <spinner v-if="processing"></spinner>
-              <img v-if="!processing" class="ml-2" src="@/assets/images/arrow.svg" />
+              <img
+                v-if="!processing"
+                class="ml-2"
+                src="@/assets/images/arrow.svg"
+              />
             </button>
           </div>
         </form>
@@ -497,26 +503,21 @@ export default defineComponent({
       }
     },
     async fileSelected(selectedImage: any) {
-      const imageDbUrl = (await this.uploadTos3andGetDocumentUrl(
-        selectedImage
-      )) as string;
-      if (imageDbUrl) {
-        this.$toast.success('Vehicle license was uploaded successfully');
-      }
-      this.form.files.push(imageDbUrl);
+      this.uploadingFile = true;
+      await this.uploadTos3andGetDocumentUrl(selectedImage)
+        .then((res) => {
+          this.form.files.push(res);
+          this.$toast.success('Driver’s License was uploaded successfully');
+        })
+        .catch(() => {
+          this.$toast.error(
+            'Something went wrong while uploading Driver’s License'
+          );
+        })
+        .finally(() => {
+          this.uploadingFile = false;
+        });
     },
-
-    // async handleProfileUpload(e: any) {
-    //   const selectedProfile = e.target.files[0];
-    //   this.uploadingProfile = true
-    //   this.profilePreview = URL.createObjectURL(selectedProfile);
-    //   const response = await this.uploadTos3andGetDocumentUrl(selectedProfile);
-    //   if (response) {
-    //     this.uploadingFile = false
-    //     this.$toast.success('Profile picture was uploaded successfully');
-    //   }
-    //   this.form.avatar = response;
-    // },
 
     async handleProfileUpload(e: any) {
       const selectedProfile = e.target.files[0];
@@ -536,7 +537,7 @@ export default defineComponent({
     },
 
     async uploadTos3andGetDocumentUrl(file: any) {
-      this.uploadingFile = true;
+      // this.uploadingFile = true;
       try {
         const formData = new FormData();
         formData.append('file', file);
@@ -552,7 +553,7 @@ export default defineComponent({
           'An error occured while uploading your file, please try again'
         );
       } finally {
-        this.uploadingFile = false;
+        // this.uploadingFile = false;
       }
     }
   }
