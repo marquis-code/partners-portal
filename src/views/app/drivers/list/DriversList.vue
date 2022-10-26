@@ -288,7 +288,7 @@ import PageActionHeader from '@/components/PageActionHeader.vue';
 import PageLayout from '@/components/layout/PageLayout.vue';
 import AppModal from '@/components/Modals/AppModal.vue';
 import { extractErrorMessage } from '@/utils/helper';
-import OptionsDropdown from '@/components/OptionsDropdown.vue';
+
 export default defineComponent({
   name: 'DriversList',
   components: {
@@ -335,7 +335,7 @@ export default defineComponent({
       partnerContext: 'auth/activeContext',
       userSessionData: 'auth/userSessionData'
     }),
-    filteredDrivers() {
+    filteredDrivers () {
       const results = this.tableData as any[];
       console.log(results);
 

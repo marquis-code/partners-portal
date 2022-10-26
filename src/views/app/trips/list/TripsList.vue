@@ -26,64 +26,64 @@
           <!-- End of search box -->
           <!-- Start of filter -->
           <div class="flex items-center pb-2 px-6 py-4">
-        <span
-          class="
-            text-sm
-            font-medium
-            leading-6
-            pb-2
-            pt-1
-            px-2
-            border-b-2
-            cursor-pointer
-          "
-          :class="
-            this.filters.status === 'active-trips'
-              ? 'text-black border-b-sh-green-500'
-              : 'text-sh-grey-500 border-b-transparent'
-          "
-          @click="setStatusFilter('active-trips')"
-          >Active</span
-        >
-        <span
-          class="
-            text-sm
-            font-medium
-            leading-6
-            pb-2
-            pt-1
-            px-2
-            border-b-2
-            cursor-pointer
-          "
-          :class="
-            this.filters.status === 'upcoming-trips'
-              ? 'text-black border-b-sh-green-500'
-              : 'text-sh-grey-500 border-b-transparent'
-          "
-          @click="setStatusFilter('upcoming-trips')"
-          >Upcoming</span
-        >
-        <span
-          class="
-            text-sm
-            font-medium
-            leading-6
-            pb-2
-            pt-1
-            px-2
-            border-b-2
-            cursor-pointer
-          "
-          :class="
-            this.filters.status === 'completed-trips'
-              ? 'text-black border-b-sh-green-500'
-              : 'text-sh-grey-500 border-b-transparent'
-          "
-          @click="setStatusFilter('completed-trips')"
-          >Completed</span
-        >
-      </div>
+            <span
+              class="
+                text-sm
+                font-medium
+                leading-6
+                pb-2
+                pt-1
+                px-2
+                border-b-2
+                cursor-pointer
+              "
+              :class="
+                this.filters.status === 'active-trips'
+                  ? 'text-black border-b-sh-green-500'
+                  : 'text-sh-grey-500 border-b-transparent'
+              "
+              @click="setStatusFilter('active-trips')"
+              >Active</span
+            >
+            <span
+              class="
+                text-sm
+                font-medium
+                leading-6
+                pb-2
+                pt-1
+                px-2
+                border-b-2
+                cursor-pointer
+              "
+              :class="
+                this.filters.status === 'upcoming-trips'
+                  ? 'text-black border-b-sh-green-500'
+                  : 'text-sh-grey-500 border-b-transparent'
+              "
+              @click="setStatusFilter('upcoming-trips')"
+              >Upcoming</span
+            >
+            <span
+              class="
+                text-sm
+                font-medium
+                leading-6
+                pb-2
+                pt-1
+                px-2
+                border-b-2
+                cursor-pointer
+              "
+              :class="
+                this.filters.status === 'completed-trips'
+                  ? 'text-black border-b-sh-green-500'
+                  : 'text-sh-grey-500 border-b-transparent'
+              "
+              @click="setStatusFilter('completed-trips')"
+              >Completed</span
+            >
+          </div>
           <!-- End of filter -->
           <app-table
             :loading="loading"
@@ -220,7 +220,7 @@ export default defineComponent({
       result: [],
       filters: {
         status: 'active-trips' as string,
-        search: '' as string
+        search: ''
       },
       search: '',
       loading: false,
@@ -254,7 +254,21 @@ export default defineComponent({
   computed: {
     ...mapGetters({
       partnerContext: 'auth/activeContext'
-    })
+    }),
+    filteredTrips(): any[] {
+      const results = this.tableData as any[];
+      const searchKeyword = this.search.toLowerCase();
+      if (!searchKeyword) return results;
+      const searchResult = results.filter((item) => {
+        return (
+          item?.routeCode?.toLowerCase().includes(searchKeyword) ||
+          item?.driver?.toLowerCase().includes(searchKeyword) ||
+          item?.pickup?.toLowerCase().includes(searchKeyword) ||
+          item?.dropoff?.toLowerCase().includes(searchKeyword)
+        );
+      });
+      return searchResult;
+    }
   },
   watch: {
     'filters.status'(value) {
@@ -282,6 +296,7 @@ export default defineComponent({
           `/v1/partners/${this.partnerContext.partner.id}/${params.status}?metadata=${params.metadata}`
         )
         .then((res) => {
+          console.log(res);
           const trips = this.transformActiveOrUpcomingTrips(res.data.data);
           this.tableData = trips;
           this.totalRecords = res.data.metadata?.total;
@@ -299,6 +314,7 @@ export default defineComponent({
             `cost-revenue/v1/partners/${this.partnerContext.partner.id}/revenues`
           )
           .then((res) => {
+            console.log(res);
             const trips = this.transformedTrips(res.data.result);
             this.tableData = trips;
             this.totalRecords = res.data.metadata?.total;
