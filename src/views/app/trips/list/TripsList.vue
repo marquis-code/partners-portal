@@ -19,7 +19,6 @@
                 "
                 type="search"
                 placeholder="Search"
-                @keyup.enter.prevent="searchFetchTrips"
               />
             </div>
           </div>
@@ -88,7 +87,7 @@
           <app-table
             :loading="loading"
             :error-loading="errorLoading"
-            :items="tableData"
+            :items="filteredTrips"
             :fields="
               filters.status === 'completed-trips'
                 ? completedTripsHeaders
@@ -228,9 +227,9 @@ export default defineComponent({
       totalRecords: null,
       errorLoading: false,
       activeAndUpcomingTripsHeaders: [
-        { label: 'Date', key: 'createdAt' },
-        { label: 'Route', key: 'route' },
         { label: 'Route Code', key: 'routeCode' },
+        { label: 'Route', key: 'route' },
+        { label: 'Date', key: 'createdAt' },
         { label: 'Driver', key: 'driver' },
         { label: 'Start Time', key: 'startTime' },
         { label: 'End Time', key: 'endTime' },
@@ -239,9 +238,9 @@ export default defineComponent({
       ] as Array<any>,
 
       completedTripsHeaders: [
-        { label: 'Date', key: 'createdAt' },
-        { label: 'Route', key: 'route' },
         { label: 'Route Code', key: 'routeCode' },
+        { label: 'Route', key: 'route' },
+        { label: 'Date', key: 'createdAt' },
         { label: 'Driver', key: 'driver' },
         { label: 'Start Time', key: 'startTime' },
         { label: 'End Time', key: 'endTime' },
@@ -267,6 +266,7 @@ export default defineComponent({
           item?.dropoff?.toLowerCase().includes(searchKeyword)
         );
       });
+      console.log(searchResult);
       return searchResult;
     }
   },
@@ -276,9 +276,6 @@ export default defineComponent({
     }
   },
   methods: {
-    searchFetchTrips() {
-      console.log('search trips');
-    },
     setStatusFilter(value: string) {
       this.filters.status = value;
       this.fetchPartnerTripsFromRevenue();
