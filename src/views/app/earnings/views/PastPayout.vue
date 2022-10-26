@@ -107,23 +107,6 @@ export default defineComponent({
       isFetchingAllEarnings: false,
       isFetchingSettlements: false,
       isFetchingNextPaydate: false,
-      allEarnings: {
-        value: 4000,
-        lastUpdated: moment(Date.now()).format('MMMM DD, YYYY'),
-      },
-      settlement: {
-        value: 0,
-        accountName: '---',
-
-      },
-      nextPayDate: {
-        isRouteable: true,
-        bottomDesc: 'Change Account',
-        desc: 'All-time earnings',
-        value: 0,
-        isIcon: false,
-        placeHolder: 'Next Payout Date'
-      },
     }
   }
 })
