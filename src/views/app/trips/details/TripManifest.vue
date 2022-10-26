@@ -1,5 +1,6 @@
 <template>
-  <main class="lg:w-6/12 bg-white rounded-md shadow-md py-8 px-8 h-screen overflow-y-auto">
+  <Spinner v-if="loading"/>
+  <main v-else class="lg:w-6/12 bg-white rounded-md shadow-md py-8 px-8 h-screen overflow-y-auto">
     <div class="flex items-center mb-8">
       <img src="@/assets/images/blackDot.svg" class="mr-3" />
       <p class="text-sm font-medium">No of stops: {{Object.keys(passengers).length || 'N/A'}}</p>
@@ -39,15 +40,16 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { extractErrorMessage } from '@/utils/helper';
 import 'core-js/actual/array/group-by';
-import axios from 'axios';
+import Spinner from '@/components/layout/Spinner.vue'
 
 export default defineComponent({
   name: 'TripManifest',
+  components: {
+    Spinner
+  },
   created () {
     this.fetchPassengers();
-    // await this.fetchTrip();
   },
   data () {
     return {
@@ -59,7 +61,7 @@ export default defineComponent({
   },
   methods: {
     async fetchPassengers () {
-      const fetchPassengersParams = JSON.parse(localStorage.getItem('TRIP_PASSENGER_PARAM'));
+      const fetchPassengersParams = JSON.parse(localStorage.getItem('TRIP_PASSENGER_PARAM') || '');
       const response = await this.$axios.get(
         `v1/routes/${fetchPassengersParams.route_id}/bookings`, {
           params: {
@@ -75,25 +77,6 @@ export default defineComponent({
       });
       return groupPassengers;
     },
-    async fetchTrip () {
-      this.loading = true;
-      await this.$axios
-        .get(`/v1/trips/${this.$route.params.tripId}`)
-        .then((res) => {
-          this.routeId = res.data.route.id;
-        })
-        .catch((err) => {
-          const errorMessage = extractErrorMessage(
-            err,
-            null,
-            'Oops! An error occurred, please try again.'
-          );
-          this.$toast.error(errorMessage);
-        })
-        .finally(() => {
-          this.loading = false;
-        });
-    }
   }
 });
 </script>

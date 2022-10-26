@@ -12,22 +12,32 @@ import { extractErrorMessage } from '@/utils/helper';
 import SingleTrip from '@/views/app/trips/components/SingleTrip.vue';
 import { getDefaultDatePickerDate } from '@/utils/dateFormatters';
 
+interface fetchPassengerParamInterface {
+  created_at: string,
+  route: {
+    itineraries: any,
+    id: number
+  },
+  driver: {
+    id: number
+  }
+}
 export default defineComponent({
   name: 'TripInfo',
   components: {
     SingleTrip
   },
-  data() {
+  data () {
     return {
-      tripInfo: {},
-      loading: false
-    };
+      tripInfo: {} as fetchPassengerParamInterface,
+      loading: false,
+    }
   },
-  created() {
+  created () {
     this.fetchTrip();
   },
   methods: {
-    async fetchTrip() {
+    async fetchTrip () {
       this.loading = true;
       await this.$axios
         .get(`/v1/trips/${this.$route.params.tripId}`)
