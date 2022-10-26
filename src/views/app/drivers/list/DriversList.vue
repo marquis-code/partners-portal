@@ -187,11 +187,30 @@
                     params: { driverId: item.id }
                   }"
                   @click="editDriver"
-                  class="font-medium text-gray-800 border-2 rounded-md px-3 py-2 border-black"
+                  class="
+                    font-medium
+                    text-gray-800
+                    border-2
+                    rounded-md
+                    px-3
+                    py-2
+                    border-black
+                  "
                 >
                   Edit
                 </router-link>
-                <p @click="removeDriver(item.id)" class="font-medium text-red-500 border-2 rounded-md border-red-500 px-3 py-2">
+                <p
+                  @click="removeDriver(item.id)"
+                  class="
+                    font-medium
+                    text-red-500
+                    border-2
+                    rounded-md
+                    border-red-500
+                    px-3
+                    py-2
+                  "
+                >
                   Remove
                 </p>
               </div>
@@ -316,7 +335,27 @@ export default defineComponent({
     ...mapGetters({
       partnerContext: 'auth/activeContext',
       userSessionData: 'auth/userSessionData'
-    })
+    }),
+    filteredDrivers() {
+      const results = this.tableData as any[];
+
+      const searchKeyword = this.search.toUpperCase();
+
+      if (!searchKeyword) return results;
+
+      const searchResult = results.filter((item) => {
+        console.log(
+          item?.registration_number?.toUpperCase().includes(searchKeyword)
+        );
+        return (
+          item?.registration_number?.toUpperCase().includes(searchKeyword) ||
+          item?.brand?.toUpperCase().includes(searchKeyword) ||
+          item?.name?.toUpperCase().includes(searchKeyword) ||
+          item?.type?.toUpperCase().includes(searchKeyword)
+        );
+      });
+      return searchResult;
+    }
   },
 
   methods: {
