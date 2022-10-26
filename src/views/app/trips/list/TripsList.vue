@@ -266,7 +266,6 @@ export default defineComponent({
           item?.dropoff?.toLowerCase().includes(searchKeyword)
         );
       });
-      console.log(searchResult);
       return searchResult;
     }
   },
@@ -293,7 +292,6 @@ export default defineComponent({
           `/v1/partners/${this.partnerContext.partner.id}/${params.status}?metadata=${params.metadata}`
         )
         .then((res) => {
-          console.log(res);
           const trips = this.transformActiveOrUpcomingTrips(res.data.data);
           this.tableData = trips;
           this.totalRecords = res.data.metadata?.total;
@@ -311,7 +309,6 @@ export default defineComponent({
             `cost-revenue/v1/partners/${this.partnerContext.partner.id}/revenues`
           )
           .then((res) => {
-            console.log(res);
             const trips = this.transformedTrips(res.data.result);
             this.tableData = trips;
             this.totalRecords = res.data.metadata?.total;
