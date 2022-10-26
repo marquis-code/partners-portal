@@ -266,19 +266,16 @@ export default defineComponent({
     filteredVehicles() {
       const results = this.tableData as any[];
 
-      const searchKeyword = this.search.toUpperCase();
+      const searchKeyword = this.search.toLowerCase();
 
       if (!searchKeyword) return results;
 
       const searchResult = results.filter((item) => {
-        console.log(
-          item?.registration_number?.toUpperCase().includes(searchKeyword)
-        );
         return (
-          item?.registration_number?.toUpperCase().includes(searchKeyword) ||
-          item?.brand?.toUpperCase().includes(searchKeyword) ||
-          item?.name?.toUpperCase().includes(searchKeyword) ||
-          item?.type?.toUpperCase().includes(searchKeyword)
+          item?.registration_number?.toLowerCase().includes(searchKeyword) ||
+          item?.brand?.toLowerCase().includes(searchKeyword) ||
+          item?.name?.toLowerCase().includes(searchKeyword) ||
+          item?.type?.toLowerCase().includes(searchKeyword)
         );
       });
       return searchResult;
