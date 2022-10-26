@@ -5,7 +5,7 @@
         <template #breadcrumbs>
           <div class="flex items-center space-x-3 py-3">
             <router-link
-              :to="{ name: 'drivers.list' }"
+              to="/"
               class="text-gray-400 text-sm hover:text-gray-900"
               >Dashboard</router-link
             >
@@ -16,7 +16,7 @@
                 params: { driverId: this.$route.params.driverId }
               }"
               class="text-gray-400 text-sm hover:text-gray-900"
-              >Drivers management</router-link
+              >Driver management</router-link
             >
             <img src="@/assets/images/breadcrumbs.svg" />
             <p class="text-gray-900 text-sm">Edit driver</p>

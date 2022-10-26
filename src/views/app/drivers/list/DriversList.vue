@@ -189,7 +189,7 @@
                 >
                   Edit
                 </router-link>
-                <p @click="removeDriver()" class="font-medium text-red-500 border-2 rounded-md border-red-500 px-3 py-2">
+                <p @click="removeDriver(item.id)" class="font-medium text-red-500 border-2 rounded-md border-red-500 px-3 py-2">
                   Remove
                 </p>
               </div>
@@ -293,6 +293,7 @@ export default defineComponent({
       search: '',
       showSuccessModal: false,
       selectedDriverId: null,
+      driverToRemoveId: null,
       showDropdown: false,
       loading: false,
       modalLoading: false,
@@ -324,7 +325,7 @@ export default defineComponent({
       this.modalLoading = true;
       await this.$axios
         .delete(
-          `/v1/partners/${this.partnerContext.partner.id}/drivers/${this.selectedDriverId}`
+          `/v1/partners/${this.partnerContext.partner.id}/drivers/${this.driverToRemoveId}`
         )
         .then(() => {
           this.modalLoading = false;
@@ -397,7 +398,8 @@ export default defineComponent({
       });
       return newTableData;
     },
-    removeDriver() {
+    removeDriver(id: any) {
+      this.driverToRemoveId = id;
       this.handleShowInfoModal();
       this.showDropdown = false;
     },
