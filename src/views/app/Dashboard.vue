@@ -17,35 +17,41 @@
           <CheckList
             class="text-xs md:text-base"
             :item="`Identity verification`"
-            :done="fasle"
+            :status="'under-review'"
+            :actionRoute="``"
           />
           <CheckList
             class="text-xs md:text-base"
             :item="`Address verification`"
-            :done="fasle"
+            :status="'under-review'"
+            :actionRoute="``"
           />
           <CheckList
             class="text-xs md:text-base"
             :item="`Upload company documents`"
-            :done="false"
-            @click="goToCompanyDocUpload"
+            :status="'pending'"
+            :actionRoute="`/dashboard/company-kyc`"
           />
+
           <CheckList
-            :routeName="'add-driver'"
             class="text-xs md:text-base"
             :item="`Add a Driver (Optional)`"
-            :done="false"
+            :status="'pending'"
+            :actionRoute="`/drivers/add-driver`"
           />
           <CheckList
-            :routeName="'add-vehicle'"
+            routeName="addVehicle"
             class="text-xs md:text-base"
             :item="`Add a vehicle`"
-            :done="false"
+            :status="'pending'"
+            :actionRoute="`/vehicles/add-vehicle`"
           />
+
           <CheckList
             class="text-xs md:text-base"
             :item="`Settlement Account details`"
-            :done="false"
+            :status="'pending'"
+            :actionRoute="`/add-account`"
           />
         </div>
       </div>
@@ -82,7 +88,7 @@
         ring-1 ring-gray-50
       "
     >
-        <chart></chart>
+      <chart></chart>
     </section>
     <pie-chart></pie-chart>
   </page-layout>
@@ -129,9 +135,6 @@ export default defineComponent({
     this.fetchPartnersStats();
   },
   methods: {
-    goToCompanyDocUpload() {
-      this.$router.push('/dashboard/company-kyc');
-    },
     async fetchPartnersStats(partnerId) {
       this.loading = true;
       Promise.all([
