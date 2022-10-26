@@ -96,10 +96,10 @@
             :items="filteredDrivers"
             :fields="headers"
           >
-            <template v-slot:routes="{ item }">
-              <span v-if="item.routes">
-                <span v-for="(route, index) in item.routes" :key="index">{{
-                  route
+            <template v-slot:routeVehicles="{ item }">
+              <span v-if="item.routeVehicles">
+                <span v-for="(route, index) in item.routeVehicles" :key="index">{{
+                  route.route.route_code + "   "
                 }}</span>
               </span>
               <span class="text-sm text-grays-black-6" v-else
@@ -323,7 +323,7 @@ export default defineComponent({
       headers: [
         { label: 'Driver', key: 'name' },
         { label: 'Email', key: 'email' },
-        { label: 'Route Assigned', key: 'itenararies' },
+        { label: 'Route Assigned', key: 'routeVehicles' },
         { label: 'Phone Number', key: 'phone' },
         { label: 'Actions', key: 'actions' }
       ],
@@ -419,7 +419,7 @@ export default defineComponent({
           lname: eachDriver.driver.lname,
           phone: eachDriver.driver.phone,
           email: eachDriver.driver.email,
-          routes: eachDriver.driver.routes,
+          routeVehicles: eachDriver?.routeVehicles || null,
           avatar: eachDriver.driver.avatar,
           active: eachDriver.driver.active,
           deleted_at: eachDriver.driver.deleted_at,
