@@ -8,6 +8,7 @@
           <div class="dashboard-name text-xl font-medium">
             {{ pageTitle }}
           </div>
+          <div class="p-4 bg-black text-white rounded-lg font-medium">{{companyName}}</div>
         </div>
         <slot name="breadcrumbs"></slot>
         <hr class="mt-5 mb-0 hidden" />
@@ -28,6 +29,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import { mapGetters } from "vuex";
 
 export default defineComponent({
   name: "PageLayout",
@@ -42,7 +44,21 @@ export default defineComponent({
       default: false,
     },
   },
+  computed: {
+    ...mapGetters({
+      userSessionData: 'auth/userSessionData',
+    })
+  },
+  data () {
+    return { companyName: '' }
+  },
+  created () {
+    this.setCompany()
+  },
   methods: {
+    setCompany() {
+      this.companyName = this.userSessionData.activeContext.partner.company_name
+    },
     async logout() {
       // TODO: block UI with overlay while logout api is called
       try {
