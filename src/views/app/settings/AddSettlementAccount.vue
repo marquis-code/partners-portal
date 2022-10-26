@@ -34,7 +34,13 @@
                   "
                 >
                   <option selected>Choose</option>
-                  <option v-for="(bank, index) in allBanks" :key="index" :value="bank">{{bank.name}}</option>
+                  <option
+                    v-for="(bank, index) in allBanks"
+                    :key="index"
+                    :value="bank"
+                  >
+                    {{ bank.name }}
+                  </option>
                 </select>
                 <span
                   class="text-xs font-light text-red-500"
@@ -125,8 +131,7 @@
               class="
                 rounded-md
                 w-32
-                flex
-                flex-row
+                flex flex-row
                 justify-center
                 items-center
                 p-3
@@ -187,13 +192,13 @@ import PageLayout from '@/components/layout/PageLayout.vue';
 import banks from 'ng-banks';
 
 interface USSD {
-    code: string | null;
+  code: string | null;
 }
 interface Bank {
-    name: string;
-    code: string | null;
-    slug: string;
-    ussd: USSD;
+  name: string;
+  code: string | null;
+  slug: string;
+  ussd: USSD;
 }
 interface Account {
   bankObject?: Bank;
@@ -201,7 +206,7 @@ interface Account {
   accountName?: string;
   partnerId?: string;
   entityType?: string;
-  isDefault?: boolean
+  isDefault?: boolean;
 }
 export default defineComponent({
   components: {
@@ -227,8 +232,8 @@ export default defineComponent({
       form: {
         bankObject: { required },
         accountNumber: { required },
-        accountName: { required },
-      },
+        accountName: { required }
+      }
     };
   },
   computed: {
@@ -240,17 +245,17 @@ export default defineComponent({
       driverData: 'driver/getDriverData'
     })
   },
-  created () {
-    this.setPartnerId()
-    this.showBanks()
+  created() {
+    this.setPartnerId();
+    this.showBanks();
   },
   methods: {
-    showBanks () {
+    showBanks() {
       const ngBanks = banks.getBanks();
       this.allBanks = ngBanks || [];
     },
-    setPartnerId () {
-      this.form.partnerId = this.partnerContext.partner.account_sid
+    setPartnerId() {
+      this.form.partnerId = this.partnerContext.partner.account_sid;
     },
     async AddNewAccount() {
       this.processing = true;
@@ -260,10 +265,12 @@ export default defineComponent({
         bankCode: this.form.bankObject?.code,
         bankName: this.form.bankObject?.name,
         partnerId: this.form.partnerId
-      }
+      };
       try {
-        await this.$axios.post(`/cost-revenue/v1/settlement-accounts`, {...payload});
-        this.showSuccessModal = true
+        await this.$axios.post(`/cost-revenue/v1/settlement-accounts`, {
+          ...payload
+        });
+        this.showSuccessModal = true;
       } catch (error) {
         const errorMessage = extractErrorMessage(
           error,
@@ -272,12 +279,12 @@ export default defineComponent({
         );
         this.$toast.error(errorMessage);
       } finally {
-        this.processing = false
+        this.processing = false;
       }
     },
-    closeSuccessModal () {
+    closeSuccessModal() {
       this.showSuccessModal = false;
-      this.$router.push({name: 'settings.edit.settlement.account'})
+      this.$router.push({ name: 'settings.edit.settlement.account' });
     }
   }
 });
