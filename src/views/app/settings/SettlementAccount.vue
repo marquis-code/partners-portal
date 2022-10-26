@@ -100,7 +100,7 @@
           :class="loading ? 'bg-sh-green-100' : 'bg-sh-green-500'"
           @click="assignAsDefault"
         >
-          <Spinner v-if="loading"></Spinner>
+          <span><Spinner v-if="loading"></Spinner></span>
           <span>{{ loading ? 'Processing' : 'Continue' }}</span>
         </button>
       </div>
@@ -139,11 +139,10 @@
         <button
           :disabled="loading"
           class="rounded-lg bg-red-500 text-white w-32 md:w-40 py-2 flex flex-row justify-center"
-          :class="loading ? 'bg-sh-green-100' : 'bg-sh-green-500'"
           @click="removeThisAccount"
         >
-          <Spinner v-if="loading"></Spinner>
-          {{ loading ? 'Processing' : 'Remove' }}
+          <span><Spinner v-if="loading"></Spinner></span>
+          <span>Remove</span>
         </button>
       </div>
     </div>

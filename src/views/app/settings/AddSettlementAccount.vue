@@ -19,7 +19,7 @@
                   >Bank Name</label
                 >
                 <select
-                  v-model="form.bankName"
+                  v-model="form.bankObject"
                   id="bank"
                   class="
                     text-xs
@@ -34,33 +34,13 @@
                   "
                 >
                   <option selected>Choose</option>
-                  <option value="access">Access Bank</option>
-                  <option value="citibank">Citibank</option>
-                  <option value="diamond">Diamond Bank</option>
-                  <option value="ecobank">Ecobank</option>
-                  <option value="fidelity">Fidelity Bank</option>
-                  <option value="firstbank">First Bank</option>
-                  <option value="fcmb">First City Monument Bank (FCMB)</option>
-                  <option value="gtb">Guaranty Trust Bank (GTB)</option>
-                  <option value="heritage">Heritage Bank</option>
-                  <option value="keystone">Keystone Bank</option>
-                  <option value="polaris">Polaris Bank</option>
-                  <option value="providus">Providus Bank</option>
-                  <option value="stanbic">Stanbic IBTC Bank</option>
-                  <option value="standard">Standard Chartered Bank</option>
-                  <option value="sterling">Sterling Bank</option>
-                  <option value="suntrust">Suntrust Bank</option>
-                  <option value="union">Union Bank</option>
-                  <option value="uba">United Bank for Africa (UBA)</option>
-                  <option value="unity">Unity Bank</option>
-                  <option value="wema">Wema Bank</option>
-                  <option value="zenith">Zenith Bank</option>
+                  <option v-for="(bank, index) in allBanks" :key="index" :value="bank">{{bank.name}}</option>
                 </select>
                 <span
                   class="text-xs font-light text-red-500"
                   v-if="
-                    v$.form.bankName.$dirty &&
-                    v$.form.bankName.required.$invalid
+                    v$.form.bankObject.$dirty &&
+                    v$.form.bankObject.required.$invalid
                   "
                 >
                   This field must be provided
@@ -146,6 +126,7 @@
                 rounded-md
                 w-32
                 flex
+                flex-row
                 justify-center
                 items-center
                 p-3
@@ -159,8 +140,8 @@
                   : 'bg-sh-green-500 font-medium'
               "
             >
-              {{ processing ? 'Saving' : 'Add' }}
-              <spinner v-if="processing"></spinner>
+              <span><spinner v-if="processing"></spinner></span>
+              <span>{{ processing ? 'Saving' : 'Add' }}</span>
             </button>
           </div>
         </div>
@@ -203,16 +184,25 @@ import { format } from 'date-fns';
 import Spinner from '@/components/layout/Spinner.vue';
 import AppModal from '@/components/Modals/AppModal.vue';
 import PageLayout from '@/components/layout/PageLayout.vue';
+import banks from 'ng-banks';
 
+interface USSD {
+    code: string | null;
+}
+interface Bank {
+    name: string;
+    code: string | null;
+    slug: string;
+    ussd: USSD;
+}
 interface Account {
-  bankName?: string;
+  bankObject?: Bank;
   accountNumber?: string;
   accountName?: string;
   partnerId?: string;
   entityType?: string;
   isDefault?: boolean
 }
-
 export default defineComponent({
   components: {
     Spinner,
@@ -224,6 +214,7 @@ export default defineComponent({
       format,
       v$: useVuelidate(),
       showModal: false,
+      allBanks: [] as Bank[],
       form: {
         isDefault: false
       } as Account,
@@ -234,9 +225,9 @@ export default defineComponent({
   validations() {
     return {
       form: {
-        bankName: { required },
+        bankObject: { required },
         accountNumber: { required },
-        accountName: { required }
+        accountName: { required },
       },
     };
   },
@@ -251,15 +242,27 @@ export default defineComponent({
   },
   created () {
     this.setPartnerId()
+    this.showBanks()
   },
   methods: {
+    showBanks () {
+      const ngBanks = banks.getBanks();
+      this.allBanks = ngBanks || [];
+    },
     setPartnerId () {
       this.form.partnerId = this.partnerContext.partner.account_sid
     },
     async AddNewAccount() {
-      this.processing = true
+      this.processing = true;
+      const payload = {
+        accountNumber: this.form.accountNumber,
+        accountName: this.form.accountName,
+        bankCode: this.form.bankObject?.code,
+        bankName: this.form.bankObject?.name,
+        partnerId: this.form.partnerId
+      }
       try {
-        await this.$axios.post(`/cost-revenue/v1/settlement-accounts`, {...this.form});
+        await this.$axios.post(`/cost-revenue/v1/settlement-accounts`, {...payload});
         this.showSuccessModal = true
       } catch (error) {
         const errorMessage = extractErrorMessage(
