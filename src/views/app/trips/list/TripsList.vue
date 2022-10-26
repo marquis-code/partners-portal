@@ -94,22 +94,100 @@
             "
             @rowClicked="viewTripDetails"
           >
+            <template v-slot:createdAt="{ item }">
+              <router-link
+                class="
+                  text-gray-800
+                  hover:underline
+                  hover:decoration-sh-green-500
+                  hover:text-sh-green-500
+                "
+                :to="{
+                  name: 'trip.detail.info',
+                  params: { tripId: item.id }
+                }"
+                >{{ item?.createdAt ?? 'N/A' }}</router-link
+              >
+            </template>
+
+            <template v-slot:routeCode="{ item }">
+              <router-link
+                class="
+                  text-gray-800
+                  hover:underline
+                  hover:decoration-sh-green-500
+                  hover:text-sh-green-500
+                "
+                :to="{
+                  name: 'trip.detail.info',
+                  params: { tripId: item.id }
+                }"
+                >{{ item?.routeCode ?? 'N/A' }}</router-link
+              >
+            </template>
+
+            <template v-slot:passengersCount="{ item }">
+              <router-link
+                class="
+                  text-gray-800
+                  hover:underline
+                  hover:decoration-sh-green-500
+                  hover:text-sh-green-500
+                "
+                :to="{
+                  name: 'trip.detail.info',
+                  params: { tripId: item.id }
+                }"
+                >{{ item?.passengersCount ?? 'N/A' }}</router-link
+              >
+            </template>
+
+            <template v-slot:driver="{ item }">
+              <router-link
+                :to="{
+                  name: 'driver.detail.info',
+                  params: { driverId: item.driverId }
+                }"
+                class="
+                  text-gray-800
+                  hover:underline
+                  hover:decoration-sh-green-500
+                  hover:text-sh-green-500
+                "
+                >{{ item?.driver ?? 'N/A' }}</router-link
+              >
+            </template>
+
             <template v-slot:route="{ item }">
-              <trip-history
-                :pickup="item?.route?.pickup"
-                :destination="item?.route?.destination"
-              ></trip-history>
+              <router-link
+                class="
+                  font-medium
+                  text-gray-800
+                  hover:underline
+                  hover:decoration-sh-green-500
+                  hover:text-sh-green-500
+                "
+                :to="{
+                  name: 'trip.detail.info',
+                  params: { tripId: item.id }
+                }"
+              >
+                <trip-history
+                  :pickup="item?.route?.pickup"
+                  :destination="item?.route?.destination"
+                ></trip-history>
+              </router-link>
             </template>
             <template v-slot:endTime="{ item }">
-               <span class="font-light">{{item.endTime == "Invalid date" ? 'N/A' : item.endTime}}</span>
+              <span class="font-light">{{
+                item.endTime == 'Invalid date' ? 'N/A' : item.endTime
+              }}</span>
             </template>
             <template v-slot:revenue="{ item }">
-              <p class="flex justify-center items-center font-light text-center">
-                {{
-                  item?.revenue
-                    ? `₦${item?.revenue}`
-                    : 'N/A'
-                }}
+              <p
+                class="flex justify-center items-center font-light text-center"
+              >
+                {{ item?.revenue ? `₦${item?.revenue}` : 'N/A' }}
               </p>
             </template>
           </app-table>
@@ -183,8 +261,8 @@ export default defineComponent({
     }
   },
   methods: {
-    searchFetchTrips () {
-      console.log('search trips')
+    searchFetchTrips() {
+      console.log('search trips');
     },
     setStatusFilter(value: string) {
       this.filters.status = value;
@@ -234,12 +312,6 @@ export default defineComponent({
           });
       }
     },
-    viewTripDetails(trip: any) {
-      this.$router.push({
-        name: 'trip.detail.info',
-        params: { tripId: trip.id }
-      });
-    },
     getFormattedDate(date: any) {
       return moment(date).format('LL');
     },
@@ -250,6 +322,7 @@ export default defineComponent({
           createdAt: moment(trip.createdAt).format('LL'),
           pickup: trip.metadata.pickup,
           dropoff: trip.metadata.dropoff,
+          driverId: trip.driver.id,
           driver: trip.metadata.driver.fname + ' ' + trip.metadata.driver.lname,
           routeCode: trip.metadata.routeCode,
           startTime: moment(trip.metadata.startTime).format('LT'),
@@ -268,6 +341,7 @@ export default defineComponent({
         newTrips.push({
           createdAt: moment(trip.created_at).format('LL'),
           driver: trip.driver.fname + ' ' + trip.driver.lname,
+          driverId: trip.driver.id,
           routeCode: trip.route.route_code,
           startTime: moment(trip.start_trip).format('h:mm a'),
           endTime: moment(trip.end_trip).format('h:mm a'),

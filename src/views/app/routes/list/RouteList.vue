@@ -33,18 +33,76 @@
             :usePagination="true"
           >
             <template v-slot:route="{ item }">
-              <trip-history
-                :pickup="item?.route.pickup"
-                :destination="item?.route.destination"
-              ></trip-history>
+              <router-link
+                :to="{
+                  name: 'routes.detail.info',
+                  params: { routeId: item.route_id }
+                }"
+                class="
+                  text-gray-800
+                  hover:underline
+                  hover:decoration-sh-green-500
+                  hover:text-sh-green-500
+                "
+              >
+                <trip-history
+                  :pickup="item?.route.pickup"
+                  :destination="item?.route.destination"
+                ></trip-history>
+              </router-link>
             </template>
+
+            <template v-slot:route_code="{ item }">
+              <router-link
+                :to="{
+                  name: 'routes.detail.info',
+                  params: { routeId: item.route_id }
+                }"
+                class="
+                  text-gray-800
+                  hover:underline
+                  hover:decoration-sh-green-500
+                  hover:text-sh-green-500
+                "
+                >{{ item?.route_code ?? 'N/A' }}</router-link
+              >
+            </template>
+
+            <template v-slot:driver_assigned="{ item }">
+              <router-link
+                :to="{
+                  name: 'driver.detail.info',
+                  params: { driverId: item.driver_id }
+                }"
+                class="
+                  text-gray-800
+                  hover:underline
+                  hover:decoration-sh-green-500
+                  hover:text-sh-green-500
+                "
+                >{{ item?.driver_assigned ?? 'N/A' }}</router-link
+              >
+            </template>
+
+            <template v-slot:vehicle="{ item }">
+              <router-link
+                :to="{
+                  name: 'vehicle.detail.info',
+                  params: { vehicleId: item.vehicle_id }
+                }"
+                class="
+                  text-gray-800
+                  hover:underline
+                  hover:decoration-sh-green-500
+                  hover:text-sh-green-500
+                "
+                >{{ item?.vehicle ?? 'N/A' }}</router-link
+              >
+            </template>
+
             <template v-slot:cost="{ item }">
               <p class="flex justify-center items-center text-center">
-                {{
-                  item
-                    ? `₦ ${item.cost}`
-                    : 'N/A'
-                }}
+                {{ item ? `₦ ${item.cost}` : 'N/A' }}
               </p>
             </template>
           </app-table>
@@ -72,13 +130,13 @@ export default defineComponent({
     TripHistory
     /* DownloadButton */
   },
-  created () {
+  created() {
     this.fetchPartnerRoutes();
   },
   props: {
     routeId: String
   },
-  data () {
+  data() {
     return {
       result: [],
       search: '',
@@ -104,7 +162,7 @@ export default defineComponent({
     })
   },
   methods: {
-    async fetchPartnerRoutes () {
+    async fetchPartnerRoutes() {
       // this.loading = true;
       // call routes api call
       this.loading = true;
@@ -112,7 +170,7 @@ export default defineComponent({
         const response = await this.$axios.get(
           `/v1/partners/${this.partnerContext.partner.id}/routes?page=1&limit=20`
         );
-        console.log(this.tableData)
+        console.log(this.tableData);
         this.tableData = this.structureRouteFromResponse(response.data.data);
       } catch (error) {
         const errorMessage = extractErrorMessage(
@@ -125,23 +183,28 @@ export default defineComponent({
         this.loading = false;
       }
     },
-    viewRouteDetails (route: any) {
-      this.$router.push({
-        name: 'routes.detail.info',
-        params: { routeId: route.routeId }
-      });
-    },
-    structureRouteFromResponse (routeList : any[]) {
-      const newRoute: any[] = routeList.map(route => {
+    structureRouteFromResponse(routeList: any[]) {
+      const newRoute: any[] = routeList.map((route) => {
         return {
           route_code: route.route.route_code,
           route: route?.route,
           destination: route?.route.destination,
           start_time: route.route_itinerary.trip_time,
           driver_assigned: route?.driver?.fname + ' ' + route?.driver?.lname,
-          vehicle: "" + route.vehicle.seats + ' seater - ' + route.vehicle.brand + " " + route.vehicle.name + " " + route.vehicle.registration_number,
+          driver_id: route?.driver?.id,
+          vehicle_id: route.vehicle.id,
+          vehicle:
+            '' +
+            route.vehicle.seats +
+            ' seater - ' +
+            route.vehicle.brand +
+            ' ' +
+            route.vehicle.name +
+            ' ' +
+            route.vehicle.registration_number,
           cost: route.cost_of_supply,
-          routeId: "" + route.id
+          routeId: '' + route.id,
+          route_id: route.id
         };
       });
       return newRoute;

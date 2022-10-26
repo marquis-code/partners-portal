@@ -13,9 +13,22 @@
     <p class="text-grays-black-4">Total Drivers</p>
     <h1 class="text-sh-grey-900 font-bold">200</h1>
     <div class="bg-grays-black-7 w-full h-0.5"></div>
-    <div class="flex space-x-3 items-center">
-      <img src="@/assets/images/addDriverIcon.svg" />
-      <span class="text-sh-purple-700 text-sm">Add Driver</span>
+    <div>
+      <router-link
+        class="
+          flex
+          items-center
+          space-x-3
+          text-sm
+          hover:underline hover:decoration-sh-green-500
+        "
+        :to="{ name: 'AddDriver' }"
+      >
+        <img src="@/assets/images/addDriverIcon.svg" />
+        <span class="text-sh-purple-700 text-sm hover:text-sh-green-500"
+          >Add Driver</span
+        >
+      </router-link>
     </div>
   </main>
 </template>
