@@ -1,5 +1,22 @@
 <template>
-  <div class="
+  <div
+   v-if="isLoading"
+   class="
+    w-[100%]
+    h-[180px]
+    bg-[#fff]
+    flex
+    flex-col
+    items-center
+    relative
+    justify-center
+    rounded-[5px]
+    p-[10px]
+   "
+   >
+    <spinner></spinner>
+  </div>
+  <div v-else class="
   w-[100%]
   h-[180px]
   bg-[#fff]
@@ -29,7 +46,7 @@
     <div class="truncate">
       <p class="font-bold text-[19px]">{{val}}</p>
     </div>
-  </div>
+    </div>
     <div class="
     w-[100%]
     h-[25%]
@@ -48,16 +65,24 @@
 </template>
 <script lang="ts">
 import { defineComponent } from 'vue';
+import Spinner from "@/components/layout/Spinner.vue";
 
 export default defineComponent({
   name: 'EarningsDataCard',
-  beforeMount() {
-    this.val = this.formater
-      ? this.formater(this.value)
-      : this.value;
-    if (this.currency) {
-      this.val = this.currency + ' ' + this.val;
-    }
+  components: {
+    Spinner,
+  },
+  computed: {
+    val: function () {
+      let v:any = this.formater
+        ? this.formater(this.value)
+        : this.value;
+
+      if (this.currency) {
+        v = this.currency + ' ' + v;
+      }
+      return v;
+    },
   },
   props: {
     isRouteable: Boolean,
@@ -71,9 +96,7 @@ export default defineComponent({
     currency: String,
   },
   data() {
-    return {
-      val: ''
-    };
+    return {};
   }
 })
 </script>
