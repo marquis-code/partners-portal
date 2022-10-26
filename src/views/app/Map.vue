@@ -2,6 +2,7 @@
   <GoogleMap
     ref="google"
     :center="center"
+    style="height: 100vh"
     :zoom="15"
     @tilesloaded="initMarkers"
     @dragend="onBoundingBoxChanged"
