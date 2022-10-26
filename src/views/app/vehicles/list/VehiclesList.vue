@@ -234,10 +234,10 @@ export default defineComponent({
     PageActionHeader,
     AppTable
   },
-  created() {
+  created () {
     this.fetchVehicles();
   },
-  data() {
+  data () {
     return {
       filters: {
         status: 'active',
@@ -265,14 +265,14 @@ export default defineComponent({
     })
   },
   methods: {
-    searchFetchVehicles() {
+    searchFetchVehicles () {
       console.log('search');
     },
-    setStatusFilter(value: string) {
+    setStatusFilter (value: string) {
       this.filters.status = value;
       this.fetchVehicles();
     },
-    fetchVehicles() {
+    fetchVehicles () {
       this.loading = true;
       const params = {
         related: 'driver',
