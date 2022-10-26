@@ -17,12 +17,12 @@
           <CheckList
             class="text-xs md:text-base"
             :item="`Identity verification`"
-            :done="true"
+            :done="fasle"
           />
           <CheckList
             class="text-xs md:text-base"
             :item="`Address verification`"
-            :done="true"
+            :done="fasle"
           />
           <CheckList
             class="text-xs md:text-base"
@@ -31,11 +31,13 @@
             @click="goToCompanyDocUpload"
           />
           <CheckList
+            :routeName="'add-driver'"
             class="text-xs md:text-base"
             :item="`Add a Driver (Optional)`"
             :done="false"
           />
           <CheckList
+            :routeName="'add-vehicle'"
             class="text-xs md:text-base"
             :item="`Add a vehicle`"
             :done="false"
