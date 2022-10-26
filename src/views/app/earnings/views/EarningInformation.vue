@@ -33,12 +33,12 @@
         <earnings-data-card
           :is-routeable="false"
           :bottom-desc="'Last Updated:'"
-          :bottom-desc-value="allEarnings.lastUpdated"
-          :desc="'Accrued earnings'"
+          :bottom-desc-value="unsettledEarnings.lastUpdated"
+          :desc="'Unsettled earnings'"
           :formater="Intl.NumberFormat('en-Us').format"
           :currency="'₦'"
-          :value="allEarnings.value"
-          :is-loading="isFetchingAllEarnings"
+          :value="unsettledEarnings.value"
+          :is-loading="isFetchingUnsettledEarnings"
         >
         <template #iconPlaceHolder>
           <img src="@/assets/icons/earn-money.svg"/>
@@ -48,10 +48,10 @@
       <earnings-data-card
           :is-routeable="true"
           :bottom-desc="'Change account'"
-          :link="'/earnings/settlement-account'"
+          :link="'/settings/accounts'"
           :desc="settlement.accountName"
-          :value="settlement.value"
-          :is-loading="isFetchingSettlements"
+          :value="Number(settlement.value)"
+          :is-loading="isFetchingUnsettledEarnings"
         >
         <template #iconPlaceHolder>
           <img src="@/assets/icons/bank.svg"/>
@@ -63,7 +63,7 @@
           :link="'/earnings/past-payout'"
           :desc="settlement.accountName"
           :value="settlement.value"
-          :is-loading="isFetchingNextPaydate"
+          :is-loading="isFetchingUnsettledEarnings"
           :bottom-desc="'View past payouts'"
         >
         <template #iconPlaceHolder>
@@ -153,6 +153,7 @@ import PageActionHeader from '@/components/PageActionHeader.vue';
 import EarningsDataCard from '@/views/app/earnings/components/EarningsDataCard.vue';
 import AppTable from '@/components/AppTable.vue';
 import moment from 'moment';
+import { mapGetters } from 'vuex';
 import TableEarnings from '@/models/table-earnings-data';
 import TripHistory from '@/components/TripHistory.vue';
 import ItemNavigator from '@/components/ItemNavigator.vue';
@@ -229,20 +230,142 @@ export default defineComponent({
     ItemNavigator,
     // EarningsTableDataCard,
   },
+  mounted() {
+    this.init();
+  },
   computed: {
+    ...mapGetters({
+      partnerContext: 'auth/activeContext'
+    }),
     changedFilterSortBy(nv) {
       if (nv === this.filter.sortBy) return false;
       return true;
     }
   },
   methods: {
+    async init() {
+      await this.getEarningsSummary();
+      await this.getSettlementAccount();
+      await this.listRevenues();
+    },
+    formatTableData(data: Array<any>) {
+      const result = [];
+      for (const e of data) {
+        const obj = {} as any;
+        const {
+          driver,
+          vehicle,
+          vehicleId,
+          pickup,
+          dropoff,
+          driverId,
+          routeCode,
+        } = e.metadata;
+        const {
+          partnersRevenue,
+          id,
+          routeId,
+          createdAt
+        } = e;
+
+        obj.id = id;
+        obj.createdAt = moment(createdAt).format('DD MMMM YYYY');
+        obj.routeCode = routeCode;
+        obj.route = {
+          pickup,
+          destination: dropoff,
+          routeId,
+        };
+        obj.driver = {
+          name: `${driver?.fname} ${driver?.lname}`,
+          id: driverId,
+        };
+        obj.deductions = e.totalDeductedAmount;
+        obj.netIncome = partnersRevenue;
+        obj.vehicle = {
+          name: vehicle?.name,
+          id: vehicleId,
+        }
+
+        result.push(obj);
+      }
+      return result;
+    },
+    async listRevenues() {
+      try {
+        this.isFetchingEarnings = true;
+        const response = await this.$axios.get(
+          `/cost-revenue/v1/partners/${this.partnerContext.partner.account_sid}/revenues`
+        );
+        if (response.status === 200) {
+          // sd
+          this.tableData = this.formatTableData(response.data?.result ?? []);
+        }
+      } catch (err) {
+        console.log(err);
+      } finally {
+        this.isFetchingEarnings = false;
+      }
+    },
     viewTableDetails(e: {e: any}) {
       console.log(e);
       this.$router.push(`/earnings/vehicle-information/${e}`);
     },
     gotoCostConfig() {
       this.$router.push('/earnings/cost-configuration');
-    }
+    },
+    async getSettlementAccount() {
+      try {
+        this.isFetchingSettlements = true;
+        const response = await this.$axios.get(
+          `/cost-revenue/v1/settlement-accounts/?partnerId=${this.partnerContext.partner.id}`
+        );
+        if (response.status === 200) {
+          // ew
+        }
+      } catch (err) {
+        console.log(err);
+      } finally {
+        this.isFetchingSettlements = false;
+      }
+    },
+    async getEarningsSummary() {
+      try {
+        this.isFetchingUnsettledEarnings = true;
+        const response = await this.$axios.get(
+          `/cost-revenue/v1/partners/${this.partnerContext.partner.id}/earnings-summary`
+        );
+        if (response.status === 200) {
+          const { amount, updatedAt } = response.data.unsettledEarnings;
+          this.unsettledEarnings = {
+            lastUpdated: moment(updatedAt).format('MMMM DD, YYYY'),
+            value: amount,
+          }
+
+          const settlementAccount = response.data?.settlementAccount;
+          const nextPayoutDate = response.data?.nextPayoutDate;
+          if (settlementAccount) {
+            this.settlement = {
+              ...this.settlement,
+              partnerId: settlementAccount.partnerId,
+              value: settlementAccount.accountNumber,
+              accountName: settlementAccount.accountName,
+            };
+          }
+          if (nextPayoutDate) {
+            this.nextPayDate = {
+              ...this.nextPayDate,
+              value: moment(nextPayoutDate).format('MMMM DD, YYYY')
+
+            }
+          }
+        }
+      } catch (err) {
+        console.log(err);
+      } finally {
+        this.isFetchingUnsettledEarnings = false;
+      }
+    },
   },
   data() {
     return {
@@ -262,25 +385,20 @@ export default defineComponent({
         { label: 'Net Income', key: 'netIncome' },
       ],
       tableData: dummyEarning as Array<TableEarnings>,
-      isFetchingAllEarnings: false,
+      isFetchingUnsettledEarnings: false,
       isFetchingSettlements: false,
-      isFetchingNextPaydate: false,
-      allEarnings: {
-        value: 4000,
+      unsettledEarnings: {
+        value: 0,
         lastUpdated: moment(Date.now()).format('MMMM DD, YYYY'),
       },
       settlement: {
-        value: 0,
+        partnerId: '',
+        value: 0 as any,
         accountName: '---',
 
       },
       nextPayDate: {
-        isRouteable: true,
-        bottomDesc: 'Change Account',
-        desc: 'All-time earnings',
-        value: 0,
-        isIcon: false,
-        placeHolder: 'Next Payout Date'
+        value: 0 as any,
       },
     }
   }

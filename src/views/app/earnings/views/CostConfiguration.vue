@@ -58,7 +58,7 @@
         <!--    </div>-->
         <div>
           <app-table
-            :loading="isFetchingEarnings"
+            :loading="isFetchingCostRevenue"
             :error-loading="errorLoading"
             :items="tableData"
             :fields="headers"
@@ -104,70 +104,71 @@ import PageActionHeader from '@/components/PageActionHeader.vue';
 import EarningsDataCard from '@/views/app/earnings/components/EarningsDataCard.vue';
 import AppTable from '@/components/AppTable.vue';
 import moment from 'moment';
+import { mapGetters } from 'vuex';
 import CostEarnings from '@/models/cost-earnings-data';
 import TripHistory from '@/components/TripHistory.vue';
 import ItemNavigator from '@/components/ItemNavigator.vue';
 
-const dummyEarning: Array<CostEarnings> = [
-  {
-    id: "2121",
-    routeCode: '2DSE23',
-    route: {
-      id: 592,
-      pickup: "Town Planning Bus Stop, Ilupeju, Lagos, Nigeria",
-      destination: "Ojora Close, Victoria Island, Lagos, Nigeria",
-      pickup_coordinate: "6.557215, 3.366606",
-      destination_coordinate: "6.4354235, 3.4212791",
-      distance: "19.92 km",
-      duration: "37 mins",
-      total_seats: 4,
-      day_of_week: "MON - FRI",
-      created_at: "2021-11-01 20:07:51",
-      updated_at: "2022-02-24 09:09:13",
-      status: 1,
-      fare: null,
-      visibility: "public",
-      corporate_id: null,
-      is_future_route: 0,
-      support_luggage: 0,
-      luggage_config_id: null,
-      route_code: "IKR104",
-      pickup_route_bus_stop_id: null,
-      destination_route_bus_stop_id: null,
-      is_draft: 0,
-      duration_value: 2193,
-      distance_value: 19922,
-      pickup_geometry: {
-        x: 3.366606,
-        y: 6.557215
-      },
-      destination_geometry: {
-        x: 3.4212791,
-        y: 6.4354235
-      },
-      pickup_search_area_geometry: null,
-      city_id: 25,
-      origin_city_id: 25,
-      destination_city_id: 25,
-      info: null,
-      slug: "town-planning-bus-stop-to-ojora-close",
-      route_availability_days: "[\"sunday\",\"monday\",\"tuesday\",\"wednesday\",\"thursday\",\"friday\",\"saturday\"]",
-      route_availability_start_date: null,
-      route_availability_end_date: null,
-      blacklisted_availability_days: null
-    },
-    itinerary: "ABL31",
-    driver: {
-      name: 'Elliot',
-      id: '12'
-    },
-    vehicle: {
-      name: 'Volvo',
-      id: '12'
-    },
-    cost: '400000',
-  }
-];
+// const dummyEarning: Array<CostEarnings> = [
+//   {
+//     id: "2121",
+//     routeCode: '2DSE23',
+//     route: {
+//       id: 592,
+//       pickup: "Town Planning Bus Stop, Ilupeju, Lagos, Nigeria",
+//       destination: "Ojora Close, Victoria Island, Lagos, Nigeria",
+//       pickup_coordinate: "6.557215, 3.366606",
+//       destination_coordinate: "6.4354235, 3.4212791",
+//       distance: "19.92 km",
+//       duration: "37 mins",
+//       total_seats: 4,
+//       day_of_week: "MON - FRI",
+//       created_at: "2021-11-01 20:07:51",
+//       updated_at: "2022-02-24 09:09:13",
+//       status: 1,
+//       fare: null,
+//       visibility: "public",
+//       corporate_id: null,
+//       is_future_route: 0,
+//       support_luggage: 0,
+//       luggage_config_id: null,
+//       route_code: "IKR104",
+//       pickup_route_bus_stop_id: null,
+//       destination_route_bus_stop_id: null,
+//       is_draft: 0,
+//       duration_value: 2193,
+//       distance_value: 19922,
+//       pickup_geometry: {
+//         x: 3.366606,
+//         y: 6.557215
+//       },
+//       destination_geometry: {
+//         x: 3.4212791,
+//         y: 6.4354235
+//       },
+//       pickup_search_area_geometry: null,
+//       city_id: 25,
+//       origin_city_id: 25,
+//       destination_city_id: 25,
+//       info: null,
+//       slug: "town-planning-bus-stop-to-ojora-close",
+//       route_availability_days: "[\"sunday\",\"monday\",\"tuesday\",\"wednesday\",\"thursday\",\"friday\",\"saturday\"]",
+//       route_availability_start_date: null,
+//       route_availability_end_date: null,
+//       blacklisted_availability_days: null
+//     },
+//     itinerary: "ABL31",
+//     driver: {
+//       name: 'Elliot',
+//       id: '12'
+//     },
+//     vehicle: {
+//       name: 'Volvo',
+//       id: '12'
+//     },
+//     cost: '400000',
+//   }
+// ];
 export default defineComponent({
   name: 'EarningInformation',
   components: {
@@ -182,9 +183,77 @@ export default defineComponent({
     changedFilterSortBy(nv) {
       if (nv === this.filter.sortBy) return false;
       return true;
-    }
+    },
+    ...mapGetters({
+      partnerContext: 'auth/activeContext'
+    }),
+  },
+  mounted() {
+    this.init();
   },
   methods: {
+    async init() {
+      await this.listRevenues();
+    },
+    formatTableData(data: Array<any>) {
+      const result = [];
+      for (const e of data) {
+        const obj = {} as any;
+        const {
+          driver,
+          vehicle,
+          vehicleId,
+          pickup,
+          dropoff,
+          driverId,
+          routeCode,
+        } = e.metadata;
+        const {
+          partnersRevenue,
+          id,
+          routeId,
+          createdAt
+        } = e;
+
+        obj.id = id;
+        obj.itinerary = moment(createdAt).format('hh:mm A');
+        obj.routeCode = routeCode;
+        obj.route = {
+          pickup,
+          destination: dropoff,
+          routeId,
+        };
+        obj.driver = {
+          name: `${driver?.fname} ${driver?.lname}`,
+          id: driverId,
+        };
+        obj.cost = partnersRevenue;
+        obj.vehicle = {
+          name: vehicle?.name,
+          id: vehicleId,
+        }
+
+        result.push(obj);
+      }
+      return result;
+    },
+    async listRevenues() {
+      try {
+        this.isFetchingCostRevenue = true;
+        const response = await this.$axios.get(
+          `/cost-revenue/v1/partners/${this.partnerContext.partner.account_sid}/revenues`
+        );
+        console.log(response);
+        if (response.status === 200) {
+          // sd
+          this.tableData = this.formatTableData(response.data?.result ?? []);
+        }
+      } catch (err) {
+        console.log(err);
+      } finally {
+        this.isFetchingCostRevenue = false;
+      }
+    },
     viewTableDetails(e: {e: any}) {
       console.log(e);
       this.$router.push(`/earnings/cost-configuration/vehicle/${e}`);
@@ -196,7 +265,7 @@ export default defineComponent({
   data() {
     return {
       searchText: '',
-      isFetchingEarnings: false,
+      isFetchingCostRevenue: false,
       errorLoading: false,
       filter: {
         sortBy: '',
@@ -209,7 +278,7 @@ export default defineComponent({
         { label: 'Vehicle', key: 'vehicle' },
         { label: 'Cost (₦)', key: 'cost' },
       ],
-      tableData: dummyEarning as Array<CostEarnings>,
+      tableData: [] as Array<any>,
       isFetchingAllEarnings: false,
       isFetchingSettlements: false,
       isFetchingNextPaydate: false,
