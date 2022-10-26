@@ -119,7 +119,6 @@
         </template>
       </page-action-header>
     </template>
-
     <div v-if="loading || isLoading">
       <spinner></spinner>
     </div>

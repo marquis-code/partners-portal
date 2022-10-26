@@ -1,6 +1,8 @@
 <template>
+  <div class="h-full absolute -top-7 -right-10 -left-7 bottom-0">
+  <google-maps :routeLine="polyline" :startLocation="startPoint" :endtLocation="endPoint"/>
+  </div>
   <main class="relative">
-    <Map class="h-screen absolute -top-7 -right-5 -left-7 bottom-0" />
     <section
       class="
         lg:absolute
@@ -176,13 +178,15 @@
 </template>
 
 <script>
-import Map from '@/views/app/Map.vue';
-import TripHistory from '@/components/TripHistory.vue'
+import TripHistory from '@/components/TripHistory.vue';
+import GoogleMaps from '@/components/map/GoogleMaps.vue';
+import { formatGeometry } from '@/utils/mapFunctions';
+
 export default {
   name: 'SingleTrip',
   components: {
-    Map,
-    TripHistory
+    TripHistory,
+    GoogleMaps
   },
   props: ['tripData'],
   watch: {
@@ -193,6 +197,10 @@ export default {
   data() {
     return {
       showTripChange: false,
+      polyline: [],
+      startPoint: {},
+      endPoint: {},
+      centerPoint: {},
       tripChangeList: [
         {
           itemChanged: 'Driver',
@@ -205,9 +213,18 @@ export default {
       ]
     };
   },
+  created() {
+    this.getRouteGeometry()
+  },
   methods: {
     toggleTripChange() {
       this.showTripChange = !this.showTripChange;
+    },
+    getRouteGeometry () {
+      this.polyline = formatGeometry(this.tripData.route.geometry);
+      this.startPoint = this.polyline[0];
+      this.endPoint = this.polyline[this.polyline.length - 1];
+      this.centerPoint = this.polyline[parseInt(this.polyline.length / 2)];
     }
   }
 };

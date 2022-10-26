@@ -28,7 +28,7 @@
     </div>
     <template v-else>
       <main class="relative">
-        <!-- <Map class="h-screen" /> -->
+        <google-maps class="h-full absolute -top-7 -right-10 -left-7 bottom-0" />
         <section
           class="
             lg:absolute
@@ -166,16 +166,16 @@ import { mapGetters } from 'vuex';
 import Spinner from '@/components/layout/Spinner';
 import PageActionHeader from '@/components/PageActionHeader';
 import { extractErrorMessage } from '@/utils/helper';
-import Map from '@/views/app/Map.vue';
 import TripHistory from '@/components/TripHistory.vue';
+import GoogleMaps from '@/components/map/GoogleMaps.vue';
 export default {
   name: 'DriverDetailsIndex',
   components: {
     PageActionHeader,
     Spinner,
     PageLayout,
-    // Map,
-    TripHistory
+    TripHistory,
+    GoogleMaps
   },
   props: {
     routeId: Number || String
@@ -185,22 +185,22 @@ export default {
       partnerContext: 'auth/activeContext'
     })
   },
-  data() {
+  data () {
     return {
       loading: false,
       trip: {},
       routeDetails: {}
     };
   },
-  created() {
+  created () {
     this.fetchPartnerRouteDetails();
   },
   methods: {
-    getDaysCount(stringifiedList) {
+    getDaysCount (stringifiedList) {
       const days = JSON.parse(stringifiedList);
       return days;
     },
-    getDays(daysList) {
+    getDays (daysList) {
       let days = '';
       for (let index = 0; index < daysList.length; index++) {
         const element = daysList[index];
@@ -209,7 +209,7 @@ export default {
       }
       return days;
     },
-    async fetchPartnerRouteDetails() {
+    async fetchPartnerRouteDetails () {
       this.loading = true;
       try {
         const response = await this.$axios.get(
