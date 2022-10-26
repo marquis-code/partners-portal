@@ -244,7 +244,6 @@ export default defineComponent({
       this.removeLoadingTypeItemFromVehicleDocuments();
       this.changeVehicleDocumentsExpiryDatesToTimeStamp();
       const newPayload = this.removeDocumentsWithoutFiles();
-      console.log(newPayload);
       try {
         await this.$axios.post(
           `/v1/partners/${this.partnerContext.partner.id}/vehicle/${this.getVehicleFormData.id}/vehicle-documents`,

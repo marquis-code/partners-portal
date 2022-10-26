@@ -10,6 +10,7 @@
 import { defineComponent } from 'vue';
 import { extractErrorMessage } from '@/utils/helper';
 import SingleTrip from '@/views/app/trips/components/SingleTrip.vue';
+import { getDefaultDatePickerDate } from '@/utils/dateFormatters';
 
 export default defineComponent({
   name: 'TripInfo',
@@ -31,8 +32,8 @@ export default defineComponent({
       await this.$axios
         .get(`/v1/trips/${this.$route.params.tripId}`)
         .then((res) => {
-          console.log(res.data, 'fetched data');
           this.tripInfo = res.data;
+          this.setParamsToFetchTripPassengers()
         })
         .catch((err) => {
           const errorMessage = extractErrorMessage(
@@ -45,6 +46,15 @@ export default defineComponent({
         .finally(() => {
           this.loading = false;
         });
+    },
+    setParamsToFetchTripPassengers () {
+      const params = {
+        booking_days: [getDefaultDatePickerDate(this.tripInfo?.created_at)],
+        itinerary_id: this.tripInfo?.route.itineraries?.[0].id,
+        driver_id: this.tripInfo?.driver?.id,
+        route_id: this.tripInfo?.route?.id
+      };
+      localStorage.setItem('TRIP_PASSENGER_PARAM', JSON.stringify(params));
     }
   }
 });
