@@ -25,6 +25,9 @@
           </div>
           <!-- End of search box -->
           <app-table
+            :extraOptions="{ serverSide: true, totalSize: totalRecords }"
+            @pageChange="changePage"
+            @sizeChange="showPageSize"
             :loading="loading"
             :error-loading="errorLoading"
             :items="filteredRoutes"
@@ -135,8 +138,20 @@ export default defineComponent({
   props: {
     routeId: String
   },
+  watch: {
+    'filters.pageNumber'() {
+      this.fetchPartnerRoutes();
+    },
+    'filters.pageSize'() {
+      this.fetchPartnerRoutes();
+    }
+  },
   data() {
     return {
+      filters: {
+        pageNumber: 1,
+        pageSize: 10
+      },
       result: [],
       search: '',
       loading: false,
@@ -178,13 +193,20 @@ export default defineComponent({
     }
   },
   methods: {
+    changePage(pageNumber: any) {
+      this.filters.pageNumber = pageNumber;
+    },
+    showPageSize(pageSize: any) {
+      this.filters.pageSize = pageSize;
+    },
     async fetchPartnerRoutes() {
       this.loading = true;
       try {
         const response = await this.$axios.get(
-          `/v1/partners/${this.partnerContext.partner.id}/routes?page=1&limit=20`
+          `/v1/partners/${this.partnerContext.partner.id}/routes?page=${this.filters.pageNumber}&limit=${this.filters.pageSize}`
         );
         this.tableData = this.structureRouteFromResponse(response.data.data);
+        this.totalRecords = response.data.metadata?.total;
       } catch (error) {
         const errorMessage = extractErrorMessage(
           error,
