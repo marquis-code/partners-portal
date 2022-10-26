@@ -57,7 +57,7 @@ export default defineComponent({
   },
   methods: {
     setCompany() {
-      this.companyName = this.userSessionData.activeContext.partner.company_name
+      this.companyName = this.userSessionData.activeContext.partner.company_name.slice(0, 15)
     },
     async logout() {
       // TODO: block UI with overlay while logout api is called
