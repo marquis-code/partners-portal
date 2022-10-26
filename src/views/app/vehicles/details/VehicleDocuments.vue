@@ -141,7 +141,7 @@
             :class="uploadingDoc ? 'bg-sh-green-100' : 'bg-sh-green-500'"
             @click="updateThisDocument"
           >
-            <Spinner v-if="savingForm"/>
+            <span><Spinner v-if="savingForm"/></span>
             <span>{{ savingForm ? 'Processing' : 'Save' }}</span>
           </button>
         </div>
@@ -211,7 +211,7 @@
             :class="uploadingDoc ? 'bg-sh-green-100' : 'bg-sh-green-500'"
             @click="addThisNewDocument"
           >
-            <Spinner v-if="savingForm" />
+            <span><Spinner v-if="savingForm" /></span>
             <span>{{ uploadingDoc || savingForm ? 'Processing' : 'Save' }}</span>
           </button>
         </div>

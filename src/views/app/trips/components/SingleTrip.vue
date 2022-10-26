@@ -142,14 +142,26 @@
           </small>
         </div>
 
-        <div class="flex justify-between items-center pt-4">
-          <p class="text-xs font-medium">Trip change</p>
-          <!-- <small class="font-light text-xs">
-            {{ tripData?.route?.route_code ?? 'N/A' }}
-          </small> -->
-          <select name="tripChange" id="tripChange">
-            <option value="1">2</option>
-          </select>
+        <div class="pt-4">
+          <div class="flex justify-between items-center">
+            <p class="text-xs font-medium">Trip change</p>
+            <div class="flex items-center space-x-2 cursor-pointer">
+              <p class="font-light text-xs">{{tripChangeList.length}}</p>
+              <img
+                @click="toggleTripChange()"
+                src="@/assets/images/toggleIcon.svg"
+              />
+            </div>
+          </div>
+
+          <div class="mt-3 space-y-3 w-full" v-if="showTripChange">
+            <div class="space-y-3">
+              <div class="flex justify-between items-center" v-for="(eachChange, index) in tripChangeList" :key="index">
+                <p class="text-xs font-light">{{eachChange.itemChanged}} changed</p>
+                <p class="text-xs font-light">{{eachChange.date}}</p>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="flex justify-between items-center py-4">
@@ -173,5 +185,30 @@ export default {
     TripHistory
   },
   props: ['tripData'],
+  watch: {
+    tripData(newValue) {
+      console.log(newValue, 'driver here');
+    }
+  },
+  data() {
+    return {
+      showTripChange: false,
+      tripChangeList: [
+        {
+          itemChanged: 'Driver',
+          date: '20th October, 2022 10:53 AM'
+        },
+        {
+          itemChanged: 'Vehicle',
+          date: '22th October, 2022 13:53 PM'
+        }
+      ]
+    };
+  },
+  methods: {
+    toggleTripChange() {
+      this.showTripChange = !this.showTripChange;
+    }
+  }
 };
 </script>
