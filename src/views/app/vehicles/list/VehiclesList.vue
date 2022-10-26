@@ -83,7 +83,6 @@
                 "
                 type="search"
                 placeholder="Search"
-                @keyup.enter.prevent="searchFetchVehicles()"
               />
             </div>
           </div>
@@ -91,9 +90,8 @@
           <app-table
             :loading="loading"
             :error-loading="errorLoading"
-            :items="tableData"
+            :items="filteredVehicles"
             :fields="headers"
-            @rowClicked="viewTripDetails"
           >
             <template v-slot:driver="{ item }">
               <router-link
@@ -226,6 +224,7 @@ import AppTable from '@/components/AppTable.vue';
 import { mapGetters } from 'vuex';
 import PageActionHeader from '@/components/PageActionHeader.vue';
 import PageLayout from '@/components/layout/PageLayout.vue';
+
 export default defineComponent({
   name: 'VehiclesList',
   components: {
@@ -258,15 +257,34 @@ export default defineComponent({
       items: []
     };
   },
+
   computed: {
     ...mapGetters({
       partnerContext: 'auth/activeContext'
-    })
+    }),
+
+    filteredVehicles() {
+      const results = this.tableData as any[];
+
+      const searchKeyword = this.search.toUpperCase();
+
+      if (!searchKeyword) return results;
+
+      const searchResult = results.filter((item) => {
+        console.log(
+          item?.registration_number?.toUpperCase().includes(searchKeyword)
+        );
+        return (
+          item?.registration_number?.toUpperCase().includes(searchKeyword) ||
+          item?.brand?.toUpperCase().includes(searchKeyword) ||
+          item?.name?.toUpperCase().includes(searchKeyword) ||
+          item?.type?.toUpperCase().includes(searchKeyword)
+        );
+      });
+      return searchResult;
+    }
   },
   methods: {
-    searchFetchVehicles() {
-      console.log('search');
-    },
     setStatusFilter(value: string) {
       this.filters.status = value;
       this.fetchVehicles();
