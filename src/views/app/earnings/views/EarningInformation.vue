@@ -7,8 +7,18 @@
             <div class="
               w-[100%]
               h-[100%]
-              border
-            ">sds</div>
+              p-[0]
+              ml-[28px]
+            ">
+            <div class="flex flex-row items-center">
+              <div class="mr-[20px]">
+                <p class="font-[500] text-[14px] pb-[10px] border-b-4 border-[#15CD70] rounded-t-3xl ">Earning information</p>
+              </div>
+              <div class="flex flex-row items-center mr-[30px] cursor-pointer" @click="gotoCostConfig">
+                <p class="text-[#ACAFAE] text-[14px] pb-[10px]">Cost Configuration</p>
+              </div>
+            </div>
+          </div>
           </template>
         </page-action-header>
       </template>
@@ -50,7 +60,7 @@
         <!-- Next payout -->
         <earnings-data-card
           :is-routeable="true"
-          :link="'/earnings/next-payout'"
+          :link="'/earnings/past-payout'"
           :desc="settlement.accountName"
           :value="settlement.value"
           :is-loading="isFetchingNextPaydate"
@@ -230,6 +240,9 @@ export default defineComponent({
       console.log(e);
       this.$router.push(`/earnings/vehicle-information/${e}`);
     },
+    gotoCostConfig() {
+      this.$router.push('/earnings/cost-configuration');
+    }
   },
   data() {
     return {
