@@ -43,7 +43,6 @@
                 "
                 type="search"
                 placeholder="Search"
-                @keyup.enter.prevent="searchFetchVehicles()"
               />
             </div>
           </div>
@@ -93,7 +92,7 @@
           <app-table
             :loading="loading"
             :error-loading="errorLoading"
-            :items="tableData"
+            :items="filteredVehicles"
             :fields="headers"
           >
             <template v-slot:driver="{ item }">
@@ -227,6 +226,7 @@ import AppTable from '@/components/AppTable.vue';
 import { mapGetters } from 'vuex';
 import PageActionHeader from '@/components/PageActionHeader.vue';
 import PageLayout from '@/components/layout/PageLayout.vue';
+
 export default defineComponent({
   name: 'VehiclesList',
   components: {
@@ -259,15 +259,28 @@ export default defineComponent({
       items: []
     };
   },
+
   computed: {
     ...mapGetters({
       partnerContext: 'auth/activeContext'
-    })
+    }),
+
+    filteredVehicles(): any[] {
+      const results = this.tableData as any[];
+      const searchKeyword = this.search.toLowerCase();
+      if (!searchKeyword) return results;
+      const searchResult = results.filter((item) => {
+        return (
+          item?.registration_number?.toLowerCase().includes(searchKeyword) ||
+          item?.brand?.toLowerCase().includes(searchKeyword) ||
+          item?.name?.toLowerCase().includes(searchKeyword) ||
+          item?.type?.toLowerCase().includes(searchKeyword)
+        );
+      });
+      return searchResult;
+    }
   },
   methods: {
-    searchFetchVehicles () {
-      console.log('search');
-    },
     setStatusFilter (value: string) {
       this.filters.status = value;
       this.fetchVehicles();
