@@ -1,7 +1,31 @@
 <template>
   <page-layout page-title="Trips">
     <div>
-      <div class="flex items-center pb-2">
+      <div class="space-y-5 ring-1 ring-gray-50 shadow-sm rounded-sm bg-white">
+        <div>
+          <!-- Search Box  -->
+          <div class="flex flex-row justify-between px-6 py-4 w-full">
+            <div class="flex flex-row justify-start w-full">
+              <span class="material-icons mr-4">search</span>
+              <input
+                v-model.trim="search"
+                class="
+                  list-search
+                  w-full
+                  box-border
+                  w-4/5
+                  h-8
+                  focus:outline-none
+                "
+                type="search"
+                placeholder="Search"
+                @keyup.enter.prevent="searchFetchTrips"
+              />
+            </div>
+          </div>
+          <!-- End of search box -->
+          <!-- Start of filter -->
+          <div class="flex items-center pb-2 px-6 py-4">
         <span
           class="
             text-sm
@@ -60,29 +84,7 @@
           >Completed</span
         >
       </div>
-      <div class="space-y-5 ring-1 ring-gray-50 shadow-sm rounded-sm bg-white">
-        <div>
-          <!-- Search Box  -->
-          <div class="flex flex-row justify-between px-6 py-4 w-full">
-            <div class="flex flex-row justify-start w-full">
-              <span class="material-icons mr-4">search</span>
-              <input
-                v-model.trim="search"
-                class="
-                  list-search
-                  w-full
-                  box-border
-                  w-4/5
-                  h-8
-                  focus:outline-none
-                "
-                type="search"
-                placeholder="Search"
-                @keyup.enter.prevent="searchFetchTrips"
-              />
-            </div>
-          </div>
-          <!-- End of search box -->
+          <!-- End of filter -->
           <app-table
             :loading="loading"
             :error-loading="errorLoading"
@@ -92,7 +94,6 @@
                 ? completedTripsHeaders
                 : activeAndUpcomingTripsHeaders
             "
-            @rowClicked="viewTripDetails"
           >
             <template v-slot:createdAt="{ item }">
               <router-link
@@ -281,9 +282,7 @@ export default defineComponent({
           `/v1/partners/${this.partnerContext.partner.id}/${params.status}?metadata=${params.metadata}`
         )
         .then((res) => {
-          console.log(res);
           const trips = this.transformActiveOrUpcomingTrips(res.data.data);
-          console.log(trips);
           this.tableData = trips;
           this.totalRecords = res.data.metadata?.total;
         })
@@ -337,7 +336,6 @@ export default defineComponent({
     transformActiveOrUpcomingTrips(payload: Array<any>) {
       const newTrips: any = [];
       payload.forEach((trip) => {
-        console.log(trip);
         newTrips.push({
           createdAt: moment(trip.created_at).format('LL'),
           driver: trip.driver.fname + ' ' + trip.driver.lname,

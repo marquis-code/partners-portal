@@ -156,7 +156,7 @@
         </div>
         <div class="">
           <p class="text-sm text-gray-300">
-            Add a new {{ docToAdd.document_type }}
+            Add {{ docToAdd.document_type }}
           </p>
           <div
             v-if="docToAdd.require_expiration_date"
