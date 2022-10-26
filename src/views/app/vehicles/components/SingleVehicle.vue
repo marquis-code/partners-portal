@@ -1,5 +1,6 @@
 <template>
-  <div class="w-full">
+  <google-maps class="h-full absolute -top-7 -right-10 -left-7 bottom-0" />
+  <div class="w-full absolute">
     <Transition>
       <Notification
         v-if="haspendingDocuments"
@@ -265,13 +266,14 @@ import Notification from '../../../../components/Notification.vue';
 import Spinner from '@/components/layout/Spinner.vue';
 import { axiosInstance } from '@/plugins/axios';
 import emitter from '@/libs/emitter';
+import GoogleMaps from '@/components/map/GoogleMaps.vue';
 
 export default defineComponent({
   emits: ['vehicleUpdated'],
   props: {
     singleVehicleData: Object
   },
-  data() {
+  data () {
     return {
       assignStep: 0,
       unassignStep: 0,
@@ -293,11 +295,11 @@ export default defineComponent({
       userSessionData: 'auth/userSessionData'
     })
   },
-  created() {
+  created () {
     this.fetchVehiclePartnerDrivers();
     this.checkIfVehicleHasPendingDocuments();
   },
-  mounted() {
+  mounted () {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     emitter.on('vehicles:assign-driver', () => {
@@ -315,12 +317,12 @@ export default defineComponent({
     });
   },
   methods: {
-    viewVehicleDocuments() {
+    viewVehicleDocuments () {
       this.$router.push({
         name: 'vehicle.detail.documents'
       });
     },
-    checkIfVehicleHasPendingDocuments() {
+    checkIfVehicleHasPendingDocuments () {
       this.$axios
         .get(
           `v1/partners/${this.partnerContext.partner.id}/vehicle/${this.vehicleData.id}/vehicle-documents`
@@ -336,33 +338,33 @@ export default defineComponent({
           }
         });
     },
-    nextAssignStep() {
+    nextAssignStep () {
       this.assignStep += 1;
     },
-    nextUnassignStep() {
+    nextUnassignStep () {
       this.unassignStep += 1;
     },
-    cancelAssignment() {
+    cancelAssignment () {
       this.assignDriverModal = false;
       this.assignStep = 0;
       this.selectedDriverId = null;
     },
-    finishAssignment() {
+    finishAssignment () {
       this.assignDriverModal = false;
       this.assignStep = 0;
       this.selectedDriverId = null;
     },
-    cancelUnassignment() {
+    cancelUnassignment () {
       this.unassignDriverModal = false;
       this.unassignStep = 0;
       this.selectedDriverId = null;
     },
-    finishUnassignment() {
+    finishUnassignment () {
       this.unassignDriverModal = false;
       this.unassignStep = 0;
       this.selectedDriverId = null;
     },
-    async assignDriverToThisVehicle() {
+    async assignDriverToThisVehicle () {
       this.assigningDriver = true;
       try {
         const response = await this.$axios.put(
@@ -382,7 +384,7 @@ export default defineComponent({
         this.assigningDriver = false;
       }
     },
-    async unassignDriverToThisVehicle() {
+    async unassignDriverToThisVehicle () {
       this.unassigningDriver = true;
       try {
         const response = await this.$axios.put(
@@ -402,7 +404,7 @@ export default defineComponent({
         this.unassigningDriver = false;
       }
     },
-    async updateVehicleInfo(vehicleId: number) {
+    async updateVehicleInfo (vehicleId: number) {
       try {
         const response = await axiosInstance.get(`/v1/vehicles/${vehicleId}`);
         await this.$store.dispatch('vehicle/setVehicleData', response.data);
@@ -411,7 +413,7 @@ export default defineComponent({
         console.log('done');
       }
     },
-    editVehicle() {
+    editVehicle () {
       this.$router.push({
         name: 'EditVehicle',
         params: { vehicleId: this.vehicleData.id }
@@ -423,18 +425,18 @@ export default defineComponent({
     //   } catch (error) {
     //   }
     // },
-    selectThisDriver(driver: any) {
+    selectThisDriver (driver: any) {
       // console.log(id)
       this.selectedDriverId = driver.driver_id;
     },
-    showAssignDriverModal() {
+    showAssignDriverModal () {
       this.assignDriverModal = true;
     },
-    showUnassignDriverModal() {
+    showUnassignDriverModal () {
       this.unassignDriverModal = true;
       this.selectedDriverId = this.singleVehicleData?.driver?.id;
     },
-    fetchVehiclePartnerDrivers() {
+    fetchVehiclePartnerDrivers () {
       this.fetchingVehiclePartnersDriver = true;
       this.$axios
         .get(
@@ -452,7 +454,7 @@ export default defineComponent({
         });
     }
   },
-  components: { AppModal, Notification, Spinner }
+  components: { AppModal, Notification, Spinner, GoogleMaps }
 });
 </script>
 

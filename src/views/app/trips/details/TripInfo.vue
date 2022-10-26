@@ -1,7 +1,7 @@
 <template>
   <div class="relative">
     <div class="w-full relative rounded-sm shadow-sm">
-      <singleTrip :tripData="tripInfo" class="absolute" />
+      <singleTrip :tripData="tripInfo"/>
     </div>
   </div>
 </template>
