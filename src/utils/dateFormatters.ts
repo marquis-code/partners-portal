@@ -11,3 +11,7 @@ export function getExpiryDate(date: string): string | null {
 export function getUserReadableDate(date: string): string {
   return moment(date).format('LL');
 }
+
+export function getDefaultDatePickerDate(date: string): string {
+  return moment(date).format('YYYY-MM-DD');
+}

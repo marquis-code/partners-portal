@@ -111,14 +111,10 @@ export default defineComponent({
         this.fileName = this.existingImage.name;
         this.fileSize = this.existingImage.size;
       }
-      console.log(newVal)
-      console.log(this.fileName)
-      console.log(this.fileSize);
     }
   },
   methods: {
     uploadFile(event: any) {
-      console.log('working');
       if (this.isFileSizeOk(event.target.files[0].size)) {
         this.selectedFile = event.target.files[0];
         this.fileSize = (event.target.files[0].size / 1000000)

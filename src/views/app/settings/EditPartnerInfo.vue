@@ -278,7 +278,7 @@
                     ring-1 ring-gray-300
                     bg-sh-grey-100
                   "
-                  placeholder="Enter drivers address"
+                  placeholder=""
                 />
                 <span
                   class="text-xs font-light text-red-500"
@@ -320,7 +320,7 @@
                     ring-1 ring-gray-300
                     bg-sh-grey-100
                   "
-                  placeholder="Enter license number"
+                  placeholder=""
                 />
                 <span
                   class="text-xs font-light text-red-500"
@@ -351,7 +351,7 @@
                     ring-1 ring-gray-300
                     bg-sh-grey-100
                   "
-                  placeholder="Enter Document number"
+                  placeholder=""
                 />
                 <span
                   class="text-xs font-light text-red-500"
