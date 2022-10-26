@@ -71,7 +71,7 @@
                 text-white
                 bg-black
               "
-              >Update</span
+              >Upload</span
             >
           </span>
         </template>
@@ -137,11 +137,12 @@
           </button>
           <button
             :disabled="uploadingDoc || savingForm"
-            class="rounded-lg bg-sh-green-500 w-32 md:w-40 py-2"
+            class="rounded-lg bg-sh-green-500 w-32 md:w-40 py-2 flex flex-row justify-center items-center"
             :class="uploadingDoc ? 'bg-sh-green-100' : 'bg-sh-green-500'"
             @click="updateThisDocument"
           >
-            {{ uploadingDoc || savingForm ? 'Processing' : 'Save' }}
+            <Spinner v-if="savingForm"/>
+            <span>{{ savingForm ? 'Processing' : 'Save' }}</span>
           </button>
         </div>
       </app-modal>
@@ -155,9 +156,7 @@
           />
         </div>
         <div class="">
-          <p class="text-sm text-gray-300">
-            Add {{ docToAdd.document_type }}
-          </p>
+          <p class="text-sm text-gray-300">Add {{ docToAdd.document_type }}</p>
           <div
             v-if="docToAdd.require_expiration_date"
             class="space-y-2 w-full pr-1 py-5"
@@ -199,12 +198,21 @@
           </button>
           <button
             :disabled="uploadingDoc || savingForm"
-            class="rounded-lg bg-sh-green-500 w-32 md:w-40 py-2 flex flex-row justify-center"
+            class="
+              rounded-lg
+              bg-sh-green-500
+              w-32
+              md:w-40
+              py-2
+              flex flex-row
+              justify-center
+              items-center
+            "
             :class="uploadingDoc ? 'bg-sh-green-100' : 'bg-sh-green-500'"
             @click="addThisNewDocument"
           >
             <Spinner v-if="savingForm" />
-            {{ uploadingDoc || savingForm ? 'Processing' : 'Save' }}
+            <span>{{ uploadingDoc || savingForm ? 'Processing' : 'Save' }}</span>
           </button>
         </div>
       </app-modal>
@@ -221,9 +229,14 @@ import AppTable from '@/components/AppTable.vue';
 import { getExpiryDate, getUserReadableDate } from '@/utils/dateFormatters';
 import AppModal from '@/components/Modals/AppModal.vue';
 import ImageUploadInModal from '@/components/ImageUploadInModal.vue';
-import Spinner from '@/components/layout/Spinner.vue'
+import Spinner from '@/components/layout/Spinner.vue';
 import moment from 'moment';
 
+interface AddVehicleDocumentType {
+    files?: string[],
+    document_type?: string,
+    expiry_date?: string
+}
 export default defineComponent({
   name: 'VehicleDocuments',
   components: { AppTable, AppModal, ImageUploadInModal, Spinner },
@@ -295,19 +308,20 @@ export default defineComponent({
       this.docToUpdate.partner_id = mainDoc.partner_id;
       this.docToUpdate.files = mainDoc.files[0];
       this.docToUpdate.document_type = mainDoc.document_type;
-      this.docToUpdate.status = mainDoc.status
-      this.docToUpdate.document_slug = mainDoc.document_slug
-      this.docToUpdate.vehicle_id = mainDoc.vehicle_id
-      this.docToUpdate.expiry_date = mainDoc.expiry_date ? mainDoc.expiry_date.slice(0, 10) : null
-      this.docToUpdate.require_expiration_date = !!doc.require_expiration_date
+      this.docToUpdate.status = mainDoc.status;
+      this.docToUpdate.document_slug = mainDoc.document_slug;
+      this.docToUpdate.vehicle_id = mainDoc.vehicle_id;
+      this.docToUpdate.expiry_date = mainDoc.expiry_date
+        ? mainDoc.expiry_date.slice(0, 10)
+        : null;
+      this.docToUpdate.require_expiration_date = !!doc.require_expiration_date;
     },
     openDocumentadditionModal (doc: any) {
-      console.log(doc)
       // open the modal
       this.showDocumentAddingModal = true;
       // initialize the docs to update
       this.docToAdd.document_type = doc?.type;
-      this.docToAdd.require_expiration_date = !!doc.require_expiration_date
+      this.docToAdd.require_expiration_date = !!doc.require_expiration_date;
     },
     async updateThisDocument () {
       const payload = {
@@ -318,12 +332,12 @@ export default defineComponent({
         document_slug: this.docToUpdate.document_slug,
         vehicle_id: this.docToUpdate.vehicle_id,
         expiry_date: this.docToUpdate.expiry_date
-      }
+      };
       this.savingForm = true;
       try {
         await this.$axios.patch(
           `v1/partner-vehicle-documentss/${this.docToUpdate.id}`,
-          {...payload}
+          { ...payload }
         );
         this.$toast.success(`${this.docToUpdate.document_type} updated`);
         this.showDocumentUpdateModal = false;
@@ -335,16 +349,22 @@ export default defineComponent({
       }
     },
     async addThisNewDocument () {
-      const payload = {
+      const payload: AddVehicleDocumentType = {
         document_type: this.docToAdd.document_type,
-        files: [this.docToAdd.files],
-        expiry_date: moment(this.docToAdd.expiry_date).format('YYYY-MM-DD HH:mm:ss')
+        files: [this.docToAdd.files]
+      };
+      if (this.docToAdd.expiry_date) {
+        payload.expiry_date = moment(this.docToAdd.expiry_date).format(
+          'YYYY-MM-DD HH:mm:ss'
+        );
       }
       this.savingForm = true;
       try {
         await this.$axios.post(
           `/v1/partners/${this.partnerContext.partner.id}/vehicle/${this.vehicleData.id}/vehicle-documents`,
-          {...payload}
+          {
+            vehicle_documents: [payload]
+          }
         );
         this.$toast.success(`${this.docToUpdate.document_type} updated`);
         this.showDocumentAddingModal = false;
@@ -385,11 +405,13 @@ export default defineComponent({
         this.docToUpdate.files = '';
       }
       this.docToUpdate.files = fileUrl;
-      this.$toast.success(`${this.docToUpdate.document_type} has been uploaded`);
+      this.$toast.success(
+        `${this.docToUpdate.document_type} has been uploaded`
+      );
     },
     removeExistingDoc () {
       this.docToUpdate.files = '';
-      this.docToUpdate.expiry_date = ''
+      this.docToUpdate.expiry_date = '';
     },
     onHide () {
       this.visibleRef = false;
@@ -451,16 +473,17 @@ export default defineComponent({
           : 'not uploaded',
         date: getUserReadableDate(cityDocumentObect?.created_at),
         actions: {
-          docUrl: cityDocumentObect?.files[0],
+          docUrl: cityDocumentObect?.files[0]
           // doc
-        },
+        }
       };
       return cityDoc;
     },
     structureDocumentTable (documentResponseResponse: Array<any>): [] {
       const newDocumentsList: any = [];
       documentResponseResponse.forEach((doc) => {
-        const docRequireExpiryDate = doc?.require_expiration_date && !!doc?.require_expiration_date;
+        const docRequireExpiryDate =
+          doc?.require_expiration_date && !!doc?.require_expiration_date;
         const docProp = doc?.documents?.[0] || {};
         newDocumentsList.push({
           type: doc.document_type,
@@ -493,13 +516,11 @@ export default defineComponent({
         this.docToAdd.files = '';
       }
       this.docToAdd.files = fileUrl;
-      this.$toast.success(
-        `${this.docToAdd.document_type} uploaded`
-      );
+      this.$toast.success(`${this.docToAdd.document_type} uploaded`);
     },
     removeYetToBeAddedDocument () {
-      this.docToAdd.files = ''
-    }
+      this.docToAdd.files = '';
+    },
   }
 });
 </script>

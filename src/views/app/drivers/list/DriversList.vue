@@ -98,9 +98,11 @@
           >
             <template v-slot:routeVehicles="{ item }">
               <span v-if="item.routeVehicles">
-                <span v-for="(route, index) in item.routeVehicles" :key="index">{{
-                  route.route.route_code + "   "
-                }}</span>
+                <span
+                  v-for="(route, index) in item.routeVehicles"
+                  :key="index"
+                  >{{ route.route.route_code + '   ' }}</span
+                >
               </span>
               <span class="text-sm text-grays-black-6" v-else
                 >No route assigned</span
@@ -297,13 +299,13 @@ export default defineComponent({
     AppTable,
     AppModal
   },
-  created() {
+  created () {
     this.fetchDrivers();
   },
   props: {
     rowClicked: Function
   },
-  data() {
+  data () {
     return {
       filters: {
         status: 1,
@@ -335,9 +337,8 @@ export default defineComponent({
       partnerContext: 'auth/activeContext',
       userSessionData: 'auth/userSessionData'
     }),
-    filteredDrivers() {
+    filteredDrivers () {
       const results = this.tableData as any[];
-      console.log(results);
 
       const searchKeyword = this.search.toLowerCase();
 
@@ -356,7 +357,7 @@ export default defineComponent({
   },
 
   methods: {
-    async proceed() {
+    async proceed () {
       this.modalLoading = true;
       await this.$axios
         .delete(
@@ -381,11 +382,11 @@ export default defineComponent({
           this.handleHideInfoModal();
         });
     },
-    setStatusFilter(value: string) {
+    setStatusFilter (value: string) {
       this.filters.status = value === 'active' ? 1 : 0;
       this.fetchDrivers();
     },
-    fetchDrivers() {
+    fetchDrivers () {
       this.loading = true;
       this.$axios
         .get(
@@ -399,17 +400,17 @@ export default defineComponent({
           this.loading = false;
         });
     },
-    handleDriver(eachDriver: any) {
+    handleDriver (eachDriver: any) {
       this.showDropdown = !this.showDropdown;
       this.selectedDriverId = eachDriver.id;
     },
-    editDriver() {
+    editDriver () {
       this.$router.push({
         name: 'EditDriver',
         params: { driverId: this.selectedDriverId }
       });
     },
-    formatApiFormData(apiFormData: Array<any>) {
+    formatApiFormData (apiFormData: Array<any>) {
       const newTableData: any = [];
       apiFormData.forEach((eachDriver) => {
         newTableData.push({
@@ -433,21 +434,21 @@ export default defineComponent({
       });
       return newTableData;
     },
-    removeDriver(id: any) {
+    removeDriver (id: any) {
       this.driverToRemoveId = id;
       this.handleShowInfoModal();
       this.showDropdown = false;
     },
-    handleShowInfoModal() {
+    handleShowInfoModal () {
       this.showInfoModal = true;
     },
-    handleShowSuccessModal() {
+    handleShowSuccessModal () {
       this.showSuccessModal = true;
     },
-    handleHideInfoModal() {
+    handleHideInfoModal () {
       this.showInfoModal = false;
     },
-    handleHideSuccessModal() {
+    handleHideSuccessModal () {
       this.showSuccessModal = false;
     }
   }
