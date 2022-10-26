@@ -27,9 +27,8 @@
           <app-table
             :loading="loading"
             :error-loading="errorLoading"
-            :items="tableData"
+            :items="filteredRoutes"
             :fields="headers"
-            @rowClicked="viewRouteDetails"
             :usePagination="true"
           >
             <template v-slot:route="{ item }">
@@ -159,18 +158,32 @@ export default defineComponent({
   computed: {
     ...mapGetters({
       partnerContext: 'auth/activeContext'
-    })
+    }),
+    filteredRoutes(): any[] {
+      const results = this.tableData as any[];
+      const searchKeyword = this.search.toLowerCase();
+      if (!searchKeyword) return results;
+      const searchResult = results.filter((item) => {
+        return (
+          item?.route_code?.toLowerCase().includes(searchKeyword) ||
+          item?.driver_assigned?.toLowerCase().includes(searchKeyword) ||
+          item?.destination?.toLowerCase().includes(searchKeyword) ||
+          item?.dropoff?.toLowerCase().includes(searchKeyword) ||
+          item?.plate_number?.toLowerCase().includes(searchKeyword) ||
+          item?.vehicle_name?.toLowerCase().includes(searchKeyword) ||
+          item?.vehicle_brand?.toLowerCase().includes(searchKeyword)
+        );
+      });
+      return searchResult;
+    }
   },
   methods: {
     async fetchPartnerRoutes() {
-      // this.loading = true;
-      // call routes api call
       this.loading = true;
       try {
         const response = await this.$axios.get(
           `/v1/partners/${this.partnerContext.partner.id}/routes?page=1&limit=20`
         );
-        console.log(this.tableData);
         this.tableData = this.structureRouteFromResponse(response.data.data);
       } catch (error) {
         const errorMessage = extractErrorMessage(
@@ -193,6 +206,9 @@ export default defineComponent({
           driver_assigned: route?.driver?.fname + ' ' + route?.driver?.lname,
           driver_id: route?.driver?.id,
           vehicle_id: route.vehicle.id,
+          plate_number: route?.vehicle?.registration_number,
+          vehicle_name: route?.vehicle?.name,
+          vehicle_brand: route?.vehicle?.name,
           vehicle:
             '' +
             route.vehicle.seats +
