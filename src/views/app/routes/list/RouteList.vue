@@ -147,7 +147,7 @@ export default defineComponent({
         { label: 'Start Time', key: 'start_time' },
         { label: 'Driver Assigned', key: 'driver_assigned' },
         { label: 'Vehicle Assigned', key: 'vehicle' },
-        { label: 'Cost', key: 'cost' }
+        { label: 'Cost of Supply', key: 'cost' }
       ],
       tableData: [] as Array<any>,
       totalRecords: null,
