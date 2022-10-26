@@ -44,7 +44,6 @@
                 "
                 type="search"
                 placeholder="Search"
-                @keyup.enter.prevent="searchFetchDrivers()"
               />
             </div>
           </div>
@@ -94,7 +93,7 @@
           <app-table
             :loading="loading"
             :error-loading="errorLoading"
-            :items="tableData"
+            :items="filteredDrivers"
             :fields="headers"
           >
             <template v-slot:routes="{ item }">
@@ -338,20 +337,18 @@ export default defineComponent({
     }),
     filteredDrivers() {
       const results = this.tableData as any[];
+      console.log(results);
 
-      const searchKeyword = this.search.toUpperCase();
+      const searchKeyword = this.search.toLowerCase();
 
       if (!searchKeyword) return results;
 
       const searchResult = results.filter((item) => {
-        console.log(
-          item?.registration_number?.toUpperCase().includes(searchKeyword)
-        );
         return (
-          item?.registration_number?.toUpperCase().includes(searchKeyword) ||
-          item?.brand?.toUpperCase().includes(searchKeyword) ||
-          item?.name?.toUpperCase().includes(searchKeyword) ||
-          item?.type?.toUpperCase().includes(searchKeyword)
+          item?.fname?.toLowerCase().includes(searchKeyword) ||
+          item?.lname?.toLowerCase().includes(searchKeyword) ||
+          item?.email?.toLowerCase().includes(searchKeyword) ||
+          item?.phone?.includes(searchKeyword)
         );
       });
       return searchResult;
@@ -359,9 +356,6 @@ export default defineComponent({
   },
 
   methods: {
-    searchFetchDrivers() {
-      console.log('search drivers');
-    },
     async proceed() {
       this.modalLoading = true;
       await this.$axios
