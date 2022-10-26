@@ -105,7 +105,6 @@
                 >No route assigned</span
               >
             </template>
-
             <template v-slot:email="{ item }">
               <router-link
                 class="
@@ -316,22 +315,18 @@ export default defineComponent({
       userSessionData: 'auth/userSessionData'
     })
   },
-  mounted() {
-    console.log(this.partnerContext);
-  },
+
   methods: {
     searchFetchDrivers() {
       console.log('search drivers');
     },
     async proceed() {
       this.modalLoading = true;
-      console.log('proceeding....', this.selectedDriverId);
       await this.$axios
         .delete(
           `/v1/partners/${this.partnerContext.partner.id}/drivers/${this.selectedDriverId}`
         )
-        .then((res) => {
-          console.log(res);
+        .then(() => {
           this.modalLoading = false;
           this.handleHideInfoModal();
           this.handleShowSuccessModal();
@@ -361,6 +356,7 @@ export default defineComponent({
           `/v1/partners/${this.userSessionData.activeContext.partner.account_sid}/drivers`
         )
         .then((res) => {
+          console.log(res);
           this.tableData = (this.formatApiFormData(res.data.data) as any) || [];
           this.totalRecords = res.data.metadata?.total;
         })

@@ -1,6 +1,6 @@
 <template>
   <main class="relative">
-    <Map class="h-screen" />
+    <Map class="h-screen absolute -top-7 -right-5 -left-7 bottom-0" />
     <section
       class="
         lg:absolute
@@ -8,7 +8,7 @@
         lg:mt-0 lg:w-7/12
         md:w-7/12 md:mt-10
         lg:top-3
-        xl:w-5/12 xl:top-10 xl:left-10
+        xl:w-5/12 xl:top-3 xl:left-3
         right-0
         bottom-0
         left-10
@@ -76,7 +76,10 @@
           </div>
           <router-link
             class="text-indigo-500 underline text-xs"
-            :to="{name: 'driver.detail.info', params: {driverId: tripData?.driver?.id  ?? 'N/A'}}"
+            :to="{
+              name: 'driver.detail.info',
+              params: { driverId: tripData?.driver?.id ?? 'N/A' }
+            }"
             >View Driver</router-link
           >
         </div>
@@ -88,7 +91,7 @@
               <p class="text-xs font-medium">Vehicle</p>
               <p class="text-xs font-light">
                 {{ tripData?.driver?.vehicle?.brand ?? 'N/A' }}
-                {{ tripData?.driver?.vehicle?.name  ?? 'N/A'}}
+                {{ tripData?.driver?.vehicle?.name ?? 'N/A' }}
               </p>
             </div>
           </div>
@@ -96,7 +99,7 @@
             class="text-indigo-500 underline text-xs"
             :to="{
               name: 'vehicle.detail.info',
-              params: { vehicleId: tripData?.driver?.vehicle?.id  ?? 'N/A' }
+              params: { vehicleId: tripData?.driver?.vehicle?.id ?? 'N/A' }
             }"
             >View vehicle</router-link
           >
@@ -126,11 +129,11 @@
           </div>
           <small
             class="
-              font-light
+              font-medium
               ring-1 ring-gray-50
-              bg-gray-100
+              bg-gray-200
               text-xs
-              rounded-md
+              rounded-lg
               py-1
               px-3
             "
@@ -141,15 +144,18 @@
 
         <div class="flex justify-between items-center pt-4">
           <p class="text-xs font-medium">Trip change</p>
-          <small class="font-light text-xs">
+          <!-- <small class="font-light text-xs">
             {{ tripData?.route?.route_code ?? 'N/A' }}
-          </small>
+          </small> -->
+          <select name="tripChange" id="tripChange">
+            <option value="1">2</option>
+          </select>
         </div>
 
         <div class="flex justify-between items-center py-4">
           <p class="text-xs font-medium">Expected earnings</p>
-          <div class="font-light text-xs">
-            {{ tripData?.cost_of_supply ?? 'N/A' }}
+          <div class="font-medium text-xs">
+            NGN {{ tripData?.cost_of_supply ?? 'N/A' }}
           </div>
         </div>
       </div>
