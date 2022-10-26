@@ -263,13 +263,10 @@ export default defineComponent({
       partnerContext: 'auth/activeContext'
     }),
 
-    filteredVehicles() {
+    filteredVehicles(): any[] {
       const results = this.tableData as any[];
-
       const searchKeyword = this.search.toLowerCase();
-
       if (!searchKeyword) return results;
-
       const searchResult = results.filter((item) => {
         return (
           item?.registration_number?.toLowerCase().includes(searchKeyword) ||
