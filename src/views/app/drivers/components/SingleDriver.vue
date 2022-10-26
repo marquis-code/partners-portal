@@ -48,16 +48,32 @@
           <img class="h-5 w-5" src="@/assets/images/carIcon.svg" />
           <div class="">
             <p class="font-medium text-sm">Assigned vehicle</p>
-            <p class="font-light text-xs">
+            <router-link
+              class="
+               text-gray-900
+                hover:text-sh-green-500
+                hover:underline hover:decoration-sh-green-500
+                font-light
+                text-xs
+              "
+              :to="{
+                name: 'vehicle.detail.info',
+                params: { vehicleId: driverData.vehicle.id }
+              }"
+            >
               {{
                 driverData.vehicle
-                  ?  driverData.vehicle.brand +" "+ driverData.vehicle.name
+                  ? driverData.vehicle.brand + ' ' + driverData.vehicle.name
                   : 'N/A'
               }}
-            </p>
+            </router-link>
           </div>
         </div>
-        <a class="underline text-indigo-600 text-xs cursor-pointer" @click="$emit('AssignVehicleToDriver')">{{driverData?.vehicle ? 'Unassign Vehicle' : 'Assign vehicle'}}</a>
+        <a
+          class="underline text-indigo-600 text-xs cursor-pointer"
+          @click="$emit('AssignVehicleToDriver')"
+          >{{ driverData?.vehicle ? 'Unassign Vehicle' : 'Assign vehicle' }}</a
+        >
       </div>
       <div class="flex justify-between items-center py-6">
         <div class="flex space-x-2">
@@ -65,15 +81,17 @@
           <div class="">
             <p class="font-medium text-sm">License number</p>
             <p class="font-light text-xs">
-              {{
-                 driverData?.documents[0]?.registeration_number ?? 'N/A'
-              }}
+              {{ driverData?.documents[0]?.registeration_number ?? 'N/A' }}
             </p>
           </div>
         </div>
         <router-link
           :to="{ name: 'EditDriver', params: { driverId: driverData.id } }"
-          class="underline text-indigo-600 text-sm hover:text-sh-green-500 hover:decoration-sh-green-500"
+          class="
+            underline
+            text-indigo-600 text-sm
+            hover:text-sh-green-500 hover:decoration-sh-green-500
+          "
           >Update drivers licence</router-link
         >
       </div>
@@ -87,7 +105,13 @@
             </p>
           </div>
         </div>
-        <router-link to="trips" class="underline text-indigo-600 text-xs hover:text-sh-green-500 hover:decoration-sh-green-500"
+        <router-link
+          to="trips"
+          class="
+            underline
+            text-indigo-600 text-xs
+            hover:text-sh-green-500 hover:decoration-sh-green-500
+          "
           >View all</router-link
         >
       </div>
@@ -103,7 +127,11 @@
         </div>
         <router-link
           :to="{ name: 'EditDriver', params: { driverId: driverData.id } }"
-          class="underline text-indigo-600 text-xs hover:text-sh-green-500 hover:decoration-sh-green-500"
+          class="
+            underline
+            text-indigo-600 text-xs
+            hover:text-sh-green-500 hover:decoration-sh-green-500
+          "
           >Change email</router-link
         >
       </div>
@@ -119,7 +147,12 @@
         </div>
         <router-link
           :to="{ name: 'EditDriver', params: { driverId: driverData.id } }"
-          class="underline text-indigo-600 text-xs cursor-pointer  hover:text-sh-green-500 hover:decoration-sh-green-500"
+          class="
+            underline
+            text-indigo-600 text-xs
+            cursor-pointer
+            hover:text-sh-green-500 hover:decoration-sh-green-500
+          "
           >Change phone</router-link
         >
       </div>

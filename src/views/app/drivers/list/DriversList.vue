@@ -26,46 +26,6 @@
       </page-action-header>
     </template>
     <div>
-      <div class="flex items-center">
-        <span
-          class="
-            text-sm
-            font-medium
-            leading-6
-            pb-2
-            pt-1
-            px-2
-            border-b-2
-            cursor-pointer
-          "
-          :class="
-            filters.status === 1
-              ? 'text-black border-b-sh-green-500'
-              : 'text-sh-grey-500 border-b-transparent'
-          "
-          @click="setStatusFilter('active')"
-          >Active</span
-        >
-        <span
-          class="
-            text-sm
-            font-medium
-            leading-6
-            pb-2
-            pt-1
-            px-2
-            border-b-2
-            cursor-pointer
-          "
-          :class="
-            filters.status === 0
-              ? 'text-black border-b-sh-green-500'
-              : 'text-sh-grey-500 border-b-transparent'
-          "
-          @click="setStatusFilter('inactive')"
-          >Inactive</span
-        >
-      </div>
       <div class="space-y-5 ring-1 ring-gray-50 shadow-sm rounded-sm bg-white">
         <div class="relative">
           <!-- Search Box  -->
@@ -84,22 +44,65 @@
                 "
                 type="search"
                 placeholder="Search"
-                @keyup.enter.prevent="searchFetchDrivers()"
               />
             </div>
           </div>
           <!-- End of search box -->
+          <!-- Start of filter -->
+          <div class="flex items-center px-6 py-4">
+            <span
+              class="
+                text-sm
+                font-medium
+                leading-6
+                pb-2
+                pt-1
+                px-2
+                border-b-2
+                cursor-pointer
+              "
+              :class="
+                filters.status === 1
+                  ? 'text-black border-b-sh-green-500'
+                  : 'text-sh-grey-500 border-b-transparent'
+              "
+              @click="setStatusFilter('active')"
+              >Active</span
+            >
+            <span
+              class="
+                text-sm
+                font-medium
+                leading-6
+                pb-2
+                pt-1
+                px-2
+                border-b-2
+                cursor-pointer
+              "
+              :class="
+                filters.status === 0
+                  ? 'text-black border-b-sh-green-500'
+                  : 'text-sh-grey-500 border-b-transparent'
+              "
+              @click="setStatusFilter('inactive')"
+              >Inactive</span
+            >
+          </div>
+          <!-- End of filter -->
           <app-table
             :loading="loading"
             :error-loading="errorLoading"
-            :items="tableData"
+            :items="filteredDrivers"
             :fields="headers"
           >
-            <template v-slot:routes="{ item }">
-              <span v-if="item.routes">
-                <span v-for="(route, index) in item.routes" :key="index">{{
-                  route
-                }}</span>
+            <template v-slot:routeVehicles="{ item }">
+              <span v-if="item.routeVehicles">
+                <span
+                  v-for="(route, index) in item.routeVehicles"
+                  :key="index"
+                  >{{ route.route.route_code + '   ' }}</span
+                >
               </span>
               <span class="text-sm text-grays-black-6" v-else
                 >No route assigned</span
@@ -185,11 +188,30 @@
                     params: { driverId: item.id }
                   }"
                   @click="editDriver"
-                  class="font-medium text-gray-800 border-2 rounded-md px-3 py-2 border-black"
+                  class="
+                    font-medium
+                    text-gray-800
+                    border-2
+                    rounded-md
+                    px-3
+                    py-2
+                    border-black
+                  "
                 >
                   Edit
                 </router-link>
-                <p @click="removeDriver()" class="font-medium text-red-500 border-2 rounded-md border-red-500 px-3 py-2">
+                <p
+                  @click="removeDriver(item.id)"
+                  class="
+                    font-medium
+                    text-red-500
+                    border-2
+                    rounded-md
+                    border-red-500
+                    px-3
+                    py-2
+                  "
+                >
                   Remove
                 </p>
               </div>
@@ -268,7 +290,7 @@ import PageActionHeader from '@/components/PageActionHeader.vue';
 import PageLayout from '@/components/layout/PageLayout.vue';
 import AppModal from '@/components/Modals/AppModal.vue';
 import { extractErrorMessage } from '@/utils/helper';
-import OptionsDropdown from '@/components/OptionsDropdown.vue';
+
 export default defineComponent({
   name: 'DriversList',
   components: {
@@ -277,13 +299,13 @@ export default defineComponent({
     AppTable,
     AppModal
   },
-  created() {
+  created () {
     this.fetchDrivers();
   },
   props: {
     rowClicked: Function
   },
-  data() {
+  data () {
     return {
       filters: {
         status: 1,
@@ -293,6 +315,7 @@ export default defineComponent({
       search: '',
       showSuccessModal: false,
       selectedDriverId: null,
+      driverToRemoveId: null,
       showDropdown: false,
       loading: false,
       modalLoading: false,
@@ -302,7 +325,7 @@ export default defineComponent({
       headers: [
         { label: 'Driver', key: 'name' },
         { label: 'Email', key: 'email' },
-        { label: 'Route Assigned', key: 'itenararies' },
+        { label: 'Route Assigned', key: 'routeVehicles' },
         { label: 'Phone Number', key: 'phone' },
         { label: 'Actions', key: 'actions' }
       ],
@@ -313,18 +336,32 @@ export default defineComponent({
     ...mapGetters({
       partnerContext: 'auth/activeContext',
       userSessionData: 'auth/userSessionData'
-    })
+    }),
+    filteredDrivers () {
+      const results = this.tableData as any[];
+
+      const searchKeyword = this.search.toLowerCase();
+
+      if (!searchKeyword) return results;
+
+      const searchResult = results.filter((item) => {
+        return (
+          item?.fname?.toLowerCase().includes(searchKeyword) ||
+          item?.lname?.toLowerCase().includes(searchKeyword) ||
+          item?.email?.toLowerCase().includes(searchKeyword) ||
+          item?.phone?.includes(searchKeyword)
+        );
+      });
+      return searchResult;
+    }
   },
 
   methods: {
-    searchFetchDrivers() {
-      console.log('search drivers');
-    },
-    async proceed() {
+    async proceed () {
       this.modalLoading = true;
       await this.$axios
         .delete(
-          `/v1/partners/${this.partnerContext.partner.id}/drivers/${this.selectedDriverId}`
+          `/v1/partners/${this.partnerContext.partner.id}/drivers/${this.driverToRemoveId}`
         )
         .then(() => {
           this.modalLoading = false;
@@ -345,11 +382,11 @@ export default defineComponent({
           this.handleHideInfoModal();
         });
     },
-    setStatusFilter(value: string) {
+    setStatusFilter (value: string) {
       this.filters.status = value === 'active' ? 1 : 0;
       this.fetchDrivers();
     },
-    fetchDrivers() {
+    fetchDrivers () {
       this.loading = true;
       this.$axios
         .get(
@@ -363,17 +400,17 @@ export default defineComponent({
           this.loading = false;
         });
     },
-    handleDriver(eachDriver: any) {
+    handleDriver (eachDriver: any) {
       this.showDropdown = !this.showDropdown;
       this.selectedDriverId = eachDriver.id;
     },
-    editDriver() {
+    editDriver () {
       this.$router.push({
         name: 'EditDriver',
         params: { driverId: this.selectedDriverId }
       });
     },
-    formatApiFormData(apiFormData: Array<any>) {
+    formatApiFormData (apiFormData: Array<any>) {
       const newTableData: any = [];
       apiFormData.forEach((eachDriver) => {
         newTableData.push({
@@ -383,7 +420,7 @@ export default defineComponent({
           lname: eachDriver.driver.lname,
           phone: eachDriver.driver.phone,
           email: eachDriver.driver.email,
-          routes: eachDriver.driver.routes,
+          routeVehicles: eachDriver?.routeVehicles || null,
           avatar: eachDriver.driver.avatar,
           active: eachDriver.driver.active,
           deleted_at: eachDriver.driver.deleted_at,
@@ -397,20 +434,21 @@ export default defineComponent({
       });
       return newTableData;
     },
-    removeDriver() {
+    removeDriver (id: any) {
+      this.driverToRemoveId = id;
       this.handleShowInfoModal();
       this.showDropdown = false;
     },
-    handleShowInfoModal() {
+    handleShowInfoModal () {
       this.showInfoModal = true;
     },
-    handleShowSuccessModal() {
+    handleShowSuccessModal () {
       this.showSuccessModal = true;
     },
-    handleHideInfoModal() {
+    handleHideInfoModal () {
       this.showInfoModal = false;
     },
-    handleHideSuccessModal() {
+    handleHideSuccessModal () {
       this.showSuccessModal = false;
     }
   }

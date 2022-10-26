@@ -25,46 +25,6 @@
       </page-action-header>
     </template>
     <div>
-      <div class="flex items-center pb-2">
-        <span
-          class="
-            text-sm
-            font-medium
-            leading-6
-            pb-2
-            pt-1
-            px-2
-            border-b-2
-            cursor-pointer
-          "
-          :class="
-            filters.status === 'active'
-              ? 'text-black border-b-sh-green-500'
-              : 'text-sh-grey-500 border-b-transparent'
-          "
-          @click="setStatusFilter('active')"
-          >Active</span
-        >
-        <span
-          class="
-            text-sm
-            font-medium
-            leading-6
-            pb-2
-            pt-1
-            px-2
-            border-b-2
-            cursor-pointer
-          "
-          :class="
-            filters.status === 'inactive'
-              ? 'text-black border-b-sh-green-500'
-              : 'text-sh-grey-500 border-b-transparent'
-          "
-          @click="setStatusFilter('inactive')"
-          >InActive</span
-        >
-      </div>
       <div class="space-y-5 ring-1 ring-gray-50 shadow-sm rounded-sm bg-white">
         <div>
           <!-- Search Box  -->
@@ -83,17 +43,57 @@
                 "
                 type="search"
                 placeholder="Search"
-                @keyup.enter.prevent="searchFetchVehicles()"
               />
             </div>
           </div>
           <!-- End of search box -->
+          <!-- start of filter -->
+          <div class="flex items-center pb-2 px-6 py-4">
+          <span
+            class="
+              text-sm
+              font-medium
+              leading-6
+              pb-2
+              pt-1
+              px-2
+              border-b-2
+              cursor-pointer
+            "
+            :class="
+              filters.status === 'active'
+                ? 'text-black border-b-sh-green-500'
+                : 'text-sh-grey-500 border-b-transparent'
+            "
+            @click="setStatusFilter('active')"
+            >Active</span
+          >
+          <span
+            class="
+              text-sm
+              font-medium
+              leading-6
+              pb-2
+              pt-1
+              px-2
+              border-b-2
+              cursor-pointer
+            "
+            :class="
+              filters.status === 'inactive'
+                ? 'text-black border-b-sh-green-500'
+                : 'text-sh-grey-500 border-b-transparent'
+            "
+            @click="setStatusFilter('inactive')"
+            >InActive</span
+          >
+        </div>
+          <!-- End of filters -->
           <app-table
             :loading="loading"
             :error-loading="errorLoading"
-            :items="tableData"
+            :items="filteredVehicles"
             :fields="headers"
-            @rowClicked="viewTripDetails"
           >
             <template v-slot:driver="{ item }">
               <router-link
@@ -226,6 +226,7 @@ import AppTable from '@/components/AppTable.vue';
 import { mapGetters } from 'vuex';
 import PageActionHeader from '@/components/PageActionHeader.vue';
 import PageLayout from '@/components/layout/PageLayout.vue';
+
 export default defineComponent({
   name: 'VehiclesList',
   components: {
@@ -233,10 +234,10 @@ export default defineComponent({
     PageActionHeader,
     AppTable
   },
-  created() {
+  created () {
     this.fetchVehicles();
   },
-  data() {
+  data () {
     return {
       filters: {
         status: 'active',
@@ -258,20 +259,33 @@ export default defineComponent({
       items: []
     };
   },
+
   computed: {
     ...mapGetters({
       partnerContext: 'auth/activeContext'
-    })
+    }),
+
+    filteredVehicles(): any[] {
+      const results = this.tableData as any[];
+      const searchKeyword = this.search.toLowerCase();
+      if (!searchKeyword) return results;
+      const searchResult = results.filter((item) => {
+        return (
+          item?.registration_number?.toLowerCase().includes(searchKeyword) ||
+          item?.brand?.toLowerCase().includes(searchKeyword) ||
+          item?.name?.toLowerCase().includes(searchKeyword) ||
+          item?.type?.toLowerCase().includes(searchKeyword)
+        );
+      });
+      return searchResult;
+    }
   },
   methods: {
-    searchFetchVehicles() {
-      console.log('search');
-    },
-    setStatusFilter(value: string) {
+    setStatusFilter (value: string) {
       this.filters.status = value;
       this.fetchVehicles();
     },
-    fetchVehicles() {
+    fetchVehicles () {
       this.loading = true;
       const params = {
         related: 'driver',

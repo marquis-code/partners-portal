@@ -1,6 +1,8 @@
 <template>
   <page-layout
-    :page-title="`${routeDetails?.route?.pickup || ''} to ${routeDetails?.route?.destination || ''}`"
+    :page-title="`${routeDetails?.route?.pickup || ''} to ${
+      routeDetails?.route?.destination || ''
+    }`"
   >
     <template #actionsPane>
       <page-action-header>
@@ -15,9 +17,7 @@
                 >Routes</a
               >
               <img src="@/assets/images/breadcrumbs.svg" />
-              <span
-                > {{routeDetails?.route?.route_code || ''}}</span
-              >
+              <span> {{ routeDetails?.route?.route_code || '' }}</span>
             </div>
           </div>
         </template>
@@ -64,7 +64,9 @@
                   :destination="routeDetails.route.destination"
                 ></trip-history>
               </div>
-              <p class="bg-sh-grey-100 px-2.5 py-1 rounded-2xl text-xs">{{routeDetails?.route?.route_code}}</p>
+              <p class="bg-sh-grey-100 px-2.5 py-1 rounded-2xl text-xs">
+                {{ routeDetails?.route?.route_code }}
+              </p>
             </div>
 
             <div class="flex justify-between items-center pt-4">
@@ -72,9 +74,15 @@
                 <p class="text-sm font-medium">Driver assigned</p>
               </div>
               <router-link
-                class="text-indigo-500 underline text-xs"
+                class="
+                  text-indigo-500
+                  underline
+                  text-xs
+                  hover:text-sh-green-500 hover:decoration-sh-green-500
+                "
                 :to="`/drivers/details/${routeDetails.driver.id}/information`"
-                >{{routeDetails.driver.fname || ''}} {{routeDetails.driver.lname || ''}}</router-link
+                >{{ routeDetails.driver.fname || '' }}
+                {{ routeDetails.driver.lname || '' }}</router-link
               >
             </div>
             <div class="flex justify-between items-center pt-4">
@@ -82,38 +90,68 @@
                 <p class="text-sm font-medium">Vehicle assigned</p>
               </div>
               <router-link
-                class="text-indigo-500 underline text-xs"
-                :to="`/vehicle/${routeDetails?.vehicle_id}`"
-                >28 seater - Toyota coaster:ABC - 123DE</router-link
+                class="
+                  text-indigo-500
+                  underline
+                  text-xs
+                  hover:text-sh-green-500 hover:decoration-sh-green-500
+                "
+                :to="{
+                  name: 'vehicle.detail.info',
+                  params: { vehicleId: routeDetails?.vehicle_id }
+                }"
+                >{{ routeDetails?.vehicle?.seats }} seater -
+                {{ routeDetails?.vehicle?.brand }}
+                {{ routeDetails?.vehicle?.name }} : {{
+                  routeDetails?.vehicle?.registration_number
+                }}</router-link
               >
             </div>
             <div class="flex justify-between items-center pt-4">
               <div class="flex space-x-2">
-                <p class="text-sm font-medium">Cost</p>
+                <p class="text-sm font-medium">Cost Of Supply</p>
               </div>
-              <p class="text-sm">NGN {{routeDetails.cost_of_supply}}</p>
+              <p class="text-sm">NGN {{ routeDetails.cost_of_supply }}</p>
             </div>
             <div class="flex justify-between items-center pt-4">
               <div class="flex space-x-2">
                 <p class="text-sm font-medium">Days available</p>
               </div>
-              <p class="text-sm">{{
-              getDaysCount(routeDetails.route.route_availability_days).length === 7 ? 'Everyday' :
-              getDays(getDaysCount(routeDetails.route.route_availability_days))
-              }}</p>
+              <p class="text-sm">
+                {{
+                  getDaysCount(routeDetails.route.route_availability_days)
+                    .length === 7
+                    ? 'Everyday'
+                    : getDays(
+                        getDaysCount(routeDetails.route.route_availability_days)
+                      )
+                }}
+              </p>
             </div>
             <div class="flex justify-between items-center pt-4">
               <div class="flex space-x-2">
                 <p class="text-sm font-medium">Availability</p>
               </div>
-              <p v-if="routeDetails?.route?.visibility === 'private'" class="text-sm bg-black text-white px-2 py-1 rounded-2xl">private</p>
-              <p v-if="routeDetails?.route?.visibility === 'public'" class="text-sm bg-sh-green-700 text-white px-2 py-1 rounded-2xl">public</p>
+              <p
+                v-if="routeDetails?.route?.visibility === 'private'"
+                class="text-sm bg-black text-white px-2 py-1 rounded-2xl"
+              >
+                private
+              </p>
+              <p
+                v-if="routeDetails?.route?.visibility === 'public'"
+                class="text-sm bg-sh-green-700 text-white px-2 py-1 rounded-2xl"
+              >
+                public
+              </p>
             </div>
             <div class="flex justify-between items-center pt-4">
               <div class="flex space-x-2">
                 <p class="text-sm font-medium">City</p>
               </div>
-              <p class="text-sm">{{routeDetails?.route.city?.name || "N/A"}}</p>
+              <p class="text-sm">
+                {{ routeDetails?.route.city?.name || 'N/A' }}
+              </p>
             </div>
           </div>
         </section>
@@ -147,34 +185,36 @@ export default {
       partnerContext: 'auth/activeContext'
     })
   },
-  data () {
+  data() {
     return {
       loading: false,
       trip: {},
-      routeDetails: {},
+      routeDetails: {}
     };
   },
   created() {
     this.fetchPartnerRouteDetails();
   },
   methods: {
-    getDaysCount (stringifiedList) {
+    getDaysCount(stringifiedList) {
       const days = JSON.parse(stringifiedList);
-      return days
+      return days;
     },
-    getDays (daysList) {
-      let days = ''
+    getDays(daysList) {
+      let days = '';
       for (let index = 0; index < daysList.length; index++) {
         const element = daysList[index];
         // eslint-disable-next-line no-const-assign
-        days += element + ', '
+        days += element + ', ';
       }
-      return days
+      return days;
     },
-    async fetchPartnerRouteDetails () {
+    async fetchPartnerRouteDetails() {
       this.loading = true;
       try {
-        const response = await this.$axios.get(`/v1/partners/${this.partnerContext.partner.id}/routes/${this.routeId}`);
+        const response = await this.$axios.get(
+          `/v1/partners/${this.partnerContext.partner.id}/routes/${this.routeId}`
+        );
         this.routeDetails = response.data;
       } catch (error) {
         const errorMessage = extractErrorMessage(
@@ -186,7 +226,7 @@ export default {
       } finally {
         this.loading = false;
       }
-    },
+    }
   }
 };
 </script>

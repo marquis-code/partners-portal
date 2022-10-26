@@ -4,9 +4,9 @@
       <page-action-header>
         <template #breadcrumbs>
           <div class="flex items-center space-x-3 py-2">
-            <p class="text-gray-400">Dashboaard</p>
+            <router-link to="/" class="text-gray-400">Dashboard</router-link>
             <img src="@/assets/images/breadcrumbs.svg" />
-            <p class="text-gray-400">Drivers management</p>
+            <router-link to="/drivers" class="text-gray-400">Drivers</router-link>
             <img src="@/assets/images/breadcrumbs.svg" />
             <p class="text-gray-900">Add driver</p>
           </div>

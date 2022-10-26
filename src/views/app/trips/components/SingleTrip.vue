@@ -177,12 +177,12 @@
 
 <script>
 import Map from '@/views/app/Map.vue';
-// import TripHistory from '@/components/TripHistory.vue';
+import TripHistory from '@/components/TripHistory.vue'
 export default {
   name: 'SingleTrip',
   components: {
-    Map
-    // TripHistory
+    Map,
+    TripHistory
   },
   props: ['tripData'],
   watch: {

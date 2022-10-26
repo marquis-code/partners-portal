@@ -2,7 +2,7 @@
   <main>
     <page-layout page-title="Earnings">
       <template #breadcrumbs>
-        <div class="flex items-center space-x-3 py-3">
+        <div class="flex items-center space-x-3 py-3 ml-[28px]">
           <router-link
             :to="'/earnings'"
             class="text-gray-400 text-sm hover:text-gray-900"
