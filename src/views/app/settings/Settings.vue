@@ -17,10 +17,10 @@
                 :title="'Settlement Account'"
                 :to="{ name: 'settings.edit.settlement.account' }"
               />
-              <TabItem
+              <!-- <TabItem
                 :title="'Role Management'"
                 :to="{ name: 'settings.edit.role.management' }"
-              />
+              /> -->
             </TabContainer>
           </main>
         </template>
