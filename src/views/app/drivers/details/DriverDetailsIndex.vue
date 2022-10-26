@@ -18,12 +18,12 @@
                 :to="{
                   name: 'drivers.list'
                 }"
-                class="text-gray-400 text-sm hover:text-gray-900"
+                class="text-gray-400 text-xs lg:text-sm hover:text-gray-900"
                 >Drivers management</router-link
               >
               <img src="@/assets/images/breadcrumbs.svg" />
-              <span>{{ driverData?.fname }}</span>
-              <span>{{ driverData?.lname }}</span>
+              <span class="lg:text-base sm:text-sm text-xs">{{ driverData?.fname }}</span>
+              <span class="lg:text-base sm:text-sm text-xs">{{ driverData?.lname }}</span>
             </div>
             <div
               @click="toggleDropdown"
