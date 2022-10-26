@@ -2,6 +2,7 @@
   <div class="relative">
     <div class="w-full relative rounded-sm shadow-sm">
       <single-driver
+        @AssignVehicleToDriver="$emit('AssignVehicleToDriver')"
         :driver-data="driverData"
         class="absolute"
       ></single-driver>
@@ -20,6 +21,7 @@ export default defineComponent({
   components: {
     SingleDriver
   },
+  emits: ['AssignVehicleToDriver'],
   data() {
     return {
       driverInformation: null,

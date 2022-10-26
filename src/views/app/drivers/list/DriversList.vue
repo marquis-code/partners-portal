@@ -39,7 +39,7 @@
             cursor-pointer
           "
           :class="
-            filters.status === 'active'
+            filters.status === 1
               ? 'text-black border-b-sh-green-500'
               : 'text-sh-grey-500 border-b-transparent'
           "
@@ -58,7 +58,7 @@
             cursor-pointer
           "
           :class="
-            filters.status === 'inactive'
+            filters.status === 0
               ? 'text-black border-b-sh-green-500'
               : 'text-sh-grey-500 border-b-transparent'
           "
@@ -185,11 +185,11 @@
                     params: { driverId: item.id }
                   }"
                   @click="editDriver"
-                  class="font-medium text-gray-800"
+                  class="font-medium text-gray-800 border-2 rounded-md px-3 py-2 border-black"
                 >
                   Edit
                 </router-link>
-                <p @click="removeDriver(item)" class="font-medium text-red-500">
+                <p @click="removeDriver()" class="font-medium text-red-500 border-2 rounded-md border-red-500 px-3 py-2">
                   Remove
                 </p>
               </div>
@@ -286,7 +286,7 @@ export default defineComponent({
   data() {
     return {
       filters: {
-        status: 'active',
+        status: 1,
         search: ''
       },
       showInfoModal: false,
@@ -346,17 +346,16 @@ export default defineComponent({
         });
     },
     setStatusFilter(value: string) {
-      this.filters.status = value;
+      this.filters.status = value === 'active' ? 1 : 0;
       this.fetchDrivers();
     },
     fetchDrivers() {
       this.loading = true;
       this.$axios
         .get(
-          `/v1/partners/${this.userSessionData.activeContext.partner.account_sid}/drivers`
+          `/v1/partners/${this.userSessionData.activeContext.partner.account_sid}/drivers?active=${this.filters.status}`
         )
         .then((res) => {
-          console.log(res);
           this.tableData = (this.formatApiFormData(res.data.data) as any) || [];
           this.totalRecords = res.data.metadata?.total;
         })

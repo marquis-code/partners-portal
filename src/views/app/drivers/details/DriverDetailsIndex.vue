@@ -112,7 +112,7 @@
       <spinner></spinner>
     </div>
     <template v-else>
-      <router-view></router-view>
+      <router-view @AssignVehicleToDriver="assignDriver(driverData)"></router-view>
     </template>
     <app-modal :modalActive="openAssignModal">
       <div class="px-3 py-5">
@@ -350,24 +350,6 @@
             Continue
           </button>
         </div>
-      </div>
-    </app-modal>
-
-    <app-modal :modalActive="confirmedRemoveDriver">
-      <div class="flex flex-col justify-center items-center py-3">
-        <img src="@/assets/images/successCheck.svg" />
-        <div class="space-y-3 pb-16 pt-5">
-          <h1 class="text-center font-medium">Remove driver</h1>
-          <p class="text-gray-400 text-center">
-            You have successfully removed this driver.
-          </p>
-        </div>
-        <button
-          @click="closeDriverRemoveModal()"
-          class="text-black bg-sh-green-500 rounded-md p-2 w-11/12 font-medium"
-        >
-          Dismiss
-        </button>
       </div>
     </app-modal>
   </page-layout>

@@ -57,7 +57,7 @@
             </p>
           </div>
         </div>
-        <p class="underline text-indigo-600 text-xs">Assign vehicle</p>
+        <a class="underline text-indigo-600 text-xs cursor-pointer" @click="$emit('AssignVehicleToDriver')">{{driverData?.vehicle ? 'Unassign Vehicle' : 'Assign vehicle'}}</a>
       </div>
       <div class="flex justify-between items-center py-6">
         <div class="flex space-x-2">
@@ -131,7 +131,7 @@
 import { defineComponent } from 'vue';
 
 export default defineComponent({
-  emits: ['driverUpdated'], // emitted when driver is changed or updated
+  emits: ['driverUpdated', 'AssignVehicleToDriver'], // emitted when driver is changed or updated
   props: {
     driverData: Object
   }
