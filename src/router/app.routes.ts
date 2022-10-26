@@ -264,6 +264,15 @@ export const AppRoutes: Array<RouteRecordRaw> = [
               requiresAuth: true,
             },
           },
+          {
+            path: '/earnings/past-payout',
+            name: 'earnings.past-payout',
+            component: loadRouteComponent('app/earnings/views/PastPayout'),
+            meta: {
+              title: 'Earnings-Past-Payout',
+              requiresAuth: true,
+            },
+          },
 
         ]
       },

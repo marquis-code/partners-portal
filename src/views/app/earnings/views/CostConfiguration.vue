@@ -7,8 +7,18 @@
             <div class="
               w-[100%]
               h-[100%]
-              border
-            ">sds</div>
+              p-[0]
+              ml-[28px]
+            ">
+            <div class="flex flex-row items-center">
+              <div class="flex flex-row items-center mr-[30px] cursor-pointer" @click="gotoEarning">
+                <p class="text-[#ACAFAE] text-[14px] pb-[10px]">Earning Information</p>
+              </div>
+              <div class="mr-[20px]">
+                <p class="font-[500] text-[14px] pb-[10px] border-b-4 border-[#15CD70] rounded-t-3xl ">Cost Configuration</p>
+              </div>
+            </div>
+          </div>
           </template>
         </page-action-header>
       </template>
@@ -179,6 +189,9 @@ export default defineComponent({
       console.log(e);
       this.$router.push(`/earnings/cost-configuration/vehicle/${e}`);
     },
+    gotoEarning() {
+      this.$router.push('/earnings');
+    }
   },
   data() {
     return {
