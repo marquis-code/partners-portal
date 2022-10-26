@@ -85,6 +85,9 @@
           </div>
           <!-- End of filter -->
           <app-table
+            :extraOptions="{ serverSide: true, totalSize: totalRecords }"
+            @pageChange="changePage"
+            @sizeChange="showPageSize"
             :loading="loading"
             :error-loading="errorLoading"
             :items="filteredTrips"
@@ -219,7 +222,9 @@ export default defineComponent({
       result: [],
       filters: {
         status: 'active-trips' as string,
-        search: ''
+        search: '',
+        pageNumber: 1,
+        pageSize: 10
       },
       search: '',
       loading: false,
@@ -272,9 +277,21 @@ export default defineComponent({
   watch: {
     'filters.status'(value) {
       this.filters.status = value;
+    },
+    'filters.pageNumber'() {
+      this.fetchPartnerTripsFromRevenue();
+    },
+    'filters.pageSize'() {
+      this.fetchPartnerTripsFromRevenue();
     }
   },
   methods: {
+    changePage(pageNumber: any) {
+      this.filters.pageNumber = pageNumber;
+    },
+    showPageSize(pageSize: any) {
+      this.filters.pageSize = pageSize;
+    },
     setStatusFilter(value: string) {
       this.filters.status = value;
       this.fetchPartnerTripsFromRevenue();
@@ -289,7 +306,7 @@ export default defineComponent({
       };
       this.$axios
         .get(
-          `/v1/partners/${this.partnerContext.partner.id}/${params.status}?metadata=${params.metadata}`
+          `/v1/partners/${this.partnerContext.partner.id}/${params.status}?metadata=${params.metadata}&page=${this.filters.pageNumber}&limit=${this.filters.pageSize}`
         )
         .then((res) => {
           const trips = this.transformActiveOrUpcomingTrips(res.data.data);
@@ -297,7 +314,7 @@ export default defineComponent({
           this.totalRecords = res.data.metadata?.total;
         })
         .catch((err) => {
-          this.$toast.error(err.response.data.message || 'An error occured');
+          this.$toast.error(err?.response?.data?.message || 'An error occured');
         })
         .finally(() => {
           this.loading = false;
