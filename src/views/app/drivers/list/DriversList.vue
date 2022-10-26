@@ -26,46 +26,6 @@
       </page-action-header>
     </template>
     <div>
-      <div class="flex items-center">
-        <span
-          class="
-            text-sm
-            font-medium
-            leading-6
-            pb-2
-            pt-1
-            px-2
-            border-b-2
-            cursor-pointer
-          "
-          :class="
-            filters.status === 1
-              ? 'text-black border-b-sh-green-500'
-              : 'text-sh-grey-500 border-b-transparent'
-          "
-          @click="setStatusFilter('active')"
-          >Active</span
-        >
-        <span
-          class="
-            text-sm
-            font-medium
-            leading-6
-            pb-2
-            pt-1
-            px-2
-            border-b-2
-            cursor-pointer
-          "
-          :class="
-            filters.status === 0
-              ? 'text-black border-b-sh-green-500'
-              : 'text-sh-grey-500 border-b-transparent'
-          "
-          @click="setStatusFilter('inactive')"
-          >Inactive</span
-        >
-      </div>
       <div class="space-y-5 ring-1 ring-gray-50 shadow-sm rounded-sm bg-white">
         <div class="relative">
           <!-- Search Box  -->
@@ -89,6 +49,48 @@
             </div>
           </div>
           <!-- End of search box -->
+          <!-- Start of filter -->
+          <div class="flex items-center px-6 py-4">
+            <span
+              class="
+                text-sm
+                font-medium
+                leading-6
+                pb-2
+                pt-1
+                px-2
+                border-b-2
+                cursor-pointer
+              "
+              :class="
+                filters.status === 1
+                  ? 'text-black border-b-sh-green-500'
+                  : 'text-sh-grey-500 border-b-transparent'
+              "
+              @click="setStatusFilter('active')"
+              >Active</span
+            >
+            <span
+              class="
+                text-sm
+                font-medium
+                leading-6
+                pb-2
+                pt-1
+                px-2
+                border-b-2
+                cursor-pointer
+              "
+              :class="
+                filters.status === 0
+                  ? 'text-black border-b-sh-green-500'
+                  : 'text-sh-grey-500 border-b-transparent'
+              "
+              @click="setStatusFilter('inactive')"
+              >Inactive</span
+            >
+          </div>
+          <!-- End of filter -->
           <app-table
             :loading="loading"
             :error-loading="errorLoading"

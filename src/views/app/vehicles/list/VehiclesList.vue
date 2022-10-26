@@ -25,46 +25,6 @@
       </page-action-header>
     </template>
     <div>
-      <div class="flex items-center pb-2">
-        <span
-          class="
-            text-sm
-            font-medium
-            leading-6
-            pb-2
-            pt-1
-            px-2
-            border-b-2
-            cursor-pointer
-          "
-          :class="
-            filters.status === 'active'
-              ? 'text-black border-b-sh-green-500'
-              : 'text-sh-grey-500 border-b-transparent'
-          "
-          @click="setStatusFilter('active')"
-          >Active</span
-        >
-        <span
-          class="
-            text-sm
-            font-medium
-            leading-6
-            pb-2
-            pt-1
-            px-2
-            border-b-2
-            cursor-pointer
-          "
-          :class="
-            filters.status === 'inactive'
-              ? 'text-black border-b-sh-green-500'
-              : 'text-sh-grey-500 border-b-transparent'
-          "
-          @click="setStatusFilter('inactive')"
-          >InActive</span
-        >
-      </div>
       <div class="space-y-5 ring-1 ring-gray-50 shadow-sm rounded-sm bg-white">
         <div>
           <!-- Search Box  -->
@@ -88,12 +48,53 @@
             </div>
           </div>
           <!-- End of search box -->
+          <!-- start of filter -->
+          <div class="flex items-center pb-2 px-6 py-4">
+          <span
+            class="
+              text-sm
+              font-medium
+              leading-6
+              pb-2
+              pt-1
+              px-2
+              border-b-2
+              cursor-pointer
+            "
+            :class="
+              filters.status === 'active'
+                ? 'text-black border-b-sh-green-500'
+                : 'text-sh-grey-500 border-b-transparent'
+            "
+            @click="setStatusFilter('active')"
+            >Active</span
+          >
+          <span
+            class="
+              text-sm
+              font-medium
+              leading-6
+              pb-2
+              pt-1
+              px-2
+              border-b-2
+              cursor-pointer
+            "
+            :class="
+              filters.status === 'inactive'
+                ? 'text-black border-b-sh-green-500'
+                : 'text-sh-grey-500 border-b-transparent'
+            "
+            @click="setStatusFilter('inactive')"
+            >InActive</span
+          >
+        </div>
+          <!-- End of filters -->
           <app-table
             :loading="loading"
             :error-loading="errorLoading"
             :items="tableData"
             :fields="headers"
-            @rowClicked="viewTripDetails"
           >
             <template v-slot:driver="{ item }">
               <router-link

@@ -51,6 +51,7 @@ export default defineComponent({
       // TODO: Support server side pagination
       await this.$axios
         .get(
+          // TODO change this endpoint
           `/cost-revenue/v1/vehicles/${this.$route.params.driverId}/revenues?metadata=true`
         )
         .then((res) => {

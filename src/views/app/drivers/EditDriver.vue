@@ -418,6 +418,7 @@ import PageLayout from '@/components/layout/PageLayout.vue';
 import PageActionHeader from '@/components/PageActionHeader.vue';
 import Spinner from '@/components/layout/Spinner.vue';
 import AppModal from '@/components/Modals/AppModal.vue';
+import { getDefaultDatePickerDate } from '@/utils/dateFormatters';
 
 interface Driver {
   fname?: string;
@@ -516,7 +517,7 @@ export default defineComponent({
           this.form.residential_address = res.data.residential_address;
           this.form.dob = res.data.dob;
           this.form.license_number = res.data.documents[0].registration_number;
-          this.form.expiry_date = res.data.documents[0].expiry_date;
+          this.form.expiry_date = getDefaultDatePickerDate(res.data.documents[0].expiry_date);
           this.form.files = [JSON.parse(res.data.documents[0].files)[0]];
           this.form.avatar = res.data.avatar;
           this.profilePreview = res.data.avatar;
