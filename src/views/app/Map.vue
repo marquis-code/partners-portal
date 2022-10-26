@@ -21,7 +21,7 @@ const chance = new Chance();
 
 export default defineComponent({
   components: { GoogleMap },
-  setup() {
+  setup () {
     const center = { lat: 40.689247, lng: -74.044502 };
     const google = ref(null);
     const markers = ref([]);
@@ -29,7 +29,7 @@ export default defineComponent({
     return { center, google, markers, markerClusterer };
   },
   methods: {
-    initMarkers() {
+    initMarkers () {
       if (this.markerClusterer === null) {
         this.markerClusterer = new MarkerClusterer(this.google.map, [], {
           gridSize: 30,
@@ -45,7 +45,7 @@ export default defineComponent({
         });
       }
     },
-    clearMarkers() {
+    clearMarkers () {
       this.markerClusterer.clearMarkers();
       console.log(`Clearing ${this.markers.length} markers`);
       for (let i = 0; i < this.markers.length; i++) {
@@ -54,19 +54,19 @@ export default defineComponent({
       }
       this.markers = [];
     },
-    getMarker(title, pos) {
+    getMarker (title, pos) {
       return new this.google.api.Marker({
         position: pos,
         title: title,
         map: this.google.map
       });
     },
-    generateRandomMarkers() {
+    generateRandomMarkers () {
       const newMarkers = [];
       const count = chance.integer({ min: 50, max: 150 });
       const [sw, ne] = this.getBoundingBox();
       let nlat, nlng;
-      for (var i = 0; i <= count; i++) {
+      for (let i = 0; i <= count; i++) {
         nlat = chance.floating({ min: sw.lat, max: ne.lat, fixed: 7 });
         nlng = chance.floating({ min: sw.lng, max: ne.lng, fixed: 7 });
         newMarkers.push(
@@ -76,7 +76,7 @@ export default defineComponent({
       this.markers = newMarkers;
       this.markerClusterer.addMarkers(newMarkers);
     },
-    getBoundingBox() {
+    getBoundingBox () {
       const bounds = this.google.map.getBounds();
       const swb = bounds.getSouthWest();
       const neb = bounds.getNorthEast();
@@ -84,7 +84,7 @@ export default defineComponent({
       const ne = { lat: neb.lat(), lng: neb.lng() };
       return [sw, ne];
     },
-    onBoundingBoxChanged() {
+    onBoundingBoxChanged () {
       this.clearMarkers();
       this.generateRandomMarkers();
     }
