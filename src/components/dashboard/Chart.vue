@@ -4,7 +4,7 @@
       <h1 class="text-gray-400 font-medium">Trips</h1>
     </div>
     <apexchart
-      class="w-full overflow-x-auto"
+      class="apexcharts-bar-area w-full overflow-x-auto"
       type="bar"
       height="350"
       :width="this.series[0].data.length * 35"
@@ -31,7 +31,8 @@ export default defineComponent({
             100, 200, 300, 400, 500, 600, 700, 800, 900, 100, 200, 300, 400,
             500, 600, 700, 800, 900, 100, 200, 300, 400, 500, 600, 700, 800,
             900, 100, 200, 300
-          ]
+          ],
+          color: '#000000'
         }
       ],
       chartOptions: {
@@ -128,4 +129,7 @@ export default defineComponent({
 </script>
 
 <style>
+.apexcharts-bar-area:hover {
+  fill: #20e682 !important;
+}
 </style>

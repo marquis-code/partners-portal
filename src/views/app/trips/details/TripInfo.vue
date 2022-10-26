@@ -1,7 +1,6 @@
 <template>
   <div class="relative">
     <div class="w-full relative rounded-sm shadow-sm">
-      <!-- <single-trip :tripData="tripInfo" class="absolute"></single-trip> -->
       <singleTrip :tripData="tripInfo" class="absolute" />
     </div>
   </div>

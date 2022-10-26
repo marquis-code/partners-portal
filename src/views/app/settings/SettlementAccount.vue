@@ -1,10 +1,7 @@
 <template>
-    <div v-if="fetchingAccounts">
-      <Spinner></Spinner>
-    </div>
-    <div class="flex flex-row p-4 justify-end">
-      <router-link
-      :to="{name:'add.settlement.account'}"
+  <div class="flex flex-row p-4 justify-end">
+    <router-link
+      :to="{ name: 'add.settlement.account' }"
       class="
         bg-sh-green-500
         font-medium
@@ -20,11 +17,11 @@
       "
       >Add account</router-link
     >
-    </div>
-    <main class="w-full p-5 lg:p-14 bg-white ring-1 ring-gray-100">
-      <div class="space-y-5 ring-1 ring-gray-50 shadow-sm rounded-sm bg-white">
+  </div>
+  <main class="w-full p-5 lg:p-14 bg-white ring-1 ring-gray-100">
+    <div class="space-y-5 ring-1 ring-gray-50 shadow-sm rounded-sm bg-white">
       <app-table
-        :loading="gettingAccounts"
+        :loading="fetchingAccounts"
         :error-loading="errorLoading"
         :items="tableData"
         :fields="headers"
@@ -33,109 +30,141 @@
           <span class="text-sm text-sh-green-700" v-if="item.isDefault">
             Assigned
           </span>
-          <span class="text-sm text-grays-black-6" v-else>
-            Not assigned
-          </span>
+          <span class="text-sm text-grays-black-6" v-else> Not assigned </span>
         </template>
         <template v-slot:actions="{ item }">
-          <span v-if="!item.isDefault" class="text-sm" @click="startAccountAssignment(item)">Assign</span>
-          <span class="text-red-500 ml-2 text-sm" @click="showRemoveConfirmationModal = true">Remove</span>
+          <span
+            v-if="!item.isDefault"
+            class="
+              text-sm
+              mr-4
+              border-2
+              rounded-md
+              px-3
+              py-2
+              border-black
+              text-white
+              bg-black
+            "
+            @click="startAccountAssignment(item)"
+            >Assign</span
+          >
+          <span v-else>
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+            &nbsp;
+          </span>
+          <span
+            class="
+              mr-4
+              border-2
+              rounded-md
+              px-3
+              py-2
+              border-red-500
+              text-red-500
+              ml-2
+              text-sm
+            "
+            @click="setItemToRemoveAndOpenModal(item)"
+            >Remove</span
+          >
         </template>
       </app-table>
     </div>
-    </main>
-    <app-modal :modalActive="showConfirmationModal">
-      <div class="pb-5 px-5 text-center">
-          <img src="@/assets/icons/question.svg" class="mx-auto mb-7" />
-          <p class="mb-2 font-bold font-lg">Assign account?</p>
-          <p class="mb-14">Are you sure you want to continue?</p>
-          <div class="flex flex-row justify-between bottom-0 w-full">
-            <button
-              @click="showConfirmationModal = false"
-              class="border border-sh-grey-400 rounded-lg w-32 md:w-40 py-2"
-            >
-              Cancel
-            </button>
-
-            <button
-              :disabled="loading"
-              class="rounded-lg bg-sh-green-500 w-32 md:w-40 py-2"
-              :class="
-                loading
-                  ? 'bg-sh-green-100'
-                  : 'bg-sh-green-500'
-              "
-              @click="assignAsDefault"
-            >
-              <Spinner v-if="loading"></Spinner>
-              {{ loading ? 'Processing' : 'Continue' }}
-            </button>
-          </div>
-        </div>
-    </app-modal>
-    <app-modal :modalActive="showSuccessModal">
-      <div class="flex flex-col justify-center items-center py-3">
-        <img src="@/assets/images/successCheck.svg" />
-        <div class="space-y-3 pb-16 pt-5">
-          <h1 class="text-center font-medium">Settlement account assigned</h1>
-          <p class="text-gray-400 text-center">
-            Your settlement account is ready.
-          </p>
-        </div>
+  </main>
+  <app-modal :modalActive="showConfirmationModal">
+    <div class="pb-5 px-5 text-center">
+      <img src="@/assets/icons/question.svg" class="mx-auto mb-7" />
+      <p class="mb-2 font-bold font-lg">Assign account?</p>
+      <p class="mb-14">Are you sure you want to continue?</p>
+      <div class="flex flex-row justify-between bottom-0 w-full">
         <button
-          @click="showSuccessModal = false"
-          class="text-black bg-sh-green-500 rounded-md p-2 w-11/12 font-medium"
+          @click="showConfirmationModal = false"
+          class="border border-sh-grey-400 rounded-lg w-32 md:w-40 py-2"
         >
-          Dismiss
+          Cancel
+        </button>
+
+        <button
+          :disabled="loading"
+          class="
+            rounded-lg
+            bg-sh-green-500
+            w-32
+            md:w-40
+            py-2
+            flex flex-row
+            justify-center
+            items-center
+          "
+          :class="loading ? 'bg-sh-green-100' : 'bg-sh-green-500'"
+          @click="assignAsDefault"
+        >
+          <Spinner v-if="loading"></Spinner>
+          <span>{{ loading ? 'Processing' : 'Continue' }}</span>
         </button>
       </div>
-    </app-modal>
-    <app-modal :modalActive="showRemoveConfirmationModal">
-      <div class="pb-5 px-5 text-center">
-          <img src="@/assets/icons/question.svg" class="mx-auto mb-7" />
-          <p class="mb-2 font-bold font-lg">Remove account?</p>
-          <p class="mb-14">Are you sure you want to continue?</p>
-          <div class="flex flex-row justify-between bottom-0 w-full">
-            <button
-              @click="showRemoveConfirmationModal = false"
-              class="border border-sh-grey-400 rounded-lg w-32 md:w-40 py-2"
-            >
-              Cancel
-            </button>
-
-            <button
-              :disabled="loading"
-              class="rounded-lg bg-red-500 text-white w-32 md:w-40 py-2"
-              :class="
-                loading
-                  ? 'bg-sh-green-100'
-                  : 'bg-sh-green-500'
-              "
-              @click="removeThisAccount"
-            >
-              {{ loading ? 'Processing' : 'Remove' }}
-              <Spinner v-if="loading"></Spinner>
-            </button>
-          </div>
-        </div>
-    </app-modal>
-    <app-modal :modalActive="showRemoveSuccessModal">
-      <div class="flex flex-col justify-center items-center py-3">
-        <img src="@/assets/images/successCheck.svg" />
-        <div class="space-y-3 pb-16 pt-5">
-          <h1 class="text-center font-medium">Account removed</h1>
-          <p class="text-gray-400 text-center">
-            You have successfully removed an account.
-          </p>
-        </div>
+    </div>
+  </app-modal>
+  <app-modal :modalActive="showSuccessModal">
+    <div class="flex flex-col justify-center items-center py-3">
+      <img src="@/assets/images/successCheck.svg" />
+      <div class="space-y-3 pb-16 pt-5">
+        <h1 class="text-center font-medium">Settlement account assigned</h1>
+        <p class="text-gray-400 text-center">
+          Your settlement account is ready.
+        </p>
+      </div>
+      <button
+        @click="showSuccessModal = false"
+        class="text-black bg-sh-green-500 rounded-md p-2 w-11/12 font-medium"
+      >
+        Dismiss
+      </button>
+    </div>
+  </app-modal>
+  <app-modal :modalActive="showRemoveConfirmationModal">
+    <div class="pb-5 px-5 text-center">
+      <img src="@/assets/icons/question.svg" class="mx-auto mb-7" />
+      <p class="mb-2 font-bold font-lg">Remove account?</p>
+      <p class="mb-14">Are you sure you want to continue?</p>
+      <div class="flex flex-row justify-between bottom-0 w-full">
         <button
-          @click="showRemoveSuccessModal = false"
-          class="text-black bg-sh-green-500 rounded-md p-2 w-11/12 font-medium"
+          @click="showRemoveConfirmationModal = false"
+          class="border border-sh-grey-400 rounded-lg w-32 md:w-40 py-2"
         >
-          Dismiss
+          Cancel
+        </button>
+
+        <button
+          :disabled="loading"
+          class="rounded-lg bg-red-500 text-white w-32 md:w-40 py-2 flex flex-row justify-center"
+          :class="loading ? 'bg-sh-green-100' : 'bg-sh-green-500'"
+          @click="removeThisAccount"
+        >
+          <Spinner v-if="loading"></Spinner>
+          {{ loading ? 'Processing' : 'Remove' }}
         </button>
       </div>
-    </app-modal>
+    </div>
+  </app-modal>
+  <app-modal :modalActive="showRemoveSuccessModal">
+    <div class="flex flex-col justify-center items-center py-3">
+      <img src="@/assets/images/successCheck.svg" />
+      <div class="space-y-3 pb-16 pt-5">
+        <h1 class="text-center font-medium">Account removed</h1>
+        <p class="text-gray-400 text-center">
+          You have successfully removed an account.
+        </p>
+      </div>
+      <button
+        @click="showRemoveSuccessModal = false"
+        class="text-black bg-sh-green-500 rounded-md p-2 w-11/12 font-medium"
+      >
+        Dismiss
+      </button>
+    </div>
+  </app-modal>
   <!-- </page-layout> -->
 </template>
 
@@ -170,6 +199,7 @@ export default defineComponent({
       loading: false,
       tableData: [],
       currentAccountId: null,
+      accountToRemoveId: null,
       headers: [
         { label: 'Account Number', key: 'accountNumber' },
         { label: 'Bank Name', key: 'bankName' },
@@ -193,7 +223,7 @@ export default defineComponent({
       processing: false,
       documentId: null,
       isUploaded: false,
-      uploadingProfile: false,
+      uploadingProfile: false
     };
   },
   validations () {
@@ -219,19 +249,25 @@ export default defineComponent({
     this.fetchSettlementAccounts();
   },
   methods: {
+    setItemToRemoveAndOpenModal (item: any) {
+      this.accountToRemoveId = item.id
+      this.showRemoveConfirmationModal = true;
+    },
     startAccountAssignment (item: any) {
       this.selectedAccountId = item.id;
       this.form.accountName = item.accountName;
       this.form.accountNumber = item.accountNumber;
       this.form.bankName = item.bankName;
-      this.showConfirmationModal = true
+      this.showConfirmationModal = true;
     },
     async fetchSettlementAccounts () {
       // this.showConfirmationModal = false;
       // API call to assign an account
-      this.fetchingAccounts = true
+      this.fetchingAccounts = true;
       try {
-        const response = await this.$axios.get(`/cost-revenue/v1/settlement-accounts?partnerId=${this.partnerContext.partner.account_sid}`);
+        const response = await this.$axios.get(
+          `/cost-revenue/v1/settlement-accounts?partnerId=${this.partnerContext.partner.account_sid}`
+        );
         this.tableData = response.data;
       } catch (error) {
         const errorMessage = extractErrorMessage(
@@ -246,13 +282,18 @@ export default defineComponent({
     },
     async assignAsDefault () {
       // API call to make an account a default
-      this.loading = true
+      this.loading = true;
       try {
-        await this.$axios.patch(`/cost-revenue/v1/settlement-accounts/${this.selectedAccountId}`, {
-          ...this.form,
-          isDefault: true
-        });
-        const response = await this.$axios.get(`/cost-revenue/v1/settlement-accounts?partnerId=${this.partnerContext.partner.account_sid}`);
+        await this.$axios.patch(
+          `/cost-revenue/v1/settlement-accounts/${this.selectedAccountId}`,
+          {
+            ...this.form,
+            isDefault: true
+          }
+        );
+        const response = await this.$axios.get(
+          `/cost-revenue/v1/settlement-accounts?partnerId=${this.partnerContext.partner.account_sid}`
+        );
         this.tableData = response.data;
         this.showConfirmationModal = false;
       } catch (error) {
@@ -273,7 +314,7 @@ export default defineComponent({
       this.showModal = true;
     },
     closeModal () {
-      this.showSuccessModal = true
+      this.showSuccessModal = true;
     },
     getUploadedFileUrlFromStringifiedArray (stringifiedArray: any) {
       const parsedArray = JSON.parse(stringifiedArray);
@@ -282,12 +323,26 @@ export default defineComponent({
       }
       return null;
     },
-    removeThisAccount () {
-      this.loading = true;
-      this.showRemoveConfirmationModal = false;
-      this.showRemoveSuccessModal = true;
-      // API call for removing acconut
-      this.loading = false;
+    async removeThisAccount () {
+      try {
+        this.loading = true;
+        await this.$axios.delete(`/cost-revenue/v1/settlement-accounts/${this.accountToRemoveId}`);
+        const response = await this.$axios.get(
+          `/cost-revenue/v1/settlement-accounts?partnerId=${this.partnerContext.partner.account_sid}`
+        );
+        this.tableData = response.data;
+        this.showRemoveConfirmationModal = false;
+        this.showRemoveSuccessModal = true;
+      } catch (error) {
+        const errorMessage = extractErrorMessage(
+          error,
+          null,
+          'Oops! An error occurred, please try again.'
+        );
+        this.$toast.error(errorMessage);
+      } finally {
+        this.loading = false;
+      }
     }
   }
 });

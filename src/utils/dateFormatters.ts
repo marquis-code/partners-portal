@@ -1,10 +1,10 @@
 import moment from 'moment';
 
-export function getExpiryDate(date: string): string {
+export function getExpiryDate(date: string): string | null {
   if (moment(date).isValid()) {
     return moment(date).format('LL');
   } else {
-    return 'N/A'
+    return null
   }
 }
 
