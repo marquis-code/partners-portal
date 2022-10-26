@@ -49,16 +49,17 @@
           <div class="">
             <p class="font-medium text-sm">Assigned vehicle</p>
             <router-link
+            v-if="driverData.vehicle_id"
               class="
                text-gray-900
                 hover:text-sh-green-500
                 hover:underline hover:decoration-sh-green-500
                 font-light
-                text-xs
+                text-sm
               "
               :to="{
                 name: 'vehicle.detail.info',
-                params: { vehicleId: driverData.vehicle.id }
+                params: {vehicleId: driverData?.vehicle?.id }
               }"
             >
               {{
@@ -67,6 +68,7 @@
                   : 'N/A'
               }}
             </router-link>
+              <p class="text-sm text-gray-500 font-light pt-2" v-else>No vehicle assigned</p>
           </div>
         </div>
         <a
@@ -167,7 +169,7 @@ export default defineComponent({
   emits: ['driverUpdated', 'AssignVehicleToDriver'], // emitted when driver is changed or updated
   props: {
     driverData: Object
-  }
+  },
 });
 </script>
 
