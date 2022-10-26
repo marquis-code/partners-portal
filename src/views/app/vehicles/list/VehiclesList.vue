@@ -49,51 +49,54 @@
           <!-- End of search box -->
           <!-- start of filter -->
           <div class="flex items-center pb-2 px-6 py-4">
-          <span
-            class="
-              text-sm
-              font-medium
-              leading-6
-              pb-2
-              pt-1
-              px-2
-              border-b-2
-              cursor-pointer
-            "
-            :class="
-              filters.status === 'active'
-                ? 'text-black border-b-sh-green-500'
-                : 'text-sh-grey-500 border-b-transparent'
-            "
-            @click="setStatusFilter('active')"
-            >Active</span
-          >
-          <span
-            class="
-              text-sm
-              font-medium
-              leading-6
-              pb-2
-              pt-1
-              px-2
-              border-b-2
-              cursor-pointer
-            "
-            :class="
-              filters.status === 'inactive'
-                ? 'text-black border-b-sh-green-500'
-                : 'text-sh-grey-500 border-b-transparent'
-            "
-            @click="setStatusFilter('inactive')"
-            >InActive</span
-          >
-        </div>
+            <span
+              class="
+                text-sm
+                font-medium
+                leading-6
+                pb-2
+                pt-1
+                px-2
+                border-b-2
+                cursor-pointer
+              "
+              :class="
+                filters.status === 'active'
+                  ? 'text-black border-b-sh-green-500'
+                  : 'text-sh-grey-500 border-b-transparent'
+              "
+              @click="setStatusFilter('active')"
+              >Active</span
+            >
+            <span
+              class="
+                text-sm
+                font-medium
+                leading-6
+                pb-2
+                pt-1
+                px-2
+                border-b-2
+                cursor-pointer
+              "
+              :class="
+                filters.status === 'inactive'
+                  ? 'text-black border-b-sh-green-500'
+                  : 'text-sh-grey-500 border-b-transparent'
+              "
+              @click="setStatusFilter('inactive')"
+              >InActive</span
+            >
+          </div>
           <!-- End of filters -->
           <app-table
             :loading="loading"
             :error-loading="errorLoading"
             :items="filteredVehicles"
             :fields="headers"
+            :extraOptions="{ serverSide: true, totalSize: totalRecords }"
+            @pageChange="changePage"
+            @sizeChange="showPageSize"
           >
             <template v-slot:driver="{ item }">
               <router-link
@@ -234,15 +237,18 @@ export default defineComponent({
     PageActionHeader,
     AppTable
   },
-  created () {
+  created() {
     this.fetchVehicles();
   },
-  data () {
+  data() {
     return {
       filters: {
         status: 'active',
-        search: ''
+        search: '',
+        pageNumber: 1,
+        pageSize: 10
       },
+      serverTotal: null,
       search: '',
       loading: false,
       tableData: [],
@@ -280,12 +286,26 @@ export default defineComponent({
       return searchResult;
     }
   },
+  watch: {
+    'filters.pageNumber'() {
+      this.fetchVehicles();
+    },
+    'filters.pageSize'() {
+      this.fetchVehicles();
+    }
+  },
   methods: {
-    setStatusFilter (value: string) {
+    changePage(pageNumber: any) {
+      this.filters.pageNumber = pageNumber;
+    },
+    showPageSize(pageSize: any) {
+      this.filters.pageSize = pageSize;
+    },
+    setStatusFilter(value: string) {
       this.filters.status = value;
       this.fetchVehicles();
     },
-    fetchVehicles () {
+    fetchVehicles() {
       this.loading = true;
       const params = {
         related: 'driver',
@@ -293,9 +313,12 @@ export default defineComponent({
         metadata: true
       };
       this.$axios
-        .get(`/v1/partner/${this.partnerContext.partner?.id}/vehicles`, {
-          params
-        })
+        .get(
+          `/v1/partner/${this.partnerContext.partner?.id}/vehicles?page=${this.filters.pageNumber}&limit=${this.filters.pageSize}`,
+          {
+            params
+          }
+        )
         .then((res) => {
           this.tableData = res.data.data || [];
           this.totalRecords = res.data.metadata?.total;
