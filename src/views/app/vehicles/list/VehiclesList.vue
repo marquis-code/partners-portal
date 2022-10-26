@@ -93,7 +93,6 @@
             :error-loading="errorLoading"
             :items="tableData"
             :fields="headers"
-            @rowClicked="viewTripDetails"
           >
             <template v-slot:driver="{ item }">
               <router-link
