@@ -95,6 +95,9 @@
             :error-loading="errorLoading"
             :items="filteredDrivers"
             :fields="headers"
+            :extraOptions="{ serverSide: true, totalSize: totalRecords }"
+            @pageChange="changePage"
+            @sizeChange="showPageSize"
           >
             <template v-slot:routeVehicles="{ item }">
               <span v-if="item.routeVehicles">
@@ -299,17 +302,27 @@ export default defineComponent({
     AppTable,
     AppModal
   },
-  created () {
+  created() {
     this.fetchDrivers();
   },
   props: {
     rowClicked: Function
   },
-  data () {
+  watch: {
+    'filters.pageNumber'() {
+      this.fetchDrivers();
+    },
+    'filters.pageSize'() {
+      this.fetchDrivers();
+    }
+  },
+  data() {
     return {
       filters: {
         status: 1,
-        search: ''
+        search: '',
+        pageNumber: 1,
+        pageSize: 10
       },
       showInfoModal: false,
       search: '',
@@ -337,7 +350,7 @@ export default defineComponent({
       partnerContext: 'auth/activeContext',
       userSessionData: 'auth/userSessionData'
     }),
-    filteredDrivers () {
+    filteredDrivers() {
       const results = this.tableData as any[];
 
       const searchKeyword = this.search.toLowerCase();
@@ -357,7 +370,13 @@ export default defineComponent({
   },
 
   methods: {
-    async proceed () {
+    changePage(pageNumber: any) {
+      this.filters.pageNumber = pageNumber;
+    },
+    showPageSize(pageSize: any) {
+      this.filters.pageSize = pageSize;
+    },
+    async proceed() {
       this.modalLoading = true;
       await this.$axios
         .delete(
@@ -382,15 +401,15 @@ export default defineComponent({
           this.handleHideInfoModal();
         });
     },
-    setStatusFilter (value: string) {
+    setStatusFilter(value: string) {
       this.filters.status = value === 'active' ? 1 : 0;
       this.fetchDrivers();
     },
-    fetchDrivers () {
+    fetchDrivers() {
       this.loading = true;
       this.$axios
         .get(
-          `/v1/partners/${this.userSessionData.activeContext.partner.account_sid}/drivers?active=${this.filters.status}`
+          `/v1/partners/${this.userSessionData.activeContext.partner.account_sid}/drivers?active=${this.filters.status}?page=${this.filters.pageNumber}&limit=${this.filters.pageSize}`
         )
         .then((res) => {
           this.tableData = (this.formatApiFormData(res.data.data) as any) || [];
@@ -400,17 +419,17 @@ export default defineComponent({
           this.loading = false;
         });
     },
-    handleDriver (eachDriver: any) {
+    handleDriver(eachDriver: any) {
       this.showDropdown = !this.showDropdown;
       this.selectedDriverId = eachDriver.id;
     },
-    editDriver () {
+    editDriver() {
       this.$router.push({
         name: 'EditDriver',
         params: { driverId: this.selectedDriverId }
       });
     },
-    formatApiFormData (apiFormData: Array<any>) {
+    formatApiFormData(apiFormData: Array<any>) {
       const newTableData: any = [];
       apiFormData.forEach((eachDriver) => {
         newTableData.push({
@@ -434,21 +453,21 @@ export default defineComponent({
       });
       return newTableData;
     },
-    removeDriver (id: any) {
+    removeDriver(id: any) {
       this.driverToRemoveId = id;
       this.handleShowInfoModal();
       this.showDropdown = false;
     },
-    handleShowInfoModal () {
+    handleShowInfoModal() {
       this.showInfoModal = true;
     },
-    handleShowSuccessModal () {
+    handleShowSuccessModal() {
       this.showSuccessModal = true;
     },
-    handleHideInfoModal () {
+    handleHideInfoModal() {
       this.showInfoModal = false;
     },
-    handleHideSuccessModal () {
+    handleHideSuccessModal() {
       this.showSuccessModal = false;
     }
   }

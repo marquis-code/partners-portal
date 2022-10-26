@@ -192,8 +192,7 @@
                       "
                     >
                       <option value="10">10</option>
-                      <option value="25">25</option>
-                      <option value="50">50</option>
+                      <option value="20">20</option>
                     </select>
                     <span class="text-xs font-medium text-gray-type-8"
                       >Rows per page:</span
