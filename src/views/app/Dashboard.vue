@@ -3,6 +3,7 @@
     <div v-if="loadingStats"><spinner/></div>
     <div v-else>
     <div
+    v-if="!isTodoComplete"
       class="
         p-6
         lg:py-7 lg:px-16
@@ -147,6 +148,7 @@ export default defineComponent({
         ratingOverTen: 0
       },
       doneCount: 0,
+      isTodoComplete: false
     };
   },
   computed: {
@@ -159,7 +161,15 @@ export default defineComponent({
   },
   methods: {
     checkIfAllTodosAreDone () {
-      console.log(1)
+      if (this.partnerStats.hasCompletedIdentityVerification === 'completed' &&
+          this.partnerStats.hasCompletedAddressVerification === 'completed' &&
+          this.partnerStats.hasUploadedCompanyDoc &&
+          this.partnerStats.hasADriver &&
+          this.partnerStats.hasAVehicle &&
+          this.partnerStats.hasSettlementAccount
+      ) {
+        this.isTodoComplete = true;
+      }
     },
     async setTableStates () {
       this.loadingStats = true;
@@ -168,6 +178,7 @@ export default defineComponent({
       await this.checkIfSettlementAccountHasBeenProvided();
       await this.getPartnerAccruedEarnings();
       await this.getOverallRatings();
+      this.checkIfAllTodosAreDone()
       this.loadingStats = false;
     },
     async getOverallRatings () {
