@@ -9,7 +9,7 @@
       v-if="status === `under-review`"
       class="flex flex-row justify-center items-center"
     >
-        <span v-if="status == 'under-review'" class="text-yellow-500">under review</span>
+        <span v-if="status == 'under-review'" class="text-yellow-600 font-medium">under review</span>
     </div>
 
     <router-link
