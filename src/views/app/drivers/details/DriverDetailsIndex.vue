@@ -22,8 +22,12 @@
                 >Drivers management</router-link
               >
               <img src="@/assets/images/breadcrumbs.svg" />
-              <span class="lg:text-base sm:text-sm text-xs">{{ driverData?.fname }}</span>
-              <span class="lg:text-base sm:text-sm text-xs">{{ driverData?.lname }}</span>
+              <span class="lg:text-base sm:text-sm text-xs">{{
+                driverData?.fname
+              }}</span>
+              <span class="lg:text-base sm:text-sm text-xs">{{
+                driverData?.lname
+              }}</span>
             </div>
             <div
               @click="toggleDropdown"
@@ -62,7 +66,7 @@
               "
             >
               <a
-                href="#"
+                href.prevent="#"
                 @click="editDriver(driverData)"
                 class="
                   text-gray-500
@@ -76,7 +80,7 @@
                 >Edit</a
               >
               <a
-                href="#"
+                href.prevent="#"
                 @click="assignDriver(driverData)"
                 class="
                   text-gray-500
@@ -91,7 +95,7 @@
                 }}</a
               >
               <a
-                href="#"
+                href.prevent="#"
                 @click="removeDriver(driverData)"
                 class="
                   text-red-500
@@ -112,7 +116,9 @@
       <spinner></spinner>
     </div>
     <template v-else>
-      <router-view @AssignVehicleToDriver="assignDriver(driverData)"></router-view>
+      <router-view
+        @AssignVehicleToDriver="assignDriver(driverData)"
+      ></router-view>
     </template>
     <app-modal :modalActive="openAssignModal">
       <div class="px-3 py-5">
@@ -381,6 +387,9 @@ export default {
       partnerContext: 'auth/activeContext'
     })
   },
+  mounted() {
+    console.log(this.driverData);
+  },
   data() {
     return {
       loading: true,
@@ -421,6 +430,7 @@ export default {
       this.showDropdown = !this.showDropdown;
     },
     editDriver(item) {
+      console.log(item);
       this.$router.push({
         name: 'EditDriver',
         params: { driverId: item.id }

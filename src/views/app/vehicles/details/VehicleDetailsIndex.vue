@@ -47,7 +47,7 @@
             "
           >
             <a
-              href="#"
+              href.prevent="#"
               @click="editVehicle"
               class="
                 text-gray-500
@@ -62,7 +62,7 @@
             >
             <a
               v-if="!vehicleData.driver"
-              href="#"
+              href.prevent="#"
               @click="assignDriver(vehicleData)"
               class="
                 text-gray-500
@@ -76,7 +76,7 @@
             >
             <a
               v-else
-              href="#"
+              href.prevent="#"
               @click="unassignDriver(vehicleData)"
               class="
                 text-gray-500
@@ -89,7 +89,7 @@
               >Unassign Driver</a
             >
             <a
-              href="#"
+              href.prevent="#"
               @click="removeVehicle(vehicleData)"
               class="
                 text-red-500
