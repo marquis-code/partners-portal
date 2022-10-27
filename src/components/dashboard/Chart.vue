@@ -3,14 +3,15 @@
     <div class="flex justify-between items-center">
       <h1 class="text-gray-400 font-medium">Trips</h1>
     </div>
-    <apexchart
-      class="apexcharts-bar-area w-full overflow-x-auto"
-      type="bar"
-      height="350"
-      :width="this.series[0].data.length * 35"
-      :options="chartOptions"
-      :series="series"
-    ></apexchart>
+    <div class="flex justify-center items-center">
+      <apexchart
+        class="apexcharts-bar-area w-full overflow-x-auto"
+        type="bar"
+        height="350"
+        :options="chartOptions"
+        :series="series"
+      ></apexchart>
+    </div>
   </div>
 </template>
 
