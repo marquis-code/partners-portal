@@ -34,7 +34,7 @@
           :is-routeable="false"
           :bottom-desc="'Last Updated:'"
           :bottom-desc-value="unsettledEarnings.lastUpdated"
-          :desc="'Unsettled earnings'"
+          :desc="'Earnings'"
           :formater="Intl.NumberFormat('en-Us').format"
           :currency="'₦'"
           :value="unsettledEarnings.value"
