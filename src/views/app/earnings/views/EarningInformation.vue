@@ -47,11 +47,10 @@
       <!-- Settlement account -->
       <earnings-data-card
           :is-routeable="true"
-          :bottom-desc="'Change account'"
+          :bottom-desc="settlement?.value ? 'Change account' : 'Add A Settlement Account'"
           :link="'/settings/accounts'"
-          :desc="`Settlement account (${settlement.accountName})`"
+          :desc=" settlement?.value ? `Settlement account (${settlement.accountName})` : '---'"
           :value="settlement.value"
-          v-if="settlement.value"
           :is-loading="isFetchingUnsettledEarnings"
         >
         <template #iconPlaceHolder>
@@ -64,7 +63,6 @@
           :link="'/earnings/past-payout'"
           :desc="nextPayDate.due"
           :value="nextPayDate.value"
-          v-if="nextPayDate.value"
           :is-loading="isFetchingUnsettledEarnings"
           :bottom-desc="'View past payouts'"
         >
