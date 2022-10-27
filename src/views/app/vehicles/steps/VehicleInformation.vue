@@ -116,11 +116,11 @@
           <label class="text-xs font-medium text-grays-black-5">City of operation</label>
           <v-select
             :disabled="fetchingModels"
-            @input="console.log($event)"
             class="form-group"
-            @option:selected="selectThisCity($event)"
             :options="cities"
-            label="id"
+            :reduce="(city) => city.id"
+            v-model="form.city_ids"
+            multiple
             required>
             <template v-slot:option="model">
               {{ model.city.name }}
@@ -253,10 +253,6 @@ export default defineComponent<any, any, any>({
     this.form.partner_id = this.partnerContext?.partner?.id;
   },
   methods: {
-    selectThisCity (city: any) {
-      const cityId = city.city.id
-      this.form.city_ids = [cityId]
-    },
     uppercase ($event: any) {
       this.form.registration_number = this.form.registration_number.toUpperCase();
       this.getKeyStroke($event)
@@ -283,7 +279,11 @@ export default defineComponent<any, any, any>({
     fetchPageData () {
       this.loading = true;
       this.vehicleYears = this.getYearsFrom('1980');
-      this.cities = this.partnerContext.supportedCities;
+      this.$axios.get(`/v1/partners/${this.partnerContext?.partner?.id}/cities`).then((r: AxiosResponse) => {
+        console.log(r.data.data)
+        this.cities = r.data.data
+      })
+      // this.cities = this.partnerContext.activeContext.supportedCities;
       this.$axios.get('/v1/vehicle-makes?limit=1000').then((r: AxiosResponse) => {
         this.vehicleBrands = r.data.data || [];
       })
