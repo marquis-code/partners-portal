@@ -54,44 +54,72 @@ import { defineComponent } from 'vue';
 import PageLayout from '@/components/layout/PageLayout.vue';
 import AppTable from '@/components/AppTable.vue';
 import moment from 'moment';
-import CostEarnings from '@/models/cost-earnings-data';
-import TripHistory from '@/components/TripHistory.vue';
-import ItemNavigator from '@/components/ItemNavigator.vue';
+import { mapGetters } from 'vuex';
 
-const dummyEarning: Array<any> = [
-  {
-    id: "2121",
-    date: '20 May 2022',
-    time: '8:54AM',
-    bankName: 'Access Bank',
-    accountNumber: '0032332',
-    amount: '400000',
-  }
-];
 export default defineComponent({
   name: 'EarningInformation',
   components: {
     PageLayout,
     AppTable,
-    // TripHistory,
-    // ItemNavigator,
-    // EarningsTableDataCard,
   },
   computed: {
+    ...mapGetters({
+      partnerContext: 'auth/activeContext'
+    }),
     changedFilterSortBy(nv) {
       if (nv === this.filter.sortBy) return false;
       return true;
-    }
+    },
+  },
+  mounted() {
+    this.init();
   },
   methods: {
+    async init() {
+      await this.getAllPayouts();
+    },
     gotoEarning() {
       this.$router.push('/earnings');
-    }
+    },
+    async getAllPayouts() {
+      try {
+        this.isFetchingPayouts = true;
+        const response = await this.$axios.get(
+          `/cost-revenue/v1/partners/${this.partnerContext.partner.account_sid}/payouts`
+        );
+        if (response.status === 200) {
+          this.tableData = this.formatTableData(response.data.result) as Array<any>;
+        }
+      } catch (e) {
+        console.log(e);
+      } finally {
+        this.isFetchingPayouts = false;
+      }
+    },
+    formatTableData(data: Array<any>) {
+      try {
+        const result = [];
+        for (const d of data) {
+          const obj = {} as any;
+          obj.id = d.id;
+          obj.date = moment(d.createdAt).format('DD MMMM YYYY');
+          obj.time = moment(d.createdAt).format('hh:mm A');
+          obj.bankName = d.settlementAccount.bankName;
+          obj.accountNumber = d.settlementAccount.accountNumber;
+          obj.amount = d.amount;
+
+          result.push(obj);
+        }
+        return result;
+      } catch (err) {
+        console.log(err);
+      }
+    },
   },
   data() {
     return {
       searchText: '',
-      isFetchingEarnings: false,
+      isFetchingPayouts: true,
       errorLoading: false,
       filter: {
         sortBy: '',
@@ -103,7 +131,7 @@ export default defineComponent({
         { label: 'Account Number', key: 'accountNumber' },
         { label: 'Amount (₦)', key: 'amount' },
       ],
-      tableData: dummyEarning as Array<CostEarnings>,
+      tableData: [] as Array<any>,
       isFetchingAllEarnings: false,
       isFetchingSettlements: false,
       isFetchingNextPaydate: false,
