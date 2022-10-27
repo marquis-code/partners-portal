@@ -49,7 +49,7 @@
           :is-routeable="true"
           :bottom-desc="'Change account'"
           :link="'/settings/accounts'"
-          :desc="settlement.accountName"
+          :desc="`Settlement account (${settlement.accountName})`"
           :value="Number(settlement.value)"
           :is-loading="isFetchingUnsettledEarnings"
         >
@@ -61,8 +61,8 @@
         <earnings-data-card
           :is-routeable="true"
           :link="'/earnings/past-payout'"
-          :desc="settlement.accountName"
-          :value="settlement.value"
+          :desc="nextPayDate.due"
+          :value="nextPayDate.value"
           :is-loading="isFetchingUnsettledEarnings"
           :bottom-desc="'View past payouts'"
         >
@@ -273,7 +273,7 @@ export default defineComponent({
       try {
         this.isFetchingUnsettledEarnings = true;
         const response = await this.$axios.get(
-          `/cost-revenue/v1/partners/${this.partnerContext.partner.id}/earnings-summary`
+          `/cost-revenue/v1/partners/${this.partnerContext.partner.account_sid}/earnings-summary`
         );
         if (response.status === 200) {
           const { amount, updatedAt } = response.data.unsettledEarnings;
@@ -289,13 +289,14 @@ export default defineComponent({
               ...this.settlement,
               partnerId: settlementAccount.partnerId,
               value: settlementAccount.accountNumber,
-              accountName: settlementAccount.accountName,
+              accountName: settlementAccount.bankName,
             };
           }
           if (nextPayoutDate) {
             this.nextPayDate = {
               ...this.nextPayDate,
-              value: moment(nextPayoutDate).format('MMMM DD, YYYY')
+              value: moment(nextPayoutDate).format('MMMM DD, YYYY'),
+              due: moment(nextPayoutDate).fromNow(),
 
             }
           }
@@ -338,7 +339,8 @@ export default defineComponent({
 
       },
       nextPayDate: {
-        value: 0 as any,
+        value: '',
+        due: '',
       },
     }
   }
