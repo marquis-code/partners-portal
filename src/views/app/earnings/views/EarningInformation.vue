@@ -34,7 +34,7 @@
           :is-routeable="false"
           :bottom-desc="'Last Updated:'"
           :bottom-desc-value="unsettledEarnings.lastUpdated"
-          :desc="'Unsettled earnings'"
+          :desc="'Earnings'"
           :formater="Intl.NumberFormat('en-Us').format"
           :currency="'₦'"
           :value="unsettledEarnings.value"
@@ -50,7 +50,8 @@
           :bottom-desc="'Change account'"
           :link="'/settings/accounts'"
           :desc="`Settlement account (${settlement.accountName})`"
-          :value="Number(settlement.value)"
+          :value="settlement.value"
+          v-if="settlement.value"
           :is-loading="isFetchingUnsettledEarnings"
         >
         <template #iconPlaceHolder>
@@ -60,6 +61,7 @@
         <!-- Next payout -->
         <earnings-data-card
           :is-routeable="true"
+          v-if="nextPayDate.value"
           :link="'/earnings/past-payout'"
           :desc="nextPayDate.due"
           :value="nextPayDate.value"
@@ -184,7 +186,6 @@ export default defineComponent({
   methods: {
     async init() {
       await this.getEarningsSummary();
-      await this.getSettlementAccount();
       await this.listRevenues();
     },
     formatTableData(data: Array<any>) {
@@ -254,21 +255,6 @@ export default defineComponent({
     gotoCostConfig() {
       this.$router.push('/earnings/cost-configuration');
     },
-    async getSettlementAccount() {
-      try {
-        this.isFetchingSettlements = true;
-        const response = await this.$axios.get(
-          `/cost-revenue/v1/settlement-accounts/?partnerId=${this.partnerContext.partner.id}`
-        );
-        if (response.status === 200) {
-          // ew
-        }
-      } catch (err) {
-        console.log(err);
-      } finally {
-        this.isFetchingSettlements = false;
-      }
-    },
     async getEarningsSummary() {
       try {
         this.isFetchingUnsettledEarnings = true;
@@ -288,7 +274,7 @@ export default defineComponent({
             this.settlement = {
               ...this.settlement,
               partnerId: settlementAccount.partnerId,
-              value: settlementAccount.accountNumber,
+              value: `${settlementAccount.accountNumber}`,
               accountName: settlementAccount.bankName,
             };
           }
@@ -334,7 +320,7 @@ export default defineComponent({
       },
       settlement: {
         partnerId: '',
-        value: 0 as any,
+        value: '',
         accountName: '---',
 
       },
