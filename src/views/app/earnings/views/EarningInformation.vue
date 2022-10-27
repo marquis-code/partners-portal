@@ -51,7 +51,6 @@
           :link="'/settings/accounts'"
           :desc="`Settlement account (${settlement.accountName})`"
           :value="settlement.value"
-          v-if="settlement.value"
           :is-loading="isFetchingUnsettledEarnings"
         >
         <template #iconPlaceHolder>
@@ -61,7 +60,6 @@
         <!-- Next payout -->
         <earnings-data-card
           :is-routeable="true"
-          v-if="nextPayDate.value"
           :link="'/earnings/past-payout'"
           :desc="nextPayDate.due"
           :value="nextPayDate.value"
