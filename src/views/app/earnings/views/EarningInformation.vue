@@ -51,6 +51,7 @@
           :link="'/settings/accounts'"
           :desc="`Settlement account (${settlement.accountName})`"
           :value="settlement.value"
+          v-if="settlement.value"
           :is-loading="isFetchingUnsettledEarnings"
         >
         <template #iconPlaceHolder>
@@ -319,7 +320,7 @@ export default defineComponent({
       },
       settlement: {
         partnerId: '',
-        value: 0 as any,
+        value: '',
         accountName: '---',
 
       },
