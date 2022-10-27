@@ -9,7 +9,7 @@
                 <v-select
                   class="form-group"
                   :options="cities"
-                  :reduce="(city) => city.id"
+                  :reduce="(city) => city.city_id"
                   v-model="city_ids"
                   label="name"
                   multiple
