@@ -46,7 +46,7 @@
       <spinner></spinner>
     </div>
     <template v-else>
-       <router-view></router-view>
+      <router-view></router-view>
     </template>
   </page-layout>
 </template>
