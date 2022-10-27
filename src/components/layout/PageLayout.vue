@@ -8,7 +8,7 @@
           <div class="dashboard-name text-xl font-medium">
             {{ pageTitle }}
           </div>
-          <div class="p-4 bg-black text-white rounded-lg font-medium">{{companyName}}</div>
+          <div class="py-3 px-5 bg-black text-white rounded-lg font-medium">{{companyName}}</div>
         </div>
         <slot name="breadcrumbs"></slot>
         <hr class="mt-5 mb-0 hidden" />

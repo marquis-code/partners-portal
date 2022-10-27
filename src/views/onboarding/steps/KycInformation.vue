@@ -227,7 +227,7 @@
         </button>
       </div>
       <div class="flex space-x-5" v-if="activeView === 1">
-        <button
+        <!-- <button
           class="
             rounded-md
             w-32
@@ -245,7 +245,7 @@
           @click.prevent="previous()"
         >
           Go back
-        </button>
+        </button> -->
         <button
           class="
             rounded-md

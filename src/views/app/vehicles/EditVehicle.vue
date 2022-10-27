@@ -13,7 +13,7 @@
         </template>
       </PageActionHeader>
     </template>
-    <main class="space-y-16 bg-white py-8 lg:w-10/12 mx-auto" >
+    <main class="space-y-16 bg-white py-8 lg:w-10/12" >
       <div class="flex justify-center pl-3 md:pl-0 lg:w-10/12 mx-auto items-center md:space-x-3 w-full">
         <div class="flex items-center space-x-1">
           <p
