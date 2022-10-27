@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="flex justify-between items-center">
-      <h1 class="text-gray-400 font-medium">Trips</h1>
+      <h1 class="text-gray-400 font-medium">Completed trips this month</h1>
     </div>
     <div class="flex justify-center items-center">
       <apexchart
@@ -18,10 +18,25 @@
 <script lang="ts">
 import { defineComponent } from '@vue/runtime-core';
 import VueApexCharts from 'vue3-apexcharts';
+
 export default defineComponent({
   name: 'BarChart',
   components: {
     apexchart: VueApexCharts
+  },
+  props: {
+    tripDays: Array,
+    tripCounts: Array
+  },
+  created () {
+    this.setDataProps()
+  },
+  methods: {
+    setDataProps () {
+      console.log(this.tripCounts)
+      this.series[0].data = this.tripCounts as any;
+      this.chartOptions.xaxis.categories = this.tripDays as any;
+    }
   },
   data() {
     return {

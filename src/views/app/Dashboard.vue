@@ -91,7 +91,7 @@
         ring-1 ring-gray-50
       "
     >
-      <chart></chart>
+      <chart :tripCounts="partnerStats.monthTripCount" :tripDays="partnerStats.monthTripDays"></chart>
     </section>
     <pie-chart :upcomingTripsCount="partnerStats.partnerUpcomingTrips || 0" :completedTripsCount="partnerStats.partnerCompletedTrips || 0"></pie-chart>
     </div>
@@ -111,6 +111,7 @@ import Chart from '@/components/dashboard/Chart.vue';
 import CheckList from '@/components/CheckList.vue';
 import { extractErrorMessage } from '@/utils/helper';
 import Spinner from '@/components/layout/Spinner.vue';
+import moment from 'moment';
 
 export default defineComponent({
   components: {
@@ -145,7 +146,9 @@ export default defineComponent({
         partnerCompletedTrips: 0,
         partnerUpcomingTrips: 0,
         ratingCount: 0,
-        ratingOverTen: 0
+        ratingOverTen: 0,
+        monthTripCount: [],
+        monthTripDays: [],
       },
       doneCount: 0,
       isTodoComplete: false
@@ -160,6 +163,26 @@ export default defineComponent({
     this.setTableStates();
   },
   methods: {
+    async getBarChartTripsData () {
+      try {
+        const response = await this.$axios.get(`/v1/partners/${this.partnerContext.partner.id}/trips/stats`) || [];
+        const numberOfTripsPerDay = response.data.map(item => {
+          return item.total
+        })
+        const tripDays = response.data.map(item => {
+          return moment(item.date).format("MMM Do YY");
+        })
+        this.partnerStats.monthTripCount = numberOfTripsPerDay;
+        this.partnerStats.monthTripDays = tripDays;
+      } catch (error) {
+        const errorMessage = extractErrorMessage(
+          error,
+          null,
+          'An error occured while fetching your trips history'
+        );
+        this.$toast.warning(errorMessage);
+      }
+    },
     async getPartnerEarning () {
       try {
         const response = await this.$axios.get(`cost-revenue/v1/partners/${this.partnerContext.partner.account_sid}/earnings-summary`);
@@ -192,7 +215,8 @@ export default defineComponent({
       await this.getPartnerAccruedEarnings();
       await this.getOverallRatings();
       await this.getPartnerEarning();
-      this.checkIfAllTodosAreDone()
+      this.checkIfAllTodosAreDone();
+      this.getBarChartTripsData()
       this.loadingStats = false;
     },
     async getOverallRatings () {
