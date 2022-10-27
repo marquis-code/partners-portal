@@ -32,7 +32,7 @@
             <div class="flex flex-row justify-start w-full">
               <span class="material-icons mr-4">search</span>
               <input
-                v-model.trim="search"
+                v-model.trim="filters.search"
                 class="
                   list-search
                   w-full
@@ -92,7 +92,7 @@
           <app-table
             :loading="loading"
             :error-loading="errorLoading"
-            :items="filteredVehicles"
+            :items="tableData"
             :fields="headers"
             :extraOptions="{ serverSide: true, totalSize: totalRecords }"
             @pageChange="changePage"
@@ -248,6 +248,7 @@ export default defineComponent({
         pageNumber: 1,
         pageSize: 10
       },
+      debounce: null as any,
       serverTotal: null,
       search: '',
       loading: false,
@@ -292,6 +293,12 @@ export default defineComponent({
     },
     'filters.pageSize'() {
       this.fetchVehicles();
+    },
+    'filters.search'() {
+      clearTimeout(this.debounce);
+      this.debounce = setTimeout(() => {
+        this.fetchVehicles();
+      }, 600);
     }
   },
   methods: {
@@ -314,7 +321,7 @@ export default defineComponent({
       };
       this.$axios
         .get(
-          `/v1/partner/${this.partnerContext.partner?.id}/vehicles?page=${this.filters.pageNumber}&limit=${this.filters.pageSize}`,
+          `/v1/partner/${this.partnerContext.partner?.id}/vehicles?page=${this.filters.pageNumber}&limit=${this.filters.pageSize}&search=${this.filters.search}`,
           {
             params
           }
