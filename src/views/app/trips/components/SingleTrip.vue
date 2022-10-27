@@ -92,8 +92,8 @@
             <div class="space-y-1">
               <p class="text-xs font-medium">Vehicle</p>
               <p class="text-xs font-light">
-                {{ tripData?.driver?.vehicle?.brand ?? 'N/A' }}
-                {{ tripData?.driver?.vehicle?.name ?? 'N/A' }}
+                {{ tripData?.driver?.vehicle?.brand || tripData?.vehicle?.brand || 'N/A' }}
+                {{ tripData?.driver?.vehicle?.name || tripData?.vehicle?.brand || 'N/A' }}
               </p>
             </div>
           </div>
@@ -101,7 +101,7 @@
             class="text-indigo-500 underline text-xs"
             :to="{
               name: 'vehicle.detail.info',
-              params: { vehicleId: tripData?.driver?.vehicle?.id ?? 'N/A' }
+              params: { vehicleId: tripData?.driver?.vehicle?.id || tripData?.vehicle?.id || 'N/A' }
             }"
             >View vehicle</router-link
           >
@@ -113,7 +113,7 @@
             <div class="space-y-1">
               <p class="text-xs font-medium">Plate number</p>
               <p class="text-xs font-light">
-                {{ tripData?.driver?.vehicle?.registration_number ?? 'N/A' }}
+                {{ tripData?.driver?.vehicle?.registration_number || tripData?.vehicle?.registration_number || 'N/A' }}
               </p>
             </div>
           </div>
