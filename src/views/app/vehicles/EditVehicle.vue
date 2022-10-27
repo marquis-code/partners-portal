@@ -4,9 +4,9 @@
       <PageActionHeader>
         <template #breadcrumbs>
           <div class="flex items-center space-x-3 py-3">
-            <p class="text-gray-400 text-sm">Dashboard</p>
+            <router-link to="/" class="text-gray-400 text-sm">Dashboard</router-link>
             <img src="@/assets/images/breadcrumbs.svg" />
-            <p class="text-gray-400 text-sm">Vehicle management</p>
+            <router-link to="/vehicles" class="text-gray-400 text-sm">Vehicles</router-link>
             <img src="@/assets/images/breadcrumbs.svg" />
             <p class="text-gray-900 text-sm">Update Vehicle Information</p>
           </div>

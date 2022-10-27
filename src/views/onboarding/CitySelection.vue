@@ -5,25 +5,17 @@
         <form class="w-full max-w-xl mx-auto">
           <div class="flex flex-col">
             <div class="flex flex-col space-y-2">
-                <label class="text-grays-black-5 font-medium text-sm">Cities (Select Multiple Cities)</label>
-                  <select
-                    class="py-3 px-5 border-none placeholder:text-grays-black-7
-                    outline-none ring-1 border text-sm rounded-md placeholder-opacity-50"
-                    @change="selectThisCity($event)">
-                    <option disabled selected>Select a City</option>
-                    <option
-                      v-for="(city,index) in cities"
-                      :key="index"
-                      :value="index">
-                      {{city.city.name}}
-                    </option>
-                </select>
+                <label class="text-grays-black-5 font-medium text-sm p-1">Cities (You can select multiple Cities)</label>
+                <v-select
+                  class="form-group"
+                  :options="cities"
+                  :reduce="(city) => city.id"
+                  v-model="city_ids"
+                  label="name"
+                  multiple
+                  required>
+                </v-select>
                 </div>
-            <div class="mt-4 flex flex-wrap">
-                <span v-for="(city, index) in selectedCities" :key="city.city.id">
-                  <SelectedCityBadge class="mr-2" :value="city" @removeCity="removeCity(index)"></SelectedCityBadge>
-                </span>
-            </div>
                 <button
                   :disabled="loading || loadingData"
                   @click.prevent="savePartnerCities()"
@@ -41,7 +33,7 @@
 import OnboardingLayout from '@/views/layouts/OnboardingLayout.vue';
 import FormContainer from '@/views/layouts/FormContainer.vue';
 import CenteredPageHeader from '@/components/CenteredPageHeader.vue'
-import SelectedCityBadge from '@/components/SelectedCityBadge.vue'
+// import SelectedCityBadge from '@/components/SelectedCityBadge.vue'
 import {mapGetters} from "vuex";
 import {extractErrorMessage} from "@/utils/helper";
 export default {
@@ -53,13 +45,14 @@ export default {
       cities: [],
       loading: false,
       loadingData: false,
+      city_ids: []
     }
   },
   components: {
     OnboardingLayout,
     FormContainer,
     CenteredPageHeader,
-    SelectedCityBadge
+    // SelectedCityBadge
   },
   created () {
     this.fetchCities();
@@ -70,28 +63,27 @@ export default {
       user: 'auth/user'
     })
   },
+  watch: {
+    city_ids() {
+      console.log(typeof this.city_ids)
+    }
+  },
   methods: {
-    selectThisCity (event) {
-      const newAddition = this.cities[event.target.value];
-      const index = this.selectedCities.findIndex(o => o.city.id === newAddition?.city.id);
-      if (index < 0) {
-        this.selectedCities.push(newAddition)
-      }
-    },
     fetchCities () {
       this.loadingData = true;
-      this.$axios.get('/v1/city').then(res => {
+      this.$axios.get('/v1/city/all?limit=1000').then(res => {
         this.cities = res.data.data;
+        console.log(res.data.data)
       }).finally(() => {
         this.loadingData = false;
       });
     },
     async savePartnerCities () {
-      if (this.selectedCities.length) {
+      if (this.city_ids.length) {
         try {
           this.loading = true;
-          await Promise.all([...(this.selectedCities.map(city =>
-            this.$axios.post(`v1/partners/${this.contextOrg?.partner?.id}/cities`, {city_id: city.city.id})))]);
+          await Promise.all([...(this.city_ids.map(cityId =>
+            this.$axios.post(`v1/partners/${this.contextOrg?.partner?.id}/cities`, {city_id: cityId})))]);
           await this.$store.dispatch('auth/refreshActiveContext', this.user.id);
           this.$toast.success('Partner account created');
           await this.$router.push({name: 'dashboard'})
@@ -109,8 +101,5 @@ export default {
       this.selectedCities.splice(index, 1);
     }
   },
-  beforeUnmount () {
-    // this.$shModal.close();
-  }
 }
 </script>

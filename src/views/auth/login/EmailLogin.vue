@@ -51,7 +51,7 @@
 
       <div class="flex justify-center items-center space-x-2 text-sm md:text-base font-medium">
         <span class="text-grays-black-3">Do you want to be a partner?</span>
-        <p @click="$emit('goToSignUp')" class="text-indigo-600 text-sm md:text-base">Join now</p>
+        <p @click="$emit('goToSignUp')" class="text-indigo-600 text-sm md:text-base cursor-pointer">Join now</p>
       </div>
     </div>
   </form>
