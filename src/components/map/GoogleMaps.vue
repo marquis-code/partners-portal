@@ -1,5 +1,6 @@
 <template>
   <GoogleMap
+    ref="googleMapInstance"
     :api-key="mapAPIKey"
     style="width: 100vw; height: 100vh"
     :center="centerLocation"
@@ -52,6 +53,9 @@ export default defineComponent({
   created () {
     this.flightPath.path = this.routeLine || [];
     console.log(this.mapAPIKey)
-  }
+  },
+  mounted () {
+  },
+  methods:
 });
 </script>
