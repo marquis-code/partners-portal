@@ -10,8 +10,8 @@ export interface Geometry {
 export const formatGeometry = (pointList: Geometry[]): LocationType[] => {
   return pointList.map(point => {
     return {
-      lat: point.x,
-      lng: point.y
+      lng: point.x,
+      lat: point.y
     }
   })
 }
