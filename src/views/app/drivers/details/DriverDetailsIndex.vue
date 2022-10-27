@@ -52,7 +52,7 @@
               v-if="showDropdown"
               class="
                 absolute
-                top-36
+                top-40
                 bottom-0
                 right-7
                 h-36
