@@ -317,6 +317,7 @@ export const AppRoutes: Array<RouteRecordRaw> = [
                   title: 'Trip Details',
                   requiresAuth: true
                 },
+                props: true
               },
               {
                 path: 'manifest',
@@ -328,6 +329,16 @@ export const AppRoutes: Array<RouteRecordRaw> = [
                 },
               }
             ]
+          },
+          {
+            path: 'information/upcoming/:tripId',
+            name: 'trip.detail.info.upoming',
+            component: loadRouteComponent('app/trips/details/UpcomingTripInfo'),
+            meta: {
+              title: 'Trip Details',
+              requiresAuth: true
+            },
+            props: true
           },
         ]
       },

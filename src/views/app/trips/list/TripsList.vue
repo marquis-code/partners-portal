@@ -37,7 +37,7 @@
                 cursor-pointer
               "
               :class="
-                this.filters.status === 'active-trips'
+                filters.status === 'active-trips'
                   ? 'text-black border-b-sh-green-500'
                   : 'text-sh-grey-500 border-b-transparent'
               "
@@ -56,7 +56,7 @@
                 cursor-pointer
               "
               :class="
-                this.filters.status === 'upcoming-trips'
+                filters.status === 'upcoming-trips'
                   ? 'text-black border-b-sh-green-500'
                   : 'text-sh-grey-500 border-b-transparent'
               "
@@ -75,7 +75,7 @@
                 cursor-pointer
               "
               :class="
-                this.filters.status === 'completed-trips'
+                filters.status === 'completed-trips'
                   ? 'text-black border-b-sh-green-500'
                   : 'text-sh-grey-500 border-b-transparent'
               "
@@ -105,9 +105,15 @@
                   hover:decoration-sh-green-500
                   hover:text-sh-green-500
                 "
-                :to="{
+                :to="
+                filters.status !== 'upcoming-trips' ?
+                {
                   name: 'trip.detail.info',
-                  params: { tripId: item.id }
+                  params: { tripId: item.id}
+                } :
+                {
+                  name: 'trip.detail.info.upoming',
+                  params: { tripId: item.id}
                 }"
                 >{{ item?.createdAt ?? 'N/A' }}</router-link
               >
@@ -121,9 +127,15 @@
                   hover:decoration-sh-green-500
                   hover:text-sh-green-500
                 "
-                :to="{
+                :to="
+                filters.status !== 'upcoming-trips' ?
+                {
                   name: 'trip.detail.info',
-                  params: { tripId: item.id }
+                  params: { tripId: item.id}
+                } :
+                {
+                  name: 'trip.detail.info.upoming',
+                  params: { tripId: item.id}
                 }"
                 >{{ item?.routeCode ?? 'N/A' }}</router-link
               >
@@ -137,9 +149,15 @@
                   hover:decoration-sh-green-500
                   hover:text-sh-green-500
                 "
-                :to="{
+                :to="
+                filters.status !== 'upcoming-trips' ?
+                {
                   name: 'trip.detail.info',
-                  params: { tripId: item.id }
+                  params: { tripId: item.id}
+                } :
+                {
+                  name: 'trip.detail.info.upoming',
+                  params: { tripId: item.id}
                 }"
                 >{{ item?.passengersCount ?? 'N/A' }}</router-link
               >
@@ -170,9 +188,15 @@
                   hover:decoration-sh-green-500
                   hover:text-sh-green-500
                 "
-                :to="{
+                :to="
+                filters.status !== 'upcoming-trips' ?
+                {
                   name: 'trip.detail.info',
-                  params: { tripId: item.id }
+                  params: { tripId: item.id}
+                } :
+                {
+                  name: 'trip.detail.info.upoming',
+                  params: { tripId: item.id}
                 }"
               >
                 <trip-history
@@ -311,22 +335,6 @@ export default defineComponent({
         status: this.filters.status,
         metadata: true
       };
-      this.$axios
-        .get(
-          `/v1/partners/${this.partnerContext.partner.id}/${params.status}?metadata=${params.metadata}&page=${this.filters.pageNumber}&limit=${this.filters.pageSize}&search=${this.filters.search}`
-        )
-        .then((res) => {
-          const trips = this.transformActiveOrUpcomingTrips(res?.data?.data);
-          this.tableData = trips;
-          this.totalRecords = res?.data?.metadata?.total;
-        })
-        .catch((err) => {
-          this.$toast.error(err?.response?.data?.message || 'An error occured');
-        })
-        .finally(() => {
-          this.loading = false;
-        });
-
       if (params.status === 'completed-trips') {
         this.$axios
           .get(
@@ -339,6 +347,24 @@ export default defineComponent({
           })
           .catch((err) => {
             this.$toast.error(err.response.data.message || 'An error occured');
+          })
+          .finally(() => {
+            this.loading = false;
+          });
+      } else {
+        this.$axios
+          .get(
+            `/v1/partners/${this.partnerContext.partner.id}/${params.status}?metadata=${params.metadata}&page=${this.filters.pageNumber}&limit=${this.filters.pageSize}&search=${this.filters.search}`
+          )
+          .then((res) => {
+            const trips = this.transformActiveOrUpcomingTrips(res?.data?.data);
+            this.tableData = trips;
+            this.totalRecords = res?.data?.metadata?.total;
+          })
+          .catch((err) => {
+            this.$toast.error(
+              err?.response?.data?.message || 'An error occured'
+            );
           })
           .finally(() => {
             this.loading = false;
