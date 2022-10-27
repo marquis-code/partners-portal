@@ -87,7 +87,7 @@ export default defineComponent({
   props: {
     isRouteable: Boolean,
     desc: String,
-    value: Number,
+    value: Number || String,
     link: String,
     bottomDesc: String,
     bottomDescValue: String,

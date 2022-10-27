@@ -12,8 +12,5 @@ export default defineComponent({
     'title',
     'link'
   ],
-  mounted() {
-    console.log(this.$props);
-  }
 })
 </script>
