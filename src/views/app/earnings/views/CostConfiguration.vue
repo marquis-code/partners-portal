@@ -218,7 +218,7 @@ export default defineComponent({
         { label: 'Itinerary', key: 'itinerary' },
         { label: 'Driver', key: 'driver' },
         { label: 'Vehicle', key: 'vehicle' },
-        { label: 'Cost (₦)', key: 'cost' },
+        { label: 'Supply Cost (₦)', key: 'cost' },
       ],
       tableData: [] as Array<any>,
       isFetchingAllEarnings: false,

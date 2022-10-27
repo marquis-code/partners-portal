@@ -159,6 +159,7 @@ export default defineComponent({
         const response = await this.$axios.get(
           `/cost-revenue/v1/trips/${params?.id}/revenues`
         );
+        console.log(response.data);
         if (response.status === 200) {
           const {
             driver,
@@ -173,11 +174,12 @@ export default defineComponent({
           const {
             totalDeductedAmount,
             deductions,
+            partnersRevenue,
             finalPartnersRevenue,
           } = response.data;
 
           this.netIncome = finalPartnersRevenue;
-
+          this.supplyCost = partnersRevenue;
           this.driver = {
             driverId,
             name: `${driver?.fname} ${driver?.lname}`,
