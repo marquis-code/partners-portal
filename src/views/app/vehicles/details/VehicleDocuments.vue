@@ -1,5 +1,6 @@
 <template>
   <div>
+    <!-- <p class="text-lg mb-2">Vehicle Documents</p> -->
     <div class="space-y-5 ring-1 ring-gray-50 shadow-sm rounded-sm bg-white">
       <app-table
         :loading="loading"
@@ -137,11 +138,20 @@
           </button>
           <button
             :disabled="uploadingDoc || savingForm"
-            class="rounded-lg bg-sh-green-500 w-32 md:w-40 py-2 flex flex-row justify-center items-center"
+            class="
+              rounded-lg
+              bg-sh-green-500
+              w-32
+              md:w-40
+              py-2
+              flex flex-row
+              justify-center
+              items-center
+            "
             :class="uploadingDoc ? 'bg-sh-green-100' : 'bg-sh-green-500'"
             @click="updateThisDocument"
           >
-            <span><Spinner v-if="savingForm"/></span>
+            <span><Spinner v-if="savingForm" /></span>
             <span>{{ savingForm ? 'Processing' : 'Save' }}</span>
           </button>
         </div>
@@ -212,10 +222,90 @@
             @click="addThisNewDocument"
           >
             <span><Spinner v-if="savingForm" /></span>
-            <span>{{ uploadingDoc || savingForm ? 'Processing' : 'Save' }}</span>
+            <span>{{
+              uploadingDoc || savingForm ? 'Processing' : 'Save'
+            }}</span>
           </button>
         </div>
       </app-modal>
+    </div>
+    <div v-if="cityDocumentTableData.length > 0" class="text-lg mt-10">
+      <p>City Documents</p>
+      <app-table
+        :loading="loadingCityDoc"
+        :error-loading="errorLoadingCityDoc"
+        :items="cityDocumentTableData"
+        :fields="headers"
+      >
+        <!-- <template v-slot:status="{ item }">
+          <span v-if="item.status === 'submitted'" class="text-sh-green-700"
+            >Summitted</span
+          >
+          <span v-if="item.status === 'Not uploaded'" class="text-sh-yellow-800"
+            >Not uploaded</span
+          >
+        </template>
+        <template v-slot:expiry="{ item }">
+          <span
+            v-if="item.expiry && item.require_expiration_date"
+            class="text-sm text-sh-green-700"
+            >{{ item.expiry }}</span
+          >
+          <span
+            v-if="item.expiry === null && item.require_expiration_date"
+            class="text-sm"
+            >Required</span
+          >
+          <span
+            v-if="
+              item.expiry === null && item.require_expiration_date === false
+            "
+            class="text-sm"
+            >Not required</span
+          >
+        </template>
+        <template v-slot:actions="{ item }">
+          <span v-if="item.status === 'submitted'">
+            <span
+              @click="showImage(item.actions.docUrl)"
+              class="mr-4 border-2 rounded-md px-3 py-2 border-black"
+              >View</span
+            >
+            <span
+              v-if="item.actions"
+              @click="openDocumentUploadModal(item.actions.doc)"
+              class="
+                mr-4
+                border-2
+                rounded-md
+                px-3
+                py-2
+                border-black
+                text-white
+                bg-black
+              "
+              >Update</span
+            >
+          </span>
+          <span v-else>
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+            <span
+              @click="openDocumentadditionModal(item)"
+              class="
+                mr-4
+                border-2
+                rounded-md
+                px-3
+                py-2
+                border-black
+                text-white
+                bg-black
+              "
+              >Upload</span
+            >
+          </span>
+        </template> -->
+      </app-table>
     </div>
     <br />
     <br />
@@ -233,14 +323,14 @@ import Spinner from '@/components/layout/Spinner.vue';
 import moment from 'moment';
 
 interface AddVehicleDocumentType {
-    files?: string[],
-    document_type?: string,
-    expiry_date?: string
+  files?: string[];
+  document_type?: string;
+  expiry_date?: string;
 }
 export default defineComponent({
   name: 'VehicleDocuments',
   components: { AppTable, AppModal, ImageUploadInModal, Spinner },
-  data () {
+  data() {
     return {
       docToUpdate: {
         id: null,
@@ -259,6 +349,8 @@ export default defineComponent({
         files: '',
         require_expiration_date: false
       },
+      loadingCityDoc: false,
+      errorLoadingCityDoc: false,
       showDocumentAddingModal: false,
       // end of docu edit param
       loading: false,
@@ -268,6 +360,7 @@ export default defineComponent({
       showDocumentUpdateModal: false,
       vehicleTableData: [] as Array<any>,
       documentTableData: [] as Array<any>,
+      cityDocumentTableData: [] as Array<any>,
       errorLoading: null,
       selectedDropDown: -1,
       visibleRef: false,
@@ -294,12 +387,12 @@ export default defineComponent({
       isLoading: 'vehicle/getVehicleLoading'
     })
   },
-  mounted () {
+  mounted() {
     this.fetchAllDocuments();
     // this.fetchVehicleDocuments();
   },
   methods: {
-    openDocumentUploadModal (doc: any) {
+    openDocumentUploadModal(doc: any) {
       // open the modal
       this.showDocumentUpdateModal = true;
       // initialize the docs to update
@@ -316,14 +409,14 @@ export default defineComponent({
         : null;
       this.docToUpdate.require_expiration_date = !!doc.require_expiration_date;
     },
-    openDocumentadditionModal (doc: any) {
+    openDocumentadditionModal(doc: any) {
       // open the modal
       this.showDocumentAddingModal = true;
       // initialize the docs to update
       this.docToAdd.document_type = doc?.type;
       this.docToAdd.require_expiration_date = !!doc.require_expiration_date;
     },
-    async updateThisDocument () {
+    async updateThisDocument() {
       const payload = {
         partner_id: this.docToUpdate.partner_id,
         files: [this.docToUpdate.files],
@@ -348,7 +441,7 @@ export default defineComponent({
         this.savingForm = false;
       }
     },
-    async addThisNewDocument () {
+    async addThisNewDocument() {
       const payload: AddVehicleDocumentType = {
         document_type: this.docToAdd.document_type,
         files: [this.docToAdd.files]
@@ -375,11 +468,11 @@ export default defineComponent({
         this.savingForm = false;
       }
     },
-    cancleDocumentChange () {
+    cancleDocumentChange() {
       this.uploadingDoc = false;
       this.showDocumentUpdateModal = false;
     },
-    async uploadTos3andGetDocumentUrl (file: string | Blob): Promise<any> {
+    async uploadTos3andGetDocumentUrl(file: string | Blob): Promise<any> {
       try {
         const formData = new FormData();
         formData.append('file', file);
@@ -396,7 +489,7 @@ export default defineComponent({
         );
       }
     },
-    async selectThisNewDocument ($event: any) {
+    async selectThisNewDocument($event: any) {
       const fileHolder = $event;
       this.uploadingDoc = true;
       const fileUrl = await this.uploadTos3andGetDocumentUrl(fileHolder);
@@ -409,24 +502,24 @@ export default defineComponent({
         `${this.docToUpdate.document_type} has been uploaded`
       );
     },
-    removeExistingDoc () {
+    removeExistingDoc() {
       this.docToUpdate.files = '';
       this.docToUpdate.expiry_date = '';
     },
-    onHide () {
+    onHide() {
       this.visibleRef = false;
     },
-    showImage (imgUrl: any) {
+    showImage(imgUrl: any) {
       this.imgsRef = [imgUrl];
       this.onShow();
     },
-    onShow () {
+    onShow() {
       this.visibleRef = true;
     },
-    closeDocumentUploadModal () {
+    closeDocumentUploadModal() {
       this.uploadingDoc = false;
     },
-    fetchVehicleDocuments () {
+    fetchVehicleDocuments() {
       this.loading = true;
       this.$axios
         .get(
@@ -451,6 +544,8 @@ export default defineComponent({
           this.documentTableData =
             this.structureDocumentTable(vehicleDocuments) || [];
           // const cityDocuments = r.data.cityDocuments;
+          // console.log(cityDocuments);
+          // const cityDocuments = r.data.cityDocuments;
           // const cityDocumentsObject =
           //   this.structureCityDocuments(cityDocuments);
           // if (cityDocumentsObject) {
@@ -461,7 +556,7 @@ export default defineComponent({
           this.loading = false;
         });
     },
-    structureCityDocuments (cityDocumentArray: Array<any>) {
+    structureCityDocuments(cityDocumentArray: Array<any>) {
       const cityRequiredDocuments = cityDocumentArray?.[0]?.required_document;
       const cityDocumentObect = cityDocumentArray?.[0].documents?.[0];
       const cityDoc = {
@@ -479,7 +574,7 @@ export default defineComponent({
       };
       return cityDoc;
     },
-    structureDocumentTable (documentResponseResponse: Array<any>): [] {
+    structureDocumentTable(documentResponseResponse: Array<any>): [] {
       const newDocumentsList: any = [];
       documentResponseResponse.forEach((doc) => {
         const docRequireExpiryDate =
@@ -503,11 +598,11 @@ export default defineComponent({
       });
       return newDocumentsList;
     },
-    selectThis (dropDownId: number) {
+    selectThis(dropDownId: number) {
       this.selectedDropDown = dropDownId;
     },
     // adding yet to be added document
-    async addYetToBeAddedDocument ($event: any) {
+    async addYetToBeAddedDocument($event: any) {
       const fileHolder = $event;
       this.uploadingDoc = true;
       const fileUrl = await this.uploadTos3andGetDocumentUrl(fileHolder);
@@ -518,9 +613,9 @@ export default defineComponent({
       this.docToAdd.files = fileUrl;
       this.$toast.success(`${this.docToAdd.document_type} uploaded`);
     },
-    removeYetToBeAddedDocument () {
+    removeYetToBeAddedDocument() {
       this.docToAdd.files = '';
-    },
+    }
   }
 });
 </script>

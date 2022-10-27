@@ -5,11 +5,11 @@
         <form class="w-full max-w-xl mx-auto">
           <div class="flex flex-col">
             <div class="flex flex-col space-y-2">
-                <label class="text-grays-black-5 font-medium text-sm">Cities (Select Multiple Cities)</label>
+                <label class="text-grays-black-5 font-medium text-sm p-1">Cities (You can select multiple Cities)</label>
                 <v-select
                   class="form-group"
                   :options="cities"
-                  :reduce="(city) => city.city_id"
+                  :reduce="(city) => city.id"
                   v-model="city_ids"
                   label="name"
                   multiple
