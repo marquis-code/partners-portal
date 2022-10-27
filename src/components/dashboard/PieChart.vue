@@ -22,7 +22,7 @@
       height="250"
       type="donut"
       :options="chartOptions"
-      :series="series"
+      :series="[completedTripsCount, upcomingTripsCount]"
     ></apexchart>
   </div>
 </template>
@@ -35,11 +35,15 @@ export default defineComponent({
   components: {
     apexchart: VueApexCharts
   },
+  props: {
+    completedTripsCount: Number,
+    upcomingTripsCount: Number
+  },
   data() {
     return {
-      series: [44, 55],
+      // series: [100, 55],
       chartOptions: {
-        labels: [`Completed trips: 0 trips`, `Incompleted trips: 0 trips`],
+        labels: [`Completed trips: ${this.completedTripsCount || 0} trips`, `Incompleted trips: ${this.upcomingTripsCount || 0} trips`],
         colors: ['#20E682', '#E8E8E8'],
         chart: {
           type: 'donut'

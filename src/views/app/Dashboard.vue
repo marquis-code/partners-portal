@@ -1,5 +1,7 @@
 <template>
   <page-layout page-title="Welcome">
+    <div v-if="loadingStats"><spinner/></div>
+    <div v-else>
     <div
       class="
         p-6
@@ -17,40 +19,40 @@
           <CheckList
             class="text-xs md:text-base"
             :item="`Identity verification`"
-            :status="'under-review'"
+            :status="partnerStats.hasCompletedIdentityVerification === 'completed' ? 'completed' : 'under-review'"
             :actionRoute="``"
           />
           <CheckList
             class="text-xs md:text-base"
             :item="`Address verification`"
-            :status="'under-review'"
+            :status="partnerStats.hasCompletedAddressVerification === 'completed' ? 'completed' : 'under-review'"
             :actionRoute="``"
           />
           <CheckList
             class="text-xs md:text-base"
             :item="`Upload company documents`"
-            :status="'pending'"
+            :status="partnerStats.hasUploadedCompanyDoc ? 'completed' : 'pending'"
             :actionRoute="`/dashboard/company-kyc`"
           />
 
           <CheckList
             class="text-xs md:text-base"
             :item="`Add a Driver (Optional)`"
-            :status="'pending'"
+            :status="partnerStats.hasADriver ? 'completed' : 'pending'"
             :actionRoute="`/drivers/add-driver`"
           />
           <CheckList
             routeName="addVehicle"
             class="text-xs md:text-base"
             :item="`Add a vehicle`"
-            :status="'pending'"
+            :status="partnerStats.hasAVehicle ? 'completed' : 'pending'"
             :actionRoute="`/vehicles/add-vehicle`"
           />
 
           <CheckList
             class="text-xs md:text-base"
             :item="`Settlement Account details`"
-            :status="'pending'"
+            :status="partnerStats.hasSettlementAccount ? 'completed' : 'pending'"
             :actionRoute="`/add-account`"
           />
         </div>
@@ -62,7 +64,7 @@
           </p>
           <p class="text-sm md:text-base">
             You’re doing well,
-            <span class="text-sh-purple-700 underline">3 of 5</span> steps to be
+            <span class="text-sh-purple-700 underline">{{doneCount}} of 6</span> steps to be
             completed
           </p>
         </div>
@@ -70,10 +72,10 @@
     </div>
     <h1 class="font-medium text-gray-800 py-5">Overview</h1>
     <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      <earnings></earnings>
-      <vehicles></vehicles>
-      <drivers></drivers>
-      <ratings></ratings>
+      <earnings :accruedEarnings="partnerStats.partnerAccruedEarnings"></earnings>
+      <vehicles :vehiclesCount="partnerStats.partnerVehicleCount"></vehicles>
+      <drivers :driversCount="partnerStats.partnerDriverCount"></drivers>
+      <ratings :count="partnerStats.ratingCount" :rating="partnerStats.ratingOverTen"></ratings>
     </section>
 
     <section
@@ -90,7 +92,8 @@
     >
       <chart></chart>
     </section>
-    <pie-chart></pie-chart>
+    <pie-chart :upcomingTripsCount="partnerStats.partnerUpcomingTrips || 0" :completedTripsCount="partnerStats.partnerCompletedTrips || 0"></pie-chart>
+    </div>
   </page-layout>
 </template>
 
@@ -106,6 +109,8 @@ import PieChart from '@/components/dashboard/PieChart.vue';
 import Chart from '@/components/dashboard/Chart.vue';
 import CheckList from '@/components/CheckList.vue';
 import { extractErrorMessage } from '@/utils/helper';
+import Spinner from '@/components/layout/Spinner.vue';
+
 export default defineComponent({
   components: {
     PageLayout,
@@ -115,15 +120,33 @@ export default defineComponent({
     Vehicles,
     Chart,
     Ratings,
-    PieChart
+    PieChart,
+    Spinner
   },
-  data() {
+  data () {
     return {
       partnerEarnings: null,
       partnerVehicles: null,
       partnerDrivers: null,
       partnerTrips: null,
-      loading: false
+      loading: false,
+      loadingStats: false,
+      partnerStats: {
+        hasADriver: null,
+        hasAVehicle: null,
+        hasUploadedCompanyDoc: null,
+        hasSettlementAccount: null,
+        hasCompletedAddressVerification: 'under-review',
+        hasCompletedIdentityVerification: 'under-review',
+        partnerDriverCount: 0,
+        partnerVehicleCount: 0,
+        partnerAccruedEarnings: 0,
+        partnerCompletedTrips: 0,
+        partnerUpcomingTrips: 0,
+        ratingCount: 0,
+        ratingOverTen: 0
+      },
+      doneCount: 0,
     };
   },
   computed: {
@@ -131,36 +154,100 @@ export default defineComponent({
       partnerContext: 'auth/activeContext'
     })
   },
-  init() {
-    this.fetchPartnersStats();
+  created () {
+    this.setTableStates();
   },
   methods: {
-    async fetchPartnersStats(partnerId) {
-      this.loading = true;
-      Promise.all([
-        await this.$axios.get(`/v1/earnings/${partnerId}`),
-        await this.$axios.get(`/v1/vehicles/${partnerId}`),
-        await this.$axios.get(`/v1/drivers/${partnerId}`),
-        await this.$axios.get(`/v1/trips/${partnerId}`)
-      ])
-        .then((res) => {
-          this.partnerEarnings = res[0].data;
-          this.partnerVehicles = res[1].data;
-          this.partnerDrivers = res[2].data;
-          this.partnerTrips = res[3].data;
-        })
-        .catch((err) => {
-          const errorMessage = extractErrorMessage(
-            err,
-            null,
-            'Oops! An error occurred, please try again.'
-          );
-          this.$toast.error(errorMessage);
-        })
-        .finally(() => {
-          this.loading = false;
-        });
-    }
+    async setTableStates () {
+      this.loadingStats = true;
+      this.checkIdentityStatuses();
+      await this.fetchDashboardSummary();
+      await this.checkIfSettlementAccountHasBeenProvided();
+      await this.getPartnerAccruedEarnings();
+      await this.getOverallRatings();
+      this.loadingStats = false;
+    },
+    async getOverallRatings () {
+      try {
+        // Use this to filter if and when the need arises
+        // this.$axios.get(`/ratings/partners/${this.partnerContext.partner.id}?creation_date_start=2021-02-33&creation_date_end=2021-02-33`)
+        const response = await this.$axios.get(`v1/ratings/partners/${this.partnerContext.partner.id}`);
+        console.log(response.data)
+        this.partnerStats.ratingCount = response.data.count;
+        this.partnerStats.ratingOverTen = response.data.rating;
+      } catch (error) {
+        const errorMessage = extractErrorMessage(
+          error,
+          null,
+          'Oops! An error occurred, please try again.'
+        );
+        this.$toast.error(errorMessage);
+      }
+    },
+    async getPartnerAccruedEarnings () {
+      try {
+        const response = await this.$axios.get(`/cost-revenue/v1/partners/${this.partnerContext.partner.account_sid}/earnings`);
+        this.partnerStats.partnerAccruedEarnings = response.data.amount;
+      } catch (error) {
+        const errorMessage = extractErrorMessage(
+          error,
+          null,
+          'Oops! An error occurred, please try again.'
+        );
+        this.$toast.error(errorMessage);
+      }
+    },
+    checkIdentityStatuses () {
+      console.log(this.partnerContext.onboardingState.address)
+      console.log(this.partnerContext.onboardingState.identity)
+      if (this.partnerContext.onboardingState.address === 'completed') {
+        this.partnerStats.hasCompletedAddressVerification = 'completed';
+        this.doneCount += 1
+      }
+      if (this.partnerContext.onboardingState.identity === 'completed') {
+        this.partnerStats.hasCompletedIdentityVerification = 'completed';
+        this.doneCount += 1
+      }
+    },
+    async checkIfSettlementAccountHasBeenProvided () {
+      try {
+        const response = await this.$axios.get(
+          `/cost-revenue/v1/settlement-accounts?partnerId=${this.partnerContext.partner.account_sid}`
+        );
+        if (response.data?.length) {
+          this.partnerStats.hasSettlementAccount = true;
+          this.doneCount += 1;
+        }
+      } catch (error) {
+        const errorMessage = extractErrorMessage(
+          error,
+          null,
+          'Oops! An error occurred, please try again.'
+        );
+        this.$toast.error(errorMessage);
+      }
+    },
+    async fetchDashboardSummary () {
+      const response = await this.$axios.get(`/v1/partners/${this.partnerContext.partner.id}/summaries`);
+      //  Total driver check
+      this.partnerStats.partnerDriverCount = response.data.total_drivers;
+      if (this.partnerStats.partnerDriverCount > 0) {
+        this.partnerStats.hasADriver = true;
+        this.doneCount += 1;
+      }
+      // Total vehicle check
+      this.partnerStats.partnerVehicleCount = response.data.total_vehicles;
+      if (this.partnerStats.partnerVehicleCount > 0) {
+        this.partnerStats.hasAVehicle = true;
+        this.doneCount += 1;
+      }
+      // Company document check
+      this.partnerStats.hasUploadedCompanyDoc = response.data.companyDocs?.length
+      if (this.partnerStats.hasUploadedCompanyDoc) this.doneCount += 1;
+
+      this.partnerStats.partnerUpcomingTrips = response.data.total_upcoming_trips;
+      this.partnerStats.partnerCompletedTrips = response.data.total_completed_trips;
+    },
   }
 });
 </script>
