@@ -273,7 +273,7 @@ export default defineComponent({
       try {
         this.isFetchingUnsettledEarnings = true;
         const response = await this.$axios.get(
-          `/cost-revenue/v1/partners/${this.partnerContext.partner.id}/earnings-summary`
+          `/cost-revenue/v1/partners/${this.partnerContext.partner.account_sid}/earnings-summary`
         );
         if (response.status === 200) {
           const { amount, updatedAt } = response.data.unsettledEarnings;

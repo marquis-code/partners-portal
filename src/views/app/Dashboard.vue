@@ -160,6 +160,19 @@ export default defineComponent({
     this.setTableStates();
   },
   methods: {
+    async getPartnerEarning () {
+      try {
+        const response = await this.$axios.get(`cost-revenue/v1/partners/${this.partnerContext.partner.account_sid}/earnings-summary`);
+        this.partnerStats.partnerAccruedEarnings = response.data.unsettledEarnings.amount
+      } catch (error) {
+        const errorMessage = extractErrorMessage(
+          error,
+          null,
+          'An error occured while fetching your earnings'
+        );
+        this.$toast.warning(errorMessage);
+      }
+    },
     checkIfAllTodosAreDone () {
       if (this.partnerStats.hasCompletedIdentityVerification === 'completed' &&
           this.partnerStats.hasCompletedAddressVerification === 'completed' &&
@@ -178,6 +191,7 @@ export default defineComponent({
       await this.checkIfSettlementAccountHasBeenProvided();
       await this.getPartnerAccruedEarnings();
       await this.getOverallRatings();
+      await this.getPartnerEarning();
       this.checkIfAllTodosAreDone()
       this.loadingStats = false;
     },
