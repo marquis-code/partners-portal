@@ -33,7 +33,7 @@
             <div class="flex flex-row justify-start w-full">
               <span class="material-icons mr-4">search</span>
               <input
-                v-model.trim="search"
+                v-model.trim="filters.search"
                 class="
                   list-search
                   w-full
@@ -93,7 +93,7 @@
           <app-table
             :loading="loading"
             :error-loading="errorLoading"
-            :items="filteredDrivers"
+            :items="tableData"
             :fields="headers"
             :extraOptions="{ serverSide: true, totalSize: totalRecords }"
             @pageChange="changePage"
@@ -293,8 +293,12 @@ import PageActionHeader from '@/components/PageActionHeader.vue';
 import PageLayout from '@/components/layout/PageLayout.vue';
 import AppModal from '@/components/Modals/AppModal.vue';
 import { extractErrorMessage } from '@/utils/helper';
+// import { vue3Debounce } from 'vue-debounce'
 
 export default defineComponent({
+  // directives: {
+  //   debounce: vue3Debounce({ lock: true })
+  // },
   name: 'DriversList',
   components: {
     PageLayout,
@@ -314,6 +318,12 @@ export default defineComponent({
     },
     'filters.pageSize'() {
       this.fetchDrivers();
+    },
+    'filters.search'() {
+      clearTimeout(this.debounce);
+      this.debounce = setTimeout(() => {
+        this.fetchDrivers();
+      }, 600);
     }
   },
   data() {
@@ -324,6 +334,7 @@ export default defineComponent({
         pageNumber: 1,
         pageSize: 10
       },
+      debounce: null as any,
       showInfoModal: false,
       search: '',
       showSuccessModal: false,
@@ -409,7 +420,7 @@ export default defineComponent({
       this.loading = true;
       this.$axios
         .get(
-          `/v1/partners/${this.userSessionData.activeContext.partner.account_sid}/drivers?active=${this.filters.status}?page=${this.filters.pageNumber}&limit=${this.filters.pageSize}`
+          `/v1/partners/${this.userSessionData.activeContext.partner.account_sid}/drivers?active=${this.filters.status}?page=${this.filters.pageNumber}&limit=${this.filters.pageSize}&search=${this.filters.search}`
         )
         .then((res) => {
           this.tableData = (this.formatApiFormData(res.data.data) as any) || [];

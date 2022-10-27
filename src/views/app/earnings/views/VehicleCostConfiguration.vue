@@ -49,7 +49,7 @@
             </div>
             <div>
               <router-link
-                :to="'/driver/12'"
+                :to="`/driver/details/${driver?.driverId}/information`"
                 title="View driver"
                 class="text-[#4848ED] text-[15px] underline font-[500]"
               >View driver</router-link>
@@ -71,7 +71,7 @@
             </div>
             <div>
               <router-link
-                :to="'/vehicle/12'"
+                :to="`/vehicle/details/${vehicle?.vehicleId}/information`"
                 title="View vehicle"
                 class="text-[#4848ED] text-[15px] underline font-[500]"
               >View vehicle</router-link>
@@ -128,80 +128,89 @@ export default defineComponent({
     PageLayout,
     TripHistory,
   },
+  mounted() {
+    this.init();
+  },
   methods: {
-    triggerDeductionExpand() {
-      this.expand = !this.expand;
-    }
+    async init() {
+      await this.getVehicleInformation();
+    },
+    async getVehicleInformation() {
+      try {
+        const params = this.$route.params;
+        console.log(params);
+        this.isFetchingInformation = true;
+        const response = await this.$axios.get(
+          `/cost-revenue/v1/trips/${params?.id}/revenues`
+        );
+        if (response.status === 200) {
+          const {
+            driver,
+            vehicle,
+            driverId,
+            vehicleId,
+            dropoff,
+            pickup,
+            routeCode,
+          } = response.data.metadata;
+
+          const {
+            totalDeductedAmount,
+            deductions,
+            partnersRevenue,
+          } = response.data;
+
+          this.cost = Intl.NumberFormat('en-us').format(partnersRevenue ?? 0);
+
+          this.driver = {
+            driverId,
+            name: `${driver?.fname} ${driver?.lname}`,
+            avatar: driver?.avatar ?? this.driver.avatar,
+          };
+          this.vehicle = {
+            ...this.vehicle,
+            vehicleId,
+            name: vehicle?.name,
+            licenseNumber: vehicle?.registration_number,
+          };
+          this.route = {
+            ...this.route,
+            pickup,
+            destination: dropoff,
+            route_code: routeCode,
+          };
+        }
+      } catch (e) {
+        console.log(e);
+      } finally {
+        this.isFetchingInformation = false;
+      }
+    },
   },
   data() {
     return {
-      cost: 0,
+      isFetchingInformation: true,
+      cost: 0 as any,
       city: 'Lagos',
       daysAvailable: 'Everyday',
       netIncome: 0,
       currency: '₦',
       vehicle: {
-        name: 'Hiace',
-        licenseNumber: '2323KJK FSD'
-      },
-      deductions: {
-        totalDeduction: 3000,
-        allDeductions: [
-          {
-            cause: 'Bad behaviour',
-            deduction: 1222,
-          }
-        ],
+        vehicleId: undefined,
+        name: '',
+        licenseNumber: ''
       },
       driver: {
-        name: 'Jerry',
+        driverId: undefined,
+        name: '',
         avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80'
       },
       route: {
-        id: 592,
-        pickup: "Town Planning Bus Stop, Ilupeju, Lagos, Nigeria",
-        destination: "Ojora Close, Victoria Island, Lagos, Nigeria",
-        pickup_coordinate: "6.557215, 3.366606",
-        destination_coordinate: "6.4354235, 3.4212791",
-        distance: "19.92 km",
-        duration: "37 mins",
-        total_seats: 4,
-        day_of_week: "MON - FRI",
-        created_at: "2021-11-01 20:07:51",
-        updated_at: "2022-02-24 09:09:13",
-        status: 1,
-        fare: null,
-        visibility: "public",
-        corporate_id: null,
-        is_future_route: 0,
-        support_luggage: 0,
-        luggage_config_id: null,
-        route_code: "IKR104",
-        pickup_route_bus_stop_id: null,
-        destination_route_bus_stop_id: null,
-        is_draft: 0,
-        duration_value: 2193,
-        distance_value: 19922,
-        pickup_geometry: {
-          x: 3.366606,
-          y: 6.557215
-        },
-        destination_geometry: {
-          x: 3.4212791,
-          y: 6.4354235
-        },
-        pickup_search_area_geometry: null,
-        city_id: 25,
-        origin_city_id: 25,
-        destination_city_id: 25,
-        info: null,
-        slug: "town-planning-bus-stop-to-ojora-close",
-        route_availability_days: "[\"sunday\",\"monday\",\"tuesday\",\"wednesday\",\"thursday\",\"friday\",\"saturday\"]",
-        route_availability_start_date: null,
-        route_availability_end_date: null,
-        blacklisted_availability_days: null
+        id: undefined,
+        pickup: "",
+        destination: "",
+        route_code: '',
       },
-      expand: false,
     }
   }
 })

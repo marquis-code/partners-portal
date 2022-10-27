@@ -8,7 +8,7 @@
             <div class="flex flex-row justify-start w-full">
               <span class="material-icons mr-4">search</span>
               <input
-                v-model.trim="search"
+                v-model.trim="filters.search"
                 class="
                   list-search
                   w-full
@@ -90,7 +90,7 @@
             @sizeChange="showPageSize"
             :loading="loading"
             :error-loading="errorLoading"
-            :items="filteredTrips"
+            :items="tableData"
             :fields="
               filters.status === 'completed-trips'
                 ? completedTripsHeaders
@@ -226,6 +226,7 @@ export default defineComponent({
         pageNumber: 1,
         pageSize: 10
       },
+      debounce: null as any,
       search: '',
       loading: false,
       tableData: [] as Array<any>,
@@ -283,6 +284,12 @@ export default defineComponent({
     },
     'filters.pageSize'() {
       this.fetchPartnerTripsFromRevenue();
+    },
+    'filters.search'() {
+      clearTimeout(this.debounce);
+      this.debounce = setTimeout(() => {
+        this.fetchPartnerTripsFromRevenue();
+      }, 600);
     }
   },
   methods: {
@@ -306,12 +313,12 @@ export default defineComponent({
       };
       this.$axios
         .get(
-          `/v1/partners/${this.partnerContext.partner.id}/${params.status}?metadata=${params.metadata}&page=${this.filters.pageNumber}&limit=${this.filters.pageSize}`
+          `/v1/partners/${this.partnerContext.partner.id}/${params.status}?metadata=${params.metadata}&page=${this.filters.pageNumber}&limit=${this.filters.pageSize}&search=${this.filters.search}`
         )
         .then((res) => {
-          const trips = this.transformActiveOrUpcomingTrips(res.data.data);
+          const trips = this.transformActiveOrUpcomingTrips(res?.data?.data);
           this.tableData = trips;
-          this.totalRecords = res.data.metadata?.total;
+          this.totalRecords = res?.data?.metadata?.total;
         })
         .catch((err) => {
           this.$toast.error(err?.response?.data?.message || 'An error occured');

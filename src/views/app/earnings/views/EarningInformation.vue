@@ -106,7 +106,7 @@
             :error-loading="errorLoading"
             :items="tableData"
             :fields="headers"
-            @rowClicked="(e) => viewTableDetails(e?.id)"
+            @rowClicked="(e) => viewTableDetails(e?.tripId)"
           >
             <template v-slot:route="{ item }">
               <trip-history
@@ -118,14 +118,14 @@
             <template v-slot:driver="{item}">
               <item-navigator
                 :title="item?.driver?.name"
-                :link="`/drivers/${item?.driver?.id}`"
+                :link="`/drivers/details/${item?.driver?.id}/information`"
               ></item-navigator>
             </template>
 
             <template v-slot:vehicle="{item}">
               <item-navigator
                 :title="item?.vehicle?.name"
-                :link="`/vehicle/${item?.vehicle?.id}`"
+                :link="`/vehicles/details/${item?.vehicle?.id}/information`"
               ></item-navigator>
             </template>
             <template v-slot:deductions="{item}">
@@ -158,67 +158,6 @@ import TableEarnings from '@/models/table-earnings-data';
 import TripHistory from '@/components/TripHistory.vue';
 import ItemNavigator from '@/components/ItemNavigator.vue';
 
-const dummyEarning: Array<TableEarnings> = [
-  {
-    id: "2121",
-    createdAt: 'October 24, 2022',
-    route: {
-      id: 592,
-      pickup: "Town Planning Bus Stop, Ilupeju, Lagos, Nigeria",
-      destination: "Ojora Close, Victoria Island, Lagos, Nigeria",
-      pickup_coordinate: "6.557215, 3.366606",
-      destination_coordinate: "6.4354235, 3.4212791",
-      distance: "19.92 km",
-      duration: "37 mins",
-      total_seats: 4,
-      day_of_week: "MON - FRI",
-      created_at: "2021-11-01 20:07:51",
-      updated_at: "2022-02-24 09:09:13",
-      status: 1,
-      fare: null,
-      visibility: "public",
-      corporate_id: null,
-      is_future_route: 0,
-      support_luggage: 0,
-      luggage_config_id: null,
-      route_code: "IKR104",
-      pickup_route_bus_stop_id: null,
-      destination_route_bus_stop_id: null,
-      is_draft: 0,
-      duration_value: 2193,
-      distance_value: 19922,
-      pickup_geometry: {
-        x: 3.366606,
-        y: 6.557215
-      },
-      destination_geometry: {
-        x: 3.4212791,
-        y: 6.4354235
-      },
-      pickup_search_area_geometry: null,
-      city_id: 25,
-      origin_city_id: 25,
-      destination_city_id: 25,
-      info: null,
-      slug: "town-planning-bus-stop-to-ojora-close",
-      route_availability_days: "[\"sunday\",\"monday\",\"tuesday\",\"wednesday\",\"thursday\",\"friday\",\"saturday\"]",
-      route_availability_start_date: null,
-      route_availability_end_date: null,
-      blacklisted_availability_days: null
-    },
-    routeCode: "ABL31",
-    driver: {
-      name: 'Elliot',
-      id: '12'
-    },
-    vehicle: {
-      name: 'Volvo',
-      id: '12'
-    },
-    deductions: '-1000',
-    netIncome: '400000',
-  }
-];
 export default defineComponent({
   name: 'EarningInformation',
   components: {
@@ -264,11 +203,13 @@ export default defineComponent({
         const {
           partnersRevenue,
           id,
+          tripId,
           routeId,
           createdAt
         } = e;
 
         obj.id = id;
+        obj.tripId = tripId;
         obj.createdAt = moment(createdAt).format('DD MMMM YYYY');
         obj.routeCode = routeCode;
         obj.route = {
@@ -307,8 +248,7 @@ export default defineComponent({
         this.isFetchingEarnings = false;
       }
     },
-    viewTableDetails(e: {e: any}) {
-      console.log(e);
+    viewTableDetails(e: { e: any }) {
       this.$router.push(`/earnings/vehicle-information/${e}`);
     },
     gotoCostConfig() {
@@ -338,7 +278,7 @@ export default defineComponent({
         if (response.status === 200) {
           const { amount, updatedAt } = response.data.unsettledEarnings;
           this.unsettledEarnings = {
-            lastUpdated: moment(updatedAt).format('MMMM DD, YYYY'),
+            lastUpdated: updatedAt ? moment(updatedAt).format('MMMM DD, YYYY') : '',
             value: amount,
           }
 
@@ -370,7 +310,7 @@ export default defineComponent({
   data() {
     return {
       searchText: '',
-      isFetchingEarnings: false,
+      isFetchingEarnings: true,
       errorLoading: false,
       filter: {
         sortBy: '',
@@ -384,7 +324,7 @@ export default defineComponent({
         { label: 'Deductions', key: 'deductions' },
         { label: 'Net Income', key: 'netIncome' },
       ],
-      tableData: dummyEarning as Array<TableEarnings>,
+      tableData: [] as Array<TableEarnings>,
       isFetchingUnsettledEarnings: false,
       isFetchingSettlements: false,
       unsettledEarnings: {
