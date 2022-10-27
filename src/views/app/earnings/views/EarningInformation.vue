@@ -47,9 +47,9 @@
       <!-- Settlement account -->
       <earnings-data-card
           :is-routeable="true"
-          :bottom-desc="'Change account'"
+          :bottom-desc="settlement?.value ? 'Change account' : 'Add A Settlement Account'"
           :link="'/settings/accounts'"
-          :desc="`Settlement account (${settlement.accountName})`"
+          :desc=" settlement?.value ? `Settlement account (${settlement.accountName})` : '---'"
           :value="settlement.value"
           :is-loading="isFetchingUnsettledEarnings"
         >
