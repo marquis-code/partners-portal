@@ -1,6 +1,10 @@
 <template>
   <page-layout page-title="Add Vehicle">
     <main class="space-y-16 bg-white py-8 lg:w-9/12">
+      <p
+            class="text-xs text-center text-left font-medium cursor-pointer text-bg-grays-black-2">
+            Add New Vehicle
+          </p>
       <div
         class="
           flex
