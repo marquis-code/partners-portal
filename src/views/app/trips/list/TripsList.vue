@@ -106,15 +106,16 @@
                   hover:text-sh-green-500
                 "
                 :to="
-                filters.status !== 'upcoming-trips' ?
-                {
-                  name: 'trip.detail.info',
-                  params: { tripId: item.id}
-                } :
-                {
-                  name: 'trip.detail.info.upoming',
-                  params: { tripId: item.id}
-                }"
+                  filters.status !== 'upcoming-trips'
+                    ? {
+                        name: 'trip.detail.info',
+                        params: { tripId: item.id }
+                      }
+                    : {
+                        name: 'trip.detail.info.upoming',
+                        params: { tripId: item.id }
+                      }
+                "
                 >{{ item?.createdAt ?? 'N/A' }}</router-link
               >
             </template>
@@ -128,15 +129,16 @@
                   hover:text-sh-green-500
                 "
                 :to="
-                filters.status !== 'upcoming-trips' ?
-                {
-                  name: 'trip.detail.info',
-                  params: { tripId: item.id}
-                } :
-                {
-                  name: 'trip.detail.info.upoming',
-                  params: { tripId: item.id}
-                }"
+                  filters.status !== 'upcoming-trips'
+                    ? {
+                        name: 'trip.detail.info',
+                        params: { tripId: item.id }
+                      }
+                    : {
+                        name: 'trip.detail.info.upoming',
+                        params: { tripId: item.id }
+                      }
+                "
                 >{{ item?.routeCode ?? 'N/A' }}</router-link
               >
             </template>
@@ -150,15 +152,16 @@
                   hover:text-sh-green-500
                 "
                 :to="
-                filters.status !== 'upcoming-trips' ?
-                {
-                  name: 'trip.detail.info',
-                  params: { tripId: item.id}
-                } :
-                {
-                  name: 'trip.detail.info.upoming',
-                  params: { tripId: item.id}
-                }"
+                  filters.status !== 'upcoming-trips'
+                    ? {
+                        name: 'trip.detail.info',
+                        params: { tripId: item.id }
+                      }
+                    : {
+                        name: 'trip.detail.info.upoming',
+                        params: { tripId: item.id }
+                      }
+                "
                 >{{ item?.passengersCount ?? 'N/A' }}</router-link
               >
             </template>
@@ -189,15 +192,16 @@
                   hover:text-sh-green-500
                 "
                 :to="
-                filters.status !== 'upcoming-trips' ?
-                {
-                  name: 'trip.detail.info',
-                  params: { tripId: item.id}
-                } :
-                {
-                  name: 'trip.detail.info.upoming',
-                  params: { tripId: item.id}
-                }"
+                  filters.status !== 'upcoming-trips'
+                    ? {
+                        name: 'trip.detail.info',
+                        params: { tripId: item.id }
+                      }
+                    : {
+                        name: 'trip.detail.info.upoming',
+                        params: { tripId: item.id }
+                      }
+                "
               >
                 <trip-history
                   :pickup="item?.route?.pickup"
@@ -338,7 +342,7 @@ export default defineComponent({
       if (params.status === 'completed-trips') {
         this.$axios
           .get(
-            `cost-revenue/v1/partners/${this.partnerContext.partner.id}/revenues`
+            `cost-revenue/v1/partners/${this.partnerContext.partner.account_sid}/revenues`
           )
           .then((res) => {
             const trips = this.transformedTrips(res.data.result);
