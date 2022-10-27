@@ -149,7 +149,6 @@
                   class="form-group"
                   :reduce="(option) => option.city.id"
                   :options="cities"
-                  :multiple="true"
                   label="id"
                   required>
                   <template v-slot:option="model">

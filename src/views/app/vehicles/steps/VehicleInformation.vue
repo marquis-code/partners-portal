@@ -94,7 +94,7 @@
         </span>
         </div>
         <div class="space-y-2 w-full">
-          <label class="text-xs font-medium text-grays-black-5">Passenger capacity (Includes drivers seat)</label>
+          <label class="text-xs font-medium text-grays-black-5">Passenger capacity</label>
           <input
             type="number"
             min="2"

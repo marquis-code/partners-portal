@@ -158,6 +158,9 @@ export default defineComponent({
     this.setTableStates();
   },
   methods: {
+    checkIfAllTodosAreDone () {
+      console.log(1)
+    },
     async setTableStates () {
       this.loadingStats = true;
       this.checkIdentityStatuses();
@@ -172,7 +175,6 @@ export default defineComponent({
         // Use this to filter if and when the need arises
         // this.$axios.get(`/ratings/partners/${this.partnerContext.partner.id}?creation_date_start=2021-02-33&creation_date_end=2021-02-33`)
         const response = await this.$axios.get(`v1/ratings/partners/${this.partnerContext.partner.id}`);
-        console.log(response.data)
         this.partnerStats.ratingCount = response.data.count;
         this.partnerStats.ratingOverTen = response.data.rating;
       } catch (error) {
@@ -198,8 +200,6 @@ export default defineComponent({
       }
     },
     checkIdentityStatuses () {
-      console.log(this.partnerContext.onboardingState.address)
-      console.log(this.partnerContext.onboardingState.identity)
       if (this.partnerContext.onboardingState.address === 'completed') {
         this.partnerStats.hasCompletedAddressVerification = 'completed';
         this.doneCount += 1
