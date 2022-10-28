@@ -303,9 +303,6 @@ export default defineComponent({
       return searchResult;
     }
   },
-  // mounted() {
-  //   console.log(this.partnerContext);
-  // },
   watch: {
     'filters.status'(value) {
       this.filters.status = value;
@@ -349,7 +346,6 @@ export default defineComponent({
             // `cost-revenue/v1/partners/${this.partnerContext.partner.account_sid}/revenues`
           )
           .then((res) => {
-            console.log(res);
             const trips = this.transformActiveOrUpcomingTrips(res?.data?.data);
             // const trips = this.transformedTrips(res.data.result);
             this.tableData = trips;
