@@ -8,7 +8,7 @@
             <div class="flex flex-row justify-start w-full">
               <span class="material-icons mr-4">search</span>
               <input
-                v-model.trim="search"
+                v-model.trim="filters.search"
                 class="
                   list-search
                   w-full
@@ -19,7 +19,6 @@
                 "
                 type="search"
                 placeholder="Search"
-                @keyup.enter.prevent="fetchUsers(true)"
               />
             </div>
           </div>
@@ -30,7 +29,7 @@
             @sizeChange="showPageSize"
             :loading="loading"
             :error-loading="errorLoading"
-            :items="filteredRoutes"
+            :items="tableData"
             :fields="headers"
             :usePagination="true"
           >
@@ -119,18 +118,14 @@ import { defineComponent } from 'vue';
 import AppTable from '@/components/AppTable.vue';
 import { mapGetters } from 'vuex';
 import PageLayout from '@/components/layout/PageLayout.vue';
-import OptionsDropdown from '@/components/OptionsDropdown.vue';
 import TripHistory from '@/components/TripHistory.vue';
 import { extractErrorMessage } from '@/utils/helper';
-import moment from 'moment';
 export default defineComponent({
   name: 'RoutesList',
   components: {
     PageLayout,
-    // PageActionHeader,
     AppTable,
     TripHistory
-    /* DownloadButton */
   },
   created() {
     this.fetchPartnerRoutes();
@@ -144,17 +139,25 @@ export default defineComponent({
     },
     'filters.pageSize'() {
       this.fetchPartnerRoutes();
+    },
+    'filters.search'() {
+      clearTimeout(this.debounce);
+      this.debounce = setTimeout(() => {
+        this.fetchPartnerRoutes();
+      }, 600);
     }
   },
   data() {
     return {
       filters: {
         pageNumber: 1,
-        pageSize: 10
+        pageSize: 10,
+        search: ''
       },
       result: [],
       search: '',
       loading: false,
+      debounce: null as any,
       headers: [
         { label: 'Route Code', key: 'route_code' },
         { label: 'Route', key: 'route' },
@@ -203,7 +206,7 @@ export default defineComponent({
       this.loading = true;
       try {
         const response = await this.$axios.get(
-          `/v1/partners/${this.partnerContext.partner.id}/routes?page=${this.filters.pageNumber}&limit=${this.filters.pageSize}`
+          `/v1/partners/${this.partnerContext.partner.id}/routes?page=${this.filters.pageNumber}&limit=${this.filters.pageSize}&search=${this.filters.search}`
         );
         this.tableData = this.structureRouteFromResponse(response.data.data);
         this.totalRecords = response.data.metadata?.total;
