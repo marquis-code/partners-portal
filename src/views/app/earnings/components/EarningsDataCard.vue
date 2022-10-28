@@ -1,88 +1,106 @@
 <template>
   <div
-   v-if="isLoading"
-   class="
-    w-[100%]
-    h-[180px]
-    bg-[#fff]
-    flex
-    flex-col
-    items-center
-    relative
-    justify-center
-    rounded-[5px]
-    p-[10px]
-   "
-   >
+    v-if="isLoading"
+    class="
+      w-[100%]
+      h-[180px]
+      bg-[#fff]
+      flex flex-col
+      items-center
+      relative
+      justify-center
+      rounded-[5px]
+      p-[10px]
+    "
+  >
     <spinner></spinner>
   </div>
-  <div v-else class="
-  w-[100%]
-  h-[180px]
-  bg-[#fff]
-  flex
-  flex-col
-  items-start
-  relative
-  justify-between
-  rounded-[5px]
-  p-[10px]">
+  <div v-else>
     <div
       class="
-      w-[100%]
-      h-[75%]
-      border-b-[1.2px]
-      flex
-      flex-col
-      items-start
-      justify-between
-      pb-[10px]
-      border-[#73787624]"
+        w-[100%]
+        h-[180px]
+        bg-[#fff]
+        items-start
+        relative
+        justify-between
+        rounded-[5px]
+        p-6
+      "
     >
-    <slot name="iconPlaceHolder"></slot>
-    <div>
-      <p class="relative text-[13px] text-[#575A65]">{{desc}}</p>
+      <div
+        class="
+          w-[100%]
+          h-[75%]
+          border-b-[1.2px]
+          flex flex-col
+          items-start
+          justify-between
+          pb-[10px]
+          border-[#73787624]
+        "
+      >
+        <slot name="iconPlaceHolder"></slot>
+        <div class="">
+          <p class="relative text-xs text-[#575A65]">{{ desc }}</p>
+        </div>
+        <div>
+          <p class="font-bold text-[19px]">{{ val }}</p>
+        </div>
+      </div>
+      <div class="w-[100%] h-[25%] relative">
+        <div
+          v-if="!isRouteable"
+          class="
+            text-[12px]
+            flex flex-row
+            items-center
+            w-[100%]
+            h-[100%]
+            relative
+          "
+        >
+          <p class="text-[#575A65] mr-[4px]">{{ bottomDesc }}</p>
+          <p class="text-[#575A65] font-bold">{{ bottomDescValue }}</p>
+        </div>
+        <router-link
+          v-else
+          class="
+            text-[12px]
+            flex flex-row
+            items-center
+            justify-between
+            w-[100%]
+            h-[100%]
+            relative
+          "
+          :to="link ?? '/'"
+        >
+          <p class="text-[#4848ED]">{{ bottomDesc }}</p>
+          <img src="@/assets/icons/arrow-earnings.svg" />
+        </router-link>
+      </div>
     </div>
-    <div class="truncate">
-      <p class="font-bold text-[19px]">{{val}}</p>
-    </div>
-    </div>
-    <div class="
-    w-[100%]
-    h-[25%]
-    relative
-    ">
-    <div v-if="!isRouteable" class="text-[12px] flex flex-row items-center w-[100%] h-[100%] relative">
-      <p class="text-[#575A65] mr-[4px]">{{bottomDesc}}</p>
-      <p class="text-[#575A65] font-bold">{{bottomDescValue}}</p>
-    </div>
-    <router-link v-else class="text-[12px] flex flex-row items-center justify-between w-[100%] h-[100%] relative" :to="link ?? '/'">
-      <p class="text-[#4848ED]">{{bottomDesc}}</p>
-      <img src="@/assets/icons/arrow-earnings.svg"/>
-    </router-link>
-  </div>
   </div>
 </template>
 <script lang="ts">
 import { defineComponent } from 'vue';
-import Spinner from "@/components/layout/Spinner.vue";
+import Spinner from '@/components/layout/Spinner.vue';
 
 export default defineComponent({
   name: 'EarningsDataCard',
   components: {
-    Spinner,
+    Spinner
   },
   computed: {
     val: function () {
-      let v:any = this.formater
-        ? this.formater(this.value)
-        : this.value;
+      let v: any = this.formater ? this.formater(this.value) : this.value;
 
       if (this.currency) {
         v = this.currency + ' ' + v;
       }
       return v;
-    },
+    }
   },
   props: {
     isRouteable: Boolean,
@@ -93,10 +111,10 @@ export default defineComponent({
     bottomDescValue: String,
     isLoading: Boolean,
     formater: Function,
-    currency: String,
+    currency: String
   },
   data() {
     return {};
   }
-})
+});
 </script>

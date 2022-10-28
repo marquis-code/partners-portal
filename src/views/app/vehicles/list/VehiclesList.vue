@@ -25,7 +25,15 @@
       </page-action-header>
     </template>
     <div>
-      <div class="space-y-5 ring-1 ring-gray-50 shadow-sm rounded-sm bg-white">
+      <div
+        class="
+          space-y-5
+          ring-1 ring-gray-50
+          shadow-sm
+          rounded-tr-lg rounded-tl-lg
+          bg-white
+        "
+      >
         <div>
           <!-- Search Box  -->
           <div class="flex flex-row justify-between px-6 py-4 w-full">
