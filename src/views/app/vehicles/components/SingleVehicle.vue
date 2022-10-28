@@ -1,6 +1,10 @@
 <template>
-  <google-maps class="h-full absolute -top-7 -right-10 -left-7 bottom-0" />
-  <div class="w-full absolute">
+  <div class="h-full absolute -top-7 -right-10 -left-7 bottom-0">
+    <single-google-maps/>
+  </div>
+  <div
+  class="relative"
+  >
     <Transition>
       <Notification
         v-if="haspendingDocuments"
@@ -266,7 +270,7 @@ import Notification from '../../../../components/Notification.vue';
 import Spinner from '@/components/layout/Spinner.vue';
 import { axiosInstance } from '@/plugins/axios';
 import emitter from '@/libs/emitter';
-import GoogleMaps from '@/components/map/GoogleMaps.vue';
+import SingleGoogleMaps from '@/components/map/SingleGoogleMaps.vue';
 
 export default defineComponent({
   emits: ['vehicleUpdated'],
@@ -454,7 +458,7 @@ export default defineComponent({
         });
     }
   },
-  components: { AppModal, Notification, Spinner, GoogleMaps }
+  components: { AppModal, Notification, Spinner, SingleGoogleMaps }
 });
 </script>
 
