@@ -119,7 +119,7 @@ export default defineComponent({
           }
         );
         const tripDays = response.data.map((item: any) => {
-          return moment(item.date).format('MMM Do YY').slice(0, 7);
+          return moment(item.date).format('MMM Do YY');
         });
         this.chartOptions = {
           ...this.chartOptions,
