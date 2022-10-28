@@ -110,7 +110,7 @@
             <img class="h-5 w-5" src="@/assets/images/tripsIcon.svg" />
             <div class="">
               <p class="font-medium text-xs">Trips</p>
-              <p class="font-light text-xs">28</p>
+              <!-- <p class="font-light text-xs">28</p> -->
             </div>
           </div>
           <router-link
