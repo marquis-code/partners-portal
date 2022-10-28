@@ -71,7 +71,7 @@
         </template>
       </earnings-data-card>
         </div>
-        <div class="w-[100%] h-[auto] bg-[#fff] mt-[2rem] p-[10px] relative">
+        <div class="w-[100%] h-[auto] bg-[#fff] mt-[2rem] p-[10px] relative rounded-tr-lg rounded-tl-lg">
           <div class="w-[100%] flex flex-row justify-between items-center">
             <div>
               <div v-if="tableData.length > 0" class="flex flex-row items-center">

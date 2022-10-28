@@ -38,7 +38,7 @@
               :destination="tripData?.route?.destination"
             ></trip-history>
           </div>
-          <p class="text-indigo-500 underline text-xs">View manifest</p>
+          <!-- <p class="text-indigo-500 underline text-xs">View manifest</p> -->
         </div>
 
         <div class="flex justify-between items-center pt-4">
