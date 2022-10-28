@@ -28,7 +28,11 @@
     </div>
     <template v-else>
       <main class="relative">
-        <google-maps class="h-full absolute -top-7 -right-10 -left-7 bottom-0" />
+        <google-maps
+          :startLocation="startPoint"
+          :endLocation="endPoint"
+          :routeLine="polyline"
+          class="h-full absolute -top-7 -right-10 -left-7 bottom-0" />
         <section
           class="
             lg:absolute
@@ -168,6 +172,8 @@ import PageActionHeader from '@/components/PageActionHeader';
 import { extractErrorMessage } from '@/utils/helper';
 import TripHistory from '@/components/TripHistory.vue';
 import GoogleMaps from '@/components/map/GoogleMaps.vue';
+import { formatGeometry } from '@/utils/mapFunctions';
+
 export default {
   name: 'DriverDetailsIndex',
   components: {
@@ -189,7 +195,11 @@ export default {
     return {
       loading: false,
       trip: {},
-      routeDetails: {}
+      routeDetails: {},
+      polyline: [],
+      startPoint: {},
+      endPoint: {},
+      centerPoint: {},
     };
   },
   created () {
@@ -216,6 +226,7 @@ export default {
           `/v1/partners/${this.partnerContext.partner.id}/routes/${this.routeId}`
         );
         this.routeDetails = response.data;
+        this.getRouteGeometry();
       } catch (error) {
         const errorMessage = extractErrorMessage(
           error,
@@ -226,6 +237,19 @@ export default {
       } finally {
         this.loading = false;
       }
+    },
+    getRouteGeometry () {
+      console.log(1)
+      this.polyline = formatGeometry(this.routeDetails.route.geometry);
+      // console.log(this.routeDetails.route.geometry)
+      // console.log(this.polyline)
+      this.startPoint = this.polyline[0];
+      this.endPoint = this.polyline[this.polyline.length - 1];
+      this.centerPoint = this.polyline[parseInt(this.polyline.length / 2)];
+      console.log(this.startPoint)
+      console.log(this.endPoint)
+      console.log(this.centerPoint)
+      console.log(2)
     }
   }
 };

@@ -53,7 +53,6 @@ export default defineComponent({
   },
   created() {
     this.flightPath.path = this.routeLine || [];
-    console.log(this.mapAPIKey);
   },
   mounted() {
     this.$nextTick(() => {
@@ -74,11 +73,11 @@ export default defineComponent({
         bounds = bounds.extend(entry);
       });
 
-      console.log(
-        this.$refs.googleMapInstance,
-        bounds.getNorthEast(),
-        bounds.getSouthWest()
-      );
+      // console.log(
+      //   this.$refs.googleMapInstance,
+      //   bounds.getNorthEast(),
+      //   bounds.getSouthWest()
+      // );
       (this.$refs.googleMapInstance as any)?.map?.fitBounds(bounds, 250);
     }
   }
