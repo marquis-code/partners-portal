@@ -93,16 +93,31 @@
           This field is required
         </span>
         </div>
+        <!-- Capacity list -->
         <div class="space-y-2 w-full">
           <label class="text-xs font-medium text-grays-black-5">Passenger capacity</label>
-          <input
-            type="number"
-            min="2"
+          <select
             v-model="v$.form.seats.$model"
-            class=" text-xs border-none outline-none w-full rounded-md p-3 placeholder-gray-500
-           placeholder-opacity-25 ring-1 ring-gray-300"
-            placeholder="What is the capacity of your vehicle"
-          />
+            class="
+            text-xs
+            border-none
+            outline-none
+            w-full
+            rounded-md
+            p-3
+            placeholder-gray-500 placeholder-opacity-25
+            ring-1 ring-gray-300
+          "
+          >
+            <option value="" disabled hidden>Select from available Capacity</option>
+              <option
+                :value="capacity"
+                v-for="(capacity, index) in capacityList"
+                :key="index"
+              >
+                {{ capacity }} Seat
+              </option>
+        </select>
           <span
             class="text-sm font-light text-red-500"
             v-if="v$.form.seats.$dirty && v$.form.seats.required.$invalid"
@@ -216,6 +231,7 @@ export default defineComponent<any, any, any>({
       vehicleModelMap: new Map(),
       processing: false,
       loading: false,
+      capacityList: []
 
     };
   },
@@ -263,7 +279,6 @@ export default defineComponent<any, any, any>({
     },
     getKeyStroke ($event: any) {
       const pressedKey = ($event.key)
-      console.log(1)
       if (pressedKey === 'Backspace' && this.form.registration_number.length === 3) {
         console.log('Do nothing')
       } else if (this.form.registration_number.length === 3) {
@@ -295,7 +310,9 @@ export default defineComponent<any, any, any>({
         })
     },
     onCarModelChanged (carModel: any) {
+      // console.log('model', carModel.capacity_list)
       this.form.name = carModel.name;
+      this.capacityList = carModel.capacity_list || []
       if (this.form.name) {
         // TODO: Memoize
         this.vehicleYears = this.getYearsFrom(`${carModel.start_year}`);
