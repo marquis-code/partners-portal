@@ -91,7 +91,7 @@
         ring-1 ring-gray-50
       "
     >
-      <chart :tripCounts="partnerStats.monthTripCount" :tripDays="partnerStats.monthTripDays"></chart>
+      <chart></chart>
     </section>
     <pie-chart :upcomingTripsCount="partnerStats.partnerUpcomingTrips || 0" :completedTripsCount="partnerStats.partnerCompletedTrips || 0"></pie-chart>
     </div>
