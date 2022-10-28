@@ -10,36 +10,35 @@
         height="350"
         :options="chartOptions"
         :series="series"
+        :on-load="loading"
       ></apexchart>
     </div>
   </div>
 </template>
 
 <script lang="ts">
+import { extractErrorMessage } from '@/utils/helper';
 import { defineComponent } from '@vue/runtime-core';
 import VueApexCharts from 'vue3-apexcharts';
-
+import moment from 'moment';
+import { mapGetters } from 'vuex';
 export default defineComponent({
   name: 'BarChart',
   components: {
     apexchart: VueApexCharts
   },
-  props: {
-    tripDays: Array,
-    tripCounts: Array
+  created() {
+    // this.setDataProps();
+    this.getBarChartTripsData();
   },
-  created () {
-    this.setDataProps()
-  },
-  methods: {
-    setDataProps () {
-      console.log(this.tripCounts)
-      this.series[0].data = this.tripCounts as any;
-      this.chartOptions.xaxis.categories = this.tripDays as any;
-    }
+  computed: {
+    ...mapGetters({
+      partnerContext: 'auth/activeContext'
+    })
   },
   data() {
     return {
+      loading: false,
       series: [
         {
           name: 'trips',
@@ -105,6 +104,44 @@ export default defineComponent({
         }
       }
     };
+  },
+  methods: {
+    async getBarChartTripsData() {
+      this.loading = true;
+      try {
+        const response =
+          (await this.$axios.get(
+            `/v1/partners/${this.partnerContext.partner.id}/trips/stats`
+          )) || [];
+        const numberOfTripsPerDay = response.data.map(
+          (item: { total: any }) => {
+            return item.total;
+          }
+        );
+        const tripDays = response.data.map((item: any) => {
+          return moment(item.date).format('MMM Do YY').slice(0, 7);
+        });
+        this.chartOptions = {
+          ...this.chartOptions,
+          ...{
+            xaxis: {
+              categories: tripDays as any,
+              position: 'right'
+            }
+          }
+        };
+        this.series[0].data = numberOfTripsPerDay as any;
+      } catch (error) {
+        const errorMessage = extractErrorMessage(
+          error,
+          null,
+          'An error occured while fetching your trips history'
+        );
+        this.$toast.warning(errorMessage);
+      } finally {
+        this.loading = false;
+      }
+    }
   }
 });
 </script>
