@@ -115,7 +115,7 @@
                 v-for="(capacity, index) in capacityList"
                 :key="index"
               >
-                {{ capacity }} Seat
+                {{ capacity }} Seats
               </option>
         </select>
           <span
