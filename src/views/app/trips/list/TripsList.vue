@@ -303,6 +303,9 @@ export default defineComponent({
       return searchResult;
     }
   },
+  // mounted() {
+  //   console.log(this.partnerContext);
+  // },
   watch: {
     'filters.status'(value) {
       this.filters.status = value;
@@ -342,10 +345,13 @@ export default defineComponent({
       if (params.status === 'completed-trips') {
         this.$axios
           .get(
-            `cost-revenue/v1/partners/${this.partnerContext.partner.account_sid}/revenues`
+            `/v1/partners/${this.partnerContext.partner.id}/${params.status}?metadata=${params.metadata}&page=${this.filters.pageNumber}&limit=${this.filters.pageSize}&search=${this.filters.search}`
+            // `cost-revenue/v1/partners/${this.partnerContext.partner.account_sid}/revenues`
           )
           .then((res) => {
-            const trips = this.transformedTrips(res.data.result);
+            console.log(res);
+            const trips = this.transformActiveOrUpcomingTrips(res?.data?.data);
+            // const trips = this.transformedTrips(res.data.result);
             this.tableData = trips;
             this.totalRecords = res.data.metadata?.total;
           })
@@ -378,24 +384,24 @@ export default defineComponent({
     getFormattedDate(date: any) {
       return moment(date).format('LL');
     },
-    transformedTrips(payload: Array<any>): any[] {
-      const newTrips: any = [];
-      payload.forEach((trip) => {
-        newTrips.push({
-          createdAt: moment(trip.createdAt).format('LL'),
-          pickup: trip.metadata.pickup,
-          dropoff: trip.metadata.dropoff,
-          driverId: trip.driver.id,
-          driver: trip.metadata.driver.fname + ' ' + trip.metadata.driver.lname,
-          routeCode: trip.metadata.routeCode,
-          startTime: moment(trip.metadata.startTime).format('LT'),
-          endTime: moment(trip.metadata.endTime).format('LT'),
-          passengersCount: trip.passengersCount,
-          revenue: trip.partnersRevenue
-        });
-      });
-      return newTrips;
-    },
+    // transformedTrips(payload: Array<any>): any[] {
+    //   const newTrips: any = [];
+    //   payload.forEach((trip) => {
+    //     newTrips.push({
+    //       createdAt: moment(trip.createdAt).format('LL'),
+    //       pickup: trip.metadata.pickup,
+    //       dropoff: trip.metadata.dropoff,
+    //       driverId: trip.driver.id,
+    //       driver: trip.metadata.driver.fname + ' ' + trip.metadata.driver.lname,
+    //       routeCode: trip.metadata.routeCode,
+    //       startTime: moment(trip.metadata.startTime).format('LT'),
+    //       endTime: moment(trip.metadata.endTime).format('LT'),
+    //       passengersCount: trip.passengersCount,
+    //       revenue: trip.partnersRevenue
+    //     });
+    //   });
+    //   return newTrips;
+    // },
 
     transformActiveOrUpcomingTrips(payload: Array<any>) {
       const newTrips: any = [];
