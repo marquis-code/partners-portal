@@ -1,9 +1,18 @@
 <template>
   <form class="space-y-3 lg:space-y-7">
     <section
-      class=" lg:flex justify-between space-y-3 lg:space-y-0 lg:space-x-10 items-center">
+      class="
+        lg:flex
+        justify-between
+        space-y-3
+        lg:space-y-0 lg:space-x-10
+        items-center
+      "
+    >
       <div class="space-y-2 w-full">
-        <label class="text-xs font-medium text-grays-black-5">Company name</label>
+        <label class="text-xs font-medium text-grays-black-5"
+          >Company name</label
+        >
         <input
           v-model="v$.form.company_name.$model"
           type="text"
@@ -19,7 +28,13 @@
           "
           placeholder="Enter your company name"
         />
-        <span class="text-sm font-light text-red-500" v-if="v$.form.company_name.$dirty && v$.form.company_name.required.$invalid">
+        <span
+          class="text-sm font-light text-red-500"
+          v-if="
+            v$.form.company_name.$dirty &&
+            v$.form.company_name.required.$invalid
+          "
+        >
           Please provide your company name
         </span>
       </div>
@@ -42,7 +57,10 @@
           "
           placeholder="Enter your RC number"
         />
-        <span class="text-sm font-light text-red-500" v-if="v$.form.rc_number.$dirty && v$.form.rc_number.required.$invalid">
+        <span
+          class="text-sm font-light text-red-500"
+          v-if="v$.form.rc_number.$dirty && v$.form.rc_number.required.$invalid"
+        >
           This field is required
         </span>
       </div>
@@ -75,7 +93,13 @@
           "
           placeholder="Enter your work address"
         />
-        <span class="text-sm font-light text-red-500" v-if="v$.form.company_address.$dirty && v$.form.company_address.required.$invalid">
+        <span
+          class="text-sm font-light text-red-500"
+          v-if="
+            v$.form.company_address.$dirty &&
+            v$.form.company_address.required.$invalid
+          "
+        >
           This field is required
         </span>
       </div>
@@ -105,7 +129,13 @@
             {{ option }}
           </option>
         </select>
-        <span class="text-sm font-light text-red-500" v-if="v$.form.business_type.$dirty && v$.form.business_type.required.$invalid">
+        <span
+          class="text-sm font-light text-red-500"
+          v-if="
+            v$.form.business_type.$dirty &&
+            v$.form.business_type.required.$invalid
+          "
+        >
           This field is required
         </span>
       </div>
@@ -121,7 +151,8 @@
     >
       <div class="space-y-2 w-full lg:w-6/12 pr-1">
         <label class="text-xs font-medium text-grays-black-5"
-          >When did you start your transport business ?</label>
+          >When did you start your transport business ?</label
+        >
         <datepicker
           class="
             text-xs
@@ -136,16 +167,23 @@
           placeholder="Choose a date"
           v-model="v$.form.experience_start_date.$model"
         />
-        <span class="text-sm font-light text-red-500" v-if="v$.form.experience_start_date.$dirty && v$.form.experience_start_date.required.$invalid">
+        <span
+          class="text-sm font-light text-red-500"
+          v-if="
+            v$.form.experience_start_date.$dirty &&
+            v$.form.experience_start_date.required.$invalid
+          "
+        >
           This field is required
         </span>
       </div>
       <div class="space-y-2 w-full lg:w-6/12 pr-1">
-        <label class="text-xs font-medium text-grays-black-5"
+        <label for="companyEmail" class="text-xs font-medium text-grays-black-5"
           >Company email</label
         >
         <input
-          type="text"
+          id="companyEmail"
+          type="email"
           v-model="v$.form.company_email.$model"
           class="
             text-xs
@@ -159,22 +197,43 @@
           "
           placeholder="Enter company's email"
         />
-        <span class="text-sm font-light text-red-500" v-if="v$.form.company_email.$dirty && v$.form.company_email.$error">
+        <span
+          class="text-sm font-light text-red-500"
+          v-if="v$.form.company_email.$dirty && v$.form.company_email.$error"
+        >
           Please provide a valid email
         </span>
       </div>
     </section>
     <section class="flex justify-start space-x-10 items-start">
       <div class="space-y-2 w-full lg:w-6/12 lg:pr-6">
-        <label class="text-xs font-medium text-grays-black-5">Company phone number</label>
+        <label for="companyTel" class="text-xs font-medium text-grays-black-5"
+          >Company phone number</label
+        >
         <input
+          id="companyTel"
           type="tel"
+          maxlength="11"
           v-model="v$.form.company_phone.$model"
-          class=" text-xs border-none outline-none w-full rounded-md p-3 placeholder-gray-500
-           placeholder-opacity-25 ring-1 ring-gray-300"
+          class="
+            text-xs
+            border-none
+            outline-none
+            w-full
+            rounded-md
+            p-3
+            placeholder-gray-500 placeholder-opacity-25
+            ring-1 ring-gray-300
+          "
           placeholder="Enter your company's phone number"
         />
-        <span class="text-sm font-light text-red-500" v-if="v$.form.company_phone.$dirty && v$.form.company_phone.required.$invalid">
+        <span
+          class="text-sm font-light text-red-500"
+          v-if="
+            v$.form.company_phone.$dirty &&
+            v$.form.company_phone.required.$invalid
+          "
+        >
           This field is required
         </span>
       </div>
@@ -183,11 +242,24 @@
       <button
         type="button"
         @click="saveForm()"
-        class=" rounded-md w-32 flex justify-center items-center p-3 px-5 text-sm"
+        class="
+          rounded-md
+          w-32
+          flex
+          justify-center
+          items-center
+          p-3
+          px-5
+          text-sm
+        "
         :disabled="v$.form.$invalid || processing"
-        :class="v$.form.$invalid || processing ?
-         'cursor-not-allowed text-grays-black-5 bg-grays-black-7' : 'bg-sh-green-500 font-medium'">
-        {{ processing ? 'Saving': 'Next' }}
+        :class="
+          v$.form.$invalid || processing
+            ? 'cursor-not-allowed text-grays-black-5 bg-grays-black-7'
+            : 'bg-sh-green-500 font-medium'
+        "
+      >
+        {{ processing ? 'Saving' : 'Next' }}
         <img class="ml-2" src="@/assets/images/arrow.svg" />
       </button>
     </div>
@@ -197,17 +269,17 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import Datepicker from 'vue3-datepicker';
-import useVuelidate from "@vuelidate/core";
-import {email, required} from "@vuelidate/validators";
-import {mapGetters} from "vuex";
-import {extractErrorMessage} from "@/utils/helper";
+import useVuelidate from '@vuelidate/core';
+import { email, minLength, required } from '@vuelidate/validators';
+import { mapGetters } from 'vuex';
+import { extractErrorMessage } from '@/utils/helper';
 export default defineComponent({
   name: 'companyInformation',
   components: {
     Datepicker
   },
   emits: ['companySignUpSuccessful'],
-  data () {
+  data() {
     return {
       v$: useVuelidate(),
       form: {
@@ -225,12 +297,12 @@ export default defineComponent({
         'Company',
         'Incorporated Trustee',
         'Limited Partnership',
-        'Limited Liability Partnership',
+        'Limited Liability Partnership'
       ],
       processing: false
     };
   },
-  validations () {
+  validations() {
     return {
       form: {
         mode: { required },
@@ -240,7 +312,7 @@ export default defineComponent({
         company_address: { required },
         business_type: { required },
         company_email: { required, email },
-        company_phone: { required },
+        company_phone: { required, minLength: minLength(11) }
       }
     };
   },
@@ -251,9 +323,8 @@ export default defineComponent({
     })
   },
   methods: {
-    async saveForm () {
+    async saveForm() {
       this.v$.form.$touch();
-      console.log(this.form);
       if (this.processing || this.v$.form.$errors.length) {
         return;
       }
@@ -263,20 +334,23 @@ export default defineComponent({
           ...this.form,
           mode: 'business'
         };
-        const response = await this.$axios.post('/v1/partners', { ...payload});
+        const response = await this.$axios.post('/v1/partners', { ...payload });
         if (response.data) {
           await this.$store.dispatch('auth/refreshActiveContext', this.user.id);
           this.$emit('companySignUpSuccessful');
         }
       } catch (err) {
-        const errorMessage = extractErrorMessage(err, null, 'Oops! An error occurred, please try again.');
+        const errorMessage = extractErrorMessage(
+          err,
+          null,
+          'Oops! An error occurred, please try again.'
+        );
         this.$toast.error(errorMessage);
       } finally {
         this.processing = false;
       }
     }
   }
-
 });
 </script>
 
