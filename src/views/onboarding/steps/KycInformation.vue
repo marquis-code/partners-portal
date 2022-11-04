@@ -316,6 +316,7 @@ export default defineComponent<any, any, any>({
         }
       },
       loading: false,
+      identityDocumentLength: 11,
       activeView: 0,
       file: '',
       fileData: null,
@@ -360,7 +361,7 @@ export default defineComponent<any, any, any>({
           partner_type: { required }
         },
         document: {
-          document_id: { required, minLength: minLength(11) },
+          document_id: { required, minLength: minLength(this.identityDocumentLength) },
           type: { required },
           dob: { required },
           fname: { required },
