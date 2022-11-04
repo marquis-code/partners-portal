@@ -280,7 +280,7 @@ import { defineComponent } from 'vue';
 import { mapGetters } from 'vuex';
 import Datepicker from 'vue3-datepicker';
 import ImageUpload from '@/components/ImageUpload.vue';
-import { required } from '@vuelidate/validators';
+import { required, minLength } from '@vuelidate/validators';
 import { extractErrorMessage } from '@/utils/helper';
 import useVuelidate from '@vuelidate/core';
 import { UserData } from '@/models/user-session.model';
@@ -360,7 +360,7 @@ export default defineComponent<any, any, any>({
           partner_type: { required }
         },
         document: {
-          document_id: { required },
+          document_id: { required, minLength: minLength(11) },
           type: { required },
           dob: { required },
           fname: { required },
@@ -427,6 +427,7 @@ export default defineComponent<any, any, any>({
     },
     async saveIdentityForm() {
       this.v$.identityForm.$touch();
+      console.log(this.v$.identityForm);
       if (this.loading || this.v$.identityForm.$errors.length) {
         return;
       }
