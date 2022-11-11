@@ -36,6 +36,6 @@ export const removeAuthorization = () => {
 
 export default {
   install: (app: App/*, options: any */) => {
-    app.config.globalProperties.$axios = { ...axiosInstance };
+    app.config.globalProperties.$axios = axiosInstance
   }
 }
