@@ -124,6 +124,7 @@
               >
               <input
                 type="tel"
+                maxlength="11"
                 v-model="v$.form.phone.$model"
                 class="
                   text-xs
@@ -140,7 +141,7 @@
               />
               <span
                 class="text-xs font-light text-red-500"
-                v-if="v$.form.phone.$dirty && v$.form.phone.required.$invalid"
+                v-if="v$.form.phone.$dirty && v$.form.phone.$error"
               >
                 Please provide your drivers pohone number
               </span>
@@ -173,7 +174,7 @@
               />
               <span
                 class="text-xs font-light text-red-500"
-                v-if="v$.form.email.$dirty && v$.form.email.required.$invalid"
+                v-if="v$.form.email.$dirty && v$.form.email.$error"
               >
                 Please provide your drivers email address
               </span>
@@ -388,7 +389,7 @@ import ImageUpload from '@/components/ImageUpload.vue';
 import { defineComponent } from 'vue';
 import Datepicker from 'vue3-datepicker';
 import useVuelidate from '@vuelidate/core';
-import { email, required } from '@vuelidate/validators';
+import { email, minLength, required } from '@vuelidate/validators';
 import { mapGetters } from 'vuex';
 import { extractErrorMessage } from '@/utils/helper';
 import { format } from 'date-fns';
@@ -435,14 +436,14 @@ export default defineComponent({
       form: {
         fname: { required },
         lname: { required },
-        phone: { required },
+        phone: { required, minLength: minLength(11) },
         email: { required, email },
         residential_address: { required },
         dob: { required },
         license_number: { required },
         expiry_date: { required },
         files: { required },
-        avatar: { required } //
+        avatar: { required }
       }
     };
   },
