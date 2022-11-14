@@ -97,12 +97,11 @@
             <label class="text-grays-black-5 font-medium text-sm"
               >Confirm Password</label
             >
-            {{v$.form.confirmPassword.sameAs}}
             <input
               v-model="v$.form.confirmPassword.$model"
               type="password"
               :class="
-                !v$.form.confirmPassword.sameAs.$invalid
+                v$.form.confirmPassword.$dirty && v$.form.confirmPassword.$error
                   ? 'ring-red-500'
                   : 'ring-sh-grey-300'
               "
@@ -119,14 +118,9 @@
               "
               placeholder="Confirm your password"
             />
-            <!-- <span
+            <span
               class="text-sm font-light text-red-500"
-              v-if="
-                !v$.form.confirmPassword.required
-              "
-              >Confirm Password is required</span
-            > -->
-            <span v-if="!v$.form.confirmPassword.sameAs"
+              v-if="!passwordMatch"
               >Passwords must match</span
             >
           </div>
@@ -145,9 +139,9 @@
               w-full
               mt-8
             "
-            :disabled="!v$.form.confirmPassword.sameAs || processing"
+            :disabled="!passwordMatch || processing"
             :class="
-              !v$.form.confirmPassword.sameAs || processing
+              !passwordMatch || processing
                 ? 'cursor-not-allowed text-grays-black-5 bg-grays-black-7'
                 : 'bg-sh-green-500 font-medium'
             "
@@ -237,6 +231,11 @@ export default defineComponent({
       }
     };
   },
+  computed: {
+    passwordMatch(): boolean {
+      return this.form.password === this.form.confirmPassword;
+    }
+  },
 
   methods: {
     toggleShow() {
@@ -245,7 +244,7 @@ export default defineComponent({
     sendPasswordReset() {
       this.v$.form.$touch();
 
-      if (this.processing || this.v$.form.$errors.length) {
+      if (this.processing || this.v$.form.$errors.length || !this.passwordMatch) {
         return;
       }
 
