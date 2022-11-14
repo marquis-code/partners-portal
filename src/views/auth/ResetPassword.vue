@@ -32,10 +32,10 @@
           <h2
             class="text-sh-grey-900 font-bold text-lg lg:text-2xl text-center"
           >
-            Forgot your password?
+            Create a new password
           </h2>
           <div class="mt-1 text-xs font-medium text-center text-dark-type-4">
-            Don’t worry, it happens to the best of us.
+            Try using something you can easily remember
           </div>
           <div
             class="
@@ -54,41 +54,84 @@
               {{ errorMessage }}
             </div>
           </div>
-          <div class="mt-6">
+
+          <div class="flex flex-col space-y-2 mt-6 relative">
             <label class="text-grays-black-5 font-medium text-sm"
-              >Email address</label
+              >Password</label
             >
-            <div class="mt-2">
-              <input
-                v-model="v$.form.email.$model"
-                :class="
-                  v$.form.email.$dirty && v$.form.email.$error
-                    ? 'ring-red-500'
-                    : 'ring-sh-grey-300'
-                "
-                type="email"
-                id="email"
-                class="
-                  py-3
-                  px-5
-                  border-none
-                  placeholder:text-grays-black-7
-                  outline-none
-                  w-full
-                  ring-1
-                  text-sm
-                  rounded-md
-                  placeholder-opacity-50
-                "
-                placeholder="sample@mail.com"
-              />
-              <span
-                class="text-sm font-light text-red-500"
-                v-if="v$.form.email.$dirty && v$.form.email.$error"
-              >
-                Invalid email</span
-              >
-            </div>
+            <input
+              v-model="v$.form.password.$model"
+              :type="showPassword ? 'text' : 'password'"
+              :class="
+                v$.form.password.$dirty && v$.form.password.$error
+                  ? 'ring-red-500'
+                  : 'ring-sh-grey-300'
+              "
+              class="
+                py-3
+                px-5
+                border-none
+                placeholder:text-grays-black-7
+                outline-none
+                ring-1
+                text-sm
+                rounded-md
+                placeholder-opacity-50
+              "
+              placeholder="Type your password"
+            />
+            <span
+              class="text-sm font-light text-red-500"
+              v-if="v$.form.password.$dirty && v$.form.password.$error"
+              >Invalid password</span
+            >
+
+            <span
+              @click="toggleShow"
+              class="absolute top-7 right-3 cursor-pointer text-sm font-medium"
+              :class="[showPassword ? 'text-green-500' : 'text-red-500']"
+              >{{ showPassword ? 'Hide' : 'Show' }}</span
+            >
+          </div>
+          <div class="flex flex-col space-y-2 mt-6 relative">
+            <label class="text-grays-black-5 font-medium text-sm"
+              >Confirm Password</label
+            >
+            <input
+              v-model="v$.form.confirmPassword.$model"
+              :type="showPassword ? 'text' : 'password'"
+              :class="
+                v$.form.confirmPassword.$dirty && v$.form.confirmPassword.$error
+                  ? 'ring-red-500'
+                  : 'ring-sh-grey-300'
+              "
+              class="
+                py-3
+                px-5
+                border-none
+                placeholder:text-grays-black-7
+                outline-none
+                ring-1
+                text-sm
+                rounded-md
+                placeholder-opacity-50
+              "
+              placeholder="Type your password"
+            />
+            <span
+              class="text-sm font-light text-red-500"
+              v-if="
+                v$.form.confirmPassword.$dirty && v$.form.confirmPassword.$error
+              "
+              >Invalid password</span
+            >
+
+            <span
+              @click="toggleShow"
+              class="absolute top-7 right-3 cursor-pointer text-sm font-medium"
+              :class="[showPassword ? 'text-green-500' : 'text-red-500']"
+              >{{ showPassword ? 'Hide' : 'Show' }}</span
+            >
           </div>
           <button
             @click.prevent="sendPasswordResetEmail()"
@@ -112,7 +155,7 @@
                 : 'bg-sh-green-500 font-medium'
             "
           >
-            {{ processing ? 'Processing...' : 'Recover Password' }}
+            {{ processing ? 'Processing...' : 'Set Password' }}
             <spinner v-if="processing" class="w-5 ml-2 mx-0"></spinner>
             <img
               v-if="!processing"
@@ -162,7 +205,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { required, email } from '@vuelidate/validators';
+import { required } from '@vuelidate/validators';
 import { extractErrorMessage } from '../../utils/helper';
 import useVuelidate from '@vuelidate/core';
 import Spinner from '@/components/layout/Spinner.vue';
@@ -174,9 +217,11 @@ export default defineComponent({
       linkSent: false,
       errorMessage: '',
       form: {
-        email: '',
+        password: '',
+        confirmPassword: '',
         type: 'user'
       },
+      showPassword: false,
       processing: false
     };
   },
@@ -186,15 +231,20 @@ export default defineComponent({
   validations() {
     return {
       form: {
-        email: {
-          required,
-          email
+        password: {
+          required
+        },
+        confirmPassword: {
+          required
         }
       }
     };
   },
 
   methods: {
+    toggleShow() {
+      this.showPassword = !this.showPassword;
+    },
     sendPasswordResetEmail() {
       this.v$.form.$touch();
 
