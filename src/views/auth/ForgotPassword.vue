@@ -175,7 +175,8 @@ export default defineComponent({
       errorMessage: '',
       form: {
         email: '',
-        type: 'user'
+        type: 'user',
+        app: 'partners-portal'
       },
       processing: false
     };

@@ -97,11 +97,12 @@
             <label class="text-grays-black-5 font-medium text-sm"
               >Confirm Password</label
             >
+            {{v$.form.confirmPassword.sameAs}}
             <input
               v-model="v$.form.confirmPassword.$model"
-              :type="showPassword ? 'text' : 'password'"
+              type="password"
               :class="
-                v$.form.confirmPassword.$dirty && v$.form.confirmPassword.$error
+                !v$.form.confirmPassword.sameAs.$invalid
                   ? 'ring-red-500'
                   : 'ring-sh-grey-300'
               "
@@ -116,25 +117,21 @@
                 rounded-md
                 placeholder-opacity-50
               "
-              placeholder="Type your password"
+              placeholder="Confirm your password"
             />
-            <span
+            <!-- <span
               class="text-sm font-light text-red-500"
               v-if="
-                v$.form.confirmPassword.$dirty && v$.form.confirmPassword.$error
+                !v$.form.confirmPassword.required
               "
-              >Invalid password</span
-            >
-
-            <span
-              @click="toggleShow"
-              class="absolute top-7 right-3 cursor-pointer text-sm font-medium"
-              :class="[showPassword ? 'text-green-500' : 'text-red-500']"
-              >{{ showPassword ? 'Hide' : 'Show' }}</span
+              >Confirm Password is required</span
+            > -->
+            <span v-if="!v$.form.confirmPassword.sameAs"
+              >Passwords must match</span
             >
           </div>
           <button
-            @click.prevent="sendPasswordResetEmail()"
+            @click.prevent="sendPasswordReset()"
             type="button"
             class="
               border-none
@@ -148,9 +145,9 @@
               w-full
               mt-8
             "
-            :disabled="v$.form.$invalid || processing"
+            :disabled="!v$.form.confirmPassword.sameAs || processing"
             :class="
-              v$.form.$invalid || processing
+              !v$.form.confirmPassword.sameAs || processing
                 ? 'cursor-not-allowed text-grays-black-5 bg-grays-black-7'
                 : 'bg-sh-green-500 font-medium'
             "
@@ -205,7 +202,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { required } from '@vuelidate/validators';
+import { required, sameAs } from '@vuelidate/validators';
 import { extractErrorMessage } from '../../utils/helper';
 import useVuelidate from '@vuelidate/core';
 import Spinner from '@/components/layout/Spinner.vue';
@@ -218,8 +215,7 @@ export default defineComponent({
       errorMessage: '',
       form: {
         password: '',
-        confirmPassword: '',
-        type: 'user'
+        confirmPassword: ''
       },
       showPassword: false,
       processing: false
@@ -235,7 +231,8 @@ export default defineComponent({
           required
         },
         confirmPassword: {
-          required
+          required,
+          sameAs: sameAs(this.form.password)
         }
       }
     };
@@ -245,7 +242,7 @@ export default defineComponent({
     toggleShow() {
       this.showPassword = !this.showPassword;
     },
-    sendPasswordResetEmail() {
+    sendPasswordReset() {
       this.v$.form.$touch();
 
       if (this.processing || this.v$.form.$errors.length) {

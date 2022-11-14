@@ -57,7 +57,7 @@ const routes: Array<RouteRecordRaw> = [
         }
       },
       {
-        path: 'reset-password:resetId',
+        path: '/password/:id',
         name: 'resetPassword',
         component: ResetPassword,
         meta: {
