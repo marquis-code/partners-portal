@@ -27,7 +27,7 @@
       "
       style="margin-top: 80px"
     >
-      <template v-if="!linkSent">
+      <template v-if="!isSuccessful">
         <form>
           <h2
             class="text-sh-grey-900 font-bold text-lg lg:text-2xl text-center"
@@ -81,10 +81,17 @@
               placeholder="Type your password"
             />
             <span
-              class="text-sm font-light text-red-500"
-              v-if="v$.form.password.$dirty && v$.form.password.$error"
-              >Invalid password</span
+              class="text-xs text-red-400"
+              v-if="!v$.form.password.required && v$.form.password.$error"
+              >Please enter a password</span
             >
+            <span
+              class="text-xs text-red-400"
+              v-if="!v$.form.password.minLength"
+            >
+              Password must have at least
+              {{ v$.form.password.$params.minLength.min }} characters.
+            </span>
 
             <span
               @click="toggleShow"
@@ -99,7 +106,7 @@
             >
             <input
               v-model="v$.form.confirmPassword.$model"
-              type="password"
+              :type="showPassword ? 'text' : 'password'"
               :class="
                 v$.form.confirmPassword.$dirty && v$.form.confirmPassword.$error
                   ? 'ring-red-500'
@@ -118,8 +125,10 @@
               "
               placeholder="Confirm your password"
             />
-            <span class="text-sm font-light text-red-500" v-if="!passwordMatch"
-              >Passwords must match</span
+            <span
+              class="text-sm font-light text-red-500"
+              v-if="!v$.form.confirmPassword.sameAsPassword"
+              >Passwords must be identical.</span
             >
           </div>
           <button
@@ -137,9 +146,9 @@
               w-full
               mt-8
             "
-            :disabled="!passwordMatch || processing"
+            :disabled="!v$.form.confirmPassword.sameAsPassword || processing"
             :class="
-              !passwordMatch || processing
+              !v$.form.confirmPassword.sameAsPassword || processing
                 ? 'cursor-not-allowed text-grays-black-5 bg-grays-black-7'
                 : 'bg-sh-green-500 font-medium'
             "
@@ -154,7 +163,7 @@
           </button>
         </form>
       </template>
-      <template v-else>
+      <!-- <template v-else>
         <div class="w-full max-w-md">
           <img
             src="@/assets/images/email-sent.svg"
@@ -184,9 +193,26 @@
             >Back to home</router-link
           >
         </div>
+      </template> -->
+      <template v-else>
+        <div class="w-full max-w-md">
+          <img
+            src="@/assets/images/password-changed.svg"
+            class="block mx-auto text-center"
+            alt="Password changed"
+          />
+          <h2 class="mt-2 text-2xl font-bold text-center text-dark-type-3">Password changed</h2>
+          <div
+            class="mt-1 text-sm font-medium text-center text-dark-type-4"
+          >You have successfully changed your password</div>
+          <router-link
+            to="/"
+            class="block w-56 h-12 py-4 mx-auto mt-12 font-bold text-center text-white rounded bg-active bg-green-500"
+          >Login</router-link>
+        </div>
       </template>
     </div>
-    <div v-if="!linkSent" class="hidden lg:flex absolute bottom-0 z-0">
+    <div v-if="!successful" class="hidden lg:flex absolute bottom-0 z-0">
       <img src="@/assets/images/backgroundGraphics.svg" class="w-auto" />
     </div>
   </main>
@@ -194,16 +220,17 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { required, sameAs } from '@vuelidate/validators';
+import { required, sameAs, minLength } from '@vuelidate/validators';
 import { extractErrorMessage } from '../../utils/helper';
 import useVuelidate from '@vuelidate/core';
 import Spinner from '@/components/layout/Spinner.vue';
 
 export default defineComponent({
+  props: ['token'],
   data() {
     return {
       v$: useVuelidate(),
-      linkSent: false,
+      isSuccessful: false,
       errorMessage: '',
       form: {
         password: '',
@@ -220,19 +247,14 @@ export default defineComponent({
     return {
       form: {
         password: {
-          required
+          required,
+          minLength: minLength(6)
         },
         confirmPassword: {
-          required,
-          sameAs: sameAs(this.form.password)
+          sameAsPassword: sameAs('password')
         }
       }
     };
-  },
-  computed: {
-    passwordMatch(): boolean {
-      return this.form.password === this.form.confirmPassword;
-    }
   },
 
   methods: {
@@ -242,11 +264,7 @@ export default defineComponent({
     sendPasswordReset() {
       this.v$.form.$touch();
 
-      if (
-        this.processing ||
-        this.v$.form.$errors.length ||
-        !this.passwordMatch
-      ) {
+      if (this.processing || this.v$.form.$error) {
         return;
       }
 
@@ -255,16 +273,17 @@ export default defineComponent({
       const payload = {
         password: this.form.password,
         confirm_password: this.form.confirmPassword,
-        type: 'user'
+        type: this.$route.query.type,
+        token: this.token
       };
 
       this.$axios
         .post('v1/password/change', payload)
         .then(async () => {
-          this.linkSent = true;
+          this.isSuccessful = true;
         })
         .catch((err) => {
-          this.linkSent = false;
+          this.isSuccessful = false;
           this.$toast.error(
             extractErrorMessage(
               err,
