@@ -231,7 +231,7 @@
           class="text-sm font-light text-red-500"
           v-if="
             v$.form.company_phone.$dirty &&
-            v$.form.company_phone.required.$invalid
+            v$.form.company_phone.$error
           "
         >
            Please provide a valid phone number
