@@ -19,7 +19,7 @@
         py-3
         pb-6
         text-dark-type-4
-        w-7/12
+        w-8/12
         mx-auto
         z-10
         bg-white
@@ -118,9 +118,7 @@
               "
               placeholder="Confirm your password"
             />
-            <span
-              class="text-sm font-light text-red-500"
-              v-if="!passwordMatch"
+            <span class="text-sm font-light text-red-500" v-if="!passwordMatch"
               >Passwords must match</span
             >
           </div>
@@ -244,16 +242,24 @@ export default defineComponent({
     sendPasswordReset() {
       this.v$.form.$touch();
 
-      if (this.processing || this.v$.form.$errors.length || !this.passwordMatch) {
+      if (
+        this.processing ||
+        this.v$.form.$errors.length ||
+        !this.passwordMatch
+      ) {
         return;
       }
 
       this.processing = true;
       this.errorMessage = '';
-      const payload = { ...this.form };
+      const payload = {
+        password: this.form.password,
+        confirm_password: this.form.confirmPassword,
+        type: 'user'
+      };
 
       this.$axios
-        .post('v1/password', payload)
+        .post('v1/password/change', payload)
         .then(async () => {
           this.linkSent = true;
         })

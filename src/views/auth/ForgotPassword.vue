@@ -19,7 +19,8 @@
         py-3
         pb-6
         text-dark-type-4
-        w-7/12
+        lg:w-8/12
+        w-9/12
         mx-auto
         z-10
         bg-white
