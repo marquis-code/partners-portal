@@ -28,7 +28,7 @@
       style="margin-top: 80px"
     >
       <template v-if="!isSuccessful">
-        <form>
+        <form @submit.prevent="resetPassword">
           <h2
             class="text-sh-grey-900 font-bold text-lg lg:text-2xl text-center"
           >
@@ -60,12 +60,12 @@
               >Password</label
             >
             <input
-              v-model="v$.form.password.$model"
+              v-model.trim="v$.form.password.$model"
               :type="showPassword ? 'text' : 'password'"
+              @input="v$.form.password.$touch()"
+              id="password"
               :class="
-                v$.form.password.$dirty && v$.form.password.$error
-                  ? 'ring-red-500'
-                  : 'ring-sh-grey-300'
+                v$.form.password.$error ? 'ring-red-500' : 'ring-sh-grey-300'
               "
               class="
                 py-3
@@ -105,10 +105,12 @@
               >Confirm Password</label
             >
             <input
-              v-model="v$.form.confirmPassword.$model"
+              v-model.trim="v$.form.confirmPassword.$model"
               :type="showPassword ? 'text' : 'password'"
+              @input="v$.form.confirmPassword.$touch()"
+              id="confirmPassword"
               :class="
-                v$.form.confirmPassword.$dirty && v$.form.confirmPassword.$error
+                v$.form.confirmPassword.$error
                   ? 'ring-red-500'
                   : 'ring-sh-grey-300'
               "
@@ -125,14 +127,30 @@
               "
               placeholder="Confirm your password"
             />
+            <div v-if="v$.form.confirmPassword.$dirty">
+              <span
+                class="text-sm font-light text-red-500"
+                v-if="v$.form.confirmPassword.$error"
+              >
+                Passwords must be identical
+              </span>
+
+              <span
+                class="text-sm font-light text-red-500"
+                v-if="!v$.form.confirmPassword.required"
+              >
+                Password must not be empty.
+              </span>
+            </div>
             <span
-              class="text-sm font-light text-red-500"
-              v-if="!v$.form.confirmPassword.sameAsPassword"
-              >Passwords must be identical.</span
+              @click="toggleShow"
+              class="absolute top-7 right-3 cursor-pointer text-sm font-medium"
+              :class="[showPassword ? 'text-green-500' : 'text-red-500']"
+              >{{ showPassword ? 'Hide' : 'Show' }}</span
             >
           </div>
           <button
-            @click.prevent="sendPasswordReset()"
+            @click.prevent="resetPassword()"
             type="button"
             class="
               border-none
@@ -146,7 +164,7 @@
               w-full
               mt-8
             "
-            :disabled="!v$.form.confirmPassword.sameAsPassword || processing"
+            :disabled="v$.form.$invalid || processing"
             :class="
               !v$.form.confirmPassword.sameAsPassword || processing
                 ? 'cursor-not-allowed text-grays-black-5 bg-grays-black-7'
@@ -163,37 +181,6 @@
           </button>
         </form>
       </template>
-      <!-- <template v-else>
-        <div class="w-full max-w-md">
-          <img
-            src="@/assets/images/email-sent.svg"
-            class="block mx-auto text-center"
-            alt="Check your email"
-          />
-          <h2 class="mt-2 text-2xl font-bold text-center text-dark-type-3">
-            Check your email
-          </h2>
-          <div class="mt-1 text-sm font-medium text-center text-dark-type-4">
-            Check your email for password reset instructions
-          </div>
-          <router-link
-            to="/"
-            class="
-              block
-              w-56
-              h-12
-              py-4
-              mx-auto
-              mt-12
-              font-bold
-              text-center text-white
-              rounded
-              bg-active
-            "
-            >Back to home</router-link
-          >
-        </div>
-      </template> -->
       <template v-else>
         <div class="w-full max-w-md">
           <img
@@ -201,14 +188,27 @@
             class="block mx-auto text-center"
             alt="Password changed"
           />
-          <h2 class="mt-2 text-2xl font-bold text-center text-dark-type-3">Password changed</h2>
-          <div
-            class="mt-1 text-sm font-medium text-center text-dark-type-4"
-          >You have successfully changed your password</div>
+          <h2 class="mt-2 text-2xl font-bold text-center text-dark-type-3">
+            Password changed
+          </h2>
+          <div class="mt-1 text-sm font-medium text-center text-dark-type-4">
+            You have successfully changed your password
+          </div>
           <router-link
-            to="/"
-            class="block w-56 h-12 py-4 mx-auto mt-12 font-bold text-center text-white rounded bg-active bg-green-500"
-          >Login</router-link>
+            to="/login"
+            class="
+              block
+              w-56
+              mx-auto
+              mt-6
+              font-bold
+              text-center text-white
+              rounded
+              py-3
+              bg-active bg-green-500
+            "
+            >Login</router-link
+          >
         </div>
       </template>
     </div>
@@ -251,7 +251,9 @@ export default defineComponent({
           minLength: minLength(6)
         },
         confirmPassword: {
-          sameAsPassword: sameAs('password')
+          required,
+          minLength: minLength(6),
+          sameAsPassword: sameAs(this.form.password)
         }
       }
     };
@@ -261,7 +263,7 @@ export default defineComponent({
     toggleShow() {
       this.showPassword = !this.showPassword;
     },
-    sendPasswordReset() {
+    resetPassword() {
       this.v$.form.$touch();
 
       if (this.processing || this.v$.form.$error) {
