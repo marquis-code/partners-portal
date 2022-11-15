@@ -35,7 +35,7 @@
       </div>
 
       <div class="flex justify-end mt-4">
-        <a :href="forgotPasswordLink" class="text-grays-black-3 text-end text-xs font-medium">Forgot Password ?</a>
+        <router-link :to="{ name: 'forgotPassword'}" class="text-grays-black-3 text-end text-xs font-medium">Forgot Password ?</router-link>
       </div>
       <button
       :class="v$.form.password.$invalid || v$.form.email.$invalid || processing ?

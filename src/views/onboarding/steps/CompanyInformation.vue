@@ -234,7 +234,7 @@
             v$.form.company_phone.required.$invalid
           "
         >
-          This field is required
+          Please provide a valid phone number
         </span>
       </div>
     </section>

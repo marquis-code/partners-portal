@@ -1,14 +1,38 @@
 <template>
-  <div class="min-h-screen">
-    <div class="flex items-center justify-center h-16 py-2 bg-dark-type-1">
-      <router-link to="/">
-        <img src="@/assets/logo.png" style="width: 160px" alt="Shuttlers"
-      /></router-link>
-    </div>
-    <div class="flex flex-col items-center justify-center min-h-screen">
+  <main
+    class="
+      flex
+      items-center
+      min-h-screen
+      justify-center
+      px-8
+      py-8
+      sm:px-12
+      lg:col-span-7 lg:py-12 lg:px-16
+    "
+  >
+    <div
+      class="
+        relative
+        px-6
+        mt-20
+        py-3
+        pb-6
+        text-dark-type-4
+        lg:w-8/12
+        w-9/12
+        mx-auto
+        z-10
+        bg-white
+        rounded-lg
+      "
+      style="margin-top: 80px"
+    >
       <template v-if="!linkSent">
-        <form class="w-full max-w-xs" @submit.prevent="sendPasswordResetEmail">
-          <h2 class="text-2xl font-bold text-center text-dark-type-3">
+        <form>
+          <h2
+            class="text-sh-grey-900 font-bold text-lg lg:text-2xl text-center"
+          >
             Forgot your password?
           </h2>
           <div class="mt-1 text-xs font-medium text-center text-dark-type-4">
@@ -27,59 +51,75 @@
             "
             v-if="errorMessage"
           >
-            <div class="text-sm font-medium text-red-500">
+            <div class="text-sm font-md text-red-500">
               {{ errorMessage }}
             </div>
           </div>
-          <div class="mt-12">
+          <div class="mt-6">
+            <label class="text-grays-black-5 font-medium text-sm"
+              >Email address</label
+            >
             <div class="mt-2">
-              <label class="text-xs font-medium" for="email"
-                >Email address</label
+              <input
+                v-model="v$.form.email.$model"
+                :class="
+                  v$.form.email.$dirty && v$.form.email.$error
+                    ? 'ring-red-500'
+                    : 'ring-sh-grey-300'
+                "
+                type="email"
+                id="email"
+                class="
+                  py-3
+                  px-5
+                  border-none
+                  placeholder:text-grays-black-7
+                  outline-none
+                  w-full
+                  ring-1
+                  text-sm
+                  rounded-md
+                  placeholder-opacity-50
+                "
+                placeholder="sample@mail.com"
+              />
+              <span
+                class="text-sm font-light text-red-500"
+                v-if="v$.form.email.$dirty && v$.form.email.$error"
               >
-              <div class="mt-2">
-                <input
-                  v-model="$v.form.email.$model"
-                  type="email"
-                  id="email"
-                  class="
-                    w-full
-                    h-12
-                    px-3
-                    py-4
-                    text-xs
-                    font-medium
-                    outline-none
-                    placeholder-label-type-1
-                    bg-gray-type-6
-                    focus:outline-none
-                  "
-                  placeholder="sample@mail.com"
-                />
-                <span
-                  class="text-xs text-red-400"
-                  v-if="!$v.form.email.required && $v.form.email.$error"
-                  >Please enter your email address</span
-                >
-              </div>
+                Invalid email</span
+              >
             </div>
           </div>
           <button
-            type="submit"
+            @click.prevent="sendPasswordResetEmail()"
+            type="button"
             class="
-              block
+              border-none
+              outline-none
+              py-3
+              rounded-md
+              text-sm
+              flex
+              justify-center
+              items-center
               w-full
-              h-12
-              py-4
-              mt-12
-              font-bold
-              text-center text-white
-              rounded
-              focus:outline-none
+              mt-8
             "
-            :class="processing ? 'bg-gray-type-7' : 'bg-active'"
-            :dislabed="processing"
+            :disabled="v$.form.$invalid || processing"
+            :class="
+              v$.form.$invalid || processing
+                ? 'cursor-not-allowed text-grays-black-5 bg-grays-black-7'
+                : 'bg-sh-green-500 font-medium'
+            "
           >
             {{ processing ? 'Processing...' : 'Recover Password' }}
+            <spinner v-if="processing" class="w-5 ml-2 mx-0"></spinner>
+            <img
+              v-if="!processing"
+              class="ml-2"
+              src="@/assets/images/arrow.svg"
+            />
           </button>
         </form>
       </template>
@@ -115,58 +155,76 @@
         </div>
       </template>
     </div>
-  </div>
+    <div v-if="!linkSent" class="hidden lg:flex absolute bottom-0 z-0">
+      <img src="@/assets/images/backgroundGraphics.svg" class="w-auto" />
+    </div>
+  </main>
 </template>
 
-<script>
-import { required } from 'vuelidate/lib/validators';
+<script lang="ts">
+import { defineComponent } from 'vue';
+import { required, email } from '@vuelidate/validators';
+import { extractErrorMessage } from '../../utils/helper';
+import useVuelidate from '@vuelidate/core';
+import Spinner from '@/components/layout/Spinner.vue';
 
-export default {
+export default defineComponent({
   data() {
     return {
+      v$: useVuelidate(),
       linkSent: false,
       errorMessage: '',
       form: {
         email: '',
-        type: 'user'
+        type: 'user',
+        app: 'partners-portal'
       },
       processing: false
     };
   },
-  validations: {
-    form: {
-      email: {
-        required
-      }
-    }
+  components: {
+    Spinner
   },
+  validations() {
+    return {
+      form: {
+        email: {
+          required,
+          email
+        }
+      }
+    };
+  },
+
   methods: {
     sendPasswordResetEmail() {
-      this.$v.form.$touch();
+      this.v$.form.$touch();
 
-      if (this.processing || this.$v.form.$error) {
+      if (this.processing || this.v$.form.$errors.length) {
         return;
       }
 
       this.processing = true;
-      this.errorMessage = null;
+      this.errorMessage = '';
+      const payload = { ...this.form };
 
       this.$axios
-        .post('/password', { ...this.form })
+        .post('v1/password', payload)
         .then(async () => {
           this.linkSent = true;
         })
         .catch((err) => {
           this.linkSent = false;
-
-          if (err.response && err.response.data.message) {
-            this.errorMessage = err.response.data.message;
-          } else {
-            this.errorMessage = 'Oops! An error occurred. Please try again.';
-          }
+          this.$toast.error(
+            extractErrorMessage(
+              err,
+              null,
+              'Oops! An error occurred, please try again.'
+            )
+          );
         })
         .finally(() => (this.processing = false));
     }
   }
-};
+});
 </script>
