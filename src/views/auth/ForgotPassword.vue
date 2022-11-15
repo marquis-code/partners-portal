@@ -137,16 +137,16 @@
             Check your email for password reset instructions
           </div>
           <router-link
-            to="/"
+            to="/login"
             class="
               block
               w-56
-              h-12
-              py-4
+              py-3
               mx-auto
-              mt-12
+              mt-6
               font-bold
               text-center text-white
+              bg-sh-green-500
               rounded
               bg-active
             "

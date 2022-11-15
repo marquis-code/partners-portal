@@ -205,7 +205,7 @@
               text-center text-white
               rounded
               py-3
-              bg-active bg-green-500
+              bg-sh-green-500
             "
             >Login</router-link
           >
