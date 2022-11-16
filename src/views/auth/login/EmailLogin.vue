@@ -31,7 +31,7 @@
           class="text-sm font-light text-red-500"
           v-if="v$.form.password.$dirty && v$.form.password.$error">Invalid password</span>
 
-           <span @click="toggleShow" class="absolute top-7 right-3 cursor-pointer text-sm font-medium" :class="[showPassword ? 'text-green-500' : 'text-red-500']">{{showPassword ? "Hide" : "Show"}}</span>
+           <span @click="toggleShow" class="absolute top-7 right-3 cursor-pointer text-sm font-medium" :class="[showPassword ? 'text-green-500' : 'text-purple-dark']">{{showPassword ? "Hide" : "Show"}}</span>
       </div>
 
       <div class="flex justify-end mt-4">

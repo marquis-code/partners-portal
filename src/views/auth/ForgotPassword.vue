@@ -1,6 +1,7 @@
 <template>
   <main
     class="
+    relative
       flex
       items-center
       min-h-screen
@@ -11,6 +12,27 @@
       lg:col-span-7 lg:py-12 lg:px-16
     "
   >
+    <button
+    v-if="!linkSent"
+      @click="goBack"
+      class="
+        block
+        w-20
+        top-0
+        left-6
+        py-2
+        absolute
+        text-sm
+        mx-auto
+        mt-6
+        font-medium
+        text-center text-white
+       bg-grays-black-7
+        rounded
+        bg-active
+      "
+      >Back</button
+    >
     <div
       class="
         relative
@@ -197,6 +219,9 @@ export default defineComponent({
   },
 
   methods: {
+    goBack() {
+      this.$router.go(-1);
+    },
     sendPasswordResetEmail() {
       this.v$.form.$touch();
 
