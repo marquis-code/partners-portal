@@ -96,17 +96,18 @@
             <span
               @click="toggleShow"
               class="absolute top-7 right-3 cursor-pointer text-sm font-medium"
-              :class="[showPassword ? 'text-green-500' : 'text-red-500']"
+              :class="[showPassword ? 'text-green-500' : 'text-purple-dark']"
               >{{ showPassword ? 'Hide' : 'Show' }}</span
             >
           </div>
+
           <div class="flex flex-col space-y-2 mt-6 relative">
             <label class="text-grays-black-5 font-medium text-sm"
               >Confirm Password</label
             >
             <input
               v-model.trim="v$.form.confirmPassword.$model"
-              :type="showPassword ? 'text' : 'password'"
+              :type="showConfirmPassword ? 'text' : 'password'"
               @input="v$.form.confirmPassword.$touch()"
               id="confirmPassword"
               :class="
@@ -143,10 +144,10 @@
               </span>
             </div>
             <span
-              @click="toggleShow"
+              @click="toggleShowConfirmPassword"
               class="absolute top-7 right-3 cursor-pointer text-sm font-medium"
-              :class="[showPassword ? 'text-green-500' : 'text-red-500']"
-              >{{ showPassword ? 'Hide' : 'Show' }}</span
+              :class="[showConfirmPassword ? 'text-green-500' : 'text-purple-dark']"
+              >{{ showConfirmPassword ? 'Hide' : 'Show' }}</span
             >
           </div>
           <button
@@ -166,7 +167,7 @@
             "
             :disabled="v$.form.$invalid || processing"
             :class="
-              !v$.form.confirmPassword.sameAsPassword || processing
+              v$.form.$invalid || processing
                 ? 'cursor-not-allowed text-grays-black-5 bg-grays-black-7'
                 : 'bg-sh-green-500 font-medium'
             "
@@ -237,6 +238,7 @@ export default defineComponent({
         confirmPassword: ''
       },
       showPassword: false,
+      showConfirmPassword: false,
       processing: false
     };
   },
@@ -262,6 +264,9 @@ export default defineComponent({
   methods: {
     toggleShow() {
       this.showPassword = !this.showPassword;
+    },
+    toggleShowConfirmPassword() {
+      this.showConfirmPassword = !this.showConfirmPassword;
     },
     resetPassword() {
       this.v$.form.$touch();
