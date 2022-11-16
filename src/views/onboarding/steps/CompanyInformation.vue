@@ -206,14 +206,35 @@
       </div>
     </section>
     <section class="flex justify-start space-x-10 items-start">
-      <div class="space-y-2 w-full lg:w-6/12 lg:pr-6">
+      <div class="space-y-2 w-full lg:w-6/12 lg:pr-6 relative">
         <label for="companyTel" class="text-xs font-medium text-grays-black-5"
           >Company phone number</label
         >
+        <select
+          class="
+            select-none
+            absolute
+            top-6
+            left-0
+            py-2.5
+            outline-none
+            border-r border-gray-400
+          "
+          v-model="form.country"
+        >
+          <option
+            class="text-sm"
+            :key="country.code"
+            v-for="country in countries"
+            :value="country.code"
+          >
+            {{ countryCodeToEmoji(country.code) }}
+            {{ country.phone_code }}
+          </option>
+        </select>
         <input
           id="companyTel"
-          type="tel"
-          maxlength="11"
+          type="number"
           v-model="v$.form.company_phone.$model"
           class="
             text-xs
@@ -222,20 +243,24 @@
             w-full
             rounded-md
             p-3
+            pl-24
             placeholder-gray-500 placeholder-opacity-25
             ring-1 ring-gray-300
           "
           placeholder="Enter your company's phone number"
         />
         <span
-          class="text-sm font-light text-red-500"
-          v-if="
-            v$.form.company_phone.$dirty &&
-            v$.form.company_phone.$error
-          "
+          class="text-xs text-red-400 mt-2"
+          v-if="form.company_phone && !isPhoneValid"
         >
-           Please provide a valid phone number
+          Your phone number is not valid
         </span>
+        <!-- <span
+          class="text-sm font-light text-red-500"
+          v-if="v$.form.company_phone.$dirty && v$.form.company_phone.$error"
+        >
+          Please provide a valid phone number
+        </span> -->
       </div>
     </section>
     <div class="flex justify-end items-end">
@@ -271,12 +296,18 @@ import { defineComponent } from 'vue';
 import Datepicker from 'vue3-datepicker';
 import useVuelidate from '@vuelidate/core';
 import { email, minLength, required } from '@vuelidate/validators';
+import countryCodeEmoji from 'country-code-emoji';
+import { CountryCode, isValidPhoneNumber } from 'libphonenumber-js/mobile';
 import { mapGetters } from 'vuex';
 import { extractErrorMessage } from '@/utils/helper';
 export default defineComponent({
   name: 'companyInformation',
   components: {
     Datepicker
+  },
+  created() {
+    this.setDefaultCountry();
+    this.fetchCountries();
   },
   emits: ['companySignUpSuccessful'],
   data() {
@@ -290,8 +321,11 @@ export default defineComponent({
         company_address: '',
         business_type: '',
         company_email: '',
-        company_phone: ''
+        company_phone: '',
+        country: ''
       },
+      countries: [],
+      isPhoneValid: false,
       businessOptions: [
         'Business Name',
         'Company',
@@ -320,9 +354,36 @@ export default defineComponent({
     ...mapGetters({
       userSessionData: 'auth/userSessionData',
       user: 'auth/user'
-    })
+    }),
+    countrySelectDisabled() {
+      return this.countries?.length <= 1;
+    }
   },
   methods: {
+    setDefaultCountry() {
+      const code =
+        this.countries && this.countries.length
+          ? (this.countries[0] as any).code
+          : null;
+      if (code) {
+        this.form.country = code;
+      }
+    },
+    async fetchCountries() {
+      const response = await this.$axios.get(`v1/countries`);
+      this.countries = response.data;
+      console.log(this.countries[0]);
+      this.form.country = this.countries[0];
+    },
+    validatePhoneNumber() {
+      this.isPhoneValid = isValidPhoneNumber(
+        this.form.company_phone,
+        this.form.country as CountryCode
+      );
+    },
+    countryCodeToEmoji(code: string) {
+      return countryCodeEmoji(code);
+    },
     async saveForm() {
       this.v$.form.$touch();
       if (this.processing || this.v$.form.$errors.length) {
@@ -349,6 +410,14 @@ export default defineComponent({
       } finally {
         this.processing = false;
       }
+    }
+  },
+  watch: {
+    'form.phone'() {
+      this.validatePhoneNumber();
+    },
+    countries() {
+      this.setDefaultCountry();
     }
   }
 });
