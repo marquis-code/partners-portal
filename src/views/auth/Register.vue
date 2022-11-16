@@ -152,17 +152,48 @@
         </div>
         <div class="mt-6">
           <label class="text-xs font-medium" for="phone">Phone number</label>
-          <div class="mt-2">
+          <div class="mt-2 relative">
+            <select
+              class="
+                absolute
+                h-12
+                top-0
+                left-0
+                px-2
+                font-light
+                outline-none
+                placeholder-label-type-1
+                focus:outline-none
+                rounded-l-lg
+                border border-solid border-gray-type-9
+              "
+              v-model="form.country"
+            >
+              <option
+                class="text-sm"
+                :key="country.code"
+                v-for="country in countries"
+                :value="country.code"
+              >
+                {{ countryCodeToEmoji(country.code) }}
+                {{ country.phone_code }}
+              </option>
+            </select>
             <input
+              :class="
+                v$.form.phone.$dirty && (v$.form.phone.$error || !isPhoneValid)
+                  ? 'ring-red-500'
+                  : 'ring-sh-grey-300'
+              "
               v-model="v$.form.phone.$model"
               type="tel"
-              maxlength="11"
               id="phone"
               class="
                 w-full
                 h-12
                 px-3
                 py-4
+                pl-28
                 text-xs
                 font-medium
                 outline-none
@@ -171,21 +202,17 @@
                 border border-solid border-gray-type-9
                 focus:outline-none
               "
-              placeholder="0706 111 1198"
+              placeholder="Enter your phone number"
             />
-            <div
-              class="text-xs text-red-400"
-              v-if="v$.form.phone.required.$invalid && v$.form.phone.$error"
+            <span
+              v-if="
+                v$.form.phone.$dirty &&
+                (v$.form.phone.$error || !isPhoneValid)
+              "
+              class="text-sm text-red-500 font-light"
             >
-              Please enter a valid phone number
-            </div>
-            <div
-              class="text-xs text-red-400"
-              v-if="v$.form.phone.phoneNumber && !v$.form.phone.minLength"
-            >
-              Phone number must be at least
-              {{ v$.form.phone.$params.minLength.min }} digits
-            </div>
+              Please provide a valid phone number
+            </span>
           </div>
         </div>
         <div class="mt-6">
@@ -300,6 +327,8 @@ import { defineComponent } from 'vue';
 import { useReCaptcha } from 'vue-recaptcha-v3';
 import { AxiosResponse } from 'axios';
 import { LoginResponse } from '@/models/login-response.model';
+import countryCodeEmoji from 'country-code-emoji';
+import { CountryCode, isValidPhoneNumber } from 'libphonenumber-js/mobile';
 
 const phoneNumber = (value: string) => {
   return /^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$/.test(
@@ -322,10 +351,13 @@ export default defineComponent({
         fname: '',
         lname: '',
         phone: '',
-        password: ''
+        password: '',
+        country: ''
       },
       errorMessage: '',
+      countries: [],
       captchaInitialized: false,
+      isPhoneValid: false,
       registrationContext: null, // specifies the context from which the user is registering
       cities: []
     };
@@ -390,6 +422,10 @@ export default defineComponent({
     } catch (e) {
       console.error(e);
     }
+  },
+  created() {
+    this.setDefaultCountry();
+    this.fetchCountries();
   },
   computed: {
     termsOfUseLink() {
@@ -478,6 +514,36 @@ export default defineComponent({
           }
         }
       });
+    },
+    setDefaultCountry() {
+      const code =
+        this.countries && this.countries.length
+          ? (this.countries[0] as any).code
+          : null;
+      if (code) {
+        this.form.country = code;
+      }
+    },
+    async fetchCountries() {
+      const response = await this.$axios.get(`v1/countries`);
+      this.countries = response.data || [];
+    },
+    validatePhoneNumber() {
+      this.isPhoneValid = isValidPhoneNumber(
+        this.form.phone.toString(),
+        this.form.country as CountryCode
+      );
+    },
+    countryCodeToEmoji(code: string) {
+      return countryCodeEmoji(code);
+    }
+  },
+  watch: {
+    'form.phone'() {
+      this.validatePhoneNumber();
+    },
+    countries() {
+      this.setDefaultCountry();
     }
   }
 });

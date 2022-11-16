@@ -212,13 +212,16 @@
         >
         <select
           class="
-            select-none
             absolute
+            h-10
             top-6
             left-0
-            py-2.5
+            font-light
             outline-none
-            border-r border-gray-400
+            placeholder-label-type-1
+            focus:outline-none
+            rounded-l-lg
+            border border-solid border-gray-type-9
           "
           v-model="form.country"
         >
@@ -234,8 +237,14 @@
         </select>
         <input
           id="companyTel"
-          type="number"
-          v-model="v$.form.company_phone.$model"
+          type="tel"
+          :class="
+            v$.form.company_phone.$dirty &&
+            (v$.form.company_phone.$error || !isPhoneValid)
+              ? 'ring-red-500'
+              : 'ring-sh-grey-300'
+          "
+          v-model.trim="v$.form.company_phone.$model"
           class="
             text-xs
             border-none
@@ -250,17 +259,14 @@
           placeholder="Enter your company's phone number"
         />
         <span
-          class="text-xs text-red-400 mt-2"
-          v-if="form.company_phone && !isPhoneValid"
-        >
-          Your phone number is not valid
-        </span>
-        <!-- <span
-          class="text-sm font-light text-red-500"
-          v-if="v$.form.company_phone.$dirty && v$.form.company_phone.$error"
+          v-if="
+            v$.form.company_phone.$dirty &&
+            (v$.form.company_phone.$error || !isPhoneValid)
+          "
+          class="text-sm text-red-500 font-light"
         >
           Please provide a valid phone number
-        </span> -->
+        </span>
       </div>
     </section>
     <div class="flex justify-end items-end">
@@ -295,11 +301,12 @@
 import { defineComponent } from 'vue';
 import Datepicker from 'vue3-datepicker';
 import useVuelidate from '@vuelidate/core';
-import { email, minLength, required } from '@vuelidate/validators';
+import { email, required } from '@vuelidate/validators';
 import countryCodeEmoji from 'country-code-emoji';
 import { CountryCode, isValidPhoneNumber } from 'libphonenumber-js/mobile';
 import { mapGetters } from 'vuex';
 import { extractErrorMessage } from '@/utils/helper';
+
 export default defineComponent({
   name: 'companyInformation',
   components: {
@@ -346,7 +353,7 @@ export default defineComponent({
         company_address: { required },
         business_type: { required },
         company_email: { required, email },
-        company_phone: { required, minLength: minLength(11) }
+        company_phone: { required }
       }
     };
   },
@@ -371,13 +378,11 @@ export default defineComponent({
     },
     async fetchCountries() {
       const response = await this.$axios.get(`v1/countries`);
-      this.countries = response.data;
-      console.log(this.countries[0]);
-      this.form.country = this.countries[0];
+      this.countries = response.data || [];
     },
     validatePhoneNumber() {
       this.isPhoneValid = isValidPhoneNumber(
-        this.form.company_phone,
+        this.form.company_phone.toString(),
         this.form.country as CountryCode
       );
     },
@@ -413,7 +418,7 @@ export default defineComponent({
     }
   },
   watch: {
-    'form.phone'() {
+    'form.company_phone'() {
       this.validatePhoneNumber();
     },
     countries() {
@@ -424,4 +429,9 @@ export default defineComponent({
 </script>
 
 <style>
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
 </style>
