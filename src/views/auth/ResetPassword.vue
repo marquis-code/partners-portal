@@ -213,7 +213,7 @@
         </div>
       </template>
     </div>
-    <div v-if="!successful" class="hidden lg:flex absolute bottom-0 z-0">
+    <div v-if="!isSuccessful" class="hidden lg:flex absolute bottom-0 z-0">
       <img src="@/assets/images/backgroundGraphics.svg" class="w-auto" />
     </div>
   </main>
