@@ -122,9 +122,33 @@
               <label class="text-xs font-medium text-grays-black-5"
                 >Phone number</label
               >
+              <select
+                class="
+                  absolute
+                  h-10
+                  top-6
+                  left-0
+                  font-light
+                  outline-none
+                  placeholder-label-type-1
+                  focus:outline-none
+                  rounded-l-lg
+                  border border-solid border-gray-type-9
+                "
+                v-model="form.country"
+              >
+                <option
+                  class="text-sm"
+                  :key="country.code"
+                  v-for="country in countries"
+                  :value="country.code"
+                >
+                  {{ countryCodeToEmoji(country.code) }}
+                  {{ country.phone_code }}
+                </option>
+              </select>
               <input
                 type="tel"
-                maxlength="11"
                 v-model="v$.form.phone.$model"
                 class="
                   text-xs
@@ -132,7 +156,7 @@
                   outline-none
                   w-full
                   rounded-md
-                  pl-28
+                  pl-24
                   p-3
                   placeholder-gray-500 placeholder-opacity-25
                   ring-1 ring-gray-300
@@ -140,17 +164,13 @@
                 placeholder="Enter drivers phone number"
               />
               <span
-                class="text-xs font-light text-red-500"
-                v-if="v$.form.phone.$dirty && v$.form.phone.$error"
+                v-if="
+                  v$.form.phone.$dirty &&
+                  (v$.form.phone.$error || !isPhoneValid)
+                "
+                class="text-xs text-red-500 font-light"
               >
-                Please provide your drivers pohone number
-              </span>
-              <span class="absolute top-8 left-2 bottom-0">
-                <div class="flex justify-center items-center space-x-3">
-                  <img src="@/assets/images/naira.svg" />
-                  <p class="text-sm text-gray-400">+234</p>
-                  <div class="h-5 w-0.5 bg-gray-200"></div>
-                </div>
+                Please provide a valid phone number
               </span>
             </div>
             <div class="space-y-2 w-full">
@@ -389,7 +409,9 @@ import ImageUpload from '@/components/ImageUpload.vue';
 import { defineComponent } from 'vue';
 import Datepicker from 'vue3-datepicker';
 import useVuelidate from '@vuelidate/core';
-import { email, minLength, required } from '@vuelidate/validators';
+import { email, required } from '@vuelidate/validators';
+import countryCodeEmoji from 'country-code-emoji';
+import { CountryCode, isValidPhoneNumber } from 'libphonenumber-js/mobile';
 import { mapGetters } from 'vuex';
 import { extractErrorMessage } from '@/utils/helper';
 import { format } from 'date-fns';
@@ -407,6 +429,10 @@ export default defineComponent({
     PageActionHeader,
     AppModal,
     Spinner
+  },
+  created() {
+    this.setDefaultCountry();
+    this.fetchCountries();
   },
   data() {
     return {
@@ -426,9 +452,12 @@ export default defineComponent({
         license_number: '',
         expiry_date: '',
         files: [] as Array<string>,
-        avatar: ''
+        avatar: '',
+        country: ''
       },
-      processing: false
+      processing: false,
+      countries: [],
+      isPhoneValid: false
     };
   },
   validations() {
@@ -436,7 +465,7 @@ export default defineComponent({
       form: {
         fname: { required },
         lname: { required },
-        phone: { required, minLength: minLength(11) },
+        phone: { required },
         email: { required, email },
         residential_address: { required },
         dob: { required },
@@ -454,6 +483,28 @@ export default defineComponent({
     })
   },
   methods: {
+    setDefaultCountry() {
+      const code =
+        this.countries && this.countries.length
+          ? (this.countries[0] as any).code
+          : null;
+      if (code) {
+        this.form.country = code;
+      }
+    },
+    async fetchCountries() {
+      const response = await this.$axios.get(`v1/countries`);
+      this.countries = response.data || [];
+    },
+    validatePhoneNumber() {
+      this.isPhoneValid = isValidPhoneNumber(
+        this.form.phone.toString(),
+        this.form.country as CountryCode
+      );
+    },
+    countryCodeToEmoji(code: string) {
+      return countryCodeEmoji(code);
+    },
     openModal() {
       this.showModal = true;
     },
@@ -557,6 +608,22 @@ export default defineComponent({
         // this.uploadingFile = false;
       }
     }
+  },
+  watch: {
+    'form.phone'() {
+      this.validatePhoneNumber();
+    },
+    countries() {
+      this.setDefaultCountry();
+    }
   }
 });
 </script>
+
+<style>
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+</style>
