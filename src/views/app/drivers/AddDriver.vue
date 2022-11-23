@@ -212,9 +212,10 @@
           >
             <div class="space-y-2 w-full">
               <label class="text-xs font-medium text-grays-black-5"
-                >Residential address</label
+                >Residential address changes</label
               >
-              <input
+              <address-autocomplete></address-autocomplete>
+              <!-- <input
                 type="text"
                 v-model="v$.form.residential_address.$model"
                 class="
@@ -228,7 +229,7 @@
                   ring-1 ring-gray-300
                 "
                 placeholder="Enter drivers address"
-              />
+              /> -->
               <span
                 class="text-xs font-light text-red-500"
                 v-if="
@@ -419,6 +420,7 @@ import PageLayout from '@/components/layout/PageLayout.vue';
 import Spinner from '@/components/layout/Spinner.vue';
 import PageActionHeader from '@/components/PageActionHeader.vue';
 import AppModal from '@/components/Modals/AppModal.vue';
+import AddressAutocomplete from '@/components/AddressAutocomplete.vue';
 
 export default defineComponent({
   name: 'AddDriver',
@@ -428,7 +430,8 @@ export default defineComponent({
     PageLayout,
     PageActionHeader,
     AppModal,
-    Spinner
+    Spinner,
+    AddressAutocomplete
   },
   created() {
     this.setDefaultCountry();
