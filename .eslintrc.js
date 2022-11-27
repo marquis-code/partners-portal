@@ -29,7 +29,8 @@ module.exports = {
         allowDestructuring: true, // Allow `const { props, state } = this`; false by default
         allowedNames: ["vm"] // Allow `const vm = this`; `[]` by default
       }
-    ]
+    ],
+    camelcase: "off",
   },
   overrides: [
     {

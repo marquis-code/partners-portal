@@ -1,0 +1,13 @@
+:root {
+  --modal-bg: #ffffff;
+}
+.sh-modal {
+  background: var(--modal-bg);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  min-height: 100vh;
+  overflow: auto;
+  z-index: 1000;
+}
