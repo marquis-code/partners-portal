@@ -1,26 +1,32 @@
+/* eslint-disable */
+
 import {NavigationGuardReturn, RouteGuard} from "@/models/route-guard";
 import {NavigationGuardNext, RouteLocationNormalized} from "vue-router";
 import {Store} from "vuex";
+import {UserSessionModel} from "@/models/user-session.model";
 
 export class AuthGuard implements RouteGuard {
   constructor (private store: Store<any>) {
   }
 
-  handle (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext): NavigationGuardReturn | Promise<NavigationGuardReturn> {
+  handle (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext): boolean {
     const requiresAuth = to.matched.some(route => route.meta.requiresAuth);
     const isLoggedIn = this.store.getters["auth/isLoggedIn"];
     if (!isLoggedIn && requiresAuth) {
       this.store.dispatch('auth/clearSessionData');
-      return next({
+      next({
         name: "login",
         query: { redirect: to.fullPath }
       });
-    } else if (isLoggedIn && !requiresAuth) {
-      return next({
-        name: "dashboard",
-        query: { redirect: to.fullPath }
-      });
+      return false;
     }
-    next();
+
+    if (isLoggedIn && !requiresAuth) {
+      next({
+        name: "dashboard",
+      });
+      return false;
+    }
+    return true;
   }
 }

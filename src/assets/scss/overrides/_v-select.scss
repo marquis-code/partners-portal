@@ -1,0 +1,33 @@
+
+:deep .v-select {
+  &.vs--single {
+    & .vs__selected {
+      max-width: 80%;
+    }
+  }
+
+  & .vs__search::placeholder {
+    color: #D3DCE6;
+    font-weight: 300;
+    font-size: 0.875rem;
+  }
+
+  & .vs__dropdown-toggle {
+    height: calc(1.5em + 1rem + 2px);
+  }
+
+  & .vs__dropdown-option {
+    padding: 1rem 0.75rem;
+    font-size: 0.875rem;
+    white-space: normal;
+
+    &:hover {
+      @apply bg-grays-black-2;
+    }
+
+    &--highlight, &--selected {
+      @apply bg-grays-black-2;
+      color: white;
+    }
+  }
+}
