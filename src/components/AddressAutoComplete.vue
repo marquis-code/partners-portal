@@ -15,46 +15,48 @@
     v-model="query"
   />
 
-  <ul class="space-y-2">
-    <li
-      @click="handleSelected(item.description)"
-      v-for="item in suggestions"
-      class="py-3 rounded-sm ring-1 ring-gray-300 cursor-pointer text-sm px-2"
-      :key="item.place_id"
-    >
-      {{ item.description }}
-    </li>
+  <ul class="space-y-2 rounded-md shadow-md">
+    <div v-if="showDropdown" class="bg-gray-100">
+      <li
+        @click="handleSelected(item.description)"
+        v-for="item in suggestions"
+        class="py-3 text-xs ring-1 ring-white cursor-pointer px-2"
+        :key="item.place_id"
+      >
+        {{ item.description }}
+      </li>
+    </div>
   </ul>
 </template>
 
 <script>
-import { defineComponent, ref } from 'vue';
+import { defineComponent, ref, watch } from 'vue';
 import { usePlacesAutocomplete } from 'v-use-places-autocomplete';
 
 export default defineComponent({
-  setup (context) {
+  setup(props, { emit }) {
     const query = ref('');
-    const newAddress = ref('');
+    const showDropdown = ref(false);
     const { suggestions } = usePlacesAutocomplete(query, {
       debounce: 500,
       minLengthAutocomplete: 3
     });
-    // const newModel = computed(() => {
-    //   return newAddress.value || query;
-    // });
 
-    const handleSelected = (selectedAddressValue) => {
-      this.newAddress = selectedAddressValue;
-      console.log(selectedAddressValue);
-      context.emit('autoCompleteAddress', selectedAddressValue);
-    };
+    function handleSelected(selectedAddressValue) {
+      query.value = selectedAddressValue;
+      emit('autoCompleteAddress', selectedAddressValue);
+      showDropdown.value = false;
+    }
+
+    watch(query, () => {
+      showDropdown.value = true;
+    });
 
     return {
       query,
       suggestions,
       handleSelected,
-      newAddress,
-      // newModel
+      showDropdown
     };
   },
   emits: ['autoCompleteAddress']

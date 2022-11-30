@@ -488,8 +488,7 @@ export default defineComponent({
     })
   },
   methods: {
-    SelectedAddress(value: any) {
-      console.log(value, 'here');
+    selectedAddress(value: any) {
       this.form.residential_address = value
     },
     setDefaultCountry() {
