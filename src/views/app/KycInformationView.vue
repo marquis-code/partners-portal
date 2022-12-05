@@ -254,7 +254,7 @@ export default defineComponent<any, any, any>({
         document: {
           document_id: null,
           type: null,
-          dob: null,
+          dob: new Date(),
           fname: null,
           lname: null
         }
