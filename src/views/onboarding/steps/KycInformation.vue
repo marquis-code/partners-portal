@@ -300,7 +300,7 @@ export default defineComponent<any, any, any>({
         document: {
           document_id: null,
           type: null,
-          dob: null,
+          dob: new Date(),
           fname: null,
           lname: null
         }
@@ -361,7 +361,10 @@ export default defineComponent<any, any, any>({
           partner_type: { required }
         },
         document: {
-          document_id: { required, minLength: minLength(this.identityDocumentLength) },
+          document_id: {
+            required,
+            minLength: minLength(this.identityDocumentLength)
+          },
           type: { required },
           dob: { required },
           fname: { required },
