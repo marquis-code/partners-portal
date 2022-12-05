@@ -214,21 +214,6 @@
               <label class="text-xs font-medium text-grays-black-5"
                 >Residential address</label
               >
-              <!-- <input
-                type="text"
-                v-model="v$.form.residential_address.$model"
-                class="
-                  text-xs
-                  border-none
-                  outline-none
-                  w-full
-                  rounded-md
-                  p-3
-                  placeholder-gray-500 placeholder-opacity-25
-                  ring-1 ring-gray-300
-                "
-                placeholder="Enter drivers address"
-              /> -->
               <address-auto-complete
                 @autoCompleteAddress="selectedAddress"
               ></address-auto-complete>
@@ -455,7 +440,7 @@ export default defineComponent({
         residential_address: '',
         dob: '',
         license_number: '',
-        expiry_date: '',
+        expiry_date: new Date(),
         files: [] as Array<string>,
         avatar: '',
         country: ''
@@ -489,7 +474,7 @@ export default defineComponent({
   },
   methods: {
     selectedAddress(value: any) {
-      this.form.residential_address = value
+      this.form.residential_address = value;
     },
     setDefaultCountry() {
       const code =

@@ -15,8 +15,8 @@
     v-model="query"
   />
 
-  <ul class="space-y-2 rounded-md shadow-md">
-    <div v-if="showDropdown" class="bg-gray-100">
+  <ul v-if="showDropdown" class="space-y-2 rounded-md shadow-md">
+    <div class="bg-gray-100">
       <li
         @click="handleSelected(item.description)"
         v-for="item in suggestions"
