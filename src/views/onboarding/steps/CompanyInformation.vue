@@ -322,7 +322,7 @@ export default defineComponent({
       v$: useVuelidate(),
       form: {
         mode: this.$route.query.type,
-        experience_start_date: '' as any,
+        experience_start_date: new Date() as any,
         company_name: '',
         rc_number: '',
         company_address: '',
