@@ -214,9 +214,21 @@
               <label class="text-xs font-medium text-grays-black-5"
                 >Residential address</label
               >
-              <address-auto-complete
-                @autoCompleteAddress="selectedAddress"
-              ></address-auto-complete>
+              <input
+                type="text"
+                v-model="v$.form.residential_address.$model"
+                class="
+                  text-xs
+                  border-none
+                  outline-none
+                  w-full
+                  rounded-md
+                  p-3
+                  placeholder-gray-500 placeholder-opacity-25
+                  ring-1 ring-gray-300
+                "
+                placeholder="Enter drivers address"
+              />
               <span
                 class="text-xs font-light text-red-500"
                 v-if="
@@ -335,6 +347,7 @@
               <image-upload
                 :uploading="uploadingFile"
                 @fileSelected="fileSelected"
+                :isUploadSuccessful="isUploadSuccessful"
               ></image-upload>
             </div>
           </section>
@@ -407,7 +420,6 @@ import PageLayout from '@/components/layout/PageLayout.vue';
 import Spinner from '@/components/layout/Spinner.vue';
 import PageActionHeader from '@/components/PageActionHeader.vue';
 import AppModal from '@/components/Modals/AppModal.vue';
-import AddressAutoComplete from '@/components/AddressAutoComplete.vue';
 
 export default defineComponent({
   name: 'AddDriver',
@@ -417,8 +429,7 @@ export default defineComponent({
     PageLayout,
     PageActionHeader,
     AppModal,
-    Spinner,
-    AddressAutoComplete
+    Spinner
   },
   created() {
     this.setDefaultCountry();
@@ -440,9 +451,9 @@ export default defineComponent({
         residential_address: '',
         dob: '',
         license_number: '',
-        expiry_date: new Date(),
+        expiry_date: '',
         files: [] as Array<string>,
-        avatar: '',
+        avatar: '' as string,
         country: ''
       },
       processing: false,
@@ -473,9 +484,6 @@ export default defineComponent({
     })
   },
   methods: {
-    selectedAddress(value: any) {
-      this.form.residential_address = value;
-    },
     setDefaultCountry() {
       const code =
         this.countries && this.countries.length
@@ -555,9 +563,7 @@ export default defineComponent({
           this.$toast.success('Driver’s License was uploaded successfully');
         })
         .catch(() => {
-          this.$toast.error(
-            'Something went wrong while uploading Driver’s License'
-          );
+          this.uploadingFile = false;
         })
         .finally(() => {
           this.uploadingFile = false;
@@ -574,7 +580,7 @@ export default defineComponent({
           this.$toast.success('Profile picture was uploaded successfully');
         })
         .catch(() => {
-          this.$toast.error('Something went wrong while uploading profile');
+          this.profilePreview = '';
         })
         .finally(() => {
           this.uploadingProfile = false;
@@ -582,7 +588,6 @@ export default defineComponent({
     },
 
     async uploadTos3andGetDocumentUrl(file: any) {
-      // this.uploadingFile = true;
       try {
         const formData = new FormData();
         formData.append('file', file);
@@ -594,11 +599,10 @@ export default defineComponent({
           return response.data.files[0].Location;
         }
       } catch (error) {
-        this.$toast.warning(
+        this.$toast.error(
           'An error occured while uploading your file, please try again'
         );
-      } finally {
-        // this.uploadingFile = false;
+        this.profilePreview = '';
       }
     }
   },
