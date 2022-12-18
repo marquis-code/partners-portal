@@ -405,9 +405,9 @@ export default defineComponent<any, any, any>({
       try {
         const modifiedRegisterationNumber =
           this.form.registration_number.split('-');
-        const first_split = modifiedRegisterationNumber[0];
-        const second_split = modifiedRegisterationNumber[1];
-        const approved_registeration_nuber = first_split + second_split;
+        const plateNumber_first_split = modifiedRegisterationNumber[0];
+        const plateNumbersecond_split = modifiedRegisterationNumber[1];
+        const approved_registeration_nuber = plateNumber_first_split + plateNumbersecond_split;
         const payload = {
           brand: this.form.brand,
           name: this.form.name,
