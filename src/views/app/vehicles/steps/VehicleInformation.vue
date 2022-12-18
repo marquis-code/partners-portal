@@ -480,8 +480,6 @@ select {
   border-radius: 6px;
   padding: 5px;
   padding-top: 0px;
-
-  /* Position the tooltip */
   position: absolute;
   z-index: 1;
 }
