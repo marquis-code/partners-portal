@@ -150,7 +150,6 @@
           >
           <v-select
             :disabled="fetchingModels"
-            @input="console.log($event)"
             class="form-group"
             @option:selected="selectThisCity($event)"
             :options="cities"
@@ -372,7 +371,6 @@ export default defineComponent<any, any, any>({
         });
     },
     onCarModelChanged(carModel: any) {
-      // console.log('model', carModel.capacity_list)
       this.form.name = carModel.name;
       this.capacityList = carModel.capacity_list || [];
       if (this.form.name) {
@@ -405,8 +403,20 @@ export default defineComponent<any, any, any>({
       }
       this.processing = true;
       try {
+        const modifiedRegisterationNumber =
+          this.form.registration_number.split('-');
+        const first_split = modifiedRegisterationNumber[0];
+        const second_split = modifiedRegisterationNumber[1];
+        const approved_registeration_nuber = first_split + second_split;
         const payload = {
-          ...this.form
+          brand: this.form.brand,
+          name: this.form.name,
+          // type: 'Sedan',
+          year: this.form.year,
+          seats: this.form.seats,
+          city_ids: this.form.city_ids,
+          registration_number: approved_registeration_nuber,
+          partner_id: this.form.partner_id
         };
         const response = await this.$axios.post('/v1/vehicles', payload);
         await this.$store.dispatch('vehicle/setVehicleFormData', response.data);
@@ -423,7 +433,6 @@ export default defineComponent<any, any, any>({
       }
     },
     async getVehiclesForBrand(brandId: any) {
-      console.log(brandId, 'here');
       if (this.vehicleModelMap.has(brandId)) {
         this.vehicleModels = this.vehicleModelMap.get(brandId);
       } else {
@@ -431,7 +440,6 @@ export default defineComponent<any, any, any>({
           const vehicleModelsResponse = await this.$axios.get(
             `v1/vehicle-makes/${brandId}/vehicle-models?limit=1000`
           );
-          console.log(vehicleModelsResponse.data.data, 'am here');
           this.vehicleModels = vehicleModelsResponse.data.data;
         } catch (e) {
           this.$toast.error(extractErrorMessage(e, null, 'An error occurred!'));
