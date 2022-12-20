@@ -76,13 +76,14 @@
             This field is required
           </span>
         </div>
+        {{ selectedDocument }}
         <div class="space-y-2 w-full">
           <label class="text-xs font-medium text-grays-black-5">{{
             getDocumentLabel
           }}</label>
           <input
-            maxlength="11"
             type="text"
+            pattern="[a-zA-Z0-9]+"
             v-model="v$.identityForm.document.document_id.$model"
             class="
               text-xs
@@ -94,13 +95,13 @@
               placeholder-gray-500 placeholder-opacity-25
               ring-1 ring-gray-300
             "
-            placeholder="Enter document number"
+            placeholder="Enter BVN document number"
           />
           <span
             class="text-sm font-light text-red-500"
             v-if="
-              v$.identityForm.document.document_id.$dirty &&
-              v$.identityForm.document.document_id.required.$invalid
+              v$.identityForm?.document?.document_id?.$dirty &&
+              v$.identityForm?.document?.document_id?.required?.$invalid
             "
           >
             This field is required
@@ -324,14 +325,14 @@ export default defineComponent<any, any, any>({
         {
           key: 'nin',
           label: 'NIN',
-          desc: 'National Identification Number',
-          maxLength: 11
+          desc: 'National Identification Number'
+          // maxLength: 11
         },
         {
           key: 'bvn',
           label: 'BVN',
-          desc: 'Bank Verification Number',
-          maxLength: 11
+          desc: 'Bank Verification Number'
+          // maxLength: 11
         }
         /*        {
           key: 'drivers-license',
@@ -398,7 +399,7 @@ export default defineComponent<any, any, any>({
           : 'Document ID';
       }
       return '';
-    }
+    },
   },
   methods: {
     setFormDefaults() {
