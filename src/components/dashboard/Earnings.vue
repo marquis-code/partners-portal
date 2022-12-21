@@ -45,7 +45,7 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
+<style>
 .--loading {
   display: flex;
   flex-direction: column;

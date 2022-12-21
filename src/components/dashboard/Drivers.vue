@@ -54,12 +54,4 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.--loading {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  max-width: 330px;
-  height: 250px;
-}
 </style>
