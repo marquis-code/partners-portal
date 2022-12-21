@@ -1,14 +1,18 @@
 <template>
   <main
-    class="
+    :class="`
       rounded-md
       ring-1 ring-gray-200
       bg-grays-white
       p-6
       space-y-5
-      shadow-sm
+      shadow-sm ${
+      loading ? '--loading' : ''
+    }`
     "
   >
+  <div v-if="loading"><spinner /></div>
+  <template v-else>
     <img src="@/assets/images/overallRatings.svg" />
     <p class="text-grays-black-4">Overall ratings</p>
     <h1 class="text-sh-grey-900">{{rating}} / 10</h1>
@@ -17,19 +21,33 @@
       <img src="@/assets/images/ratingHike.svg" />
       <span class="text-sh-purple-700 text-sm"><span class="text-green-500">{{count}}</span> ratings in total</span>
     </div>
+  </template>
   </main>
 </template>
 
 <script>
 import { defineComponent } from "vue-demi";
+import Spinner from '@/components/layout/Spinner.vue';
 
 export default defineComponent({
   props: {
     count: Number,
-    rating: Number
+    rating: Number,
+    loading: Boolean
+  },
+  components: {
+    Spinner
   }
 });
 </script>
 
-<style>
+<style scoped>
+.--loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  max-width: 330px;
+  height: 250px;
+}
 </style>
