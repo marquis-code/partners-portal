@@ -1,7 +1,6 @@
 <template>
   <page-layout page-title="Welcome">
-    <div v-if="loadingStats"><spinner /></div>
-    <div v-else>
+    <div>
       <div
         v-if="!isTodoComplete"
         class="
@@ -89,12 +88,20 @@
       <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <earnings
           :accruedEarnings="partnerStats.partnerAccruedEarnings"
+          :loading="loadingStats"
         ></earnings>
-        <vehicles :vehiclesCount="partnerStats.partnerVehicleCount"></vehicles>
-        <drivers :driversCount="partnerStats.partnerDriverCount"></drivers>
+        <vehicles
+          :vehiclesCount="partnerStats.partnerVehicleCount"
+          :loading="loadingStats"
+        ></vehicles>
+        <drivers
+          :driversCount="partnerStats.partnerDriverCount"
+          :loading="loadingStats"
+        ></drivers>
         <ratings
           :count="partnerStats.ratingCount"
           :rating="partnerStats.ratingOverTen"
+          :loading="loadingStats"
         ></ratings>
       </section>
 
@@ -132,7 +139,6 @@ import PieChart from '@/components/dashboard/PieChart.vue';
 import Chart from '@/components/dashboard/Chart.vue';
 import CheckList from '@/components/CheckList.vue';
 import { extractErrorMessage } from '@/utils/helper';
-import Spinner from '@/components/layout/Spinner.vue';
 import moment from 'moment';
 
 export default defineComponent({
@@ -145,7 +151,6 @@ export default defineComponent({
     Chart,
     Ratings,
     PieChart,
-    Spinner
   },
   data() {
     return {
