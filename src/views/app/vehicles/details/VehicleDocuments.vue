@@ -10,7 +10,7 @@
       >
         <template v-slot:status="{ item }">
           <span v-if="item.status === 'submitted'" class="text-sh-green-700"
-            >Summitted</span
+            >Submitted</span
           >
           <span v-if="item.status === 'Not uploaded'" class="text-sh-yellow-800"
             >Not uploaded</span
