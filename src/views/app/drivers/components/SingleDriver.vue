@@ -49,17 +49,18 @@
           <div class="">
             <p class="font-medium text-sm">Assigned vehicle</p>
             <router-link
-            v-if="driverData.vehicle_id"
+              v-if="driverData.vehicle_id"
               class="
-               text-gray-900
+                text-gray-900
                 hover:text-sh-green-500
-                hover:underline hover:decoration-sh-green-500
+                hover:underline
+                hover:decoration-sh-green-500
                 font-light
                 text-sm
               "
               :to="{
                 name: 'vehicle.detail.info',
-                params: {vehicleId: driverData?.vehicle?.id }
+                params: { vehicleId: driverData?.vehicle?.id }
               }"
             >
               {{
@@ -68,7 +69,9 @@
                   : 'N/A'
               }}
             </router-link>
-              <p class="text-sm text-gray-500 font-light pt-2" v-else>No vehicle assigned</p>
+            <p class="text-sm text-gray-500 font-light pt-2" v-else>
+              No vehicle assigned
+            </p>
           </div>
         </div>
         <a
@@ -88,7 +91,12 @@
           </div>
         </div>
         <router-link
-          :to="{ name: 'EditDriver', params: { driverId: driverData.id } }"
+          :class="[disabled ? 'opacity-25 cursor-not-allowed' : '']"
+          :to="
+            disabled
+              ? ''
+              : { name: 'EditDriver', params: { driverId: driverData.id } }
+          "
           class="
             underline
             text-indigo-600 text-sm
@@ -128,7 +136,12 @@
           </div>
         </div>
         <router-link
-          :to="{ name: 'EditDriver', params: { driverId: driverData.id } }"
+          :to="
+            disabled
+              ? ''
+              : { name: 'EditDriver', params: { driverId: driverData.id } }
+          "
+          :class="[disabled ? 'opacity-25 cursor-not-allowed' : '']"
           class="
             underline
             text-indigo-600 text-xs
@@ -148,7 +161,12 @@
           </div>
         </div>
         <router-link
-          :to="{ name: 'EditDriver', params: { driverId: driverData.id } }"
+          :to="
+            disabled
+              ? ''
+              : { name: 'EditDriver', params: { driverId: driverData.id } }
+          "
+          :class="[disabled ? 'opacity-25 cursor-not-allowed' : '']"
           class="
             underline
             text-indigo-600 text-xs
@@ -170,6 +188,11 @@ export default defineComponent({
   props: {
     driverData: Object
   },
+  data() {
+    return {
+      disabled: true
+    };
+  }
 });
 </script>
 

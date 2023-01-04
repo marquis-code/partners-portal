@@ -45,6 +45,7 @@
           class="hidden"
           type="file"
           id="profile"
+          disabled="true"
         />
         <label
           for="profile"
@@ -380,7 +381,11 @@
             >
               {{ processing ? 'Saving' : 'Update' }}
               <spinner v-if="processing"></spinner>
-              <img v-if="!processing" class="ml-2" src="@/assets/images/arrow.svg" />
+              <img
+                v-if="!processing"
+                class="ml-2"
+                src="@/assets/images/arrow.svg"
+              />
             </button>
           </div>
         </form>
@@ -442,7 +447,7 @@ export default defineComponent({
     Spinner,
     AppModal
   },
-  data () {
+  data() {
     return {
       docId: null,
       fetchingDriver: false,
@@ -458,7 +463,7 @@ export default defineComponent({
       uploadingProfile: false
     };
   },
-  validations () {
+  validations() {
     return {
       form: {
         fname: { required },
@@ -482,21 +487,21 @@ export default defineComponent({
       driverData: 'driver/getDriverData'
     })
   },
-  created () {
+  created() {
     this.loadDriver();
   },
   methods: {
-    handleFileRemoval () {
+    handleFileRemoval() {
       this.form.files = [];
       this.isUploaded = false;
     },
-    openModal () {
+    openModal() {
       this.showModal = true;
     },
-    closeModal () {
+    closeModal() {
       this.showModal = false;
     },
-    loadDriver () {
+    loadDriver() {
       this.fetchingDriver = true;
       this.$axios
         .get(`/v1/drivers/${this.$route.params.driverId}`)
@@ -510,14 +515,17 @@ export default defineComponent({
           } else {
             this.isUploaded = false;
           }
-          this.form.fname = res.data.fname;
-          this.form.lname = res.data.lname;
-          this.form.phone = res.data.phone;
-          this.form.email = res.data.email;
-          this.form.residential_address = res.data.residential_address;
+          this.form.fname = res.data.fname || 'N/A';
+          this.form.lname = res.data.lname || 'N/A';
+          this.form.phone = res.data.phone || 'N/A';
+          this.form.email = res.data.email || 'N/A';
+          this.form.residential_address = res.data.residential_address || 'N/A';
           this.form.dob = res.data.dob;
-          this.form.license_number = res.data.documents[0].registration_number;
-          this.form.expiry_date = getDefaultDatePickerDate(res.data.documents[0].expiry_date);
+          this.form.license_number =
+            res.data.documents[0].registration_number || 'N/A';
+          this.form.expiry_date = getDefaultDatePickerDate(
+            res.data.documents[0].expiry_date
+          );
           this.form.files = [JSON.parse(res.data.documents[0].files)[0]];
           this.form.avatar = res.data.avatar;
           this.profilePreview = res.data.avatar;
@@ -535,14 +543,14 @@ export default defineComponent({
           this.fetchingDriver = false;
         });
     },
-    getUploadedFileUrlFromStringifiedArray (stringifiedArray: any) {
+    getUploadedFileUrlFromStringifiedArray(stringifiedArray: any) {
       const parsedArray = JSON.parse(stringifiedArray);
       if (parsedArray.length > 0) {
         return parsedArray[0];
       }
       return null;
     },
-    async updateDriver () {
+    async updateDriver() {
       this.v$.form.$touch();
       if (this.processing || this.v$.form.$errors.length) {
         return;
@@ -582,13 +590,13 @@ export default defineComponent({
         this.processing = false;
       }
     },
-    async fileSelected (selectedImage: any) {
+    async fileSelected(selectedImage: any) {
       const imageDbUrl = (await this.uploadTos3andGetDocumentUrl(
         selectedImage
       )) as string;
       // this.form.files.push(imageDbUrl);
     },
-    async handleProfileUpload (e: any) {
+    async handleProfileUpload(e: any) {
       const selectedProfile = e.target.files[0];
       this.uploadingProfile = true;
       await this.uploadTos3andGetDocumentUrl(selectedProfile)
@@ -605,7 +613,7 @@ export default defineComponent({
         });
     },
 
-    async uploadTos3andGetDocumentUrl (file: any) {
+    async uploadTos3andGetDocumentUrl(file: any) {
       this.uploadingFile = true;
       try {
         const formData = new FormData();
