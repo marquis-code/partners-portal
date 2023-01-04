@@ -2,13 +2,29 @@
   <page-layout page-title="Company ShareHolder KYC">
     <div class="h-full p-10 bg-white">
       <main class="space-y-5">
-        <p class="text-center">Kindly input all appropraite information for <span class="text-bold">{{identityForm.document.fname}} {{identityForm.document.lname}}</span></p>
+        <p class="text-center">
+          Kindly input all appropraite information for
+          <span class="text-bold"
+            >{{ identityForm.document.fname }}
+            {{ identityForm.document.lname }}</span
+          >
+        </p>
         <div class="flex justify-center items-center space-x-4">
-          <p :class="activeView === 0 ? 'text-grays-black-2' : 'text-grays-black-6'" class="text-sm">
+          <p
+            :class="
+              activeView === 0 ? 'text-grays-black-2' : 'text-grays-black-6'
+            "
+            class="text-sm"
+          >
             Identity verification
           </p>
           <img src="@/assets/images/pointer.svg" />
-          <p :class="activeView === 1 ? 'text-grays-black-2' : 'text-grays-black-6'" class="text-sm">
+          <p
+            :class="
+              activeView === 1 ? 'text-grays-black-2' : 'text-grays-black-6'
+            "
+            class="text-sm"
+          >
             Address verification
           </p>
         </div>
@@ -16,16 +32,32 @@
           <div class="flex items-center space-x-2">
             <span class="rounded-full p-1 border-2 border-indigo-500"></span>
             <h1 class="text-grays-black font-medium text-base lg:text-xl">
-              {{ activeView === 0 ? 'Identity verification' : 'Address verification' }}
+              {{
+                activeView === 0
+                  ? 'Identity verification'
+                  : 'Address verification'
+              }}
             </h1>
           </div>
-          <small class="text-grays-black-3">These information will help us know you more</small>
+          <small class="text-grays-black-3"
+            >These information will help us know you more</small
+          >
         </div>
 
         <form v-if="activeView === 0">
-          <section class="lg:flex justify-between space-y-3 lg:space-y-0 lg:space-x-10 items-center">
+          <section
+            class="
+              lg:flex
+              justify-between
+              space-y-3
+              lg:space-y-0 lg:space-x-10
+              items-center
+            "
+          >
             <div class="space-y-2 w-full">
-              <label class="text-xs font-medium text-grays-black-5">Means of Identification</label>
+              <label class="text-xs font-medium text-grays-black-5"
+                >Means of Identification</label
+              >
               <select
                 class="
                   text-sm
@@ -43,18 +75,27 @@
                 <option value="" hidden>Select a document type</option>
                 <option
                   v-for="(identity, index) in identificationOptions"
-                  :selected="index===0"
+                  :selected="index === 0"
                   :value="identity.key"
-                  :key="index">
+                  :key="index"
+                >
                   {{ identity.label }}
                 </option>
               </select>
-              <span class="text-sm font-light text-red-500" v-if="v$.identityForm.document.type.$dirty && v$.identityForm.document.type.required.$invalid">
-              This field is required
-            </span>
+              <span
+                class="text-sm font-light text-red-500"
+                v-if="
+                  v$.identityForm.document.type.$dirty &&
+                  v$.identityForm.document.type.required.$invalid
+                "
+              >
+                This field is required
+              </span>
             </div>
             <div class="space-y-2 w-full">
-              <label class="text-xs font-medium text-grays-black-5">{{ getDocumentLabel }}</label>
+              <label class="text-xs font-medium text-grays-black-5">{{
+                getDocumentLabel
+              }}</label>
               <input
                 maxlength="11"
                 type="text"
@@ -71,14 +112,22 @@
                 "
                 placeholder="Enter document number"
               />
-              <span class="text-sm font-light text-red-500" v-if="v$.identityForm.document.document_id.$dirty && v$.identityForm.document.document_id.required.$invalid">
+              <span
+                class="text-sm font-light text-red-500"
+                v-if="
+                  v$.identityForm.document.document_id.$dirty &&
+                  v$.identityForm.document.document_id.required.$invalid
+                "
+              >
                 This field is required
               </span>
             </div>
           </section>
           <section class="flex justify-start space-x-10 items-start pt-5">
             <div class="space-y-2 w-full lg:w-6/12 md:pr-5">
-              <label class="text-xs font-medium text-grays-black-5">Date Of Birth</label>
+              <label class="text-xs font-medium text-grays-black-5"
+                >Date Of Birth</label
+              >
               <datepicker
                 class="
                   text-xs
@@ -93,7 +142,13 @@
                 placeholder="Choose a date"
                 v-model="v$.identityForm.document.dob.$model"
               />
-              <span class="text-sm font-light text-red-500" v-if="v$.identityForm.document.dob.$dirty && v$.identityForm.document.dob.required.$invalid">
+              <span
+                class="text-sm font-light text-red-500"
+                v-if="
+                  v$.identityForm.document.dob.$dirty &&
+                  v$.identityForm.document.dob.required.$invalid
+                "
+              >
                 This field is required
               </span>
             </div>
@@ -103,7 +158,9 @@
         <form v-if="activeView === 1">
           <section class="flex justify-start flex-col space-y-5 items-start">
             <div class="space-y-2 w-full">
-              <label class="text-xs font-medium text-grays-black-5">Address</label>
+              <label class="text-xs font-medium text-grays-black-5"
+                >Address</label
+              >
               <input
                 v-model="v$.addressForm.document.full_address.$model"
                 class="
@@ -118,7 +175,13 @@
                 "
                 placeholder="Enter your address"
               />
-              <span class="text-sm font-light text-red-500" v-if="v$.addressForm.document.full_address.$dirty && v$.addressForm.document.full_address.required.$invalid">
+              <span
+                class="text-sm font-light text-red-500"
+                v-if="
+                  v$.addressForm.document.full_address.$dirty &&
+                  v$.addressForm.document.full_address.required.$invalid
+                "
+              >
                 Please provide a valid address
               </span>
             </div>
@@ -127,7 +190,7 @@
                 >Upload document (Electricity bill, Waste bill, water bill
                 etc)</label
               >
-    <!--          TODO: Review for a more scalable approach-->
+              <!--          TODO: Review for a more scalable approach-->
               <image-upload
                 @fileSelected="selectFile($event)"
                 @fileRemoved="removeFile()"
@@ -139,7 +202,7 @@
 
         <div class="flex justify-end">
           <div class="flex items-center space-x-5">
-            <!-- <button
+            <button
               class="
                 rounded-md
                 w-32
@@ -152,10 +215,10 @@
                 ring-1 ring-gray-400
                 font-medium
               "
-              @click="$router.push({name: 'dashboard.company-kyc'})"
+              @click="handleLogout()"
             >
-              Go back
-            </button> -->
+              Continue Later
+            </button>
             <button
               class="
                 rounded-md
@@ -169,17 +232,20 @@
               "
               v-if="activeView === 0"
               :disabled="v$.identityForm.$invalid || loading"
-              :class="v$.identityForm.$invalid || loading ?
-            'cursor-not-allowed text-grays-black-5 bg-grays-black-7' : 'bg-sh-green-500 font-medium'"
+              :class="
+                v$.identityForm.$invalid || loading
+                  ? 'cursor-not-allowed text-grays-black-5 bg-grays-black-7'
+                  : 'bg-sh-green-500 font-medium'
+              "
               @click.prevent="saveIdentityForm()"
             >
-            <Spinner v-if="loading"/>
-              {{loading ? 'Saving' : 'Next'}}
+              <Spinner v-if="loading" />
+              {{ loading ? 'Saving' : 'Next' }}
               <img class="ml-2" src="@/assets/images/arrow.svg" />
             </button>
           </div>
           <div class="flex space-x-5" v-if="activeView === 1">
-            <!-- <button
+            <button
               class="
                 rounded-md
                 w-32
@@ -192,11 +258,10 @@
                 ring-1 ring-gray-400
                 font-medium
               "
-              v-if="!addressProgress"
-              :disabled="loading"
-              @click.prevent="previous()">
-              Go back
-            </button> -->
+              @click.prevent="hanndleLogout()"
+            >
+              Continue Later
+            </button>
             <button
               class="
                 rounded-md
@@ -210,13 +275,20 @@
                 font-medium
               "
               :disabled="v$.addressForm.$invalid || loading"
-              :class="v$.addressForm.$invalid || loading ?
-            'cursor-not-allowed text-grays-black-5 bg-grays-black-7' : 'bg-sh-green-500 font-medium'"
-              @click.prevent="saveAddressForm();"
+              :class="
+                v$.addressForm.$invalid || loading
+                  ? 'cursor-not-allowed text-grays-black-5 bg-grays-black-7'
+                  : 'bg-sh-green-500 font-medium'
+              "
+              @click.prevent="saveAddressForm()"
             >
-              {{!loading ? 'Save' : ''}}
-              <img v-if="!loading" class="ml-2" src="@/assets/images/arrow.svg" />
-              <Spinner v-if="loading"/>
+              {{ !loading ? 'Save' : '' }}
+              <img
+                v-if="!loading"
+                class="ml-2"
+                src="@/assets/images/arrow.svg"
+              />
+              <Spinner v-if="loading" />
             </button>
           </div>
         </div>
@@ -228,13 +300,13 @@
 <script lang="ts">
 import PageLayout from '@/components/layout/PageLayout.vue';
 import { defineComponent } from 'vue';
-import {mapGetters} from 'vuex';
+import { mapGetters } from 'vuex';
 import Datepicker from 'vue3-datepicker';
 import ImageUpload from '@/components/ImageUpload.vue';
-import {required} from '@vuelidate/validators';
+import { required } from '@vuelidate/validators';
 import { extractErrorMessage } from '@/utils/helper';
-import useVuelidate from "@vuelidate/core";
-import {UserData} from "@/models/user-session.model";
+import useVuelidate from '@vuelidate/core';
+import { UserData } from '@/models/user-session.model';
 import Spinner from '@/components/layout/Spinner.vue';
 
 export default defineComponent<any, any, any>({
@@ -242,7 +314,7 @@ export default defineComponent<any, any, any>({
   props: {
     id: String
   },
-  data () {
+  data() {
     return {
       v$: useVuelidate(),
       identityForm: {
@@ -267,7 +339,7 @@ export default defineComponent<any, any, any>({
         },
         document: {
           full_address: null,
-          files: [],
+          files: []
         }
       },
       loading: false,
@@ -286,7 +358,7 @@ export default defineComponent<any, any, any>({
           label: 'BVN',
           desc: 'Bank Verification Number',
           maxLength: 11
-        },
+        }
         /*        {
           key: 'drivers-license',
           label: 'Drivers License',
@@ -307,13 +379,13 @@ export default defineComponent<any, any, any>({
       addressProgress: false
     };
   },
-  validations () {
+  validations() {
     return {
       identityForm: {
         user: {
           document_owner_id: { required },
           user_id: { required },
-          partner_type: { required },
+          partner_type: { required }
         },
         document: {
           document_id: { required },
@@ -330,12 +402,12 @@ export default defineComponent<any, any, any>({
           partner_type: { required }
         },
         document: {
-          full_address: { required },
+          full_address: { required }
         }
       }
     };
   },
-  created () {
+  created() {
     this.setFormDefaults();
   },
   computed: {
@@ -344,55 +416,71 @@ export default defineComponent<any, any, any>({
       contextOrganization: 'auth/activeContext',
       partnerContext: 'auth/activeContext'
     }),
-    getDocumentLabel () {
+    getDocumentLabel() {
       if (this.activeView === 0) {
-        return this.identityForm.document.type ? this.selectedIdentityDoc?.desc : 'Document ID';
+        return this.identityForm.document.type
+          ? this.selectedIdentityDoc?.desc
+          : 'Document ID';
       }
       return '';
     }
   },
   methods: {
-    async checkIfIdentityKYCHasBeenDone () {
+    async checkIfIdentityKYCHasBeenDone() {
       try {
-        console.log(1)
+        console.log(1);
       } catch (err: any) {
-        console.log(err)
-        const errorMessage = extractErrorMessage(err, null, 'Oops! An error occurred, please try again.');
+        console.log(err);
+        const errorMessage = extractErrorMessage(
+          err,
+          null,
+          'Oops! An error occurred, please try again.'
+        );
         this.$toast.error(errorMessage);
       }
     },
-    async checkIfAddressKYCHasBeenDone () {
+    async checkIfAddressKYCHasBeenDone() {
       try {
-        console.log(1)
+        console.log(1);
       } catch (err: any) {
-        console.log(err)
-        const errorMessage = extractErrorMessage(err, null, 'Oops! An error occurred, please try again.');
+        console.log(err);
+        const errorMessage = extractErrorMessage(
+          err,
+          null,
+          'Oops! An error occurred, please try again.'
+        );
         this.$toast.error(errorMessage);
       }
     },
-    async setFormDefaults () {
+    async setFormDefaults() {
       try {
-        const response = await this.$axios.get(`/v1/partner-share-holders/${this.id}`);
+        const response = await this.$axios.get(
+          `/v1/partner-share-holders/${this.id}`
+        );
         const user = response.data;
         this.identityForm.user.document_owner_id = user.id;
-        this.identityForm.user.user_id = "" + user.id;
+        this.identityForm.user.user_id = '' + user.id;
         this.identityForm.user.partner_type = 'business';
         this.identityForm.document.fname = user.fname;
         this.identityForm.document.lname = user.lname;
 
         this.addressForm.user.document_owner_id = user.id;
-        this.addressForm.user.user_id = "" + user.id;
+        this.addressForm.user.user_id = '' + user.id;
         this.addressForm.user.partner_type = 'business';
       } catch (err: any) {
-        console.log(err)
-        const errorMessage = extractErrorMessage(err, null, 'Oops! An error occurred, please try again.');
+        console.log(err);
+        const errorMessage = extractErrorMessage(
+          err,
+          null,
+          'Oops! An error occurred, please try again.'
+        );
         this.$toast.error(errorMessage);
       }
     },
-    previous () {
+    previous() {
       this.activeView -= 1;
     },
-    uploadFile () {
+    uploadFile() {
       this.file = this.$refs.avatar.files[0];
       const reader = new FileReader();
       reader.addEventListener('load', () => {
@@ -400,27 +488,36 @@ export default defineComponent<any, any, any>({
       });
       reader.readAsDataURL(this.file);
     },
-    handleIdentityChange () {
-      this.selectedIdentityDoc = this.identificationOptions.find((obj: any) => obj.key === this.identityForm.document.type);
+    handleIdentityChange() {
+      this.selectedIdentityDoc = this.identificationOptions.find(
+        (obj: any) => obj.key === this.identityForm.document.type
+      );
     },
-    async saveIdentityForm () {
+    async saveIdentityForm() {
       this.v$.identityForm.$touch();
       if (this.loading || this.v$.identityForm.$errors.length) {
         return;
       }
       try {
         this.loading = true;
-        await this.$axios.post(`/v1/partners/${this.partnerContext.partner.id}/shareholders/${this.id}/identity-verification`, this.identityForm);
-        this.$toast.success('Shareholder Identity KYC completed')
+        await this.$axios.post(
+          `/v1/partners/${this.partnerContext.partner.id}/shareholders/${this.id}/identity-verification`,
+          this.identityForm
+        );
+        this.$toast.success('Shareholder Identity KYC completed');
         this.activeView = 1;
       } catch (err) {
-        const errorMessage = extractErrorMessage(err, null, 'Oops! An error occurred, please try again.');
+        const errorMessage = extractErrorMessage(
+          err,
+          null,
+          'Oops! An error occurred, please try again.'
+        );
         this.$toast.error(errorMessage);
       } finally {
         this.loading = false;
       }
     },
-    async saveAddressForm () {
+    async saveAddressForm() {
       this.v$.addressForm.$touch();
       if (this.loading || this.v$.addressForm.$errors.length) {
         return;
@@ -432,28 +529,38 @@ export default defineComponent<any, any, any>({
         this.loading = true;
         const formData = new FormData();
         formData.append('file', this.file);
-        const response = await this.$axios.post(`/v1/upload/identity/files`, formData);
+        const response = await this.$axios.post(
+          `/v1/upload/identity/files`,
+          formData
+        );
         if (response.data?.files?.length) {
           this.addressForm.document.files = [response.data.files[0].Location];
         }
-        await this.$axios.post(`/v1/partners/${this.partnerContext.partner.id}/shareholders/${this.id}/address-verification`, this.addressForm);
+        await this.$axios.post(
+          `/v1/partners/${this.partnerContext.partner.id}/shareholders/${this.id}/address-verification`,
+          this.addressForm
+        );
         this.$toast.success('Shareholder Address KYC completed');
         setTimeout(() => {
-          this.$router.push({name: 'dashboard.company-kyc'});
+          this.$router.push({ name: 'dashboard.company-kyc' });
         }, 200);
       } catch (err) {
-        const errorMessage = extractErrorMessage(err, null, 'Oops! An error occurred, please try again.');
+        const errorMessage = extractErrorMessage(
+          err,
+          null,
+          'Oops! An error occurred, please try again.'
+        );
         this.$toast.error(errorMessage);
       } finally {
         this.loading = false;
       }
     },
-    selectFile ($event: File) {
+    selectFile($event: File) {
       this.file = $event;
     },
-    removeFile () {
+    removeFile() {
       this.file = '';
     }
-  },
+  }
 });
 </script>

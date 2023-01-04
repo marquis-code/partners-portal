@@ -184,11 +184,11 @@
     </form>
 
     <div class="flex justify-end">
-      <div class="flex items-center space-x-5">
-        <!--        <button
+      <div class="flex items-center space-x-5" v-if="activeView === 0">
+        <button
           class="
             rounded-md
-            w-32
+            w-1/2
             flex
             justify-center
             items-center
@@ -198,11 +198,10 @@
             ring-1 ring-gray-400
             font-medium
           "
-          v-if="activeView === 1"
-          @click="$emit('goBack');"
+          @click="logout"
         >
-          Go back
-        </button>-->
+          Continue Later
+        </button>
         <button
           class="
             rounded-md
@@ -214,7 +213,6 @@
             px-5
             text-sm
           "
-          v-if="activeView === 0"
           :disabled="v$.identityForm.$invalid || loading"
           :class="
             v$.identityForm.$invalid || loading
@@ -228,10 +226,10 @@
         </button>
       </div>
       <div class="flex space-x-5" v-if="activeView === 1">
-        <!-- <button
+        <button
           class="
             rounded-md
-            w-32
+            w-1/2
             flex
             justify-center
             items-center
@@ -241,12 +239,10 @@
             ring-1 ring-gray-400
             font-medium
           "
-          v-if="!addressProgress"
-          :disabled="loading"
-          @click.prevent="previous()"
+          @click="logout"
         >
-          Go back
-        </button> -->
+          Continue Later
+        </button>
         <button
           class="
             rounded-md
@@ -399,7 +395,7 @@ export default defineComponent<any, any, any>({
           : 'Document ID';
       }
       return '';
-    },
+    }
   },
   methods: {
     setFormDefaults() {
@@ -510,6 +506,11 @@ export default defineComponent<any, any, any>({
     },
     removeFile() {
       this.file = '';
+    },
+    logout() {
+      localStorage.clear();
+      this.$router.push('/login');
+      this.$router.go(0);
     }
   }
 });
