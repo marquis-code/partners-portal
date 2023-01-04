@@ -519,31 +519,16 @@ export default defineComponent({
       }
       this.processing = true;
       try {
-        const expiryDate = this.form.expiry_date;
-        const payload = {
+        const newDriverPayload = {
           fname: this.form.fname,
           lname: this.form.lname,
           phone: this.form.phone,
           email: this.form.email,
-          residential_address: this.form.residential_address,
-          dob: this.form.dob,
-          license_number: this.form.license_number,
-          expiry_date: format(expiryDate as any, 'yyyy-MM-dd HH:mm:ss') as any,
-          files: this.form.files,
-          avatar: this.form.avatar,
-          document_type: 'drivers_license',
           password: 'shuttlers'
         };
-        const response = await this.$axios.post(
-          `/v1/partners/${this.userSessionData.activeContext.account_sid}/drivers`,
-          payload
-        );
-        this.openModal();
-        this.$router.push({
-          name: 'driver.detail.info',
-          params: { driverId: response.data.driver_id }
+        await this.$axios.post('/v1/drivers', newDriverPayload).then((res) => {
+          return this.createPartnerDriver(res.data.id);
         });
-        this.closeModal();
       } catch (err) {
         const errorMessage = extractErrorMessage(
           err,
@@ -555,6 +540,46 @@ export default defineComponent({
         this.processing = false;
       }
     },
+    async createPartnerDriver(driverId: any) {
+      const expiryDate = this.form.expiry_date;
+      const partnerDriverPayload = {
+        fname: this.form.fname,
+        lname: this.form.lname,
+        phone: this.form.phone,
+        email: this.form.email,
+        residential_address: this.form.residential_address,
+        dob: this.form.dob,
+        registration_number: this.form.license_number,
+        expiry_date: format(expiryDate as any, 'yyyy-MM-dd HH:mm:ss') as any,
+        files: this.form.files,
+        avatar: this.form.avatar,
+        driver_id: driverId.toString(),
+        document_type: 'drivers_license',
+        password: 'shuttlers'
+      };
+      await this.$axios
+        .post(
+          `/v1/partners/${this.userSessionData.activeContext.account_sid}/drivers`,
+          partnerDriverPayload
+        )
+        .then((response) => {
+          this.openModal();
+          this.$router.push({
+            name: 'driver.detail.info',
+            params: { driverId: response.data.driver_id }
+          });
+          this.closeModal();
+        })
+        .catch((err) => {
+          const errorMessage = extractErrorMessage(
+            err,
+            null,
+            'Oops! An error occurred, please try again.'
+          );
+          this.$toast.error(errorMessage);
+        });
+    },
+
     async fileSelected(selectedImage: any) {
       this.uploadingFile = true;
       await this.uploadTos3andGetDocumentUrl(selectedImage)
