@@ -427,6 +427,7 @@ export default defineComponent<any, any, any>({
       }
       if (!this.file) {
         this.$toast.error('Kindly select a file');
+        return;
       }
       try {
         this.loading = true;
