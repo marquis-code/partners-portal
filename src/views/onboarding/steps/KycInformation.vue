@@ -282,6 +282,7 @@ import { extractErrorMessage } from '@/utils/helper';
 import useVuelidate from '@vuelidate/core';
 import { UserData } from '@/models/user-session.model';
 import Spinner from '@/components/layout/Spinner.vue';
+import {PartnerOrganization, OnboardingState} from '@/models/organisation.model';
 
 export default defineComponent<any, any, any>({
   name: 'KycInformation',
@@ -438,6 +439,11 @@ export default defineComponent<any, any, any>({
           `/v1/partners/${this.contextOrganization.account_sid}/identity-verification`,
           this.identityForm
         );
+        await this.$store.dispatch('auth/setActiveContext', {
+          onboardingState: {
+            identity: 'completed'
+          } as OnboardingState
+        } as PartnerOrganization)
         await this.$store.dispatch('auth/refreshActiveContext', this.user.id);
         this.activeView += 1;
       } catch (err) {
@@ -458,6 +464,7 @@ export default defineComponent<any, any, any>({
       }
       if (!this.file) {
         this.$toast.error('Kindly select a file');
+        return;
       }
       try {
         this.loading = true;
@@ -470,14 +477,19 @@ export default defineComponent<any, any, any>({
         if (response.data?.files?.length) {
           this.addressForm.document.files = [response.data.files[0].Location];
         }
-        await this.$axios.post(
+        const verifyResponse = await this.$axios.post(
           `/v1/partners/${this.contextOrganization.account_sid}/address-verification`,
           this.addressForm
         );
-        await this.$store.dispatch('auth/refreshActiveContext', this.user.id);
-        setTimeout(() => {
-          this.$router.push({ name: 'citySelection' });
-        }, 200);
+        if (verifyResponse.status === 200) {
+          await this.$store.dispatch('auth/refreshActiveContext', this.user.id);
+          await this.$store.dispatch('auth/setActiveContext', {
+            onboardingState: {
+              address: 'completed'
+            } as OnboardingState
+          } as PartnerOrganization);
+          await this.$router.push({ name: 'CitySelection' });
+        }
       } catch (err) {
         const errorMessage = extractErrorMessage(
           err,
