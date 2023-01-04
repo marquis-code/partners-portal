@@ -484,7 +484,7 @@ export default defineComponent<any, any, any>({
           `/v1/partners/${this.contextOrganization.account_sid}/address-verification`,
           this.addressForm
         );
-=        if (verifyResponse.status === 200) {
+        if (verifyResponse.status === 200) {
           await this.$store.dispatch('auth/refreshActiveContext', this.user.id);
           await this.$store.dispatch('auth/setActiveContext', {
             onboardingState: {
