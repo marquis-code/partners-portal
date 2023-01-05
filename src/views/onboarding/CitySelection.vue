@@ -56,7 +56,7 @@ import CenteredPageHeader from '@/components/CenteredPageHeader.vue';
 import { mapGetters } from 'vuex';
 import { extractErrorMessage } from '@/utils/helper';
 import moment from 'moment';
-import {PartnerOrganization} from '@/models/organisation.model';
+import { PartnerOrganization } from '@/models/organisation.model';
 
 export default {
   name: 'CitySelection',
@@ -121,10 +121,10 @@ export default {
               )
             )
           ]);
-          await this.$axios.post(`cost-revenue/v1/earnings-remittance-period`, {
-            partnerId: this.contextOrg?.partner?.account_sid,
-            dayOfMonth: "" + moment().date()
-          });
+          // await this.$axios.post(`cost-revenue/v1/earnings-remittance-period`, {
+          //   partnerId: this.contextOrg?.partner?.account_sid,
+          //   dayOfMonth: "" + moment().date()
+          // });
           this.$toast.success('Partner account created');
           await this.$router.push({ name: 'dashboard' });
         } catch (e) {
