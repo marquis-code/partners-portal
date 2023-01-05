@@ -282,7 +282,10 @@ import { extractErrorMessage } from '@/utils/helper';
 import useVuelidate from '@vuelidate/core';
 import { UserData } from '@/models/user-session.model';
 import Spinner from '@/components/layout/Spinner.vue';
-import {PartnerOrganization, OnboardingState} from '@/models/organisation.model';
+import {
+  PartnerOrganization,
+  OnboardingState
+} from '@/models/organisation.model';
 
 export default defineComponent<any, any, any>({
   name: 'KycInformation',
@@ -432,12 +435,12 @@ export default defineComponent<any, any, any>({
     },
     async saveIdentityForm() {
       this.v$.identityForm.$touch();
-      console.log(this.v$.identityForm);
       if (this.loading || this.v$.identityForm.$errors.length) {
         return;
       }
       try {
         this.loading = true;
+        await this.$store.dispatch('auth/refreshActiveContext', this.user.id);
         await this.$axios.post(
           `/v1/partners/${this.contextOrganization.account_sid}/identity-verification`,
           this.identityForm
@@ -445,9 +448,9 @@ export default defineComponent<any, any, any>({
         await this.$store.dispatch('auth/setActiveContext', {
           onboardingState: {
             ...this.$store.getters['auth/activeContext'].onboardingState,
-            identity: 'completed',
+            identity: 'completed'
           } as OnboardingState
-        } as PartnerOrganization)
+        } as PartnerOrganization);
         this.activeView += 1;
       } catch (err) {
         const errorMessage = extractErrorMessage(
@@ -480,6 +483,7 @@ export default defineComponent<any, any, any>({
         if (response.data?.files?.length) {
           this.addressForm.document.files = [response.data.files[0].Location];
         }
+        await this.$store.dispatch('auth/refreshActiveContext', this.user.id);
         const verifyResponse = await this.$axios.post(
           `/v1/partners/${this.contextOrganization.account_sid}/address-verification`,
           this.addressForm
@@ -488,7 +492,7 @@ export default defineComponent<any, any, any>({
           await this.$store.dispatch('auth/setActiveContext', {
             onboardingState: {
               ...this.$store.getters['auth/activeContext'].onboardingState,
-              address: 'completed',
+              address: 'completed'
             } as OnboardingState
           } as PartnerOrganization);
           await this.$router.push({ name: 'CitySelection' });
