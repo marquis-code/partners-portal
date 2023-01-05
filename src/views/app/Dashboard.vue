@@ -274,8 +274,9 @@ export default defineComponent({
     async getPartnerAccruedEarnings() {
       try {
         const response = await this.$axios.get(
-          `/cost-revenue/v1/partners/${this.partnerContext.partner.account_sid}/earnings`
+          `/cost-revenue/v1/partners/${this.partnerContext.partner.account_sid}/earnings-summary`
         );
+        console.log(response.data.amount);
         this.partnerStats.partnerAccruedEarnings = response.data.amount;
       } catch (error) {
         const errorMessage = extractErrorMessage(
