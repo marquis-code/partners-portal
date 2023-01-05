@@ -121,12 +121,13 @@ export default {
               )
             )
           ]);
-          // await this.$axios.post(`cost-revenue/v1/earnings-remittance-period`, {
-          //   partnerId: this.contextOrg?.partner?.account_sid,
-          //   dayOfMonth: "" + moment().date()
-          // });
+          await this.$axios.post(`cost-revenue/v1/earnings-remittance-period`, {
+            partnerId: this.contextOrg?.partner?.account_sid,
+            dayOfMonth: '' + moment().date()
+          });
           this.$toast.success('Partner account created');
-          await this.$router.push({ name: 'dashboard' });
+          this.$router.push({ name: 'dashboard' });
+          this.$forceUpdate();
         } catch (e) {
           this.$toast.error(extractErrorMessage(e));
         } finally {

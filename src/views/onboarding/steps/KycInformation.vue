@@ -293,7 +293,6 @@ export default defineComponent<any, any, any>({
   data() {
     return {
       v$: useVuelidate(),
-      sid: '',
       identityForm: {
         user: {
           document_owner_id: null,
@@ -387,7 +386,6 @@ export default defineComponent<any, any, any>({
   created() {
     this.setPageState();
     this.setFormDefaults();
-    this.setContextId(this.contextOrganization.account_sid);
   },
   async mounted() {
     await this.$store.dispatch('auth/refreshActiveContext', this.user.id);
@@ -407,9 +405,6 @@ export default defineComponent<any, any, any>({
     }
   },
   methods: {
-    setContextId(id: any) {
-      this.sid = id;
-    },
     setFormDefaults() {
       const user: UserData = this.user;
       this.identityForm.user.document_owner_id = user.id;
