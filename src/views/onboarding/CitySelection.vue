@@ -127,7 +127,7 @@ export default {
           });
           this.$toast.success('Partner account created');
           this.$router.push({ name: 'dashboard' });
-          this.$forceUpdate();
+          this.$router.go();
         } catch (e) {
           this.$toast.error(extractErrorMessage(e));
         } finally {
