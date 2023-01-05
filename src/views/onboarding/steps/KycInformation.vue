@@ -384,6 +384,9 @@ export default defineComponent<any, any, any>({
     this.setPageState();
     this.setFormDefaults();
   },
+  async mounted() {
+    await this.$store.dispatch('auth/refreshActiveContext', this.user.id);
+  },
   computed: {
     ...mapGetters({
       user: 'auth/user',
@@ -441,10 +444,10 @@ export default defineComponent<any, any, any>({
         );
         await this.$store.dispatch('auth/setActiveContext', {
           onboardingState: {
-            identity: 'completed'
+            ...this.$store.getters['auth/activeContext'].onboardingState,
+            identity: 'completed',
           } as OnboardingState
         } as PartnerOrganization)
-        await this.$store.dispatch('auth/refreshActiveContext', this.user.id);
         this.activeView += 1;
       } catch (err) {
         const errorMessage = extractErrorMessage(
@@ -482,10 +485,10 @@ export default defineComponent<any, any, any>({
           this.addressForm
         );
         if (verifyResponse.status === 200) {
-          await this.$store.dispatch('auth/refreshActiveContext', this.user.id);
           await this.$store.dispatch('auth/setActiveContext', {
             onboardingState: {
-              address: 'completed'
+              ...this.$store.getters['auth/activeContext'].onboardingState,
+              address: 'completed',
             } as OnboardingState
           } as PartnerOrganization);
           await this.$router.push({ name: 'CitySelection' });

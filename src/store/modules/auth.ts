@@ -87,6 +87,7 @@ export default <StoreOptions<AuthState>>{
       const session: UserSessionModel = getters.userSessionData;
       session.activeContext = context;
       commit('setSession', session);
+      localStorage.setItem(USER_SESSION_KEY, JSON.stringify(session));
     },
     clearSessionData ({commit}) {
       commit('setSession', null);
