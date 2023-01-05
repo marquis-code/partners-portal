@@ -104,7 +104,6 @@ export default defineComponent({
         try {
           this.loading = true;
           const response = await this.$axios.post('/v1/partners', { mode: 'individual'});
-          console.log(response);
           if (response.data) {
             await this.$store.dispatch('auth/refreshActiveContext', this.user.id);
             await this.$router.push({ name: 'GetStarted', query: { type: 'individual' }});
