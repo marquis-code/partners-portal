@@ -274,13 +274,14 @@
         type="button"
         class="
           rounded-md
-          w-32
           flex
           justify-center
           items-center
           p-3
           px-5
-          text-sm
+          text-sm text-grays-black-5
+          ring-1 ring-gray-400
+          font-medium
         "
         @click="logout"
       >
@@ -299,8 +300,6 @@
           px-5
           text-sm
           cursor-not-allowed
-          text-grays-black-5
-          bg-grays-black-7
         "
         :disabled="v$.form.$invalid || processing"
         :class="
