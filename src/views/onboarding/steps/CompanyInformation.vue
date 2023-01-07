@@ -274,6 +274,7 @@
         type="button"
         class="
           rounded-md
+          w-1/2
           flex
           justify-center
           items-center

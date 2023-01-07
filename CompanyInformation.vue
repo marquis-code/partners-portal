@@ -270,7 +270,7 @@
     <div class="flex justify-end items-end">
       <button
         type="button"
-        @click="saveForm()"
+        @click="logout"
         class="
           rounded-md
           w-full
