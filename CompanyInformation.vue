@@ -273,7 +273,7 @@
         @click="logout"
         class="
           rounded-md
-          w-full
+          w-40
           bg-black
           text-white
           flex
