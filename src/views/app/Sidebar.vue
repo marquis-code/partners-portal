@@ -130,8 +130,6 @@
         }}</span>
       </div>
       <span @click="logout" class="material-icons" :class="isSidebarFolded ? 'mt-5' : ''"> logout </span>
-      <!-- <span @click="logout" v-if="!isSidebarFolded" class="material-icons"> logout </span> -->
-
     </div>
   </div>
 </template>
