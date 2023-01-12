@@ -98,9 +98,9 @@
     </div>
 
     <div
-      @click="logout"
+      @click="$router.push({name:'settings.edit.partner'})"
       class="
-        flex flex-row
+        flex
         justify-between
         items-center
         py-2
@@ -110,11 +110,18 @@
         bg-green-200
         w-10/12
       "
-      :class="isSidebarFolded ? 'p-1' : 'px-3 '"
+      :class="isSidebarFolded ? 'p-1 flex-col' : 'px-3 flex-row'"
     >
       <div class="flex flex-row items-center">
         <img
-          src="@/assets/images/avatar-placeholder.svg"
+          v-if="user.avatar"
+          :src="user.avatar"
+          class="w-10 h-10 mr-2 rounded-2xl"
+          :class="isSidebarFolded && 'text-center mr-0'"
+        />
+        <img
+          v-else
+          src="@/assets/images/userIcon.svg"
           class="w-10 h-10 mr-2"
           :class="isSidebarFolded && 'text-center mr-0'"
         />
@@ -122,7 +129,9 @@
           user.fname
         }}</span>
       </div>
-      <span v-if="!isSidebarFolded" class="material-icons"> logout </span>
+      <span @click="logout" class="material-icons" :class="isSidebarFolded ? 'mt-5' : ''"> logout </span>
+      <!-- <span @click="logout" v-if="!isSidebarFolded" class="material-icons"> logout </span> -->
+
     </div>
   </div>
 </template>
