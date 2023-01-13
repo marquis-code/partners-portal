@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
+    "serve:test": "vue-cli-service serve --mode testing",
     "build": "vue-cli-service build",
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
@@ -11,8 +12,7 @@
     "build:main": "vue-cli-service build --mode production",
     "build:staging": "vue-cli-service build --mode staging",
     "build:test": "vue-cli-service build --mode testing",
-    "lint:fix": "vue-cli-service lint --fix",
-    "serve:test": "vue-cli-service serve --mode testing"
+    "lint:fix": "vue-cli-service lint --fix"
   },
   "dependencies": {
     "@googlemaps/js-api-loader": "^1.14.3",
