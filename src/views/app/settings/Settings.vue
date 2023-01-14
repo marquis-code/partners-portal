@@ -10,6 +10,7 @@
                 :to="{ name: 'settings.edit.partner' }"
               />
               <TabItem
+                v-if="partnerContext.onboardingState.address.partner_type === 'business'"
                 :title="'Company Information'"
                 :to="{ name: 'settings.edit.partner.company' }"
               />
@@ -37,14 +38,19 @@ import PageLayout from '@/components/layout/PageLayout.vue';
 import PageActionHeader from '@/components/PageActionHeader.vue';
 import TabContainer from '@/components/tab/TabContainer.vue';
 import TabItem from '@/components/tab/TabItem.vue';
-import emitter from '@/libs/emitter';
+import { mapGetters } from 'vuex';
 export default {
   components: {
     PageLayout,
     PageActionHeader,
     TabContainer,
     TabItem
-  }
+  },
+  computed: {
+    ...mapGetters({
+      partnerContext: 'auth/activeContext'
+    })
+  },
 };
 </script>
 
