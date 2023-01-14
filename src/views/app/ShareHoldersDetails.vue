@@ -562,8 +562,7 @@ export default defineComponent({
               ...payload
             })
           }
-          this.checkIfShareHoldersHaveBeenProvided()
-          // this.step += 1;
+          this.step += 1;
         } catch (error) {
           this.$toast.warning('An error occured');
         }
@@ -600,7 +599,6 @@ export default defineComponent({
       this.step += 1;
     },
     addNewStakeHolder () {
-      console.log('I am here');
       this.stakeholders.push({
         name: '',
         share_amount: 0
