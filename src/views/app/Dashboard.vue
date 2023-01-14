@@ -2,7 +2,7 @@
   <page-layout page-title="Welcome">
     <div>
       <div
-        v-if="!isTodoComplete"
+        v-if="!isTodoComplete & !loadingStats"
         class="
           p-6
           lg:py-7 lg:px-16
