@@ -483,7 +483,6 @@ export default defineComponent<any, any, any>({
         if (response.data?.files?.length) {
           this.addressForm.document.files = [response.data.files[0].Location];
         }
-        await this.$store.dispatch('auth/refreshActiveContext', this.user.id);
         const verifyResponse = await this.$axios.post(
           `/v1/partners/${this.contextOrganization.account_sid}/address-verification`,
           this.addressForm
