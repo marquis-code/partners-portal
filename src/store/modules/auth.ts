@@ -52,8 +52,7 @@ export default <StoreOptions<AuthState>>{
       const response = await axiosInstance
         .get<{data: PartnerOrganization[]}>(`v1/users/${userId}/partner-members`)
         .then((res) => <PartnerOrganization[]>(res.data.data || []))
-      
-        await Promise.all(response.map(org => {
+      await Promise.all(response.map(org => {
         return axiosInstance.get(`/v1/partners/${org.partner.account_sid}/kyc/status`).then(r => {
           org.onboardingState = {...<OnboardingState>r.data.data};
           return <OnboardingState>r.data;
