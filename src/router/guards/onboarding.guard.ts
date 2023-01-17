@@ -29,9 +29,9 @@ export class OnboardingGuard implements RouteGuard {
 
     if (contextOrg && isOnboardingRoute && !onboardingComplete) {
       // if kyc is completed and cities of operation not yet set, then redirect to city selection
-      if (to.name !== 'citySelection' && kycFormCompleted && !contextOrg.supportedCities.length) {
+      if (to.name !== 'CitySelection' && kycFormCompleted && !contextOrg?.supportedCities?.length) {
         next({
-          name: 'citySelection',
+          name: 'CitySelection',
           query: { progress: 'true' }
         });
         return false;

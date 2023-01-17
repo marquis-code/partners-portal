@@ -52,7 +52,6 @@ export default <StoreOptions<AuthState>>{
       const response = await axiosInstance
         .get<{data: PartnerOrganization[]}>(`v1/users/${userId}/partner-members`)
         .then((res) => <PartnerOrganization[]>(res.data.data || []))
-
       await Promise.all(response.map(org => {
         return axiosInstance.get(`/v1/partners/${org.partner.account_sid}/kyc/status`).then(r => {
           org.onboardingState = {...<OnboardingState>r.data.data};
@@ -87,6 +86,7 @@ export default <StoreOptions<AuthState>>{
       const session: UserSessionModel = getters.userSessionData;
       session.activeContext = context;
       commit('setSession', session);
+      localStorage.setItem(USER_SESSION_KEY, JSON.stringify(session));
     },
     clearSessionData ({commit}) {
       commit('setSession', null);

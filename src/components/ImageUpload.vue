@@ -11,7 +11,10 @@
     </form>
 
     <!-- This shows when a file is yet to be uploaded -->
-    <div v-if="!fileUploaded && !uploading && !uploadStatus" class="space-y-2 w-full relative">
+    <div
+      v-if="!fileUploaded && !uploading && !uploadStatus"
+      class="space-y-2 w-full relative"
+    >
       <div
         class="
           py-8
@@ -31,7 +34,7 @@
     </div>
     <!-- This shows when a file has been uploaded -->
     <div
-      v-if="fileUploaded && !uploading || uploadStatus"
+      v-if="(fileUploaded && !uploading) || uploadStatus"
       class="
         p-4
         ring-1 ring-gray-300

@@ -76,13 +76,14 @@
             This field is required
           </span>
         </div>
+        {{ selectedDocument }}
         <div class="space-y-2 w-full">
           <label class="text-xs font-medium text-grays-black-5">{{
             getDocumentLabel
           }}</label>
           <input
-            maxlength="11"
             type="text"
+            pattern="[a-zA-Z0-9]+"
             v-model="v$.identityForm.document.document_id.$model"
             class="
               text-xs
@@ -94,13 +95,13 @@
               placeholder-gray-500 placeholder-opacity-25
               ring-1 ring-gray-300
             "
-            placeholder="Enter document number"
+            placeholder="Enter BVN document number"
           />
           <span
             class="text-sm font-light text-red-500"
             v-if="
-              v$.identityForm.document.document_id.$dirty &&
-              v$.identityForm.document.document_id.required.$invalid
+              v$.identityForm?.document?.document_id?.$dirty &&
+              v$.identityForm?.document?.document_id?.required?.$invalid
             "
           >
             This field is required
@@ -183,11 +184,11 @@
     </form>
 
     <div class="flex justify-end">
-      <div class="flex items-center space-x-5">
-        <!--        <button
+      <div class="flex items-center space-x-5" v-if="activeView === 0">
+        <button
           class="
             rounded-md
-            w-32
+            w-1/2
             flex
             justify-center
             items-center
@@ -197,11 +198,10 @@
             ring-1 ring-gray-400
             font-medium
           "
-          v-if="activeView === 1"
-          @click="$emit('goBack');"
+          @click="logout"
         >
-          Go back
-        </button>-->
+          Continue Later
+        </button>
         <button
           class="
             rounded-md
@@ -213,7 +213,6 @@
             px-5
             text-sm
           "
-          v-if="activeView === 0"
           :disabled="v$.identityForm.$invalid || loading"
           :class="
             v$.identityForm.$invalid || loading
@@ -227,10 +226,10 @@
         </button>
       </div>
       <div class="flex space-x-5" v-if="activeView === 1">
-        <!-- <button
+        <button
           class="
             rounded-md
-            w-32
+            w-1/2
             flex
             justify-center
             items-center
@@ -240,12 +239,10 @@
             ring-1 ring-gray-400
             font-medium
           "
-          v-if="!addressProgress"
-          :disabled="loading"
-          @click.prevent="previous()"
+          @click="logout"
         >
-          Go back
-        </button> -->
+          Continue Later
+        </button>
         <button
           class="
             rounded-md
@@ -285,6 +282,10 @@ import { extractErrorMessage } from '@/utils/helper';
 import useVuelidate from '@vuelidate/core';
 import { UserData } from '@/models/user-session.model';
 import Spinner from '@/components/layout/Spinner.vue';
+import {
+  PartnerOrganization,
+  OnboardingState
+} from '@/models/organisation.model';
 
 export default defineComponent<any, any, any>({
   name: 'KycInformation',
@@ -324,14 +325,14 @@ export default defineComponent<any, any, any>({
         {
           key: 'nin',
           label: 'NIN',
-          desc: 'National Identification Number',
-          maxLength: 11
+          desc: 'National Identification Number'
+          // maxLength: 11
         },
         {
           key: 'bvn',
           label: 'BVN',
-          desc: 'Bank Verification Number',
-          maxLength: 11
+          desc: 'Bank Verification Number'
+          // maxLength: 11
         }
         /*        {
           key: 'drivers-license',
@@ -386,6 +387,9 @@ export default defineComponent<any, any, any>({
     this.setPageState();
     this.setFormDefaults();
   },
+  async mounted() {
+    await this.$store.dispatch('auth/refreshActiveContext', this.user.id);
+  },
   computed: {
     ...mapGetters({
       user: 'auth/user',
@@ -431,17 +435,22 @@ export default defineComponent<any, any, any>({
     },
     async saveIdentityForm() {
       this.v$.identityForm.$touch();
-      console.log(this.v$.identityForm);
       if (this.loading || this.v$.identityForm.$errors.length) {
         return;
       }
       try {
         this.loading = true;
+        await this.$store.dispatch('auth/refreshActiveContext', this.user.id);
         await this.$axios.post(
           `/v1/partners/${this.contextOrganization.account_sid}/identity-verification`,
           this.identityForm
         );
-        await this.$store.dispatch('auth/refreshActiveContext', this.user.id);
+        await this.$store.dispatch('auth/setActiveContext', {
+          onboardingState: {
+            ...this.$store.getters['auth/activeContext'].onboardingState,
+            identity: 'completed'
+          } as OnboardingState
+        } as PartnerOrganization);
         this.activeView += 1;
       } catch (err) {
         const errorMessage = extractErrorMessage(
@@ -461,6 +470,7 @@ export default defineComponent<any, any, any>({
       }
       if (!this.file) {
         this.$toast.error('Kindly select a file');
+        return;
       }
       try {
         this.loading = true;
@@ -473,14 +483,19 @@ export default defineComponent<any, any, any>({
         if (response.data?.files?.length) {
           this.addressForm.document.files = [response.data.files[0].Location];
         }
-        await this.$axios.post(
+        const verifyResponse = await this.$axios.post(
           `/v1/partners/${this.contextOrganization.account_sid}/address-verification`,
           this.addressForm
         );
-        await this.$store.dispatch('auth/refreshActiveContext', this.user.id);
-        setTimeout(() => {
-          this.$router.push({ name: 'citySelection' });
-        }, 200);
+        if (verifyResponse.status === 200) {
+          await this.$store.dispatch('auth/setActiveContext', {
+            onboardingState: {
+              ...this.$store.getters['auth/activeContext'].onboardingState,
+              address: 'completed'
+            } as OnboardingState
+          } as PartnerOrganization);
+          await this.$router.push({ name: 'CitySelection' });
+        }
       } catch (err) {
         const errorMessage = extractErrorMessage(
           err,
@@ -509,6 +524,11 @@ export default defineComponent<any, any, any>({
     },
     removeFile() {
       this.file = '';
+    },
+    logout() {
+      localStorage.clear();
+      this.$router.push('/login');
+      this.$router.go(0);
     }
   }
 });

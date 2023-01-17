@@ -81,7 +81,7 @@
             >
             <span
               class="text-xs text-red-400"
-              v-if="!v$.form.fname.validName && v$.form.fname.$error"
+              v-if="v$.form.fname.validName && v$.form.fname.$error"
             >
               Special characters and numbers are not allowed
             </span>
@@ -113,7 +113,7 @@
             >
             <span
               class="text-xs text-red-400"
-              v-if="!v$.form.lname.validName && v$.form.lname.$error"
+              v-if="v$.form.lname.validName && v$.form.lname.$error"
             >
               Special characters and numbers are not allowed
             </span>

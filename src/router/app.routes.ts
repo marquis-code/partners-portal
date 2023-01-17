@@ -33,7 +33,7 @@ export const AppRoutes: Array<RouteRecordRaw> = [
         name: 'dashboard',
         component: Dashboard,
         meta: {
-          title: 'Dashboard'
+          title: 'Dashboard',
         }
       },
       {
