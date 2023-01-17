@@ -270,24 +270,6 @@
     <div class="flex justify-end items-end">
       <button
         type="button"
-        @click="logout"
-        class="
-          rounded-md
-          w-40
-          bg-black
-          text-white
-          flex
-          justify-center
-          items-center
-          p-3
-          px-5
-          text-sm
-        "
-      >
-        Continue Later
-      </button>
-      <button
-        type="button"
         @click="saveForm()"
         class="
           rounded-md
