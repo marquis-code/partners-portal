@@ -86,7 +86,7 @@
           <div class="">
             <p class="font-medium text-sm">License number</p>
             <p class="font-light text-xs">
-              {{ driverData?.documents[0]?.registeration_number ?? 'N/A' }}
+              {{ driverData?.documents[0]?.registration_number ?? 'N/A' }}
             </p>
           </div>
         </div>
