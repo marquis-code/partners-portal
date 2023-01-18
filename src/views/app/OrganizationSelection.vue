@@ -48,7 +48,7 @@
             bg-sh-green-200
             text-sh-green-500
           "
-          >{{ organization.partner.company_name.slice(0, 1) }}</small
+          >{{ organization?.partner?.company_name?.slice(0, 1) }}</small
         >
         <h1 class="text-sh-grey-900 font-bold text-center md:text-sm">{{ organization.partner.company_name }}</h1>
         <p class="text-xs text-grays-black-5 text-center">{{ getOrganizationRole(organization.role) }}</p>
