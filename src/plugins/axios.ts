@@ -8,7 +8,7 @@ import {Token} from "@/models/login-response.model";
 // axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 
 const config = {
-  baseURL: process.env.VUE_APP_API_BASE_URL,
+  baseURL: 'https://api.test.shuttlers.africa/',
   timeout: 60 * 1000 // Timeout
   // withCredentials: true, // Check cross-site Access-Control
 };
