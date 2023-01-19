@@ -269,7 +269,25 @@
         </span>
       </div>
     </section>
-    <div class="flex justify-end items-end">
+    <div class="flex justify-end items-end space-x-5">
+      <button
+        type="button"
+        class="
+          rounded-md
+          w-40
+          flex
+          justify-center
+          items-center
+          p-3
+          px-5
+          text-sm text-grays-black-5
+          ring-1 ring-gray-400
+          font-medium
+        "
+        @click="logout"
+      >
+        Continue Later
+      </button>
       <button
         type="button"
         @click="saveForm()"
@@ -282,6 +300,7 @@
           p-3
           px-5
           text-sm
+          cursor-not-allowed
         "
         :disabled="v$.form.$invalid || processing"
         :class="
@@ -415,6 +434,11 @@ export default defineComponent({
       } finally {
         this.processing = false;
       }
+    },
+    logout() {
+      localStorage.clear();
+      this.$router.push('/login');
+      this.$router.go(0);
     }
   },
   watch: {

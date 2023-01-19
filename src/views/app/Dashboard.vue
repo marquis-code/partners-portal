@@ -2,7 +2,7 @@
   <page-layout page-title="Welcome">
     <div>
       <div
-        v-if="!isTodoComplete"
+        v-if="!isTodoComplete & !loadingStats"
         class="
           p-6
           lg:py-7 lg:px-16
@@ -37,6 +37,7 @@
               :actionRoute="``"
             />
             <CheckList
+              v-if="partnerType == 'business'"
               class="text-xs md:text-base"
               :item="`Upload company documents`"
               :status="
@@ -77,7 +78,7 @@
             <p class="text-sm md:text-base">
               You’re doing well,
               <span class="text-sh-purple-700 underline"
-                >{{ doneCount }} of 6</span
+                >{{ doneCount }} of {{ partnerType == 'individual' ? '5' : 6 }}</span
               >
               steps to be completed
             </p>
@@ -178,7 +179,8 @@ export default defineComponent({
         monthTripDays: []
       },
       doneCount: 0,
-      isTodoComplete: false
+      isTodoComplete: false,
+      partnerType: ''
     };
   },
   computed: {
@@ -251,6 +253,7 @@ export default defineComponent({
       await this.getPartnerEarning();
       this.checkIfAllTodosAreDone();
       this.getBarChartTripsData();
+      this.setPartnerType()
       this.loadingStats = false;
     },
     async getOverallRatings() {
@@ -276,7 +279,6 @@ export default defineComponent({
         const response = await this.$axios.get(
           `/cost-revenue/v1/partners/${this.partnerContext.partner.account_sid}/earnings-summary`
         );
-        console.log(response.data.amount);
         this.partnerStats.partnerAccruedEarnings = response.data.amount;
       } catch (error) {
         const errorMessage = extractErrorMessage(
@@ -288,13 +290,20 @@ export default defineComponent({
       }
     },
     checkIdentityStatuses() {
-      if (this.partnerContext.onboardingState.address === 'completed') {
+      if (this.partnerContext.onboardingState.address.status === 'completed') {
         this.partnerStats.hasCompletedAddressVerification = 'completed';
         this.doneCount += 1;
       }
-      if (this.partnerContext.onboardingState.identity === 'completed') {
+      if (this.partnerContext.onboardingState.identity.status === 'completed') {
         this.partnerStats.hasCompletedIdentityVerification = 'completed';
         this.doneCount += 1;
+      }
+    },
+    setPartnerType() {
+      if (this.partnerContext.onboardingState.address.partner_type === 'individual') {
+        this.partnerType = 'individual'
+      } else {
+        this.partnerType = 'business'
       }
     },
     async checkIfSettlementAccountHasBeenProvided() {
@@ -319,7 +328,6 @@ export default defineComponent({
       const response = await this.$axios.get(
         `/v1/partners/${this.partnerContext.partner.id}/summaries`
       );
-      console.log(response);
       //  Total driver check
       this.partnerStats.partnerDriverCount = response.data.total_drivers;
       if (this.partnerStats.partnerDriverCount > 0) {

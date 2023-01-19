@@ -259,7 +259,7 @@
                   Please provide your drivers date of birth
                 </span>
               </div>
-              <div class="space-y-2 w-full">
+              <!-- <div class="space-y-2 w-full">
                 <label class="text-xs font-medium text-grays-black-5"
                   >How old is your business</label
                 >
@@ -289,7 +289,7 @@
                 >
                   This field must be completed
                 </span>
-              </div>
+              </div> -->
             </section>
             <section
               class="
@@ -422,8 +422,6 @@ import { email, required } from '@vuelidate/validators';
 import { mapGetters } from 'vuex';
 import { extractErrorMessage } from '@/utils/helper';
 import { format } from 'date-fns';
-import PageLayout from '@/components/layout/PageLayout.vue';
-import PageActionHeader from '@/components/PageActionHeader.vue';
 import Spinner from '@/components/layout/Spinner.vue';
 import AppModal from '@/components/Modals/AppModal.vue';
 import emitter from '@/libs/emitter';
@@ -509,10 +507,14 @@ export default defineComponent({
   },
   methods: {
     setCurrentDetails () {
+      this.form.residential_address = this.partnerContext.onboardingState.address.address.slice(1, this.partnerContext.onboardingState.address.address.length - 1);
       this.form.fname = this.userSessionData.user.fname;
       this.form.lname = this.userSessionData.user.lname;
       this.form.phone = this.userSessionData.user.phone;
       this.form.email = this.userSessionData.user.email;
+      this.form.doc_type = this.partnerContext.onboardingState.identity.document_type
+      this.form.dob = this.partnerContext.onboardingState.identity.dob;
+      this.form.doc_id = this.partnerContext.onboardingState.identity.document_id;
     },
     handleFileRemoval () {
       this.isUploaded = false;

@@ -273,24 +273,6 @@
         @click="saveForm()"
         class="
           rounded-md
-          w-full
-          bg-black
-          text-white
-          flex
-          justify-center
-          items-center
-          p-3
-          px-5
-          text-sm
-        "
-      >
-        Continue Later
-      </button>
-      <button
-        type="button"
-        @click="saveForm()"
-        class="
-          rounded-md
           w-32
           flex
           justify-center
