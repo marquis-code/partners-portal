@@ -58,7 +58,9 @@ export default <StoreOptions<AuthState>>{
           return <OnboardingState>r.data;
         });
       }));
+
       await Promise.all(response.map(org => {
+        if(!org.partner.id) return [];
         return axiosInstance.get(`/v1/partners/${org.partner.id}/cities`).then(r => {
           org.supportedCities = [...(r.data.data || [])];
           return r.data;
