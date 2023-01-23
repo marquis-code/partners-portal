@@ -210,7 +210,7 @@
               items-center
             "
           >
-            <div class="space-y-2 w-full">
+            <!-- <div class="space-y-2 w-full">
               <label class="text-xs font-medium text-grays-black-5"
                 >Residential address</label
               >
@@ -229,6 +229,38 @@
                 "
                 placeholder="Enter drivers address"
               />
+              <span
+                class="text-xs font-light text-red-500"
+                v-if="
+                  v$.form.residential_address.$dirty &&
+                  v$.form.residential_address.required.$invalid
+                "
+              >
+                Please provide your drivers address
+              </span>
+            </div> -->
+            <div class="space-y-2 w-full">
+              <label class="text-xs font-medium text-grays-black-5"
+                >Residential address</label
+              >
+              <!-- <input
+                type="text"
+                v-model="v$.form.residential_address.$model"
+                class="
+                  text-xs
+                  border-none
+                  outline-none
+                  w-full
+                  rounded-md
+                  p-3
+                  placeholder-gray-500 placeholder-opacity-25
+                  ring-1 ring-gray-300
+                "
+                placeholder="Enter drivers address"
+              /> -->
+              <address-auto-complete
+                @autoCompleteAddress="selectedAddress"
+              ></address-auto-complete>
               <span
                 class="text-xs font-light text-red-500"
                 v-if="
