@@ -3,38 +3,13 @@
     <template #actionsPane>
       <page-action-header>
         <template #tabs>
-          <router-link
-            class="
-              text-sm
-              font-medium
-              leading-6
-              pb-2
-              pt-1
-              px-2
-              border-b
-              cursor-pointer
-            "
-            active-class="text-black border-b-sh-green-500 border-b-2"
-            to="information"
-          >
-            Drivers information</router-link
-          >
-
-          <router-link
-            class="
-              text-sm
-              font-medium
-              leading-6
-              pb-2
-              pt-1
-              px-2
-              border-b
-              cursor-pointer
-            "
-            active-class="text-black border-b-sh-green-500 border-b-2"
-            :to="`/drivers/details/${driverData?.id}/trips`"
-            >Trips</router-link
-          >
+          <TabContainer>
+            <TabItem
+              :title="'Drivers information'"
+              :to="{ name: 'driver.detail.info' }"
+            />
+            <TabItem :title="'Trips'" :to="{ name: 'driver.detail.trips' }" />
+          </TabContainer>
         </template>
         <template #breadcrumbs>
           <div class="flex justify-between items-center">
@@ -43,12 +18,16 @@
                 :to="{
                   name: 'drivers.list'
                 }"
-                class="text-gray-400 text-sm hover:text-gray-900"
+                class="text-gray-400 text-xs lg:text-sm hover:text-gray-900"
                 >Drivers management</router-link
               >
               <img src="@/assets/images/breadcrumbs.svg" />
-              <span>{{ driverData?.fname }}</span>
-              <span>{{ driverData?.lname }}</span>
+              <span class="lg:text-base sm:text-sm text-xs">{{
+                driverData?.fname
+              }}</span>
+              <span class="lg:text-base sm:text-sm text-xs">{{
+                driverData?.lname
+              }}</span>
             </div>
             <div
               @click="toggleDropdown"
@@ -56,7 +35,7 @@
                 relative
                 mb-4
                 bg-sh-green-500
-                py-1
+                py-2
                 px-6
                 rounded-md
                 flex
@@ -66,14 +45,14 @@
                 cursor-pointer
               "
             >
-              <p class="font-bold text-gray-900">Actions</p>
+              <p class="font-medium text-gray-900">Actions</p>
               <img src="@/assets/images/arrowDown.svg" />
             </div>
             <div
               v-if="showDropdown"
               class="
                 absolute
-                top-36
+                top-40
                 bottom-0
                 right-7
                 h-36
@@ -87,7 +66,7 @@
               "
             >
               <a
-                href="#"
+                href.prevent="#"
                 @click="editDriver(driverData)"
                 class="
                   text-gray-500
@@ -101,7 +80,7 @@
                 >Edit</a
               >
               <a
-                href="#"
+                href.prevent="#"
                 @click="assignDriver(driverData)"
                 class="
                   text-gray-500
@@ -116,7 +95,7 @@
                 }}</a
               >
               <a
-                href="#"
+                href.prevent="#"
                 @click="removeDriver(driverData)"
                 class="
                   text-red-500
@@ -137,7 +116,9 @@
       <spinner></spinner>
     </div>
     <template v-else>
-      <router-view></router-view>
+      <router-view
+        @AssignVehicleToDriver="assignDriver(driverData)"
+      ></router-view>
     </template>
     <app-modal :modalActive="openAssignModal">
       <div class="px-3 py-5">
@@ -377,24 +358,6 @@
         </div>
       </div>
     </app-modal>
-
-    <app-modal :modalActive="confirmedRemoveDriver">
-      <div class="flex flex-col justify-center items-center py-3">
-        <img src="@/assets/images/successCheck.svg" />
-        <div class="space-y-3 pb-16 pt-5">
-          <h1 class="text-center font-medium">Remove driver</h1>
-          <p class="text-gray-400 text-center">
-            You have successfully removed this driver.
-          </p>
-        </div>
-        <button
-          @click="closeDriverRemoveModal()"
-          class="text-black bg-sh-green-500 rounded-md p-2 w-11/12 font-medium"
-        >
-          Dismiss
-        </button>
-      </div>
-    </app-modal>
   </page-layout>
 </template>
 
@@ -405,13 +368,17 @@ import Spinner from '@/components/layout/Spinner';
 import { extractErrorMessage } from '../../../../utils/helper';
 import PageActionHeader from '@/components/PageActionHeader';
 import AppModal from '@/components/Modals/AppModal.vue';
+import TabContainer from '@/components/tab/TabContainer.vue';
+import TabItem from '@/components/tab/TabItem.vue';
 export default {
   name: 'DriverDetailsIndex',
   components: {
     PageActionHeader,
     Spinner,
     PageLayout,
-    AppModal
+    AppModal,
+    TabContainer,
+    TabItem
   },
   computed: {
     ...mapGetters({
@@ -419,6 +386,9 @@ export default {
       isLoading: 'driver/getDriverLoading',
       partnerContext: 'auth/activeContext'
     })
+  },
+  mounted() {
+    console.log(this.driverData);
   },
   data() {
     return {
@@ -460,6 +430,7 @@ export default {
       this.showDropdown = !this.showDropdown;
     },
     editDriver(item) {
+      console.log(item);
       this.$router.push({
         name: 'EditDriver',
         params: { driverId: item.id }

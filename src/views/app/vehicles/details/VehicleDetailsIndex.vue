@@ -26,137 +26,99 @@
               w-full
             "
           >
-          <span>Actions</span>
-          <span class="material-icons">
-            expand_more
-          </span>
+            <span>Actions</span>
+            <span class="material-icons"> expand_more </span>
           </button>
           <div
-              v-if="showDropdown"
+            v-if="showDropdown"
+            class="
+              absolute
+              top-36
+              bottom-0
+              right-7
+              h-36
+              w-44
+              z-50
+              rounded-md
+              shadow-md
+              flex flex-col
+              bg-white
+              px-5
+            "
+          >
+            <a
+              href.prevent="#"
+              @click="editVehicle"
               class="
-                absolute
-                top-36
-                bottom-0
-                right-7
-                h-36
-                w-44
-                z-50
+                text-gray-500
+                cursor-pointer
+                hover:bg-black hover:text-white
                 rounded-md
-                shadow-md
-                flex flex-col
-                bg-white
-                px-5
+                p-2
+                pl-2
+                mt-3
               "
+              >Edit</a
             >
-              <a
-                href="#"
-                @click="editVehicle"
-                class="
-                  text-gray-500
-                  cursor-pointer
-                  hover:bg-black hover:text-white
-                  rounded-md
-                  p-2
-                  pl-2
-                  mt-3
-                "
-                >Edit</a
-              >
-              <a
-                v-if="!vehicleData.driver"
-                href="#"
-                @click="assignDriver(vehicleData)"
-                class="
-                  text-gray-500
-                  cursor-pointer
-                  hover:bg-black hover:text-white
-                  rounded-md
-                  p-2
-                  pl-2
-                "
-                >Assign Driver</a
-              >
-              <a
-                v-else
-                href="#"
-                @click="unassignDriver(vehicleData)"
-                class="
-                  text-gray-500
-                  cursor-pointer
-                  hover:bg-black hover:text-white
-                  rounded-md
-                  p-2
-                  pl-2
-                "
-                >Unassign Driver</a
-              >
-              <a
-                href="#"
-                @click="removeVehicle(vehicleData)"
-                class="
-                  text-red-500
-                  cursor-pointer
-                  hover:bg-red-500 hover:text-white
-                  rounded-md
-                  p-2
-                  pl-2
-                "
-                >Remove</a
-              >
-            </div>
+            <a
+              v-if="!vehicleData.driver"
+              href.prevent="#"
+              @click="assignDriver(vehicleData)"
+              class="
+                text-gray-500
+                cursor-pointer
+                hover:bg-black hover:text-white
+                rounded-md
+                p-2
+                pl-2
+              "
+              >Assign Driver</a
+            >
+            <a
+              v-else
+              href.prevent="#"
+              @click="unassignDriver(vehicleData)"
+              class="
+                text-gray-500
+                cursor-pointer
+                hover:bg-black hover:text-white
+                rounded-md
+                p-2
+                pl-2
+              "
+              >Unassign Driver</a
+            >
+            <a
+              href.prevent="#"
+              @click="removeVehicle(vehicleData)"
+              class="
+                text-red-500
+                cursor-pointer
+                hover:bg-red-500 hover:text-white
+                rounded-md
+                p-2
+                pl-2
+              "
+              >Remove</a
+            >
+          </div>
         </template>
 
         <template #tabs>
-          <router-link
-            class="
-              text-sm
-              font-medium
-              leading-6
-              pb-2
-              pt-1
-              px-2
-              border-b
-              cursor-pointer
-            "
-            active-class="text-black border-b-sh-green-500 border-b-2"
-            to="information"
-          >
-            Vehicle information</router-link
-          >
-          <router-link
-            class="
-              text-sm
-              font-medium
-              leading-6
-              pb-2
-              pt-1
-              px-2
-              border-b
-              cursor-pointer
-            "
-            active-class="text-black border-b-sh-green-500 border-b-2"
-            to="trips"
-            >Trips</router-link
-          >
-          <router-link
-            class="
-              text-sm
-              font-medium
-              leading-6
-              pb-2
-              pt-1
-              px-2
-              border-b
-              cursor-pointer
-            "
-            active-class="text-black border-b-sh-green-500 border-b-2"
-            to="documents"
-            >Vehicle documents</router-link
-          >
+          <TabContainer>
+            <TabItem
+              :title="'Vehicle information'"
+              :to="{ name: 'vehicle.detail.info' }"
+            />
+            <TabItem :title="'Trips'" :to="{ name: 'vehicle.detail.trips' }" />
+            <TabItem
+              :title="'Vehicle documents'"
+              :to="{ name: 'vehicle.detail.documents' }"
+            />
+          </TabContainer>
         </template>
       </page-action-header>
     </template>
-
     <div v-if="loading || isLoading">
       <spinner></spinner>
     </div>
@@ -171,13 +133,17 @@ import PageLayout from '../../../../components/layout/PageLayout';
 import { mapGetters } from 'vuex';
 import Spinner from '../../../../components/layout/Spinner';
 import PageActionHeader from '../../../../components/PageActionHeader';
-import emitter from '@/libs/emitter'
+import emitter from '@/libs/emitter';
+import TabContainer from '@/components/tab/TabContainer.vue';
+import TabItem from '@/components/tab/TabItem.vue';
 export default {
   name: 'VehicleDetailsIndex',
   components: {
     PageActionHeader,
     Spinner,
-    PageLayout
+    PageLayout,
+    TabItem,
+    TabContainer
   },
   computed: {
     ...mapGetters({
@@ -185,13 +151,13 @@ export default {
       isLoading: 'vehicle/getVehicleLoading'
     })
   },
-  data () {
+  data() {
     return {
       loading: true,
       showDropdown: false
     };
   },
-  created () {
+  created() {
     this.$store
       .dispatch('vehicle/fetchVehicleInfo', this.$attrs.vehicleId)
       .finally(() => {
@@ -199,25 +165,25 @@ export default {
       });
   },
   methods: {
-    toggleDropdown () {
+    toggleDropdown() {
       this.showDropdown = !this.showDropdown;
     },
-    editVehicle () {
-      emitter.emit("vehicles:edit-vehicle");
+    editVehicle() {
+      emitter.emit('vehicles:edit-vehicle');
       this.showDropdown = false;
     },
-    assignDriver (item) {
-      emitter.emit("vehicles:assign-driver", item?.id);
+    assignDriver(item) {
+      emitter.emit('vehicles:assign-driver', item?.id);
       this.showDropdown = false;
     },
-    unassignDriver (item) {
-      emitter.emit("vehicles:unassign-driver", item?.id);
+    unassignDriver(item) {
+      emitter.emit('vehicles:unassign-driver', item?.id);
       this.showDropdown = false;
     },
-    removeVehicle (item) {
+    removeVehicle(item) {
       console.log(item);
       this.showDropdown = false;
-    },
+    }
   }
 };
 </script>

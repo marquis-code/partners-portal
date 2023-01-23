@@ -1,29 +1,5 @@
 <template>
-  <page-layout page-title="Settings">
-    <template #actionsPane>
-      <page-action-header>
-        <!-- <template #breadcrumbs>
-          <div class="flex items-center space-x-3 py-3">
-            <router-link
-              :to="{ name: 'drivers.list' }"
-              class="text-gray-400 text-sm hover:text-gray-900"
-              >Dashboard</router-link
-            >
-            <img src="@/assets/images/breadcrumbs.svg" />
-            <router-link
-              :to="{
-                name: 'driver.detail.info',
-                params: { driverId: this.$route.params.driverId }
-              }"
-              class="text-gray-400 text-sm hover:text-gray-900"
-              >Drivers management</router-link
-            >
-            <img src="@/assets/images/breadcrumbs.svg" />
-            <p class="text-gray-900 text-sm">Edit driver</p>
-          </div>
-        </template> -->
-      </page-action-header>
-    </template>
+  <div>
     <div v-if="fetchingCompanyInfo">
       <spinner></spinner>
     </div>
@@ -57,6 +33,7 @@
                   p-3
                   placeholder-gray-500 placeholder-opacity-25
                   ring-1 ring-gray-300
+                  bg-sh-grey-100
                 "
                 placeholder="Enter your first name"
               />
@@ -84,6 +61,7 @@
                   p-3
                   placeholder-gray-500 placeholder-opacity-25
                   ring-1 ring-gray-300
+                  bg-sh-grey-100
                 "
                 placeholder=""
               />
@@ -122,6 +100,7 @@
                   p-3
                   placeholder-gray-500 placeholder-opacity-25
                   ring-1 ring-gray-300
+                  bg-sh-grey-100
                 "
                 placeholder=""
               />
@@ -149,6 +128,7 @@
                   p-3
                   placeholder-gray-500 placeholder-opacity-25
                   ring-1 ring-gray-300
+                  bg-sh-grey-100
                 "
                 placeholder=""
               />
@@ -207,7 +187,7 @@
         </button>
       </div>
     </app-modal>
-  </page-layout>
+  </div>
 </template>
 
 <script lang="ts">
@@ -217,8 +197,6 @@ import { email, required } from '@vuelidate/validators';
 import { mapGetters } from 'vuex';
 import { extractErrorMessage } from '@/utils/helper';
 import { format } from 'date-fns';
-import PageLayout from '@/components/layout/PageLayout.vue';
-import PageActionHeader from '@/components/PageActionHeader.vue';
 import Spinner from '@/components/layout/Spinner.vue';
 import AppModal from '@/components/Modals/AppModal.vue';
 import emitter from '@/libs/emitter';
@@ -232,8 +210,6 @@ interface Company {
 
 export default defineComponent({
   components: {
-    PageActionHeader,
-    PageLayout,
     Spinner,
     AppModal
   },

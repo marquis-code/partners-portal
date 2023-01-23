@@ -4,7 +4,7 @@
       <div>
         <slot name="tabs"></slot>
       </div>
-      <div>
+      <div class="pb-3">
         <slot name="action"></slot>
       </div>
     </div>

@@ -1,5 +1,5 @@
 <template>
-    <span class="tab-container flex flex-row w-max">
+    <span class="tab-container flex flex-row w-max ">
       <slot/>
     </span>
 </template>

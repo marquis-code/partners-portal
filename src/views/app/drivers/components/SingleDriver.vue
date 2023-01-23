@@ -36,8 +36,8 @@
           }}{{ driverData.lname.slice(0, 1) }}</span
         >
       </main>
-      <p class="font-light text-gray-600 text-center">
-        {{ driverData.fname }} {{ driverData.lname }}
+      <p class="font-medium text-gray-600 text-center">
+        {{ driverData?.fname }} {{ driverData?.lname }}
       </p>
     </div>
     <hr class="mb-0" />
@@ -48,16 +48,34 @@
           <img class="h-5 w-5" src="@/assets/images/carIcon.svg" />
           <div class="">
             <p class="font-medium text-sm">Assigned vehicle</p>
-            <p class="font-light text-xs">
+            <router-link
+            v-if="driverData.vehicle_id"
+              class="
+               text-gray-900
+                hover:text-sh-green-500
+                hover:underline hover:decoration-sh-green-500
+                font-light
+                text-sm
+              "
+              :to="{
+                name: 'vehicle.detail.info',
+                params: {vehicleId: driverData?.vehicle?.id }
+              }"
+            >
               {{
                 driverData.vehicle
-                  ?  driverData.vehicle.brand +" "+ driverData.vehicle.name
+                  ? driverData.vehicle.brand + ' ' + driverData.vehicle.name
                   : 'N/A'
               }}
-            </p>
+            </router-link>
+              <p class="text-sm text-gray-500 font-light pt-2" v-else>No vehicle assigned</p>
           </div>
         </div>
-        <p class="underline text-indigo-600 text-xs">Assign vehicle</p>
+        <a
+          class="underline text-indigo-600 text-xs cursor-pointer"
+          @click="$emit('AssignVehicleToDriver')"
+          >{{ driverData?.vehicle ? 'Unassign Vehicle' : 'Assign vehicle' }}</a
+        >
       </div>
       <div class="flex justify-between items-center py-6">
         <div class="flex space-x-2">
@@ -65,17 +83,17 @@
           <div class="">
             <p class="font-medium text-sm">License number</p>
             <p class="font-light text-xs">
-              {{
-                 driverData.documents[0].registeration_number
-                  ? driverData.documents[0].registeration_number
-                  : 'N/A'
-              }}
+              {{ driverData?.documents[0]?.registeration_number ?? 'N/A' }}
             </p>
           </div>
         </div>
         <router-link
           :to="{ name: 'EditDriver', params: { driverId: driverData.id } }"
-          class="underline text-indigo-600 text-sm"
+          class="
+            underline
+            text-indigo-600 text-sm
+            hover:text-sh-green-500 hover:decoration-sh-green-500
+          "
           >Update drivers licence</router-link
         >
       </div>
@@ -89,7 +107,13 @@
             </p>
           </div>
         </div>
-        <router-link to="trips" class="underline text-indigo-600 text-xs"
+        <router-link
+          to="trips"
+          class="
+            underline
+            text-indigo-600 text-xs
+            hover:text-sh-green-500 hover:decoration-sh-green-500
+          "
           >View all</router-link
         >
       </div>
@@ -105,7 +129,11 @@
         </div>
         <router-link
           :to="{ name: 'EditDriver', params: { driverId: driverData.id } }"
-          class="underline text-indigo-600 text-xs"
+          class="
+            underline
+            text-indigo-600 text-xs
+            hover:text-sh-green-500 hover:decoration-sh-green-500
+          "
           >Change email</router-link
         >
       </div>
@@ -121,7 +149,12 @@
         </div>
         <router-link
           :to="{ name: 'EditDriver', params: { driverId: driverData.id } }"
-          class="underline text-indigo-600 text-xs cursor-pointer"
+          class="
+            underline
+            text-indigo-600 text-xs
+            cursor-pointer
+            hover:text-sh-green-500 hover:decoration-sh-green-500
+          "
           >Change phone</router-link
         >
       </div>
@@ -133,10 +166,10 @@
 import { defineComponent } from 'vue';
 
 export default defineComponent({
-  emits: ['driverUpdated'], // emitted when driver is changed or updated
+  emits: ['driverUpdated', 'AssignVehicleToDriver'], // emitted when driver is changed or updated
   props: {
     driverData: Object
-  }
+  },
 });
 </script>
 

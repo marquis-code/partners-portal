@@ -5,7 +5,7 @@
         <template #breadcrumbs>
           <div class="flex items-center space-x-3 py-3">
             <router-link
-              :to="{ name: 'drivers.list' }"
+              to="/"
               class="text-gray-400 text-sm hover:text-gray-900"
               >Dashboard</router-link
             >
@@ -16,7 +16,7 @@
                 params: { driverId: this.$route.params.driverId }
               }"
               class="text-gray-400 text-sm hover:text-gray-900"
-              >Drivers management</router-link
+              >Driver management</router-link
             >
             <img src="@/assets/images/breadcrumbs.svg" />
             <p class="text-gray-900 text-sm">Edit driver</p>
@@ -135,6 +135,7 @@
                 >Phone number</label
               >
               <input
+                readonly
                 type="tel"
                 v-model="v$.form.phone.$model"
                 class="
@@ -147,6 +148,7 @@
                   p-3
                   placeholder-gray-500 placeholder-opacity-25
                   ring-1 ring-gray-300
+                  bg-gray-100
                 "
                 placeholder="Enter drivers phone number"
               />
@@ -169,6 +171,7 @@
                 >Email address</label
               >
               <input
+                readonly
                 type="email"
                 v-model="v$.form.email.$model"
                 class="
@@ -180,6 +183,7 @@
                   p-3
                   placeholder-gray-500 placeholder-opacity-25
                   ring-1 ring-gray-300
+                  bg-gray-100
                 "
                 placeholder="Enter drivers email address"
               />
@@ -206,6 +210,7 @@
                 >Residential address</label
               >
               <input
+                readonly
                 type="text"
                 v-model="v$.form.residential_address.$model"
                 class="
@@ -217,6 +222,7 @@
                   p-3
                   placeholder-gray-500 placeholder-opacity-25
                   ring-1 ring-gray-300
+                  bg-gray-100
                 "
                 placeholder="Enter drivers address"
               />
@@ -235,6 +241,7 @@
                 >Date of birth</label
               >
               <input
+                readonly
                 type="date"
                 v-model="v$.form.dob.$model"
                 class="
@@ -246,6 +253,7 @@
                   p-3
                   placeholder-gray-500 placeholder-opacity-25
                   ring-1 ring-gray-300
+                  bg-gray-100
                 "
                 placeholder="Pick drivers date of dirth"
               />
@@ -277,6 +285,7 @@
                   >License number</label
                 >
                 <input
+                  readonly
                   type="tel"
                   v-model="v$.form.license_number.$model"
                   class="
@@ -288,6 +297,7 @@
                     p-3
                     placeholder-gray-500 placeholder-opacity-25
                     ring-1 ring-gray-300
+                    bg-gray-100
                   "
                   placeholder="Enter license number"
                 />
@@ -306,6 +316,7 @@
                   >Expiry date
                 </label>
                 <input
+                  readonly
                   type="date"
                   v-model="v$.form.expiry_date.$model"
                   class="
@@ -317,6 +328,7 @@
                     p-3
                     placeholder-gray-500 placeholder-opacity-25
                     ring-1 ring-gray-300
+                    bg-gray-100
                   "
                   placeholder="Select expiry date"
                 />
@@ -406,6 +418,7 @@ import PageLayout from '@/components/layout/PageLayout.vue';
 import PageActionHeader from '@/components/PageActionHeader.vue';
 import Spinner from '@/components/layout/Spinner.vue';
 import AppModal from '@/components/Modals/AppModal.vue';
+import { getDefaultDatePickerDate } from '@/utils/dateFormatters';
 
 interface Driver {
   fname?: string;
@@ -429,7 +442,7 @@ export default defineComponent({
     Spinner,
     AppModal
   },
-  data() {
+  data () {
     return {
       docId: null,
       fetchingDriver: false,
@@ -445,7 +458,7 @@ export default defineComponent({
       uploadingProfile: false
     };
   },
-  validations() {
+  validations () {
     return {
       form: {
         fname: { required },
@@ -469,23 +482,21 @@ export default defineComponent({
       driverData: 'driver/getDriverData'
     })
   },
-  created() {
+  created () {
     this.loadDriver();
-    console.log(this.userSessionData);
-    console.log(this.getDriverData, 'here');
   },
   methods: {
-    handleFileRemoval() {
+    handleFileRemoval () {
       this.form.files = [];
       this.isUploaded = false;
     },
-    openModal() {
+    openModal () {
       this.showModal = true;
     },
-    closeModal() {
+    closeModal () {
       this.showModal = false;
     },
-    loadDriver() {
+    loadDriver () {
       this.fetchingDriver = true;
       this.$axios
         .get(`/v1/drivers/${this.$route.params.driverId}`)
@@ -506,27 +517,32 @@ export default defineComponent({
           this.form.residential_address = res.data.residential_address;
           this.form.dob = res.data.dob;
           this.form.license_number = res.data.documents[0].registration_number;
-          this.form.expiry_date = res.data.documents[0].expiry_date;
+          this.form.expiry_date = getDefaultDatePickerDate(res.data.documents[0].expiry_date);
           this.form.files = [JSON.parse(res.data.documents[0].files)[0]];
           this.form.avatar = res.data.avatar;
           this.profilePreview = res.data.avatar;
           this.documentId = res.data.documents[0].id;
         })
         .catch((err) => {
-          console.log(err);
+          const errorMessage = extractErrorMessage(
+            err,
+            null,
+            'Oops! An error occurred, please try again.'
+          );
+          this.$toast.error(errorMessage);
         })
         .finally(() => {
           this.fetchingDriver = false;
         });
     },
-    getUploadedFileUrlFromStringifiedArray(stringifiedArray: any) {
+    getUploadedFileUrlFromStringifiedArray (stringifiedArray: any) {
       const parsedArray = JSON.parse(stringifiedArray);
       if (parsedArray.length > 0) {
         return parsedArray[0];
       }
       return null;
     },
-    async updateDriver() {
+    async updateDriver () {
       this.v$.form.$touch();
       if (this.processing || this.v$.form.$errors.length) {
         return;
@@ -552,11 +568,10 @@ export default defineComponent({
           payload
         );
         this.openModal();
-        this.$router.push({ name: 'drivers.list' });
+        this.$router.push({ name: 'driver.detail.info' });
         this.closeModal();
         this.$toast.success('Drivers details was successfully updated');
       } catch (err) {
-        console.log(err);
         const errorMessage = extractErrorMessage(
           err,
           null,
@@ -567,13 +582,13 @@ export default defineComponent({
         this.processing = false;
       }
     },
-    async fileSelected(selectedImage: any) {
+    async fileSelected (selectedImage: any) {
       const imageDbUrl = (await this.uploadTos3andGetDocumentUrl(
         selectedImage
       )) as string;
       // this.form.files.push(imageDbUrl);
     },
-    async handleProfileUpload(e: any) {
+    async handleProfileUpload (e: any) {
       const selectedProfile = e.target.files[0];
       this.uploadingProfile = true;
       await this.uploadTos3andGetDocumentUrl(selectedProfile)
@@ -590,7 +605,7 @@ export default defineComponent({
         });
     },
 
-    async uploadTos3andGetDocumentUrl(file: any) {
+    async uploadTos3andGetDocumentUrl (file: any) {
       this.uploadingFile = true;
       try {
         const formData = new FormData();

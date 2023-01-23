@@ -31,11 +31,11 @@
           class="text-sm font-light text-red-500"
           v-if="v$.form.password.$dirty && v$.form.password.$error">Invalid password</span>
 
-           <span @click="toggleShow" class="absolute top-7 right-3 cursor-pointer text-sm font-medium" :class="[showPassword ? 'text-green-500' : 'text-red-500']">{{showPassword ? "Hide" : "Show"}}</span>
+           <span @click="toggleShow" class="absolute top-7 right-3 cursor-pointer text-sm font-medium" :class="[showPassword ? 'text-green-500' : 'text-purple-dark']">{{showPassword ? "Hide" : "Show"}}</span>
       </div>
 
       <div class="flex justify-end mt-4">
-        <a :href="forgotPasswordLink" class="text-grays-black-3 text-end text-xs font-medium">Forgot Password ?</a>
+        <router-link :to="{ name: 'forgotPassword'}" class="text-grays-black-3 text-end text-xs font-medium">Forgot Password ?</router-link>
       </div>
       <button
       :class="v$.form.password.$invalid || v$.form.email.$invalid || processing ?
@@ -51,7 +51,7 @@
 
       <div class="flex justify-center items-center space-x-2 text-sm md:text-base font-medium">
         <span class="text-grays-black-3">Do you want to be a partner?</span>
-        <p @click="$emit('goToSignUp')" class="text-indigo-600 text-sm md:text-base">Join now</p>
+        <p @click="$emit('goToSignUp')" class="text-indigo-600 text-sm md:text-base cursor-pointer">Join now</p>
       </div>
     </div>
   </form>

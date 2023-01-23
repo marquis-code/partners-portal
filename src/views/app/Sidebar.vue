@@ -55,7 +55,7 @@
         </div>
         <div class="side-bar-item">
           <div v-for="(menu, index) in group.menus" :key="index" class="item">
-            <div
+            <router-link
               class="
                 h-12
                 rounded-lg
@@ -68,40 +68,30 @@
                 duration-200
               "
               :class="{
-                'bg-black': menu.selected,
                 'justify-center': isSidebarFolded,
                 'justify-between pl-5': !isSidebarFolded
               }"
-              @click="selectThisSection(groupIndex, index)"
+              :to="{ name: menu.routeName }"
             >
-              <div class="flex flex-row items-center">
+              <div class="flex flex-row items-center text-gray-500">
                 <span
-                  class="material-icons"
+                  class="material-icons sidemenu-icon"
                   :class="{
-                    'text-white': menu.selected,
-                    'text-gray-500': !menu.selected,
                     'mr-3': !isSidebarFolded
                   }"
                   >{{ menu.icon }}</span
                 >
-                <span
-                  class="font-sm"
-                  :class="menu.selected ? 'text-white' : 'text-gray-500'"
-                >
+                <span class="font-sm sidemenu-icon-label">
                   {{ isSidebarFolded ? '' : menu.title }}
                 </span>
               </div>
               <div>
                 <div
-                  class="h-5 w-1"
-                  :class="
-                    menu.selected && !isSidebarFolded
-                      ? 'bg-sh-green-500'
-                      : 'hidden'
-                  "
+                  class="h-5 w-1 sidebar-active-status"
+                  :class="!isSidebarFolded ? '' : 'hidden'"
                 ></div>
               </div>
-            </div>
+            </router-link>
           </div>
         </div>
       </div>
@@ -137,11 +127,12 @@
   </div>
 </template>
 <script lang="ts">
+// @click.prevent="selectThisSection(groupIndex, index)"
 import { defineComponent } from 'vue';
 import { mapGetters } from 'vuex';
 export default defineComponent({
   name: 'Sidebar',
-  data() {
+  data () {
     return {
       isSidebarFolded: false,
       windowWidth: 0,
@@ -150,23 +141,59 @@ export default defineComponent({
         {
           sectionTitle: 'GENERAL',
           menus: [
-            { title: 'Dashboard', icon: 'home', selected: true },
-            { title: 'Vehicles', icon: 'directions_car', selected: false },
-            { title: 'Drivers', icon: 'group', selected: false },
-            { title: 'Trips', icon: 'route', selected: false },
-            {title: 'Earnings', icon: 'payments', selected: false}
+            {
+              title: 'Dashboard',
+              routeName: 'dashboard',
+              icon: 'home',
+              selected: true
+            },
+            {
+              title: 'Vehicles',
+              routeName: 'vehicles.list',
+              icon: 'directions_car',
+              selected: false
+            },
+            {
+              title: 'Drivers',
+              routeName: 'drivers.list',
+              icon: 'group',
+              selected: false
+            },
+            {
+              title: 'Trips',
+              routeName: 'trips.list',
+              icon: 'route',
+              selected: false
+            },
+            {
+              title: 'Routes',
+              routeName: 'routes.list',
+              icon: 'location_on',
+              selected: false
+            },
+            {
+              title: 'Earnings',
+              routeName: 'earnings.information',
+              icon: 'payments',
+              selected: false
+            }
           ]
         },
         {
           sectionTitle: 'SYSTEM',
           menus: [
-            {title: 'Settings', icon: 'settings', selected: false}
+            {
+              title: 'Settings',
+              routeName: 'settings.edit.partner',
+              icon: 'settings',
+              selected: false
+            }
           ]
         }
       ]
     };
   },
-  created() {
+  created () {
     window.addEventListener('resize', this.checkScreen);
     this.checkScreen();
   },
@@ -175,7 +202,7 @@ export default defineComponent({
   },
   methods: {
     // TODO (Tobi): Refactor component implementation
-    selectThisSection(groupIndex: number, itemIndex: number) {
+    selectThisSection (groupIndex: number, itemIndex: number) {
       for (let index = 0; index < this.menuGroup.length; index++) {
         const groupMenus = this.menuGroup[index].menus;
         for (let indexJ = 0; indexJ < groupMenus.length; indexJ++) {
@@ -187,10 +214,10 @@ export default defineComponent({
         }
       }
     },
-    toggleSidebar() {
+    toggleSidebar () {
       this.isSidebarFolded = !this.isSidebarFolded;
     },
-    checkScreen() {
+    checkScreen () {
       this.windowWidth = window.innerWidth;
       if (this.windowWidth <= 768) {
         this.isSidebarFolded = true;
@@ -200,7 +227,7 @@ export default defineComponent({
         this.isMobileScreen = false;
       }
     },
-    logout() {
+    logout () {
       localStorage.clear();
       this.$router.push('/login');
       this.$router.go(0);
@@ -208,3 +235,17 @@ export default defineComponent({
   }
 });
 </script>
+
+<style scoped lang="scss">
+.router-link-active {
+  @apply bg-black;
+}
+
+.router-link-active .sidemenu-icon,
+.router-link-active .sidemenu-icon-label {
+  @apply text-white;
+}
+.router-link-active .sidebar-active-status {
+  @apply bg-sh-green-500;
+}
+</style>

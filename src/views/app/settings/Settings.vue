@@ -3,14 +3,29 @@
     <template #actionsPane>
       <page-action-header>
         <template #breadcrumbs>
-          <TabContainer>
-            <TabItem :title="'Profile Information'" @click="showProfilePage"/>
-            <TabItem :title="'Company Information'" @click="showCompanyInfo"/>
-            <TabItem :title="'Settlement Account'" @click="showAccountsPage"/>
-          </TabContainer>
+          <main class="overflow-x-auto w-full">
+            <TabContainer>
+              <TabItem
+                :title="'Profile Information'"
+                :to="{ name: 'settings.edit.partner' }"
+              />
+              <TabItem
+                :title="'Company Information'"
+                :to="{ name: 'settings.edit.partner.company' }"
+              />
+              <TabItem
+                :title="'Settlement Account'"
+                :to="{ name: 'settings.edit.settlement.account' }"
+              />
+              <!-- <TabItem
+                :title="'Role Management'"
+                :to="{ name: 'settings.edit.role.management' }"
+              /> -->
+            </TabContainer>
+          </main>
         </template>
-        </page-action-header>
-      </template>
+      </page-action-header>
+    </template>
     <main>
       <router-view />
     </main>
@@ -29,17 +44,6 @@ export default {
     PageActionHeader,
     TabContainer,
     TabItem
-  },
-  methods: {
-    showProfilePage () {
-      emitter.emit("settings:go-to-profile");
-    },
-    showCompanyInfo () {
-      emitter.emit("settings:go-to-company");
-    },
-    showAccountsPage () {
-      emitter.emit("settings:go-to-settlement");
-    },
   }
 };
 </script>

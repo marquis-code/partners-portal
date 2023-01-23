@@ -5,6 +5,7 @@ import UserSelection from "@/views/app/OrganizationSelection.vue";
 import Vehicles from "@/views/app/vehicles/Vehicles.vue";
 import Earnings from "@/views/app/earnings/Earning.vue";
 import Trips from "@/views/app/Trips.vue";
+import Routes from "@/views/app/Routes.vue";
 import Settings from "@/views/app/settings/Settings.vue";
 import {loadRouteComponent} from "@/utils/route-helper.util";
 import Drivers from "@/views/app/drivers/Drivers.vue";
@@ -44,7 +45,7 @@ export const AppRoutes: Array<RouteRecordRaw> = [
         }
       },
       {
-        path: '/dashboard/start-kyc',
+        path: '/dashboard/start-kyc/:id',
         name: 'dashboard.start-kyc',
         component: loadRouteComponent('app/KycInformationView'),
         meta: {
@@ -237,11 +238,38 @@ export const AppRoutes: Array<RouteRecordRaw> = [
             },
           },
           {
+            path: '/earnings/cost-configuration',
+            name: 'earnings.cost-configuration',
+            component: loadRouteComponent('app/earnings/views/CostConfiguration'),
+            meta: {
+              title: 'Earnings-Cost-Configuration',
+              requiresAuth: true,
+            },
+          },
+          {
             path: '/earnings/vehicle-information/:id',
             name: 'earnings.vehicleInformation',
             component: loadRouteComponent('app/earnings/views/VehicleEarningsInformation'),
             meta: {
               title: 'Vehicle-Earnings-Information',
+              requiresAuth: true,
+            },
+          },
+          {
+            path: '/earnings/cost-configuration/vehicle/:id',
+            name: 'earnings.vehicle-cost-configuration',
+            component: loadRouteComponent('app/earnings/views/VehicleCostConfiguration'),
+            meta: {
+              title: 'Vehicle-Cost-Configuration',
+              requiresAuth: true,
+            },
+          },
+          {
+            path: '/earnings/past-payout',
+            name: 'earnings.past-payout',
+            component: loadRouteComponent('app/earnings/views/PastPayout'),
+            meta: {
+              title: 'Earnings-Past-Payout',
               requiresAuth: true,
             },
           },
@@ -252,6 +280,7 @@ export const AppRoutes: Array<RouteRecordRaw> = [
         path: '/trips',
         name: 'trips',
         component: Trips,
+        redirect: 'trips.list',
         meta: {
           title: 'Trips',
           requiresAuth: true
@@ -264,28 +293,83 @@ export const AppRoutes: Array<RouteRecordRaw> = [
             meta: {
               title: 'Trips',
               requiresAuth: true
-            }
+            },
           },
           {
             path: 'details/:tripId',
-            component: loadRouteComponent('app/trips/details/SingleTrip'),
-            name: 'trips.detail.info',
+            component: loadRouteComponent('app/trips/details/TripsDetailsIndex'),
             props: true,
             meta: {
               title: 'Trip Details',
+              requiresAuth: true
+            },
+            children: [
+              {
+                path: '',
+                name: 'trip.detail',
+                redirect: 'information'
+              },
+              {
+                path: 'information',
+                name: 'trip.detail.info',
+                component: loadRouteComponent('app/trips/details/TripInfo'),
+                meta: {
+                  title: 'Trip Details',
+                  requiresAuth: true
+                },
+                props: true
+              },
+              {
+                path: 'manifest',
+                name: 'trip.detail.manifest',
+                component: loadRouteComponent('app/trips/details/TripManifest'),
+                meta: {
+                  title: 'Trip Manifest',
+                  requiresAuth: true
+                },
+              }
+            ]
+          },
+          {
+            path: 'information/upcoming/:tripId',
+            name: 'trip.detail.info.upoming',
+            component: loadRouteComponent('app/trips/details/UpcomingTripInfo'),
+            meta: {
+              title: 'Trip Details',
+              requiresAuth: true
+            },
+            props: true
+          },
+        ]
+      },
+      {
+        path: '/routes',
+        name: 'routees',
+        component: Routes,
+        meta: {
+          title: 'Routes',
+          requiresAuth: true
+        },
+        children: [
+          {
+            path: '',
+            name: 'routes.list',
+            component: loadRouteComponent('app/routes/list/RouteList'),
+            meta: {
+              title: 'Routes',
               requiresAuth: true
             }
           },
           {
-            path: 'details/mainfest/:tripId',
-            component: loadRouteComponent('app/trips/details/TripManifest'),
-            name: 'trips.manifest.info',
-            props: true,
+            path: '/details/:routeId',
+            name: 'routes.detail.info',
+            component: loadRouteComponent('app/routes/detail/SingleRoute'),
             meta: {
-              title: 'Trip Details',
+              title: 'Route Detail',
               requiresAuth: true
-            }
-          }
+            },
+            props: true
+          },
         ]
       },
       {
@@ -312,20 +396,38 @@ export const AppRoutes: Array<RouteRecordRaw> = [
             name: 'settings.edit.partner.company',
             component: loadRouteComponent('app/settings/EditCompanyInfo'),
             meta: {
-              title: 'Edit Partner Information',
+              title: 'Edit Company Information',
               requiresAuth: true
             }
           },
           {
             path: 'accounts',
-            name: 'settings.edit.settlemet.account',
+            name: 'settings.edit.settlement.account',
             component: loadRouteComponent('app/settings/SettlementAccount'),
             meta: {
               title: 'Settlement Account Information',
               requiresAuth: true
             }
+          },
+          {
+            path: 'roles',
+            name: 'settings.edit.role.management',
+            component: loadRouteComponent('app/settings/RoleManagement'),
+            meta: {
+              title: 'Role Management',
+              requiresAuth: true
+            }
           }
         ]
+      },
+      {
+        path: 'add-account',
+        name: 'add.settlement.account',
+        component: loadRouteComponent('app/settings/AddSettlementAccount'),
+        meta: {
+          title: 'Settlement Account Information',
+          requiresAuth: true
+        }
       }
     ]
   },

@@ -1,14 +1,25 @@
 <template>
   <div class="flex flex-row justify-between w-full">
     <div class="flex flex-row space-x-2 mb-4">
-      <img v-if="done" src="@/assets/icons/completed.svg" />
-      <img v-else src="@/assets/icons/pending.svg">
-      <span>{{item}}</span>
+      <img v-if="status == 'completed'" src="@/assets/icons/completed.svg" />
+      <img v-else src="@/assets/icons/pending.svg" />
+      <span>{{ item }}</span>
     </div>
-    <div v-if="!done" class="flex flex-row justify-center items-center">
-      <span class="text-sh-purple-700">Upload</span>
+    <div
+      v-if="status === `under-review`"
+      class="flex flex-row justify-center items-center"
+    >
+        <span v-if="status == 'under-review'" class="text-white text-sm font-medium p-1 bg-black rounded">under review</span>
+    </div>
+
+    <router-link
+      :to="actionRoute"
+      v-if="status === `pending`"
+      class="flex flex-row justify-center items-center"
+    >
+      <span class="text-indigo-500">upload</span>
       <img class="ml-2" src="@/assets/icons/purple-arrow.svg" />
-    </div>
+    </router-link>
   </div>
 </template>
 
@@ -16,10 +27,12 @@
 export default {
   props: {
     item: String,
-    done: Boolean
+    status: String,
+    actionRoute: String
   }
 };
 </script>
 
+<!-- add.settlement.account -->
 <style>
 </style>

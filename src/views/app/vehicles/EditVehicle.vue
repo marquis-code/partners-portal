@@ -4,16 +4,16 @@
       <PageActionHeader>
         <template #breadcrumbs>
           <div class="flex items-center space-x-3 py-3">
-            <p class="text-gray-400 text-sm">Dashboard</p>
+            <router-link to="/" class="text-gray-400 text-sm">Dashboard</router-link>
             <img src="@/assets/images/breadcrumbs.svg" />
-            <p class="text-gray-400 text-sm">Vehicle management</p>
+            <router-link to="/vehicles" class="text-gray-400 text-sm">Vehicles</router-link>
             <img src="@/assets/images/breadcrumbs.svg" />
             <p class="text-gray-900 text-sm">Update Vehicle Information</p>
           </div>
         </template>
       </PageActionHeader>
     </template>
-    <main class="space-y-16 bg-white py-8 lg:w-10/12 mx-auto" >
+    <main class="space-y-16 bg-white py-8 lg:w-10/12" >
       <div class="flex justify-center pl-3 md:pl-0 lg:w-10/12 mx-auto items-center md:space-x-3 w-full">
         <div class="flex items-center space-x-1">
           <p
@@ -149,7 +149,6 @@
                   class="form-group"
                   :reduce="(option) => option.city.id"
                   :options="cities"
-                  :multiple="true"
                   label="id"
                   required>
                   <template v-slot:option="model">

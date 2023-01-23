@@ -9,6 +9,8 @@ import store from '@/store';
 import {OnboardingGuard} from "@/router/guards/onboarding.guard";
 import SplashIntro from "@/views/LandingPage/SplashIntro.vue";
 import Login from "@/views/LandingPage/Login.vue";
+import ForgotPassword from "@/views/LandingPage/ForgotPassword.vue";
+import ResetPassword from "@/views/LandingPage/ResetPassword.vue";
 import Register from "@/views/LandingPage/Register.vue";
 import LandingPage from "@/views/LandingPage/Base.vue";
 import {ContextGuard} from "@/router/guards/context.guard";
@@ -40,6 +42,27 @@ const routes: Array<RouteRecordRaw> = [
         component: Login,
         meta: {
           title: 'Login',
+          requiresAuth: false,
+          isGuest: true
+        }
+      },
+      {
+        path: 'forgot-password',
+        name: 'forgotPassword',
+        component: ForgotPassword,
+        meta: {
+          title: 'ForgotPassword',
+          requiresAuth: false,
+          isGuest: true
+        }
+      },
+      {
+        path: '/password/:token',
+        name: 'resetPassword',
+        props: true,
+        component: ResetPassword,
+        meta: {
+          title: 'ResetPassword',
           requiresAuth: false,
           isGuest: true
         }

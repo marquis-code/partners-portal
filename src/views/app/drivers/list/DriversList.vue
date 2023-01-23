@@ -7,7 +7,7 @@
             to="drivers/add-driver"
             class="
               bg-sh-green-500
-              font-medium
+              font-light
               border-none
               outline-none
               px-6
@@ -26,66 +26,141 @@
       </page-action-header>
     </template>
     <div>
-      <div class="flex items-center">
-        <span
-          class="
-            text-sm
-            font-medium
-            leading-6
-            pb-2
-            pt-1
-            px-2
-            border-b-2
-            cursor-pointer
-          "
-          :class="
-            this.filters.status === 'active'
-              ? 'text-black border-b-sh-green-500'
-              : 'text-sh-grey-500 border-b-transparent'
-          "
-          @click="setStatusFilter('active')"
-          >Active</span
-        >
-        <span
-          class="
-            text-sm
-            font-medium
-            leading-6
-            pb-2
-            pt-1
-            px-2
-            border-b-2
-            cursor-pointer
-          "
-          :class="
-            this.filters.status === 'inactive'
-              ? 'text-black border-b-sh-green-500'
-              : 'text-sh-grey-500 border-b-transparent'
-          "
-          @click="setStatusFilter('inactive')"
-          >InActive</span
-        >
-      </div>
-      <div class="space-y-5 ring-1 ring-gray-50 shadow-sm rounded-sm bg-white">
+      <div
+        class="
+          space-y-5
+          ring-1 ring-gray-50
+          shadow-sm
+          rounded-sm
+          bg-white
+          rounded-tr-lg rounded-tl-lg
+        "
+      >
         <div class="relative">
+          <!-- Search Box  -->
+          <div
+            class="
+              flex flex-row
+              justify-between
+              px-6
+              py-4
+              w-full
+            "
+          >
+            <div class="flex flex-row justify-start w-full">
+              <span class="material-icons mr-4">search</span>
+              <input
+                v-model.trim="filters.search"
+                class="
+                  list-search
+                  w-full
+                  box-border
+                  w-4/5
+                  h-8
+                  focus:outline-none
+                "
+                type="search"
+                placeholder="Search"
+              />
+            </div>
+          </div>
+          <!-- End of search box -->
+          <!-- Start of filter -->
+          <div class="flex items-center px-6 py-4">
+            <span
+              class="
+                text-sm
+                font-medium
+                leading-6
+                pb-2
+                pt-1
+                px-2
+                border-b-2
+                cursor-pointer
+              "
+              :class="
+                filters.status === 1
+                  ? 'text-black border-b-sh-green-500'
+                  : 'text-sh-grey-500 border-b-transparent'
+              "
+              @click="setStatusFilter('active')"
+              >Active</span
+            >
+            <span
+              class="
+                text-sm
+                font-medium
+                leading-6
+                pb-2
+                pt-1
+                px-2
+                border-b-2
+                cursor-pointer
+              "
+              :class="
+                filters.status === 0
+                  ? 'text-black border-b-sh-green-500'
+                  : 'text-sh-grey-500 border-b-transparent'
+              "
+              @click="setStatusFilter('inactive')"
+              >Inactive</span
+            >
+          </div>
+          <!-- End of filter -->
           <app-table
             :loading="loading"
             :error-loading="errorLoading"
             :items="tableData"
             :fields="headers"
+            :extraOptions="{ serverSide: true, totalSize: totalRecords }"
+            @pageChange="changePage"
+            @sizeChange="showPageSize"
           >
-            <template v-slot:routes="{ item }">
-              <span v-if="item.routes">
-                <span v-for="(route, index) in item.routes" :key="index">{{
-                  route
-                }}</span>
+            <template v-slot:routeVehicles="{ item }">
+              <span v-if="item.routeVehicles">
+                <span
+                  v-for="(route, index) in item.routeVehicles"
+                  :key="index"
+                  >{{ route.route.route_code + '   ' }}</span
+                >
               </span>
               <span class="text-sm text-grays-black-6" v-else
                 >No route assigned</span
               >
             </template>
+            <template v-slot:email="{ item }">
+              <router-link
+                class="
+                  text-gray-800
+                  hover:underline
+                  hover:decoration-sh-green-500
+                  hover:text-sh-green-500
+                "
+                :to="{
+                  name: 'driver.detail.info',
+                  params: { driverId: item.id }
+                }"
+                >{{ item?.email ?? 'N/A' }}</router-link
+              >
+            </template>
 
-            <template v-slot:driver="{ item }">
+            <template v-slot:phone="{ item }">
+              <router-link
+                class="
+                  text-gray-800
+                  hover:underline
+                  hover:decoration-sh-green-500
+                  hover:text-sh-green-500
+                "
+                :to="{
+                  name: 'driver.detail.info',
+                  params: { driverId: item.id }
+                }"
+                >{{ item?.phone ?? 'N/A' }}</router-link
+              >
+            </template>
+
+            <template v-slot:name="{ item }">
               <span
                 v-if="item"
                 class="font-light flex items-center text-sm text-gray-type-3"
@@ -110,61 +185,58 @@
                   >
                 </span>
                 <router-link
-                  class="text-sh-green-700 pr-1 cursor-pointer"
+                  class="
+                    text-gray-800
+                    hover:underline
+                    font-medium
+                    hover:decoration-sh-green-500 hover:text-sh-green-500
+                  "
                   :to="{
                     name: 'driver.detail.info',
                     params: { driverId: item.id }
                   }"
-                  >{{ item.fname || '' }}</router-link
-                >
-                <router-link
-                  class="text-sh-green-700 cursor-pointer"
-                  :to="{
-                    name: 'driver.detail.info',
-                    params: { driverId: item.id }
-                  }"
-                  >{{ item.lname || '' }}</router-link
+                  >{{ item?.name ?? 'N/A' }}</router-link
                 >
               </span>
             </template>
 
             <template v-slot:actions="{ item }">
-              <img
-                class=""
-                @click="handleDriver(item)"
-                src="@/assets/icons/more_options.svg"
-              />
+              <div class="flex items-center space-x-3">
+                <router-link
+                  :to="{
+                    name: 'EditDriver',
+                    params: { driverId: item.id }
+                  }"
+                  @click="editDriver"
+                  class="
+                    font-medium
+                    text-gray-800
+                    border-2
+                    rounded-md
+                    px-3
+                    py-2
+                    border-black
+                  "
+                >
+                  Edit
+                </router-link>
+                <p
+                  @click="removeDriver(item.id)"
+                  class="
+                    font-medium
+                    text-red-500
+                    border-2
+                    rounded-md
+                    border-red-500
+                    px-3
+                    py-2
+                  "
+                >
+                  Remove
+                </p>
+              </div>
             </template>
           </app-table>
-          <div
-            v-if="showDropdown"
-            id="dropdown"
-            class="
-              z-50
-              ring-1 ring-gray-50
-              rounded-md
-              bg-white
-              flex
-              py-4
-              justify-start
-              flex-col
-              items-start
-              w-24
-              h-20
-              absolute
-              top-24
-              shadow-md
-              right-0
-              bottom-0
-            "
-          >
-            <p @click="editDriver" class="text-gray-500 pl-3 cursor-pointer">
-              Edit
-            </p>
-            <p @click="removeDriver" class="text-red-500 pl-3 cursor-pointer">
-              Remove
-            </p>
-          </div>
         </div>
       </div>
     </div>
@@ -238,8 +310,12 @@ import PageActionHeader from '@/components/PageActionHeader.vue';
 import PageLayout from '@/components/layout/PageLayout.vue';
 import AppModal from '@/components/Modals/AppModal.vue';
 import { extractErrorMessage } from '@/utils/helper';
-import OptionsDropdown from '@/components/OptionsDropdown.vue';
+// import { vue3Debounce } from 'vue-debounce'
+
 export default defineComponent({
+  // directives: {
+  //   debounce: vue3Debounce({ lock: true })
+  // },
   name: 'DriversList',
   components: {
     PageLayout,
@@ -253,15 +329,34 @@ export default defineComponent({
   props: {
     rowClicked: Function
   },
+  watch: {
+    'filters.pageNumber'() {
+      this.fetchDrivers();
+    },
+    'filters.pageSize'() {
+      this.fetchDrivers();
+    },
+    'filters.search'() {
+      clearTimeout(this.debounce);
+      this.debounce = setTimeout(() => {
+        this.fetchDrivers();
+      }, 600);
+    }
+  },
   data() {
     return {
       filters: {
-        status: 'active',
-        search: ''
+        status: 1,
+        search: '',
+        pageNumber: 1,
+        pageSize: 10
       },
+      debounce: null as any,
       showInfoModal: false,
+      search: '',
       showSuccessModal: false,
       selectedDriverId: null,
+      driverToRemoveId: null,
       showDropdown: false,
       loading: false,
       modalLoading: false,
@@ -269,9 +364,9 @@ export default defineComponent({
       totalRecords: null,
       errorLoading: false,
       headers: [
-        { label: 'Driver', key: 'driver' },
+        { label: 'Driver', key: 'name' },
         { label: 'Email', key: 'email' },
-        { label: 'Route Assigned', key: 'itenararies' },
+        { label: 'Route Assigned', key: 'routeVehicles' },
         { label: 'Phone Number', key: 'phone' },
         { label: 'Actions', key: 'actions' }
       ],
@@ -282,21 +377,40 @@ export default defineComponent({
     ...mapGetters({
       partnerContext: 'auth/activeContext',
       userSessionData: 'auth/userSessionData'
-    })
+    }),
+    filteredDrivers() {
+      const results = this.tableData as any[];
+
+      const searchKeyword = this.search.toLowerCase();
+
+      if (!searchKeyword) return results;
+
+      const searchResult = results.filter((item) => {
+        return (
+          item?.fname?.toLowerCase().includes(searchKeyword) ||
+          item?.lname?.toLowerCase().includes(searchKeyword) ||
+          item?.email?.toLowerCase().includes(searchKeyword) ||
+          item?.phone?.includes(searchKeyword)
+        );
+      });
+      return searchResult;
+    }
   },
-  mounted() {
-    console.log(this.partnerContext);
-  },
+
   methods: {
+    changePage(pageNumber: any) {
+      this.filters.pageNumber = pageNumber;
+    },
+    showPageSize(pageSize: any) {
+      this.filters.pageSize = pageSize;
+    },
     async proceed() {
       this.modalLoading = true;
-      console.log('proceeding....', this.selectedDriverId);
       await this.$axios
         .delete(
-          `/v1/partners/${this.partnerContext.partner.id}/drivers/${this.selectedDriverId}`
+          `/v1/partners/${this.partnerContext.partner.id}/drivers/${this.driverToRemoveId}`
         )
-        .then((res) => {
-          console.log(res);
+        .then(() => {
           this.modalLoading = false;
           this.handleHideInfoModal();
           this.handleShowSuccessModal();
@@ -316,14 +430,14 @@ export default defineComponent({
         });
     },
     setStatusFilter(value: string) {
-      this.filters.status = value;
+      this.filters.status = value === 'active' ? 1 : 0;
       this.fetchDrivers();
     },
     fetchDrivers() {
       this.loading = true;
       this.$axios
         .get(
-          `/v1/partners/${this.userSessionData.activeContext.partner.account_sid}/drivers`
+          `/v1/partners/${this.userSessionData.activeContext.partner.account_sid}/drivers?active=${this.filters.status}?page=${this.filters.pageNumber}&limit=${this.filters.pageSize}&search=${this.filters.search}`
         )
         .then((res) => {
           this.tableData = (this.formatApiFormData(res.data.data) as any) || [];
@@ -348,11 +462,12 @@ export default defineComponent({
       apiFormData.forEach((eachDriver) => {
         newTableData.push({
           id: eachDriver.driver.id,
+          name: eachDriver.driver.fname + ' ' + eachDriver.driver.lname,
           fname: eachDriver.driver.fname,
           lname: eachDriver.driver.lname,
           phone: eachDriver.driver.phone,
           email: eachDriver.driver.email,
-          routes: eachDriver.driver.routes,
+          routeVehicles: eachDriver?.routeVehicles || null,
           avatar: eachDriver.driver.avatar,
           active: eachDriver.driver.active,
           deleted_at: eachDriver.driver.deleted_at,
@@ -366,7 +481,8 @@ export default defineComponent({
       });
       return newTableData;
     },
-    removeDriver() {
+    removeDriver(id: any) {
+      this.driverToRemoveId = id;
       this.handleShowInfoModal();
       this.showDropdown = false;
     },

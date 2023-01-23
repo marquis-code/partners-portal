@@ -206,15 +206,20 @@ export default defineComponent({
           `/v1/admins/city-documents/${vehicleCityId}`
         );
         const element = response.data[0];
-        this.payload.city_documents = [
-          {
-            document_type: element.document_type,
-            document_requirement_id: element.id,
-            city_id: element.city_id,
-            files: []
-          }
-        ];
+        if (!element) {
+          this.payload.city_documents = []
+        } else {
+          this.payload.city_documents = [
+            {
+              document_type: element.document_type,
+              document_requirement_id: element.id,
+              city_id: element.city_id,
+              files: []
+            }
+          ];
+        }
       } catch (error) {
+        console.log(error)
         const errorMessage = extractErrorMessage(
           error,
           null,
@@ -244,7 +249,6 @@ export default defineComponent({
       this.removeLoadingTypeItemFromVehicleDocuments();
       this.changeVehicleDocumentsExpiryDatesToTimeStamp();
       const newPayload = this.removeDocumentsWithoutFiles();
-      console.log(newPayload);
       try {
         await this.$axios.post(
           `/v1/partners/${this.partnerContext.partner.id}/vehicle/${this.getVehicleFormData.id}/vehicle-documents`,

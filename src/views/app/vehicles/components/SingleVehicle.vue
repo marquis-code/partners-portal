@@ -1,5 +1,10 @@
 <template>
-  <div class="w-full">
+  <div class="h-full absolute -top-7 -right-10 -left-7 bottom-0">
+    <single-google-maps/>
+  </div>
+  <div
+  class="relative"
+  >
     <Transition>
       <Notification
         v-if="haspendingDocuments"
@@ -36,7 +41,10 @@
             <div class="">
               <div class="font-medium text-xs">
                 <p class="font-medium text-xs">Assigned Driver</p>
-                <p v-if="singleVehicleData.driver" class="font-light text-xs">{{singleVehicleData.driver.fname}} {{singleVehicleData.driver.lname}}</p>
+                <p v-if="singleVehicleData.driver" class="font-light text-xs">
+                  {{ singleVehicleData.driver.fname }}
+                  {{ singleVehicleData.driver.lname }}
+                </p>
                 <p class="font-light text-xs" v-else>No driver</p>
               </div>
             </div>
@@ -45,13 +53,20 @@
             v-if="!singleVehicleData.driver"
             class="underline text-indigo-600 text-xs"
             @click="showAssignDriverModal"
-          >Assign a Driver
+          >
+            Assign a Driver
           </p>
           <p
             v-else
-            class="underline text-indigo-600 text-xs"
+            class="
+              underline
+              text-indigo-600 text-xs
+              cursor-pointer
+              hover:decoration-sh-green-500 hover:text-sh-green-500
+            "
             @click="showUnassignDriverModal"
-          >Remove Driver
+          >
+            Remove Driver
           </p>
         </div>
         <div class="flex justify-between items-center py-6">
@@ -64,9 +79,19 @@
               </p>
             </div>
           </div>
-          <p @click="editVehicle" class="underline text-indigo-600 text-xs">
-            Change plate number
-          </p>
+
+          <router-link
+            class="
+              underline
+              hover:decoration-sh-green-500 hover:text-sh-green-500
+              text-indigo-600 text-xs
+            "
+            :to="{
+              name: 'EditVehicle',
+              params: { vehicleId: vehicleData.id }
+            }"
+            >Change plate number</router-link
+          >
         </div>
         <div class="flex justify-between items-center py-6">
           <div class="flex space-x-2">
@@ -85,10 +110,16 @@
             <img class="h-5 w-5" src="@/assets/images/tripsIcon.svg" />
             <div class="">
               <p class="font-medium text-xs">Trips</p>
-              <p class="font-light text-xs">28</p>
+              <!-- <p class="font-light text-xs">28</p> -->
             </div>
           </div>
-          <router-link to="trips" class="underline text-indigo-600 text-xs"
+          <router-link
+            to="trips"
+            class="
+              underline
+              hover:decoration-sh-green-500 hover:text-sh-green-500
+              text-indigo-600 text-xs
+            "
             >View all</router-link
           >
         </div>
@@ -136,33 +167,29 @@
           </button>
         </div>
         <Transition>
-        <div v-if="assignStep === 1" class="pb-5 px-5 text-center">
-          <img src="@/assets/icons/question.svg" class="mx-auto mb-7" />
-          <p class="mb-2 font-bold font-lg">Assign driver?</p>
-          <p class="mb-14">Are you sure you want to continue?</p>
-          <div class="flex flex-row justify-between bottom-0 w-full">
-            <button
-              @click="cancelAssignment"
-              class="border border-sh-grey-400 rounded-lg w-32 md:w-40 py-2"
-            >
-              Cancel
-            </button>
+          <div v-if="assignStep === 1" class="pb-5 px-5 text-center">
+            <img src="@/assets/icons/question.svg" class="mx-auto mb-7" />
+            <p class="mb-2 font-bold font-lg">Assign driver?</p>
+            <p class="mb-14">Are you sure you want to continue?</p>
+            <div class="flex flex-row justify-between bottom-0 w-full">
+              <button
+                @click="cancelAssignment"
+                class="border border-sh-grey-400 rounded-lg w-32 md:w-40 py-2"
+              >
+                Cancel
+              </button>
 
-            <button
-              :disabled="assigningDriver"
-              class="rounded-lg bg-sh-green-500 w-32 md:w-40 py-2"
-              :class="
-                assigningDriver
-                  ? 'bg-sh-green-100'
-                  : 'bg-sh-green-500'
-              "
-              @click="assignDriverToThisVehicle"
-            >
-              {{ assigningDriver ? 'Processing' : 'Continue' }}
-              <spinner v-if="assigningDriver"></spinner>
-            </button>
+              <button
+                :disabled="assigningDriver"
+                class="rounded-lg bg-sh-green-500 w-32 md:w-40 py-2"
+                :class="assigningDriver ? 'bg-sh-green-100' : 'bg-sh-green-500'"
+                @click="assignDriverToThisVehicle"
+              >
+                {{ assigningDriver ? 'Processing' : 'Continue' }}
+                <spinner v-if="assigningDriver"></spinner>
+              </button>
+            </div>
           </div>
-        </div>
         </Transition>
         <div v-if="assignStep === 2" class="pb-5 px-5 text-center">
           <img src="@/assets/icons/success.svg" class="mx-auto mb-7" />
@@ -201,11 +228,7 @@
             <button
               :disabled="unassigningDriver"
               class="rounded-lg bg-sh-green-500 w-32 md:w-40 py-2"
-              :class="
-                unassigningDriver
-                  ? 'bg-sh-green-100'
-                  : 'bg-sh-green-500'
-              "
+              :class="unassigningDriver ? 'bg-sh-green-100' : 'bg-sh-green-500'"
               @click="unassignDriverToThisVehicle"
             >
               {{ unassigningDriver ? 'Processing' : 'Continue' }}
@@ -246,10 +269,10 @@ import AppModal from '@/components/Modals/AppModal.vue';
 import Notification from '../../../../components/Notification.vue';
 import Spinner from '@/components/layout/Spinner.vue';
 import { axiosInstance } from '@/plugins/axios';
-import emitter from '@/libs/emitter'
+import emitter from '@/libs/emitter';
+import SingleGoogleMaps from '@/components/map/SingleGoogleMaps.vue';
 
 export default defineComponent({
-
   emits: ['vehicleUpdated'],
   props: {
     singleVehicleData: Object
@@ -280,20 +303,20 @@ export default defineComponent({
     this.fetchVehiclePartnerDrivers();
     this.checkIfVehicleHasPendingDocuments();
   },
-  mounted() {
+  mounted () {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    emitter.on("vehicles:assign-driver", () => {
+    emitter.on('vehicles:assign-driver', () => {
       this.showAssignDriverModal();
     });
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    emitter.on("vehicles:unassign-driver", () => {
+    emitter.on('vehicles:unassign-driver', () => {
       this.showUnassignDriverModal();
     });
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    emitter.on("vehicles:edit-vehicle", () => {
+    emitter.on('vehicles:edit-vehicle', () => {
       this.editVehicle();
     });
   },
@@ -301,9 +324,9 @@ export default defineComponent({
     viewVehicleDocuments () {
       this.$router.push({
         name: 'vehicle.detail.documents'
-      })
+      });
     },
-    checkIfVehicleHasPendingDocuments() {
+    checkIfVehicleHasPendingDocuments () {
       this.$axios
         .get(
           `v1/partners/${this.partnerContext.partner.id}/vehicle/${this.vehicleData.id}/vehicle-documents`
@@ -314,10 +337,10 @@ export default defineComponent({
             const element = vehicleDocuments[index];
             if (element.documents === null) {
               this.haspendingDocuments = true;
-              return 0
+              return 0;
             }
           }
-        })
+        });
     },
     nextAssignStep () {
       this.assignStep += 1;
@@ -349,10 +372,10 @@ export default defineComponent({
       this.assigningDriver = true;
       try {
         const response = await this.$axios.put(
-            `/v1/partners/${this.userSessionData.activeContext.partner.id}/drivers/${this.selectedDriverId}/vehicle-assignments?status=assign`,
-            {
-              vehicle_id: this.vehicleData.id
-            }
+          `/v1/partners/${this.userSessionData.activeContext.partner.id}/drivers/${this.selectedDriverId}/vehicle-assignments?status=assign`,
+          {
+            vehicle_id: this.vehicleData.id
+          }
         );
         await this.updateVehicleInfo(this.vehicleData.id);
         this.nextAssignStep();
@@ -369,10 +392,10 @@ export default defineComponent({
       this.unassigningDriver = true;
       try {
         const response = await this.$axios.put(
-            `/v1/partners/${this.userSessionData.activeContext.partner.id}/drivers/${this.selectedDriverId}/vehicle-assignments?status=unassign`,
-            {
-              vehicle_id: this.vehicleData.id
-            }
+          `/v1/partners/${this.userSessionData.activeContext.partner.id}/drivers/${this.selectedDriverId}/vehicle-assignments?status=unassign`,
+          {
+            vehicle_id: this.vehicleData.id
+          }
         );
         await this.updateVehicleInfo(this.vehicleData.id);
         this.nextUnassignStep();
@@ -389,9 +412,9 @@ export default defineComponent({
       try {
         const response = await axiosInstance.get(`/v1/vehicles/${vehicleId}`);
         await this.$store.dispatch('vehicle/setVehicleData', response.data);
-        this.$toast.success("Vehicle Informaion ")
+        this.$toast.success('Vehicle Informaion ');
       } finally {
-        console.log('done')
+        console.log('done');
       }
     },
     editVehicle () {
@@ -435,7 +458,7 @@ export default defineComponent({
         });
     }
   },
-  components: { AppModal, Notification, Spinner }
+  components: { AppModal, Notification, Spinner, SingleGoogleMaps }
 });
 </script>
 
