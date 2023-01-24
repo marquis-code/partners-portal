@@ -407,15 +407,14 @@ export default defineComponent<any, any, any>({
   methods: {
     setFormDefaults() {
       const user: UserData = this.user;
+      const existingBusinessMode = this.contextOrganization?.partner?.mode;
       this.identityForm.user.document_owner_id = user.id;
-      this.identityForm.user.partner_type =
-        this.$route.query.type === 'individual' ? 'individual' : 'business';
+      this.identityForm.user.partner_type = existingBusinessMode || (this.$route.query.type === 'individual' ? 'individual' : 'business');
       this.identityForm.document.fname = user.fname;
       this.identityForm.document.lname = user.lname;
 
       this.addressForm.user.document_owner_id = user.id;
-      this.addressForm.user.partner_type =
-        this.$route.query.type === 'individual' ? 'individual' : 'business';
+      this.addressForm.user.partner_type = existingBusinessMode || (this.$route.query.type === 'individual' ? 'individual' : 'business');
     },
     previous() {
       this.activeView -= 1;
