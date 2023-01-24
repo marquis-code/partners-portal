@@ -78,7 +78,7 @@
             <p class="text-sm md:text-base">
               You’re doing well,
               <span class="text-sh-purple-700 underline"
-                >{{ doneCount }} of {{ partnerType == 'individual' ? '5' : 6 }}</span
+                >{{ doneCount }} of {{ partnerType === 'individual' ? '5' : 6 }}</span
               >
               steps to be completed
             </p>
