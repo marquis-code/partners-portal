@@ -210,7 +210,7 @@
               items-center
             "
           >
-            <div class="space-y-2 w-full">
+            <!-- <div class="space-y-2 w-full">
               <label class="text-xs font-medium text-grays-black-5"
                 >Residential address</label
               >
@@ -229,6 +229,23 @@
                 "
                 placeholder="Enter drivers address"
               />
+              <span
+                class="text-xs font-light text-red-500"
+                v-if="
+                  v$.form.residential_address.$dirty &&
+                  v$.form.residential_address.required.$invalid
+                "
+              >
+                Please provide your drivers address
+              </span>
+            </div> -->
+            <div class="space-y-2 w-full">
+              <label class="text-xs font-medium text-grays-black-5"
+                >Residential address</label
+              >
+              <address-auto-complete
+                @autoCompleteAddress="selectedAddress"
+              ></address-auto-complete>
               <span
                 class="text-xs font-light text-red-500"
                 v-if="
@@ -420,6 +437,7 @@ import PageLayout from '@/components/layout/PageLayout.vue';
 import Spinner from '@/components/layout/Spinner.vue';
 import PageActionHeader from '@/components/PageActionHeader.vue';
 import AppModal from '@/components/Modals/AppModal.vue';
+import AddressAutoComplete from '@/components/AddressAutoComplete.vue';
 
 export default defineComponent({
   name: 'AddDriver',
@@ -429,7 +447,8 @@ export default defineComponent({
     PageLayout,
     PageActionHeader,
     AppModal,
-    Spinner
+    Spinner,
+    AddressAutoComplete
   },
   created() {
     this.setDefaultCountry();
@@ -484,6 +503,9 @@ export default defineComponent({
     })
   },
   methods: {
+    selectedAddress(value: any) {
+      this.form.residential_address = value;
+    },
     setDefaultCountry() {
       const code =
         this.countries && this.countries.length
@@ -524,7 +546,10 @@ export default defineComponent({
           lname: this.form.lname,
           phone: this.form.phone,
           email: this.form.email,
-          password: 'shuttlers'
+          password: 'shuttlers',
+          avatar: this.form.avatar,
+          dob: this.form.dob,
+          residential_address: this.form.residential_address,
         };
         await this.$axios.post('/v1/drivers', newDriverPayload).then((res) => {
           return this.createPartnerDriver(res.data.id);
@@ -543,19 +568,11 @@ export default defineComponent({
     async createPartnerDriver(driverId: any) {
       const expiryDate = this.form.expiry_date;
       const partnerDriverPayload = {
-        fname: this.form.fname,
-        lname: this.form.lname,
-        phone: this.form.phone,
-        email: this.form.email,
-        residential_address: this.form.residential_address,
-        dob: this.form.dob,
         registration_number: this.form.license_number,
         expiry_date: format(expiryDate as any, 'yyyy-MM-dd HH:mm:ss') as any,
         files: this.form.files,
-        avatar: this.form.avatar,
         driver_id: driverId.toString(),
         document_type: 'drivers_license',
-        password: 'shuttlers'
       };
       await this.$axios
         .post(

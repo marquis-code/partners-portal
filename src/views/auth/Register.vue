@@ -488,11 +488,7 @@ export default defineComponent({
             });
           }
         }
-        // } else {
-        //   return this.rejectCaptchaVerification("Captcha Verification Failed!");
-        // }
       } catch (e) {
-        console.log(e);
         // this.errorMessage = "Oops! An error occurred, please try again.";
         this.$toast.error(
           extractErrorMessage(
