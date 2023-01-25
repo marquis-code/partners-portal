@@ -524,7 +524,10 @@ export default defineComponent({
           lname: this.form.lname,
           phone: this.form.phone,
           email: this.form.email,
-          password: 'shuttlers'
+          password: 'shuttlers',
+          avatar: this.form.avatar,
+          dob: this.form.dob,
+          residential_address: this.form.residential_address,
         };
         await this.$axios.post('/v1/drivers', newDriverPayload).then((res) => {
           return this.createPartnerDriver(res.data.id);
@@ -543,19 +546,11 @@ export default defineComponent({
     async createPartnerDriver(driverId: any) {
       const expiryDate = this.form.expiry_date;
       const partnerDriverPayload = {
-        fname: this.form.fname,
-        lname: this.form.lname,
-        phone: this.form.phone,
-        email: this.form.email,
-        residential_address: this.form.residential_address,
-        dob: this.form.dob,
         registration_number: this.form.license_number,
         expiry_date: format(expiryDate as any, 'yyyy-MM-dd HH:mm:ss') as any,
         files: this.form.files,
-        avatar: this.form.avatar,
         driver_id: driverId.toString(),
         document_type: 'drivers_license',
-        password: 'shuttlers'
       };
       await this.$axios
         .post(
