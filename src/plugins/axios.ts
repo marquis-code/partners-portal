@@ -12,11 +12,6 @@ const config = {
   timeout: 60 * 1000 // Timeout
   // withCredentials: true, // Check cross-site Access-Control
 };
-// const config = {
-//   baseURL: 'http://localhost:8080/',
-//   timeout: 60 * 1000 // Timeout
-//   // withCredentials: true, // Check cross-site Access-Control
-// };
 export const axiosInstance = axios.create(config);
 
 /* _axios.interceptors.request.use(
