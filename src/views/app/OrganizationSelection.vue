@@ -1,9 +1,6 @@
 <template>
   <OnboardingLayout>
-    <CenteredPageHeader
-      :title="title"
-      :description="description"
-    />
+    <CenteredPageHeader :title="title" :description="description" />
     <section
       class="
         flex flex-wrap
@@ -32,7 +29,10 @@
           w-52
           mt-8
           mr-6
-          flex justify-center items-center flex-col
+          flex
+          justify-center
+          items-center
+          flex-col
         "
       >
         <small
@@ -48,10 +48,14 @@
             bg-sh-green-200
             text-sh-green-500
           "
-          >{{ organization.partner.company_name.slice(0, 1) }}</small
+          >{{ organization?.partner?.company_name?.slice(0, 1) }}</small
         >
-        <h1 class="text-sh-grey-900 font-bold text-center md:text-sm">{{ organization.partner.company_name }}</h1>
-        <p class="text-xs text-grays-black-5 text-center">{{ getOrganizationRole(organization.role) }}</p>
+        <h1 class="text-sh-grey-900 font-bold text-center md:text-sm">
+          {{ organization.partner.company_name }}
+        </h1>
+        <p class="text-xs text-grays-black-5 text-center">
+          {{ getOrganizationRole(organization.role) }}
+        </p>
       </div>
     </section>
     <button
@@ -69,7 +73,8 @@
         items-center
         w-4/12
       "
-      @click="gotoDashBoard()">
+      @click="gotoDashBoard()"
+    >
       Proceed
       <img class="ml-1" src="@/assets/images/arrow.svg" />
     </button>
@@ -79,26 +84,27 @@
 import { defineComponent } from 'vue';
 import OnboardingLayout from '@/views/layouts/OnboardingLayout.vue';
 import CenteredPageHeader from '@/components/CenteredPageHeader.vue';
-import {PartnerOrganization} from "@/models/organisation.model";
+import { PartnerOrganization } from '@/models/organisation.model';
 export default defineComponent({
   name: 'OrganizationSelection',
-  data () {
+  data() {
     return {
-      title: 'Who\'s using Shuttlers?',
-      description: 'With Shuttlers Vehicle partner portal,  you can shuffle between your organisations.',
+      title: "Who's using Shuttlers?",
+      description:
+        'With Shuttlers Vehicle partner portal,  you can shuffle between your organisations.',
       activeIndex: -1,
       organizations: []
     };
   },
-  created () {
+  created() {
     this.getPartnerMembers();
   },
   methods: {
-    getPartnerMembers () {
+    getPartnerMembers() {
       const members = this.$store.getters['auth/userSessionData'];
       this.organizations = members.associatedOrganizations;
     },
-    selected (index: number, partner: PartnerOrganization) {
+    selected(index: number, partner: PartnerOrganization) {
       if (partner.role !== 'owner' && !partner.supportedCities) {
         this.$toast.info('This profile setup is yet to be completed');
         return;
@@ -106,19 +112,19 @@ export default defineComponent({
       this.$store.dispatch('auth/setActiveContext', partner);
       this.activeIndex = index;
     },
-    gotoDashBoard () {
+    gotoDashBoard() {
       this.$router.push('/dashboard');
     },
-    getOrganizationRole (role: PartnerOrganization['role']) {
+    getOrganizationRole(role: PartnerOrganization['role']) {
       switch (role) {
-        case "owner":
-          return 'Owner'
-        case "admin":
-          return 'Admin'
-        case "staff":
-          return 'Staff'
-        case "super-admin":
-          return 'Super Admin'
+        case 'owner':
+          return 'Owner';
+        case 'admin':
+          return 'Admin';
+        case 'staff':
+          return 'Staff';
+        case 'super-admin':
+          return 'Super Admin';
       }
     }
   },

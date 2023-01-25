@@ -15,8 +15,8 @@
     v-model="query"
   />
 
-  <ul v-if="showDropdown" class="space-y-2 rounded-md shadow-md">
-    <div class="bg-gray-100">
+  <ul v-if="showDropdown" class="space-y-2 rounded-lg shadow-md absolute">
+    <div class="bg-gray-50 rounded-lg">
       <li
         @click="handleSelected(item.description)"
         v-for="item in suggestions"
@@ -46,6 +46,7 @@ export default defineComponent({
       query.value = selectedAddressValue;
       emit('autoCompleteAddress', selectedAddressValue);
       showDropdown.value = false;
+      selectedAddressValue = null;
     }
 
     watch(query, () => {
