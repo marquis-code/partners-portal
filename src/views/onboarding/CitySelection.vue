@@ -56,6 +56,7 @@ import CenteredPageHeader from '@/components/CenteredPageHeader.vue';
 import { mapGetters } from 'vuex';
 import { extractErrorMessage } from '@/utils/helper';
 import moment from 'moment';
+import { PartnerOrganization } from '@/models/organisation.model';
 
 export default {
   name: 'CitySelection',
@@ -74,6 +75,9 @@ export default {
     FormContainer,
     CenteredPageHeader
     // SelectedCityBadge
+  },
+  async mounted() {
+    await this.$store.dispatch('auth/refreshActiveContext', this.user.id);
   },
   created() {
     this.fetchCities();
@@ -94,9 +98,12 @@ export default {
       this.loadingData = true;
       this.$axios
         .get('/v1/city/all?limit=1000&fields=id,name,code,country_id')
-        .then((res) => {
+        .then(async (res) => {
           this.cities = res.data.data;
-          console.log(res.data.data);
+          await this.$store.dispatch('auth/setActiveContext', {
+            ...this.$store.getters['auth/activeContext'],
+            supportedCities: res.data.data
+          });
         })
         .finally(() => {
           this.loadingData = false;
@@ -114,15 +121,10 @@ export default {
               )
             )
           ]);
-          await this.$store.dispatch('auth/refreshActiveContext', this.user.id);
-          await this.$axios.post(`cost-revenue/v1/earnings-remittance-period`, {
-            partnerId: this.contextOrg?.partner?.account_sid,
-            dayOfMonth: "" + moment().date()
-          });
           this.$toast.success('Partner account created');
           await this.$router.push({ name: 'dashboard' });
+          this.$router.go();
         } catch (e) {
-          console.log(e);
           this.$toast.error(extractErrorMessage(e));
         } finally {
           this.loading = false;

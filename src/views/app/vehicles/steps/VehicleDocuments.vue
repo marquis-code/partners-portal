@@ -24,7 +24,7 @@
         :key="index"
       >
         <p class="text-sm text-gray-300">
-          {{ payload.vehicle_documents[index].document_type }}
+          {{ payload.vehicle_documents[index].document_type === 'Vehicle Information' ? 'Vehicle Licence' : payload.vehicle_documents[index].document_type }}
         </p>
         <div v-if="doc.expires" class="space-y-2 w-full lg:w-6/12 pr-1 py-5">
           <label class="text-xs font-medium text-grays-black-5"

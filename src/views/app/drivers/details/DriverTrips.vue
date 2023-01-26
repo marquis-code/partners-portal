@@ -23,6 +23,7 @@ import { defineComponent } from 'vue';
 import Spinner from '@/components/layout/Spinner.vue';
 import AppTable from '@/components/AppTable.vue';
 import moment from 'moment';
+import { mapGetters } from 'vuex';
 
 export default defineComponent({
   name: 'VehicleTrips',
@@ -45,6 +46,11 @@ export default defineComponent({
       ]
     };
   },
+  computed: {
+    ...mapGetters({
+      userSessionData: 'auth/userSessionData'
+    })
+  },
   methods: {
     async fetchTrips() {
       this.loading = true;
@@ -52,7 +58,7 @@ export default defineComponent({
       await this.$axios
         .get(
           // TODO change this endpoint
-          `/cost-revenue/v1/vehicles/${this.$route.params.driverId}/revenues?metadata=true`
+          `/cost-revenue/v1/partners/${this.userSessionData.activeContext.partner.account_sid}/vehicles/${this.$route.params.driverId}/revenues?metadata=true`
         )
         .then((res) => {
           console.log(res);

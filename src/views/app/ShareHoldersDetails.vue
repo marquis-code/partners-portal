@@ -173,7 +173,7 @@
                         ring-1 ring-gray-300
                       "
                       v-model="stakeholders[index].name"
-                      placeholder="Enter document number"
+                      placeholder="Enter Full Name"
                     />
                     <!-- <span class="text-sm font-light text-red-500" v-if="v$.identityForm.document.type.$dirty && v$.identityForm.document.type.required.$invalid">
                     This field is required
@@ -562,8 +562,7 @@ export default defineComponent({
               ...payload
             })
           }
-          this.checkIfShareHoldersHaveBeenProvided()
-          // this.step += 1;
+          this.step += 1;
         } catch (error) {
           this.$toast.warning('An error occured');
         }
@@ -600,7 +599,6 @@ export default defineComponent({
       this.step += 1;
     },
     addNewStakeHolder () {
-      console.log('I am here');
       this.stakeholders.push({
         name: '',
         share_amount: 0

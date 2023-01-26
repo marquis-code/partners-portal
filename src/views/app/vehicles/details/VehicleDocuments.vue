@@ -10,7 +10,7 @@
       >
         <template v-slot:status="{ item }">
           <span v-if="item.status === 'submitted'" class="text-sh-green-700"
-            >Summitted</span
+            >Submitted</span
           >
           <span v-if="item.status === 'Not uploaded'" class="text-sh-yellow-800"
             >Not uploaded</span
@@ -418,7 +418,6 @@ export default defineComponent({
     },
     async updateThisDocument() {
       const payload = {
-        partner_id: this.docToUpdate.partner_id,
         files: [this.docToUpdate.files],
         document_type: this.docToUpdate.document_type,
         status: this.docToUpdate.status,
@@ -429,7 +428,7 @@ export default defineComponent({
       this.savingForm = true;
       try {
         await this.$axios.patch(
-          `v1/partner-vehicle-documentss/${this.docToUpdate.id}`,
+          `/v1/partners/${this.docToUpdate.partner_id}/vehicle-documents/${this.docToUpdate.id}`,
           { ...payload }
         );
         this.$toast.success(`${this.docToUpdate.document_type} updated`);

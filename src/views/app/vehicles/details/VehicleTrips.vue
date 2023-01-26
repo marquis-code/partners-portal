@@ -51,7 +51,7 @@ export default defineComponent({
       this.loading = true;
       // TODO: Support server side pagination
       this.$axios
-        .get(`/cost-revenue/v1/vehicles/${this.vehicleData.id}/revenues?metadata=true`)
+        .get(`/cost-revenue/v1/partners/${this.userSessionData.activeContext.partner.account_sid}/vehicles/${this.vehicleData.id}/revenues?metadata=true`)
         .then((res) => {
           const trips = this.transformedTrips(res.data.result) || [];
           this.tableData = trips;
@@ -84,6 +84,7 @@ export default defineComponent({
   },
   computed: {
     ...mapGetters({
+      userSessionData: 'auth/userSessionData',
       vehicleData: 'vehicle/getVehicleData',
       isLoading: 'vehicle/getVehicleLoading'
     })

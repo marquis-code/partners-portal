@@ -212,24 +212,11 @@
           >
             <div class="space-y-2 w-full">
               <label class="text-xs font-medium text-grays-black-5"
-                >Residential address changes</label
+                >Residential address</label
               >
-              <address-autocomplete></address-autocomplete>
-              <!-- <input
-                type="text"
-                v-model="v$.form.residential_address.$model"
-                class="
-                  text-xs
-                  border-none
-                  outline-none
-                  w-full
-                  rounded-md
-                  p-3
-                  placeholder-gray-500 placeholder-opacity-25
-                  ring-1 ring-gray-300
-                "
-                placeholder="Enter drivers address"
-              /> -->
+              <address-auto-complete
+                @autoCompleteAddress="selectedAddress"
+              ></address-auto-complete>
               <span
                 class="text-xs font-light text-red-500"
                 v-if="
@@ -348,6 +335,7 @@
               <image-upload
                 :uploading="uploadingFile"
                 @fileSelected="fileSelected"
+                :isUploadSuccessful="isUploadSuccessful"
               ></image-upload>
             </div>
           </section>
@@ -420,7 +408,7 @@ import PageLayout from '@/components/layout/PageLayout.vue';
 import Spinner from '@/components/layout/Spinner.vue';
 import PageActionHeader from '@/components/PageActionHeader.vue';
 import AppModal from '@/components/Modals/AppModal.vue';
-import AddressAutocomplete from '@/components/AddressAutocomplete.vue';
+import AddressAutoComplete from '@/components/AddressAutoComplete.vue';
 
 export default defineComponent({
   name: 'AddDriver',
@@ -431,7 +419,7 @@ export default defineComponent({
     PageActionHeader,
     AppModal,
     Spinner,
-    AddressAutocomplete
+    AddressAutoComplete
   },
   created() {
     this.setDefaultCountry();
@@ -455,7 +443,7 @@ export default defineComponent({
         license_number: '',
         expiry_date: '',
         files: [] as Array<string>,
-        avatar: '',
+        avatar: '' as string,
         country: ''
       },
       processing: false,
@@ -486,6 +474,9 @@ export default defineComponent({
     })
   },
   methods: {
+    selectedAddress(value: any) {
+      this.form.residential_address = value;
+    },
     setDefaultCountry() {
       const code =
         this.countries && this.countries.length
@@ -521,31 +512,19 @@ export default defineComponent({
       }
       this.processing = true;
       try {
-        const expiryDate = this.form.expiry_date;
-        const payload = {
+        const newDriverPayload = {
           fname: this.form.fname,
           lname: this.form.lname,
           phone: this.form.phone,
           email: this.form.email,
-          residential_address: this.form.residential_address,
-          dob: this.form.dob,
-          license_number: this.form.license_number,
-          expiry_date: format(expiryDate as any, 'yyyy-MM-dd HH:mm:ss') as any,
-          files: this.form.files,
+          password: 'shuttlers',
           avatar: this.form.avatar,
-          document_type: 'drivers_license',
-          password: 'shuttlers'
+          dob: this.form.dob,
+          residential_address: this.form.residential_address
         };
-        const response = await this.$axios.post(
-          `/v1/partners/${this.userSessionData.activeContext.account_sid}/drivers`,
-          payload
-        );
-        this.openModal();
-        this.$router.push({
-          name: 'driver.detail.info',
-          params: { driverId: response.data.driver_id }
+        await this.$axios.post('/v1/drivers', newDriverPayload).then((res) => {
+          return this.createPartnerDriver(res.data.id);
         });
-        this.closeModal();
       } catch (err) {
         const errorMessage = extractErrorMessage(
           err,
@@ -557,6 +536,38 @@ export default defineComponent({
         this.processing = false;
       }
     },
+    async createPartnerDriver(driverId: any) {
+      const expiryDate = this.form.expiry_date;
+      const partnerDriverPayload = {
+        registration_number: this.form.license_number,
+        expiry_date: format(expiryDate as any, 'yyyy-MM-dd HH:mm:ss') as any,
+        files: this.form.files,
+        driver_id: driverId.toString(),
+        document_type: 'drivers_license'
+      };
+      await this.$axios
+        .post(
+          `/v1/partners/${this.userSessionData.activeContext.account_sid}/drivers`,
+          partnerDriverPayload
+        )
+        .then((response) => {
+          this.openModal();
+          this.$router.push({
+            name: 'driver.detail.info',
+            params: { driverId: response.data.driver_id }
+          });
+          this.closeModal();
+        })
+        .catch((err) => {
+          const errorMessage = extractErrorMessage(
+            err,
+            null,
+            'Oops! An error occurred, please try again.'
+          );
+          this.$toast.error(errorMessage);
+        });
+    },
+
     async fileSelected(selectedImage: any) {
       this.uploadingFile = true;
       await this.uploadTos3andGetDocumentUrl(selectedImage)
@@ -565,9 +576,7 @@ export default defineComponent({
           this.$toast.success('Driver’s License was uploaded successfully');
         })
         .catch(() => {
-          this.$toast.error(
-            'Something went wrong while uploading Driver’s License'
-          );
+          this.uploadingFile = false;
         })
         .finally(() => {
           this.uploadingFile = false;
@@ -584,7 +593,7 @@ export default defineComponent({
           this.$toast.success('Profile picture was uploaded successfully');
         })
         .catch(() => {
-          this.$toast.error('Something went wrong while uploading profile');
+          this.profilePreview = '';
         })
         .finally(() => {
           this.uploadingProfile = false;
@@ -592,7 +601,6 @@ export default defineComponent({
     },
 
     async uploadTos3andGetDocumentUrl(file: any) {
-      // this.uploadingFile = true;
       try {
         const formData = new FormData();
         formData.append('file', file);
@@ -604,11 +612,10 @@ export default defineComponent({
           return response.data.files[0].Location;
         }
       } catch (error) {
-        this.$toast.warning(
+        this.$toast.error(
           'An error occured while uploading your file, please try again'
         );
-      } finally {
-        // this.uploadingFile = false;
+        this.profilePreview = '';
       }
     }
   },
