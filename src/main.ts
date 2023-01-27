@@ -11,8 +11,8 @@ import emitter from './libs/emitter'
 import './assets/scss/styles.scss';
 import 'vue-toast-notification/dist/theme-default.css';
 import "vue-select/dist/vue-select.css";
-
 import {AppInitializerService} from "@/services/app-initializer.service";
+import VueGoogleMaps from '@fawmi/vue-google-maps';
 
 new AppInitializerService(router, store, axiosInstance).initialize()
   .finally(() => {
@@ -23,5 +23,11 @@ new AppInitializerService(router, store, axiosInstance).initialize()
       .use(store)
       .use(router)
       .use(VueEasyLightbox)
+      .use(VueGoogleMaps, {
+        load: {
+          key: 'AIzaSyBAfieAIDL1vGbkQd74otnW2t0jkDjiPW0',
+          libraries: "places"
+        },
+      })
       .mount('#sh-vp-portal');
   });
