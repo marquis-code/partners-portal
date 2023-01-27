@@ -531,7 +531,7 @@ export default defineComponent({
       this.checkLoading = true
       try {
         const response = await this.$axios.get(`/v1/partners/${this.partnerContext.partner.account_sid}/share-holders`);
-        // console.log(response.data.data)
+        console.log(response.data.data)
         if (response.data.data.length > 0) {
           this.tableData = this.structureShareSholders(response.data.data);
           this.step = 2;
@@ -608,10 +608,10 @@ export default defineComponent({
     structureShareSholders (shareholderslist: any[]) {
       const stakeholders = shareholderslist.map(stake => {
         return {
-          name: stake.fname + ' ' + stake.lname,
-          percent: stake.share_amount || '',
+          name: stake?.profile?.fname + ' ' + stake?.profile?.lname,
+          percent: stake?.profile.share_amount || '',
           status: 'pending',
-          action: stake.id
+          action: stake?.profile?.id
         }
       });
       return stakeholders;
