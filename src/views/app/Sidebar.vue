@@ -98,13 +98,11 @@
     </div>
 
     <div
-      @click="$router.push({name:'settings.edit.partner'})"
       class="
         flex
         justify-between
         items-center
         py-2
-        cursor-pointer
         space-x-3
         rounded-xl
         bg-green-200
@@ -112,7 +110,10 @@
       "
       :class="isSidebarFolded ? 'p-1 flex-col' : 'px-3 flex-row'"
     >
-      <div class="flex flex-row items-center">
+      <div
+        @click="$router.push({ name: 'settings.edit.partner' })"
+        class="flex flex-row items-center w-1/2 cursor-pointer"
+      >
         <img
           v-if="user.avatar"
           :src="user.avatar"
@@ -125,11 +126,18 @@
           class="w-10 h-10 mr-2"
           :class="isSidebarFolded && 'text-center mr-0'"
         />
-        <span v-if="!isSidebarFolded && user" class="text-sm font-medium">{{
-          user.fname
-        }}</span>
+        <div v-if="!isSidebarFolded && user" class="text-sm font-medium">
+          {{ user.fname }}
+        </div>
       </div>
-      <span @click="logout" class="material-icons" :class="isSidebarFolded ? 'mt-5' : ''"> logout </span>
+      <div></div>
+      <div
+        @click="logout"
+        class="material-icons w-2/12 flex justify-end items-end cursor-pointer"
+        :class="isSidebarFolded ? 'mt-5' : ''"
+      >
+        logout
+      </div>
     </div>
   </div>
 </template>
@@ -139,7 +147,7 @@ import { defineComponent } from 'vue';
 import { mapGetters } from 'vuex';
 export default defineComponent({
   name: 'Sidebar',
-  data () {
+  data() {
     return {
       isSidebarFolded: false,
       windowWidth: 0,
@@ -200,7 +208,7 @@ export default defineComponent({
       ]
     };
   },
-  created () {
+  created() {
     window.addEventListener('resize', this.checkScreen);
     this.checkScreen();
   },
@@ -209,7 +217,7 @@ export default defineComponent({
   },
   methods: {
     // TODO (Tobi): Refactor component implementation
-    selectThisSection (groupIndex: number, itemIndex: number) {
+    selectThisSection(groupIndex: number, itemIndex: number) {
       for (let index = 0; index < this.menuGroup.length; index++) {
         const groupMenus = this.menuGroup[index].menus;
         for (let indexJ = 0; indexJ < groupMenus.length; indexJ++) {
@@ -221,10 +229,10 @@ export default defineComponent({
         }
       }
     },
-    toggleSidebar () {
+    toggleSidebar() {
       this.isSidebarFolded = !this.isSidebarFolded;
     },
-    checkScreen () {
+    checkScreen() {
       this.windowWidth = window.innerWidth;
       if (this.windowWidth <= 768) {
         this.isSidebarFolded = true;
@@ -234,7 +242,7 @@ export default defineComponent({
         this.isMobileScreen = false;
       }
     },
-    logout () {
+    logout() {
       localStorage.clear();
       this.$router.push('/login');
       this.$router.go(0);
