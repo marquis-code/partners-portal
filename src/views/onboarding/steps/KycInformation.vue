@@ -145,7 +145,7 @@
         <div class="space-y-2 w-full">
           <label class="text-xs font-medium text-grays-black-5">Address</label>
           <input
-            v-model="v$.addressForm.document.company_address.$model"
+            v-model="v$.addressForm.document.full_address.$model"
             class="
               text-xs
               border-none
@@ -161,8 +161,8 @@
           <span
             class="text-sm font-light text-red-500"
             v-if="
-              v$.addressForm.document.company_address.$dirty &&
-              v$.addressForm.document.company_address.required.$invalid
+              v$.addressForm.document.full_address.$dirty &&
+              v$.addressForm.document.full_address.required.$invalid
             "
           >
             Please provide a valid address
@@ -312,7 +312,7 @@ export default defineComponent<any, any, any>({
           partner_type: null
         },
         document: {
-          company_address: null,
+          full_address: null,
           files: []
         }
       },
@@ -378,7 +378,7 @@ export default defineComponent<any, any, any>({
           partner_type: { required }
         },
         document: {
-          company_address: { required }
+          full_address: { required }
         }
       }
     };
