@@ -40,6 +40,7 @@
               v-if="partnerType == 'business'"
               class="text-xs md:text-base"
               :item="`Upload company documents`"
+              :class="[!partnerStats.hasUploadedCompanyDoc ? 'cursor-not-allowed opacity-75' : '']"
               :status="
                 partnerStats.hasUploadedCompanyDoc ? 'completed' : 'pending'
               "
