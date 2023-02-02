@@ -403,11 +403,6 @@ export default defineComponent<any, any, any>({
       }
       this.processing = true;
       try {
-        const modifiedRegisterationNumber =
-          this.form.registration_number.split('-');
-        const plateNumber_first_split = modifiedRegisterationNumber[0];
-        const plateNumbersecond_split = modifiedRegisterationNumber[1];
-        const approved_registeration_nuber = plateNumber_first_split + plateNumbersecond_split;
         const payload = {
           brand: this.form.brand,
           name: this.form.name,
@@ -415,7 +410,7 @@ export default defineComponent<any, any, any>({
           year: this.form.year,
           seats: this.form.seats,
           city_ids: this.form.city_ids,
-          registration_number: approved_registeration_nuber,
+          registration_number: this.form.registration_number,
           partner_id: this.form.partner_id
         };
         const response = await this.$axios.post('/v1/vehicles', payload);

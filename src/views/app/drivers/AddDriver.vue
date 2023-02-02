@@ -547,7 +547,7 @@ export default defineComponent({
       };
       await this.$axios
         .post(
-          `/v1/partners/${this.userSessionData.activeContext.account_sid}/drivers`,
+          `/v1/partners/${this.userSessionData.activeContext.account_sid}/drivers/${driverId.toString()}`,
           partnerDriverPayload
         )
         .then((response) => {
