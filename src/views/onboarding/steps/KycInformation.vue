@@ -95,7 +95,7 @@
               placeholder-gray-500 placeholder-opacity-25
               ring-1 ring-gray-300
             "
-            placeholder="Enter BVN document number"
+            placeholder="Enter document number"
           />
           <span
             class="text-sm font-light text-red-500"
