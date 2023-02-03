@@ -210,35 +210,6 @@
               items-center
             "
           >
-            <!-- <div class="space-y-2 w-full">
-              <label class="text-xs font-medium text-grays-black-5"
-                >Residential address</label
-              >
-              <input
-                type="text"
-                v-model="v$.form.residential_address.$model"
-                class="
-                  text-xs
-                  border-none
-                  outline-none
-                  w-full
-                  rounded-md
-                  p-3
-                  placeholder-gray-500 placeholder-opacity-25
-                  ring-1 ring-gray-300
-                "
-                placeholder="Enter drivers address"
-              />
-              <span
-                class="text-xs font-light text-red-500"
-                v-if="
-                  v$.form.residential_address.$dirty &&
-                  v$.form.residential_address.required.$invalid
-                "
-              >
-                Please provide your drivers address
-              </span>
-            </div> -->
             <div class="space-y-2 w-full">
               <label class="text-xs font-medium text-grays-black-5"
                 >Residential address</label
@@ -549,7 +520,7 @@ export default defineComponent({
           password: 'shuttlers',
           avatar: this.form.avatar,
           dob: this.form.dob,
-          residential_address: this.form.residential_address,
+          residential_address: this.form.residential_address
         };
         await this.$axios.post('/v1/drivers', newDriverPayload).then((res) => {
           return this.createPartnerDriver(res.data.id);
@@ -572,11 +543,11 @@ export default defineComponent({
         expiry_date: format(expiryDate as any, 'yyyy-MM-dd HH:mm:ss') as any,
         files: this.form.files,
         driver_id: driverId.toString(),
-        document_type: 'drivers_license',
+        document_type: 'drivers_license'
       };
       await this.$axios
         .post(
-          `/v1/partners/${this.userSessionData.activeContext.account_sid}/drivers`,
+          `/v1/partners/${this.userSessionData.activeContext.account_sid}/drivers/${driverId.toString()}`,
           partnerDriverPayload
         )
         .then((response) => {

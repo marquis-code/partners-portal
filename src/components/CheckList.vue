@@ -13,7 +13,8 @@
     </div>
 
     <router-link
-      :to="actionRoute"
+      :class="[item === 'Upload company documents' ? 'cursor-not-allowed' : '']"
+      :to="item === 'Upload company documents' ? '' : actionRoute"
       v-if="status === `pending`"
       class="flex flex-row justify-center items-center"
     >

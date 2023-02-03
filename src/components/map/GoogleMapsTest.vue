@@ -1,7 +1,7 @@
 <template>
   <GoogleMap
     ref="googleMapInstance"
-    :api-key="mapAPIKey"
+    :api-key="map"
     style="width: 100vw; height: 100vh"
     :center="centerLocation"
     :zoom="6"
@@ -40,7 +40,7 @@ export default defineComponent({
   },
   data() {
     return {
-      center: { lat: 6.420830, lng: 4.098940 },
+      center: { lat: 6.42083, lng: 4.09894 },
       flightPath: {
         path: [] as LocationType[],
         geodesic: true,
@@ -48,7 +48,7 @@ export default defineComponent({
         strokeOpacity: 1.0,
         strokeWeight: 4
       },
-      mapAPIKey: process.env.VUE_APP_GOOGLE_API_KEY || ('' as string)
+      map: process.env.VUE_APP_GOOGLE_API_KEY || ('' as string)
     };
   },
   created() {

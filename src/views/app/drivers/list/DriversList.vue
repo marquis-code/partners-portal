@@ -79,7 +79,7 @@
                 cursor-pointer
               "
               :class="
-                filters.status === 1
+                filters.status === 'active'
                   ? 'text-black border-b-sh-green-500'
                   : 'text-sh-grey-500 border-b-transparent'
               "
@@ -98,7 +98,7 @@
                 cursor-pointer
               "
               :class="
-                filters.status === 0
+                filters.status === 'inactive'
                   ? 'text-black border-b-sh-green-500'
                   : 'text-sh-grey-500 border-b-transparent'
               "
@@ -346,7 +346,7 @@ export default defineComponent({
   data() {
     return {
       filters: {
-        status: 1,
+        status: 'active',
         search: '',
         pageNumber: 1,
         pageSize: 10
@@ -430,14 +430,14 @@ export default defineComponent({
         });
     },
     setStatusFilter(value: string) {
-      this.filters.status = value === 'active' ? 1 : 0;
+      this.filters.status = value
       this.fetchDrivers();
     },
     fetchDrivers() {
       this.loading = true;
       this.$axios
         .get(
-          `/v1/partners/${this.userSessionData.activeContext.partner.account_sid}/drivers?active=${this.filters.status}?page=${this.filters.pageNumber}&limit=${this.filters.pageSize}&search=${this.filters.search}`
+          `/v1/partners/${this.userSessionData.activeContext.partner.account_sid}/drivers?status=${this.filters.status}&page=${this.filters.pageNumber}&limit=${this.filters.pageSize}&search=${this.filters.search}`
         )
         .then((res) => {
           this.tableData = (this.formatApiFormData(res.data.data) as any) || [];
