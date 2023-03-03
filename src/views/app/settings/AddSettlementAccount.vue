@@ -259,7 +259,6 @@ export default defineComponent({
   },
   watch: {
     'form.accountNumber'(oldValue, newValue) {
-      console.log(oldValue, newValue);
       if (!oldValue || !newValue) {
         this.isValidAccountNumber = true;
       }
