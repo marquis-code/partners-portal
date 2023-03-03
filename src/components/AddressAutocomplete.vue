@@ -1,16 +1,7 @@
 <template>
   <input
     type="text"
-    class="
-      text-xs
-      border-none
-      outline-none
-      w-full
-      rounded-md
-      p-3
-      placeholder-gray-500 placeholder-opacity-25
-      ring-1 ring-gray-300
-    "
+    class="text-xs border-none outline-none w-full rounded-md p-3 placeholder-gray-500 placeholder-opacity-25 ring-1 ring-gray-300"
     placeholder="Enter drivers address"
     v-model="query"
   />
@@ -34,6 +25,7 @@ import { defineComponent, ref, watch } from 'vue';
 import { usePlacesAutocomplete } from 'v-use-places-autocomplete';
 
 export default defineComponent({
+  name: 'AddressAutocomplete',
   setup(props, { emit }) {
     const query = ref('');
     const showDropdown = ref(false);
