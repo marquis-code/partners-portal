@@ -6,13 +6,7 @@
           <p class="text-sm text-gray-400 pb-3">Add Settlement Account</p>
           <form class="space-y-3 lg:space-y-7">
             <section
-              class="
-                lg:flex
-                justify-between
-                space-y-3
-                lg:space-y-0 lg:space-x-10
-                items-center
-              "
+              class="lg:flex justify-between space-y-3 lg:space-y-0 lg:space-x-10 items-center"
             >
               <div class="space-y-2 w-full">
                 <label class="text-xs font-medium text-grays-black-5"
@@ -21,17 +15,7 @@
                 <select
                   v-model="form.bankObject"
                   id="bank"
-                  class="
-                    text-xs
-                    font-medium
-                    bg-gray-type-4
-                    text-gray-type-8
-                    focus:outline-none focus:ring
-                    w-full
-                    ring-1 ring-gray-300
-                    rounded-md
-                    p-3
-                  "
+                  class="text-xs font-medium bg-gray-type-4 text-gray-type-8 focus:outline-none focus:ring w-full ring-1 ring-gray-300 rounded-md p-3"
                 >
                   <option selected>Choose</option>
                   <option
@@ -60,19 +44,13 @@
                   type="text"
                   maxlength="10"
                   v-model="v$.form.accountNumber.$model"
-                  class="
-                    text-xs
-                    border-none
-                    outline-none
-                    w-full
-                    rounded-md
-                    p-3
-                    placeholder-gray-500 placeholder-opacity-25
-                    ring-1 ring-gray-300
-                  "
+                  class="text-xs border-none outline-none w-full rounded-md p-3 placeholder-gray-500 placeholder-opacity-25 ring-1 ring-gray-300"
+                  minlength="10"
                   placeholder=""
+                  @keyup="validateAccountNumber"
+                  :class="[!isValidAccountNumber ? 'ring-1 ring-red-500' : '']"
                 />
-                <span
+                <p
                   class="text-xs font-light text-red-500"
                   v-if="
                     v$.form.accountNumber.$dirty &&
@@ -80,18 +58,15 @@
                   "
                 >
                   This field must be provided
-                </span>
+                </p>
+                <p v-if="!isValidAccountNumber" class="text-red-500 text-xs">
+                  Invalid account number!
+                </p>
               </div>
             </section>
 
             <section
-              class="
-                lg:flex
-                justify-between
-                space-y-3
-                lg:space-y-0 lg:space-x-10
-                items-center
-              "
+              class="lg:flex justify-between space-y-3 lg:space-y-0 lg:space-x-10 items-center"
             >
               <div class="space-y-2 w-full relative">
                 <label class="text-xs font-medium text-grays-black-5"
@@ -100,16 +75,7 @@
                 <input
                   type="text"
                   v-model="v$.form.accountName.$model"
-                  class="
-                    text-xs
-                    border-none
-                    outline-none
-                    w-full
-                    rounded-md
-                    p-3
-                    placeholder-gray-500 placeholder-opacity-25
-                    ring-1 ring-gray-300
-                  "
+                  class="text-xs border-none outline-none w-full rounded-md p-3 placeholder-gray-500 placeholder-opacity-25 ring-1 ring-gray-300"
                   placeholder=""
                 />
                 <span
@@ -128,16 +94,7 @@
             <button
               type="button"
               @click="AddNewAccount"
-              class="
-                rounded-md
-                w-32
-                flex flex-row
-                justify-center
-                items-center
-                p-3
-                px-5
-                text-sm
-              "
+              class="rounded-md w-32 flex flex-row justify-center items-center p-3 px-5 text-sm"
               :disabled="v$.form.$invalid || processing"
               :class="
                 v$.form.$invalid || processing
@@ -162,14 +119,7 @@
           </div>
           <button
             @click="closeSuccessModal"
-            class="
-              text-black
-              bg-sh-green-500
-              rounded-md
-              p-2
-              w-11/12
-              font-medium
-            "
+            class="text-black bg-sh-green-500 rounded-md p-2 w-11/12 font-medium"
           >
             Dismiss
           </button>
@@ -219,10 +169,17 @@ export default defineComponent({
       format,
       v$: useVuelidate(),
       showModal: false,
+      isValidAccountNumber: true as boolean,
       allBanks: [] as Bank[],
       form: {
+        bankObject: {} as Bank,
+        accountNumber: '',
+        accountName: '',
+        partnerId: '',
+        entityType: '',
         isDefault: false
       } as Account,
+      debounce: null as any,
       processing: false,
       showSuccessModal: false
     };
@@ -250,6 +207,19 @@ export default defineComponent({
     this.showBanks();
   },
   methods: {
+    validateAccountNumber() {
+      this.$axios
+        .get(
+          `/v1/banks/resolve-accounts?bank_code=${this.form.bankObject?.code}&account_number=${this.form.accountNumber}`
+        )
+        .then((res) => {
+          this.form.accountName = res?.data?.account_name;
+          this.isValidAccountNumber = true;
+        })
+        .catch(() => {
+          this.isValidAccountNumber = false;
+        });
+    },
     showBanks() {
       const ngBanks = banks.getBanks();
       this.allBanks = ngBanks || [];
@@ -285,6 +255,17 @@ export default defineComponent({
     closeSuccessModal() {
       this.showSuccessModal = false;
       this.$router.push({ name: 'settings.edit.settlement.account' });
+    }
+  },
+  watch: {
+    'form.accountNumber'(oldValue, newValue) {
+      if (!oldValue || !newValue) {
+        this.isValidAccountNumber = true;
+      }
+      clearTimeout(this.debounce);
+      this.debounce = setTimeout(() => {
+        this.validateAccountNumber();
+      }, 800);
     }
   }
 });

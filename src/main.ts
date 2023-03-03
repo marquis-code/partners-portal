@@ -6,13 +6,13 @@ import store from './store'
 import PluginService from './services/plugin.service';
 import VueEasyLightbox from 'vue-easy-lightbox'
 import emitter from './libs/emitter'
-
 // Global Styles
 import './assets/scss/styles.scss';
 import 'vue-toast-notification/dist/theme-default.css';
 import "vue-select/dist/vue-select.css";
 import {AppInitializerService} from "@/services/app-initializer.service";
 import VueGoogleMaps from '@fawmi/vue-google-maps';
+import './utils/zoho';
 
 new AppInitializerService(router, store, axiosInstance).initialize()
   .finally(() => {
