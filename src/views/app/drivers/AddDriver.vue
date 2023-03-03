@@ -408,7 +408,7 @@ import PageLayout from '@/components/layout/PageLayout.vue';
 import Spinner from '@/components/layout/Spinner.vue';
 import PageActionHeader from '@/components/PageActionHeader.vue';
 import AppModal from '@/components/Modals/AppModal.vue';
-import AddressAutoComplete from '@/components/AddressAutoComplete.vue';
+// import AddressAutocomplete from '@/components/AddressAutocomplete.vue';
 
 export default defineComponent({
   name: 'AddDriver',
@@ -419,7 +419,7 @@ export default defineComponent({
     PageActionHeader,
     AppModal,
     Spinner,
-    AddressAutoComplete
+    // AddressAutocomplete
   },
   created() {
     this.setDefaultCountry();
