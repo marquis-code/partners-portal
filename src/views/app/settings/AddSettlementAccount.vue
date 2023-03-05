@@ -47,7 +47,6 @@
                   class="text-xs border-none outline-none w-full rounded-md p-3 placeholder-gray-500 placeholder-opacity-25 ring-1 ring-gray-300"
                   minlength="10"
                   placeholder=""
-                  @keyup="validateAccountNumber"
                   :class="[!isValidAccountNumber ? 'ring-1 ring-red-500' : '']"
                 />
                 <p
@@ -59,8 +58,11 @@
                 >
                   This field must be provided
                 </p>
-                <p v-if="!isValidAccountNumber" class="text-red-500 text-xs">
-                  Invalid account number!
+                <p
+                  v-if="accountNameError || !isValidAccountNumber"
+                  class="text-red-500 text-xs"
+                >
+                  {{ accountNameError }}
                 </p>
               </div>
             </section>
@@ -77,6 +79,7 @@
                   v-model="v$.form.accountName.$model"
                   class="text-xs border-none outline-none w-full rounded-md p-3 placeholder-gray-500 placeholder-opacity-25 ring-1 ring-gray-300"
                   placeholder=""
+                  readonly
                 />
                 <span
                   class="text-xs font-light text-red-500"
@@ -171,6 +174,7 @@ export default defineComponent({
       showModal: false,
       isValidAccountNumber: true as boolean,
       allBanks: [] as Bank[],
+      accountNameError: '' as string,
       form: {
         bankObject: {} as Bank,
         accountNumber: '',
@@ -180,6 +184,7 @@ export default defineComponent({
         isDefault: false
       } as Account,
       debounce: null as any,
+
       processing: false,
       showSuccessModal: false
     };
@@ -215,8 +220,10 @@ export default defineComponent({
         .then((res) => {
           this.form.accountName = res?.data?.account_name;
           this.isValidAccountNumber = true;
+          this.accountNameError = '';
         })
-        .catch(() => {
+        .catch((error) => {
+          this.accountNameError = error.response.data.message;
           this.isValidAccountNumber = false;
         });
     },
@@ -258,14 +265,20 @@ export default defineComponent({
     }
   },
   watch: {
-    'form.accountNumber'(oldValue, newValue) {
-      if (!oldValue || !newValue) {
-        this.isValidAccountNumber = true;
-      }
-      clearTimeout(this.debounce);
-      this.debounce = setTimeout(() => {
+    'form.accountNumber'(value) {
+      if (value.length === 10) {
         this.validateAccountNumber();
-      }, 800);
+      }
+
+      if (value.length !== 10) {
+        this.isValidAccountNumber = false;
+        this.form.accountName = '';
+        this.accountNameError = '';
+      }
+
+      if (value.length === 0) {
+        this.accountNameError = '';
+      }
     }
   }
 });
