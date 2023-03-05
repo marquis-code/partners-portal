@@ -77,7 +77,7 @@
                 <input
                   type="text"
                   v-model="v$.form.accountName.$model"
-                  class="text-xs border-none outline-none w-full rounded-md p-3 placeholder-gray-500 placeholder-opacity-25 ring-1 ring-gray-300"
+                  class="text-xs bg-gray-100 border-none outline-none w-full rounded-md p-3 placeholder-gray-500 placeholder-opacity-25 ring-1 ring-gray-300"
                   placeholder=""
                   readonly
                 />
