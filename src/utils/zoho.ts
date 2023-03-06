@@ -7,6 +7,9 @@ z.salesiq = z.salesiq || {
   ready: function () {}
 };
 const d = document;
+d.addEventListener('load', function() {
+  alert('hello');
+})
 const s = d.createElement('script');
 s.type = 'text/javascript';
 s.id = 'zsiqscript';
