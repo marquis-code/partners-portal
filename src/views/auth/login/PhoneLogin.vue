@@ -153,7 +153,7 @@ export default defineComponent({
             this.form.otpValue = '';
             this.form.phone = '';
             await this.$store.dispatch('auth/authSuccess', loginResponse.data);
-
+            window.$zoho.salesiq.reset();
             const redirect: any = this.$route.query.redirect;
             if (redirect) {
               this.$router.push({path: redirect});
