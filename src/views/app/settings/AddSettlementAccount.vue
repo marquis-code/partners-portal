@@ -36,7 +36,7 @@
                   This field must be provided
                 </span>
               </div>
-              <div class="space-y-2 w-full">
+              <div class="space-y-2 w-full relative">
                 <label class="text-xs font-medium text-grays-black-5"
                   >Account Number</label
                 >
@@ -47,8 +47,12 @@
                   class="text-xs border-none outline-none w-full rounded-md p-3 placeholder-gray-500 placeholder-opacity-25 ring-1 ring-gray-300"
                   minlength="10"
                   placeholder=""
+                  :readonly="fetchingAccountName ? true : false"
                   :class="[!isValidAccountNumber ? 'ring-1 ring-red-500' : '']"
                 />
+                <div class="absolute right-3 top-8" v-if="fetchingAccountName">
+                  <spinner></spinner>
+                </div>
                 <p
                   class="text-xs font-light text-red-500"
                   v-if="
@@ -186,7 +190,8 @@ export default defineComponent({
       debounce: null as any,
 
       processing: false,
-      showSuccessModal: false
+      showSuccessModal: false,
+      fetchingAccountName: false
     };
   },
   validations() {
@@ -213,6 +218,7 @@ export default defineComponent({
   },
   methods: {
     validateAccountNumber() {
+      this.fetchingAccountName = true;
       this.$axios
         .get(
           `/v1/banks/resolve-accounts?bank_code=${this.form.bankObject?.code}&account_number=${this.form.accountNumber}`
@@ -221,10 +227,12 @@ export default defineComponent({
           this.form.accountName = res?.data?.account_name;
           this.isValidAccountNumber = true;
           this.accountNameError = '';
+          this.fetchingAccountName = false;
         })
         .catch((error) => {
           this.accountNameError = error.response.data.message;
           this.isValidAccountNumber = false;
+          this.fetchingAccountName = false;
         });
     },
     showBanks() {
