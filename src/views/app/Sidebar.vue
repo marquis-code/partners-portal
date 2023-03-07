@@ -243,6 +243,7 @@ export default defineComponent({
       }
     },
     logout() {
+      window.$zoho.salesiq.reset();
       localStorage.clear();
       this.$router.push('/login');
       this.$router.go(0);

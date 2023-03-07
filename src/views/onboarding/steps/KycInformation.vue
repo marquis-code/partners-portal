@@ -526,6 +526,7 @@ export default defineComponent<any, any, any>({
       this.file = '';
     },
     logout() {
+      window.$zoho.salesiq.reset();
       localStorage.clear();
       this.$router.push('/login');
       this.$router.go(0);

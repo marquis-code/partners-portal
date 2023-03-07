@@ -10,12 +10,14 @@ export class ContextGuard implements RouteGuard {
   handle (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext): boolean {
     const sessionData: UserSessionModel = this.store.getters['auth/userSessionData'];
     const activeContextOrg = this.store.getters['auth/activeContext'];
-    const hasOrgs = sessionData?.associatedOrganizations?.length;
-    if (to.name !== 'organization.selection' && hasOrgs && !activeContextOrg) {
-      next({
-        name: 'organization.selection'
-      });
-      return false;
+    const hasOrgs = sessionData?.associatedOrganizations?.length ?? 0;
+    if (hasOrgs > 1) {
+      if (to.name !== 'organization.selection' && hasOrgs && !activeContextOrg) {
+        next({
+          name: 'organization.selection'
+        });
+        return false;
+      }
     }
     return true;
   }
