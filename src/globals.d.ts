@@ -13,3 +13,7 @@ declare module '@vue/runtime-core' {
     $shModal: ShModal;
   }
 }
+
+declare global {
+  interface Window { $zoho: any; }
+}

@@ -62,6 +62,7 @@ export default defineComponent({
     async logout() {
       // TODO: block UI with overlay while logout api is called
       try {
+        window.$zoho.salesiq.reset();
         await this.$axios.delete("/logout");
       } catch (e) {
         console.info("An error occurred while logging out");

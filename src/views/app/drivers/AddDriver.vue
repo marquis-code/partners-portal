@@ -47,13 +47,7 @@
         <p class="text-sm text-gray-400 pb-3">Drivers Info</p>
         <form class="space-y-3 lg:space-y-7">
           <section
-            class="
-              lg:flex
-              justify-between
-              space-y-3
-              lg:space-y-0 lg:space-x-10
-              items-center
-            "
+            class="lg:flex justify-between space-y-3 lg:space-y-0 lg:space-x-10 items-center"
           >
             <div class="space-y-2 w-full">
               <label class="text-xs font-medium text-grays-black-5"
@@ -62,16 +56,7 @@
               <input
                 type="text"
                 v-model="v$.form.fname.$model"
-                class="
-                  text-xs
-                  border-none
-                  outline-none
-                  w-full
-                  rounded-md
-                  p-3
-                  placeholder-gray-500 placeholder-opacity-25
-                  ring-1 ring-gray-300
-                "
+                class="text-xs border-none outline-none w-full rounded-md p-3 placeholder-gray-500 placeholder-opacity-25 ring-1 ring-gray-300"
                 placeholder="Enter drivers first name"
               />
               <span
@@ -88,16 +73,7 @@
               <input
                 type="text"
                 v-model="v$.form.lname.$model"
-                class="
-                  text-xs
-                  border-none
-                  outline-none
-                  w-full
-                  rounded-md
-                  p-3
-                  placeholder-gray-500 placeholder-opacity-25
-                  ring-1 ring-gray-300
-                "
+                class="text-xs border-none outline-none w-full rounded-md p-3 placeholder-gray-500 placeholder-opacity-25 ring-1 ring-gray-300"
                 placeholder="Enter drivers last name"
               />
               <span
@@ -110,31 +86,14 @@
           </section>
 
           <section
-            class="
-              lg:flex
-              justify-between
-              space-y-3
-              lg:space-y-0 lg:space-x-10
-              items-center
-            "
+            class="lg:flex justify-between space-y-3 lg:space-y-0 lg:space-x-10 items-center"
           >
             <div class="space-y-2 w-full relative">
               <label class="text-xs font-medium text-grays-black-5"
                 >Phone number</label
               >
               <select
-                class="
-                  absolute
-                  h-10
-                  top-6
-                  left-0
-                  font-light
-                  outline-none
-                  placeholder-label-type-1
-                  focus:outline-none
-                  rounded-l-lg
-                  border border-solid border-gray-type-9
-                "
+                class="absolute h-10 top-6 left-0 font-light outline-none placeholder-label-type-1 focus:outline-none rounded-l-lg border border-solid border-gray-type-9"
                 v-model="form.country"
               >
                 <option
@@ -150,17 +109,7 @@
               <input
                 type="tel"
                 v-model="v$.form.phone.$model"
-                class="
-                  text-xs
-                  border-none
-                  outline-none
-                  w-full
-                  rounded-md
-                  pl-24
-                  p-3
-                  placeholder-gray-500 placeholder-opacity-25
-                  ring-1 ring-gray-300
-                "
+                class="text-xs border-none outline-none w-full rounded-md pl-24 p-3 placeholder-gray-500 placeholder-opacity-25 ring-1 ring-gray-300"
                 placeholder="Enter drivers phone number"
               />
               <span
@@ -180,16 +129,7 @@
               <input
                 type="email"
                 v-model="v$.form.email.$model"
-                class="
-                  text-xs
-                  border-none
-                  outline-none
-                  w-full
-                  rounded-md
-                  p-3
-                  placeholder-gray-500 placeholder-opacity-25
-                  ring-1 ring-gray-300
-                "
+                class="text-xs border-none outline-none w-full rounded-md p-3 placeholder-gray-500 placeholder-opacity-25 ring-1 ring-gray-300"
                 placeholder="Enter drivers email address"
               />
               <span
@@ -202,21 +142,14 @@
           </section>
 
           <section
-            class="
-              lg:flex
-              justify-between
-              space-y-3
-              lg:space-y-0 lg:space-x-10
-              items-center
-            "
+            class="lg:flex justify-between space-y-3 lg:space-y-0 lg:space-x-10 items-center"
           >
             <div class="space-y-2 w-full">
               <label class="text-xs font-medium text-grays-black-5"
                 >Residential address</label
               >
-              <address-auto-complete
-                @autoCompleteAddress="selectedAddress"
-              ></address-auto-complete>
+              <AddressAutocomplete @autoCompleteAddress="selectedAddress" />
+
               <span
                 class="text-xs font-light text-red-500"
                 v-if="
@@ -234,16 +167,7 @@
               <input
                 type="date"
                 v-model="v$.form.dob.$model"
-                class="
-                  text-xs
-                  border-none
-                  outline-none
-                  w-full
-                  rounded-md
-                  p-3
-                  placeholder-gray-500 placeholder-opacity-25
-                  ring-1 ring-gray-300
-                "
+                class="text-xs border-none outline-none w-full rounded-md p-3 placeholder-gray-500 placeholder-opacity-25 ring-1 ring-gray-300"
                 placeholder="Pick drivers date of dirth"
               />
 
@@ -260,14 +184,7 @@
             <p class="text-sm text-gray-400 pt-10">Driver’s License</p>
 
             <section
-              class="
-                pt-3
-                lg:flex
-                justify-between
-                space-y-3
-                lg:space-y-0 lg:space-x-10
-                items-center
-              "
+              class="pt-3 lg:flex justify-between space-y-3 lg:space-y-0 lg:space-x-10 items-center"
             >
               <div class="space-y-2 w-full">
                 <label class="text-xs font-medium text-grays-black-5"
@@ -276,16 +193,7 @@
                 <input
                   type="tel"
                   v-model="v$.form.license_number.$model"
-                  class="
-                    text-xs
-                    border-none
-                    outline-none
-                    w-full
-                    rounded-md
-                    p-3
-                    placeholder-gray-500 placeholder-opacity-25
-                    ring-1 ring-gray-300
-                  "
+                  class="text-xs border-none outline-none w-full rounded-md p-3 placeholder-gray-500 placeholder-opacity-25 ring-1 ring-gray-300"
                   placeholder="Enter license number"
                 />
                 <span
@@ -304,16 +212,7 @@
                 </label>
                 <datepicker
                   v-model="v$.form.expiry_date.$model"
-                  class="
-                    text-xs
-                    border-none
-                    outline-none
-                    w-full
-                    rounded-md
-                    p-3
-                    placeholder-gray-500 placeholder-opacity-25
-                    ring-1 ring-gray-300
-                  "
+                  class="text-xs border-none outline-none w-full rounded-md p-3 placeholder-gray-500 placeholder-opacity-25 ring-1 ring-gray-300"
                   placeholder="Select expiry date"
                 />
                 <span
@@ -344,16 +243,7 @@
             <button
               type="button"
               @click="saveForm()"
-              class="
-                rounded-md
-                w-32
-                flex
-                justify-center
-                items-center
-                p-3
-                px-5
-                text-sm
-              "
+              class="rounded-md w-32 flex justify-center items-center p-3 px-5 text-sm"
               :disabled="v$.form.$invalid || processing"
               :class="
                 v$.form.$invalid || processing
@@ -408,7 +298,7 @@ import PageLayout from '@/components/layout/PageLayout.vue';
 import Spinner from '@/components/layout/Spinner.vue';
 import PageActionHeader from '@/components/PageActionHeader.vue';
 import AppModal from '@/components/Modals/AppModal.vue';
-import AddressAutoComplete from '@/components/AddressAutoComplete.vue';
+import AddressAutocomplete from './components/AddressAutocomplete.vue';
 
 export default defineComponent({
   name: 'AddDriver',
@@ -419,7 +309,7 @@ export default defineComponent({
     PageActionHeader,
     AppModal,
     Spinner,
-    AddressAutoComplete
+    AddressAutocomplete
   },
   created() {
     this.setDefaultCountry();
@@ -547,7 +437,9 @@ export default defineComponent({
       };
       await this.$axios
         .post(
-          `/v1/partners/${this.userSessionData.activeContext.account_sid}/drivers/${driverId.toString()}`,
+          `/v1/partners/${
+            this.userSessionData.activeContext.account_sid
+          }/drivers/${driverId.toString()}`,
           partnerDriverPayload
         )
         .then((response) => {
