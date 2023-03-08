@@ -15,3 +15,20 @@ s.src = 'https://salesiq.zoho.com/widget';
 const t = d.getElementsByTagName('script')[0];
 t.parentNode?.insertBefore(s, t);
 window.$zoho = z
+
+// interface User {
+//   fname : string,
+//   lname : string,
+//   email : string,
+//   phone : string
+// }
+
+export function setZohoUser (user : any) {
+  try {
+    window?.$zoho?.salesiq?.visitor?.name(user?.fname + ' ' + user?.lname);
+    window?.$zoho?.salesiq?.visitor?.email(user?.email);
+    window?.$zoho?.salesiq?.visitor?.contactnumber(user?.phone);
+  } catch (error) {
+    console.log(error);
+  }
+}

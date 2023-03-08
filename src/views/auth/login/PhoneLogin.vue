@@ -79,6 +79,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import { setZohoUser } from '@/utils/zoho';
 import { required } from '@vuelidate/validators';
 import countryCodeEmoji from 'country-code-emoji';
 import { CountryCode, isValidPhoneNumber } from 'libphonenumber-js/mobile';
@@ -152,6 +153,7 @@ export default defineComponent({
           .then(async (loginResponse) => {
             this.form.otpValue = '';
             this.form.phone = '';
+            setZohoUser(loginResponse.data)
             await this.$store.dispatch('auth/authSuccess', loginResponse.data);
             window.$zoho.salesiq.reset();
             const redirect: any = this.$route.query.redirect;

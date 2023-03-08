@@ -3,6 +3,7 @@ import {UserSessionModel} from "@/models/user-session.model";
 import {axiosInstance, removeAuthorization, setAuthorization} from "@/plugins/axios";
 import {LoginResponse} from "@/models/login-response.model";
 import {OnboardingState, PartnerOrganization} from "@/models/organisation.model";
+import { setZohoUser } from '@/utils/zoho';
 
 export const USER_SESSION_KEY = 'USER_SESSION';
 /**
@@ -98,12 +99,15 @@ export default <StoreOptions<AuthState>>{
   },
   getters: {
     userSessionData: (state) => {
+      setZohoUser(state.sessionData)
       return state.sessionData
     },
     user: (state) => {
+      setZohoUser(state?.sessionData?.user)
       return state.sessionData?.user;
     },
     activeContext: (state: AuthState) => {
+      setZohoUser(state?.sessionData?.user)
       return state.sessionData?.activeContext;
     },
     hasOrganizations: (state: AuthState) => {
