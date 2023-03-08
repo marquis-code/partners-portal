@@ -99,7 +99,7 @@ export default <StoreOptions<AuthState>>{
   },
   getters: {
     userSessionData: (state) => {
-      setZohoUser(state.sessionData)
+      setZohoUser(state?.sessionData?.user)
       return state.sessionData
     },
     user: (state) => {
@@ -111,9 +111,11 @@ export default <StoreOptions<AuthState>>{
       return state.sessionData?.activeContext;
     },
     hasOrganizations: (state: AuthState) => {
+      setZohoUser(state?.sessionData?.user)
       return !!state.sessionData?.associatedOrganizations?.length;
     },
     completedOnboarding: (state) => {
+      setZohoUser(state?.sessionData?.user)
       return state.sessionData?.onboardComplete
     },
     isLoggedIn: (state: AuthState) => state.isLoggedIn
