@@ -25,7 +25,7 @@
             src="@/assets/icons/user-placeholder.svg"
           />
           <div class="flex flex-col">
-            <div class="mb-1">{{user.user.fname || ''}} {{user.user.lname || ''}}</div>
+            <div class="mb-1">{{user.user.fname.length ? user.user.fname.substring(0,1) : ''}}****** {{user.user.lname.length ? user.user.lname.substring(0,1) : ''}}******</div>
             <div class="text-sm text-gray-400">Drop-off: {{user.destination.location}}</div>
           </div>
         </div>
