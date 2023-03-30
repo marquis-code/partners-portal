@@ -6,7 +6,7 @@
     <template v-else>
     <img src="@/assets/images/earningsIcon.svg" />
     <p class="text-grays-black-8">Earnings</p>
-    <h1 class="text-grays-white text-2xl font-bold">NGN {{accruedEarnings || 0}}</h1>
+    <h1 class="text-grays-white text-2xl font-bold">NGN {{ Intl.NumberFormat('en-Us').format(accruedEarnings || 0)}}</h1>
     <div class="bg-grays-black-7 w-full h-0.5"></div>
     <div>
       <router-link

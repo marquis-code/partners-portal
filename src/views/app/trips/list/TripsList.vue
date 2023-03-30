@@ -416,7 +416,7 @@ export default defineComponent({
           driver: trip.driver.fname + ' ' + trip.driver.lname,
           driverId: trip.driver.id,
           routeCode: trip.route.route_code,
-          startTime: moment(trip.trip_start_time).subtract(1, 'h').format('LT'),
+          startTime: trip.start_trip ? moment(trip.start_trip).subtract(1, 'h').format('LT') : 'MARKED',
           endTime: moment(trip.end_trip).format('h:mm a'),
           passengersCount: trip.passengers_count,
           revenue: trip.cost_of_supply,
