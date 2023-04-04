@@ -412,11 +412,11 @@ export default defineComponent({
       const newTrips: any = [];
       payload.forEach((trip) => {
         newTrips.push({
-          createdAt: moment(trip.created_at).format('LL'),
+          createdAt: moment(trip.trip_start_time).format('LL'),
           driver: trip.driver.fname + ' ' + trip.driver.lname,
           driverId: trip.driver.id,
           routeCode: trip.route.route_code,
-          startTime: trip.start_trip ? moment(trip.start_trip).subtract(1, 'h').format('LT') : 'MARKED',
+          startTime: trip.start_trip ? moment(trip.trip_start_time).subtract(1, 'h').format('LT') : 'MARKED',
           endTime: moment(trip.end_trip).format('h:mm a'),
           passengersCount: trip.passengers_count,
           revenue: trip.cost_of_supply,
