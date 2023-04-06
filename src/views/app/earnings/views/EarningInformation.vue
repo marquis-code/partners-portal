@@ -198,18 +198,20 @@ export default defineComponent({
           dropoff,
           driverId,
           routeCode,
-          startTime
+          createdAt
         } = e.metadata;
         const {
           partnersRevenue,
           id,
           tripId,
-          routeId
+          routeId,
+          tripStartTime
         } = e;
 
         obj.id = id;
         obj.tripId = tripId;
-        obj.createdAt = moment(startTime).format('DD MMMM YYYY');
+        obj.tripStartTime = moment(tripStartTime).format('DD MMMM YYYY');
+        obj.createdAt = moment(createdAt).format('DD MMMM YYYY');
         obj.routeCode = routeCode;
         obj.route = {
           pickup,
@@ -301,7 +303,8 @@ export default defineComponent({
         sortBy: '',
       },
       headers: [
-        { label: 'Date', key: 'createdAt' },
+        { label: 'Trip Date', key: 'tripStartTime' },
+        { label: 'Time of Creation', key: 'createdAt' },
         { label: 'Route', key: 'route' },
         { label: 'Route Code', key: 'routeCode' },
         { label: 'Driver', key: 'driver' },
