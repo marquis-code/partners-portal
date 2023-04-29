@@ -13,6 +13,8 @@ import "vue-select/dist/vue-select.css";
 import {AppInitializerService} from "@/services/app-initializer.service";
 import VueGoogleMaps from '@fawmi/vue-google-maps';
 import './utils/zoho';
+import VCalendar from 'v-calendar';
+import 'v-calendar/dist/style.css';
 
 new AppInitializerService(router, store, axiosInstance).initialize()
   .finally(() => {
@@ -23,6 +25,7 @@ new AppInitializerService(router, store, axiosInstance).initialize()
       .use(store)
       .use(router)
       .use(VueEasyLightbox)
+      .use(VCalendar, {})
       .use(VueGoogleMaps, {
         load: {
           key: 'AIzaSyBAfieAIDL1vGbkQd74otnW2t0jkDjiPW0',

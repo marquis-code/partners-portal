@@ -26,7 +26,7 @@ export default defineComponent({
   data () {
     return {
       time: 10, // in seconds
-      timer: 0,
+      timer: 0 as any,
     };
   },
   created () {
