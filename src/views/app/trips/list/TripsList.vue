@@ -13,7 +13,7 @@
       >
         <div>
           <!-- Search Box  -->
-          <div class="flex flex-row justify-between px-6 py-4 w-full">
+          <div class="flex flex-col gap-4  md:flex-row justify-between px-6 py-4 w-full">
             <div class="flex flex-row justify-start w-full">
               <span class="material-icons mr-4">search</span>
               <input
@@ -30,6 +30,24 @@
                 placeholder="Search"
               />
             </div>
+            <!-- <template v-slot="{ inputValue, inputEvents, isDragging }"> -->
+            <v-date-picker v-model="filters.range" mode="date" is-range>
+              <template v-slot="{ inputValue, inputEvents }">
+                <div v-on="inputEvents.start" class="border py-2 px-2 rounded-lg w-full max-w-fit">
+                  <div v-if="filters.range.end && filters.range.start" class="flex items-center gap-2 text-sm " >
+                    <p class="" >{{ inputValue.start }}</p>
+                    <span>~</span>
+                    <p class="" >{{ inputValue.end }}</p>
+                    <button @click="clearDateFilter" class="close font-black" type="button">&#x2715;</button>
+                  </div>
+                  <p class="text-black whitespace-nowrap" v-else >Filter by date</p>
+                </div>
+              </template>
+            </v-date-picker>
+            <button @click="downloadReport" :class="downloadLoader ? 'w-[130px]' : 'w-fit'" class="bg-black p-2 py-1 whitespace-nowrap text-white text-sm font-medium rounded">
+              <spinner v-if="downloadLoader"/>
+              <span v-else>Download Report</span>
+            </button>
           </div>
           <!-- End of search box -->
           <!-- Start of filter -->
@@ -244,26 +262,41 @@ import { mapGetters } from 'vuex';
 import PageLayout from '@/components/layout/PageLayout.vue';
 import TripHistory from '@/components/TripHistory.vue';
 import moment from 'moment';
+import { formatDate, dateStringToDateObject, formatApiCallDate, downloadFile } from '@/composables/utils'
+import spinner from '@/components/loader/spinner.vue'
+import Papa from 'papaparse';
+
 export default defineComponent({
   name: 'DriversList',
   components: {
     PageLayout,
     AppTable,
-    TripHistory
+    TripHistory,
+    spinner
   },
-  created() {
-    this.fetchPartnerTripsFromRevenue();
+  created () {
+    const query = this.$route.query
+    if (query.status) this.setStatusFilter(query.status as string)
+    if (query.searchTerm) this.filters.search = query.searchTerm as string
+    if (query.dateStart && query.dateEnd) {
+      this.filters.range.start = dateStringToDateObject(query.dateStart as string)
+      this.filters.range.end = dateStringToDateObject(query.dateEnd as string)
+      this.fetchPartnerTripsFromRevenue();
+    }
+    if (Object.keys(query).length === 0) this.fetchPartnerTripsFromRevenue();
   },
-  data() {
+  data () {
     return {
       result: [],
       filters: {
         status: 'active-trips' as string,
         search: '',
         pageNumber: 1,
-        pageSize: 10
+        pageSize: 10,
+        range: { start: null as null|Date, end: null as null|Date }
       },
       debounce: null as any,
+      downloadLoader: false,
       search: '',
       loading: false,
       tableData: [] as Array<any>,
@@ -322,14 +355,93 @@ export default defineComponent({
     'filters.pageSize'() {
       this.fetchPartnerTripsFromRevenue();
     },
-    'filters.search'() {
+    'filters.search' () {
+      if (this.filters.search) this.addToQuery({searchTerm: this.filters.search})
+      if (!this.filters.search) this.removeQueryParam(['searchTerm'])
       clearTimeout(this.debounce);
       this.debounce = setTimeout(() => {
         this.fetchPartnerTripsFromRevenue();
       }, 600);
-    }
+    },
+    'filters.range' () {
+      if (this.filters.range.start && this.filters.range.end) {
+        this.addToQuery({
+          dateStart: formatDate(this.filters.range.start),
+          dateEnd: formatDate(this.filters.range.end)
+        })
+        this.fetchPartnerTripsFromRevenue();
+      }
+    },
   },
   methods: {
+    clearDateFilter () {
+      this.filters.range.start = null
+      this.filters.range.end = null
+      this.removeQueryParam(['dateStart', 'dateEnd'])
+      this.fetchPartnerTripsFromRevenue()
+    },
+    downloadReport () {
+      this.downloadLoader = true
+      this.$axios
+        .get(
+          `/v1/partners/${this.partnerContext.partner.id}/${this.filters.status}?metadata=true&page=${this.filters.pageNumber}&limit=${this.filters.pageSize}&search=${this.filters.search}&from=${this.filters.range.start ? formatApiCallDate(this.filters.range.start) : null}&to=${this.filters.range.end ? formatApiCallDate(this.filters.range.end) : null}`
+        )
+        .then((res) => {
+          const total = res?.data?.metadata?.total;
+          console.log(total)
+          this.$axios.get(
+            `/v1/partners/${this.partnerContext.partner.id}/${this.filters.status}?metadata=true&page=${this.filters.pageNumber}&limit=${total}&search=${this.filters.search}&from=${this.filters.range.start ? formatApiCallDate(this.filters.range.start) : null}&to=${this.filters.range.end ? formatApiCallDate(this.filters.range.end) : null}`
+          ).then((res) => {
+            if (res.data.data) {
+              const x = res.data.data
+              // console.log(x)
+              const newArr = []
+              for (let i = 0; i < x.length; i++) {
+                const el = x[i]
+                const y = {
+                  Route_code: el.route.route_code,
+                  Pickup: el.route.pickup,
+                  Destination: el.route.destination,
+                  Date: moment(new Date(el.start_trip)).format("MMMM D, YYYY"),
+                  Driver: `${el.driver.fname} ${el.driver.lname}`,
+                  Start_time: moment(new Date(el.start_trip)).format("h:mm A"),
+                  End_time: moment(new Date(el.end_trip)).format("h:mm A"),
+                  Passengers: el.passengers_count,
+                  Revenue: el.cost_of_supply
+
+                }
+                newArr.push(y)
+              }
+              const csv = Papa.unparse(newArr);
+              const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+              const url = URL.createObjectURL(blob);
+              downloadFile(url, 'downloaded-trips-report')
+            }
+          })
+        })
+        .catch((err) => {
+          this.$toast.error(
+            err?.response?.data?.message || 'An error occured'
+          );
+        })
+        .finally(() => {
+          this.downloadLoader = false;
+        });
+    },
+    addToQuery (obj:any) {
+      const oldQuery = this.$route.query
+      const newQuery = { ...oldQuery, ...obj };
+      this.$router.push({ query: newQuery });
+    },
+    removeQueryParam (queryNames:string[]) {
+      const queries = this.$route.query
+      const query = { ...queries };
+      for (let i = 0; i < queryNames.length; i++) {
+        const el = queryNames[i];
+        delete query[el];
+      }
+      this.$router.push({ query });
+    },
     changePage(pageNumber: any) {
       this.filters.pageNumber = pageNumber;
     },
@@ -339,9 +451,10 @@ export default defineComponent({
     setStatusFilter(value: string) {
       this.filters.status = value;
       this.fetchPartnerTripsFromRevenue();
+      this.addToQuery({status: value})
     },
 
-    async fetchPartnerTripsFromRevenue() {
+    async fetchPartnerTripsFromRevenue () {
       this.loading = true;
       const params = {
         related: 'driver,vehicle',
@@ -351,7 +464,7 @@ export default defineComponent({
       if (params.status === 'completed-trips') {
         this.$axios
           .get(
-            `/v1/partners/${this.partnerContext.partner.id}/${params.status}?metadata=${params.metadata}&page=${this.filters.pageNumber}&limit=${this.filters.pageSize}&search=${this.filters.search}`
+            `/v1/partners/${this.partnerContext.partner.id}/${params.status}?metadata=${params.metadata}&page=${this.filters.pageNumber}&limit=${this.filters.pageSize}&search=${this.filters.search}&from=${this.filters.range.start ? formatApiCallDate(this.filters.range.start) : null}&to=${this.filters.range.end ? formatApiCallDate(this.filters.range.end) : null}`
             // `cost-revenue/v1/partners/${this.partnerContext.partner.account_sid}/revenues`
           )
           .then((res) => {
@@ -369,7 +482,7 @@ export default defineComponent({
       } else {
         this.$axios
           .get(
-            `/v1/partners/${this.partnerContext.partner.id}/${params.status}?metadata=${params.metadata}&page=${this.filters.pageNumber}&limit=${this.filters.pageSize}&search=${this.filters.search}`
+            `/v1/partners/${this.partnerContext.partner.id}/${params.status}?metadata=${params.metadata}&page=${this.filters.pageNumber}&limit=${this.filters.pageSize}&search=${this.filters.search}&from=${this.filters.range.start ? formatApiCallDate(this.filters.range.start) : null}&to=${this.filters.range.end ? formatApiCallDate(this.filters.range.end) : null}`
           )
           .then((res) => {
             const trips = this.transformActiveOrUpcomingTrips(res?.data?.data);

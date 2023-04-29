@@ -1,7 +1,7 @@
 <template>
   <div class="home flex flex-row">
     <sidebar @sideBarNavigationClicked="changeNavigation"/>
-    <div class="w-full">
+    <div class="w-full pb-[80px]">
       <router-view/>
     </div>
 </div>
