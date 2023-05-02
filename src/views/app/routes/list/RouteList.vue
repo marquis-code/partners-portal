@@ -13,7 +13,7 @@
       >
         <div>
           <!-- Search Box  -->
-          <div class="flex flex-row justify-between px-6 py-4 w-full">
+          <div class="flex flex-col gap-4 md:flex-row justify-between px-6 py-4 w-full">
             <div class="flex flex-row justify-start w-full">
               <span class="material-icons mr-4">search</span>
               <input
@@ -30,6 +30,10 @@
                 placeholder="Search"
               />
             </div>
+            <button @click="downloadReport" :class="downloadLoader ? 'w-[130px]' : 'w-fit'" class="bg-black p-2 py-1 whitespace-nowrap text-white text-sm font-medium rounded">
+              <spinner v-if="downloadLoader"/>
+              <span v-else>Download Report</span>
+            </button>
           </div>
           <!-- End of search box -->
           <app-table
@@ -129,14 +133,22 @@ import { mapGetters } from 'vuex';
 import PageLayout from '@/components/layout/PageLayout.vue';
 import TripHistory from '@/components/TripHistory.vue';
 import { extractErrorMessage } from '@/utils/helper';
+import Papa from 'papaparse'
+import spinner from '@/components/loader/spinner.vue'
+import moment from 'moment';
+import { downloadFile } from '@/composables/utils'
+
 export default defineComponent({
   name: 'RoutesList',
   components: {
     PageLayout,
     AppTable,
-    TripHistory
+    TripHistory,
+    spinner
   },
-  created() {
+  created () {
+    const query = this.$route.query
+    if (query.searchTerm) this.filters.search = query.searchTerm as string
     this.fetchPartnerRoutes();
   },
   props: {
@@ -150,6 +162,8 @@ export default defineComponent({
       this.fetchPartnerRoutes();
     },
     'filters.search'() {
+      if (this.filters.search) this.addToQuery({searchTerm: this.filters.search})
+      if (!this.filters.search) this.removeQueryParam(['searchTerm'])
       clearTimeout(this.debounce);
       this.debounce = setTimeout(() => {
         this.fetchPartnerRoutes();
@@ -163,6 +177,7 @@ export default defineComponent({
         pageSize: 10,
         search: ''
       },
+      downloadLoader: false,
       result: [],
       search: '',
       loading: false,
@@ -205,6 +220,70 @@ export default defineComponent({
     }
   },
   methods: {
+    downloadReport () {
+      this.downloadLoader = true
+      this.$axios
+        .get(
+          `/v1/partners/${this.partnerContext.partner.id}/routes?page=${this.filters.pageNumber}&limit=${this.filters.pageSize}&search=${this.filters.search}`
+        )
+        .then((res) => {
+          const total = res?.data?.metadata?.total;
+          // console.log(total)
+          this.$axios.get(
+            `/v1/partners/${this.partnerContext.partner.id}/routes?page=${this.filters.pageNumber}&limit=${total}&search=${this.filters.search}`
+          ).then((res) => {
+            if (res.data.data.length) {
+              const x = res.data.data
+              console.log(x)
+              const newArr = []
+              for (let i = 0; i < x.length; i++) {
+                const el = x[i]
+                const y = {
+                  Route_code: el.route.route_code,
+                  Pickup: el.route.pickup,
+                  Destination: el.route.destination,
+                  Start_time: el.route_itinerary.trip_time,
+                  Driver: `${el.driver.fname} ${el.driver.lname}`,
+                  Vehicle_assigned: `${el.vehicle.seats ?? ''} seater - ${el.vehicle.brand ?? ''} ${el.vehicle.name ?? ''} ${el.vehicle.registration_number ?? ''}`,
+                  Cost_of_supply: el.cost_of_supply
+
+                }
+                newArr.push(y)
+              }
+              const csv = Papa.unparse(newArr);
+              const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+              const url = URL.createObjectURL(blob);
+              downloadFile(url, 'downloaded-trips-report')
+            } else {
+              this.$toast.error(
+                'No data to download'
+              );
+            }
+          })
+        })
+        .catch((err) => {
+          this.$toast.error(
+            err?.response?.data?.message || 'An error occured'
+          );
+        })
+        .finally(() => {
+          this.downloadLoader = false;
+        });
+    },
+    addToQuery (obj:any) {
+      const oldQuery = this.$route.query
+      const newQuery = { ...oldQuery, ...obj };
+      this.$router.push({ query: newQuery });
+    },
+    removeQueryParam (queryNames:string[]) {
+      const queries = this.$route.query
+      const query = { ...queries };
+      for (let i = 0; i < queryNames.length; i++) {
+        const el = queryNames[i];
+        delete query[el];
+      }
+      this.$router.push({ query });
+    },
     changePage(pageNumber: any) {
       this.filters.pageNumber = pageNumber;
     },

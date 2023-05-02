@@ -87,6 +87,11 @@
         </div>
       </div>
       <h1 class="font-medium text-gray-800 py-5">Overview</h1>
+      <div class="flex flex-col w-full py-5">
+        <select v-model="period" class="outline-none border w-[200px] rounded-md text-neutral9 px-2">
+            <option v-for="n in periodOptions" :key="n.val" :value="n.val">{{ n.key }}</option>
+          </select>
+      </div>
       <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <earnings
           :accruedEarnings="partnerStats.partnerAccruedEarnings"
@@ -154,7 +159,7 @@ export default defineComponent({
     Ratings,
     PieChart,
   },
-  data() {
+  data () {
     return {
       partnerEarnings: null,
       partnerVehicles: null,
@@ -181,15 +186,31 @@ export default defineComponent({
       },
       doneCount: 0,
       isTodoComplete: false,
-      partnerType: ''
+      partnerType: '',
+      periodOptions: [
+        {val: '', key: 'All'},
+        {val: 'current_year', key: 'This Year'},
+        {val: 'current_month', key: 'This Month'},
+        {val: 'current_week', key: 'This Week'},
+        {val: 'today', key: 'Today'},
+        {val: 'yesterday', key: 'Yesterday'},
+        {val: 'last_month', key: 'Last Month'},
+        {val: 'last_week', key: 'Last Week'}
+      ],
+      period: ''
     };
+  },
+  watch: {
+    period (newVal) {
+      this.fetchDashboardSummary(newVal)
+    },
   },
   computed: {
     ...mapGetters({
       partnerContext: 'auth/activeContext'
     })
   },
-  created() {
+  created () {
     this.setTableStates();
   },
   methods: {
@@ -244,7 +265,7 @@ export default defineComponent({
         this.isTodoComplete = true;
       }
     },
-    async setTableStates() {
+    async setTableStates () {
       this.loadingStats = true;
       this.checkIdentityStatuses();
       await this.fetchDashboardSummary();
@@ -300,7 +321,7 @@ export default defineComponent({
         this.doneCount += 1;
       }
     },
-    setPartnerType() {
+    setPartnerType () {
       if (this.partnerContext.onboardingState.address.partner_type === 'individual') {
         this.partnerType = 'individual'
       } else {
@@ -325,9 +346,10 @@ export default defineComponent({
         this.$toast.error(errorMessage);
       }
     },
-    async fetchDashboardSummary() {
+    async fetchDashboardSummary (period = '') {
+      this.loadingStats = true;
       const response = await this.$axios.get(
-        `/v1/partners/${this.partnerContext.partner.id}/summaries`
+        `/v1/partners/${this.partnerContext.partner.id}/summaries?period=${period}`
       );
       //  Total driver check
       this.partnerStats.partnerDriverCount = response.data.total_drivers;
@@ -350,6 +372,7 @@ export default defineComponent({
         response.data.total_upcoming_trips;
       this.partnerStats.partnerCompletedTrips =
         response.data.total_completed_trips;
+      this.loadingStats = false;
     }
   }
 });

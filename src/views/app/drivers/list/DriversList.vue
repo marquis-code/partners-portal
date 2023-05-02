@@ -40,7 +40,7 @@
           <!-- Search Box  -->
           <div
             class="
-              flex flex-row
+              flex flex-col gap-4 md:flex-row
               justify-between
               px-6
               py-4
@@ -63,6 +63,10 @@
                 placeholder="Search"
               />
             </div>
+            <button @click="downloadReport" :class="downloadLoader ? 'w-[130px]' : 'w-fit'" class="bg-black p-2 py-1 whitespace-nowrap text-white text-sm font-medium rounded">
+              <spinner v-if="downloadLoader"/>
+              <span v-else>Download Report</span>
+            </button>
           </div>
           <!-- End of search box -->
           <!-- Start of filter -->
@@ -310,6 +314,9 @@ import PageActionHeader from '@/components/PageActionHeader.vue';
 import PageLayout from '@/components/layout/PageLayout.vue';
 import AppModal from '@/components/Modals/AppModal.vue';
 import { extractErrorMessage } from '@/utils/helper';
+import spinner from '@/components/loader/spinner.vue'
+import {downloadFile} from '@/composables/utils'
+import Papa from 'papaparse';
 // import { vue3Debounce } from 'vue-debounce'
 
 export default defineComponent({
@@ -321,10 +328,14 @@ export default defineComponent({
     PageLayout,
     PageActionHeader,
     AppTable,
-    AppModal
+    AppModal,
+    spinner
   },
-  created() {
-    this.fetchDrivers();
+  created () {
+    const query = this.$route.query
+    if (query.status) this.setStatusFilter(query.status as string)
+    if (query.searchTerm) this.filters.search = query.searchTerm as string
+    if (Object.keys(query).length === 0) this.fetchDrivers();
   },
   props: {
     rowClicked: Function
@@ -337,6 +348,8 @@ export default defineComponent({
       this.fetchDrivers();
     },
     'filters.search'() {
+      if (this.filters.search) this.addToQuery({searchTerm: this.filters.search})
+      if (!this.filters.search) this.removeQueryParam(['searchTerm'])
       clearTimeout(this.debounce);
       this.debounce = setTimeout(() => {
         this.fetchDrivers();
@@ -351,6 +364,7 @@ export default defineComponent({
         pageNumber: 1,
         pageSize: 10
       },
+      downloadLoader: false,
       debounce: null as any,
       showInfoModal: false,
       search: '',
@@ -398,6 +412,74 @@ export default defineComponent({
   },
 
   methods: {
+    downloadReport () {
+      this.downloadLoader = true
+      this.$axios
+        .get(
+          `/v1/partners/${this.userSessionData.activeContext.partner.account_sid}/drivers?status=${this.filters.status}&page=${this.filters.pageNumber}&limit=${this.filters.pageSize}&search=${this.filters.search}`
+        )
+        .then((res) => {
+          const total = res?.data?.metadata?.total;
+          // console.log(total)
+          this.$axios.get(
+            `/v1/partners/${this.userSessionData.activeContext.partner.account_sid}/drivers?status=${this.filters.status}&page=${this.filters.pageNumber}&limit=${total}&search=${this.filters.search}`
+          ).then((res) => {
+            if (res.data.data.length) {
+              const x = res.data.data
+              console.log(x)
+              const newArr = []
+              for (let i = 0; i < x.length; i++) {
+                const el = x[i]
+                const assigned_route = []
+                if (el.routeVehicles && el.routeVehicles.length) {
+                  for (let j = 0; j < el.routeVehicles.length; j++) {
+                    const z = el.routeVehicles[j];
+                    assigned_route.push(z.route.route_code)
+                  }
+                }
+                const y = {
+                  Driver: `${el.driver.fname} ${el.driver.lname}`,
+                  Email: el.driver.email,
+                  Route_assigned: assigned_route.length ? assigned_route.join(' ') : 'N/A',
+                  Phone: el.driver.phone,
+
+                }
+                newArr.push(y)
+              }
+              const csv = Papa.unparse(newArr);
+              const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+              const url = URL.createObjectURL(blob);
+              downloadFile(url, 'downloaded-drivers-report')
+            } else {
+              this.$toast.error(
+                'No data to download'
+              );
+            }
+          })
+        })
+        .catch((err) => {
+          this.$toast.error(
+            err?.response?.data?.message || 'An error occured'
+          );
+        })
+        .finally(() => {
+          this.downloadLoader = false;
+        });
+    },
+    addToQuery (obj:any) {
+      const oldQuery = this.$route.query
+      const newQuery = { ...oldQuery, ...obj };
+      this.$router.push({ query: newQuery });
+    },
+    removeQueryParam (queryNames:string[]) {
+      const queries = this.$route.query
+      const query = { ...queries };
+      for (let i = 0; i < queryNames.length; i++) {
+        const el = queryNames[i];
+        delete query[el];
+      }
+      this.$router.push({ query });
+    },
     changePage(pageNumber: any) {
       this.filters.pageNumber = pageNumber;
     },
@@ -432,6 +514,7 @@ export default defineComponent({
     setStatusFilter(value: string) {
       this.filters.status = value
       this.fetchDrivers();
+      this.addToQuery({status: value})
     },
     fetchDrivers() {
       this.loading = true;

@@ -24,33 +24,24 @@
       </template>
       <div>
         <div class="w-[100%] h-[auto] bg-[#fff] mt-[2rem] p-[10px] relative">
-          <div class="w-[100%] flex flex-row justify-between items-center">
-            <div>
-              <div v-if="tableData.length > 0" class="flex flex-row items-center">
-                <img
-                  src="@/assets/icons/search.svg"
-                  class="mr-2"
-                />
-                <input
-                  v-model="searchText"
-                  class="outline-none p-2"
-                  placeholder="Search Trips"
-                />
-              </div>
-            </div>
-            <div class="flex flex-row items-center">
-              <select
-                :v-model="filter.sortBy"
-                class="p-[10px] text-[14px] border border-[#616161] rounded outline-none mr-[20px]"
-              >
-                <option value="this-month">This Month</option>
-                <option value="last-week">Last Week</option>
-              </select>
-              <div class="flex flex-row items-center cursor-pointer">
-                <p class="mr-[4px] text-[13px] font-bold">Export</p>
-                <img src="@/assets/icons/export_download.svg"/>
-              </div>
-            </div>
+          <div class="w-[100%] flex flex-col gap-4 md:flex-row justify-end">
+            <v-date-picker v-model="filter.range" mode="date" is-range>
+              <template v-slot="{ inputValue, inputEvents }">
+                <div v-on="inputEvents.start" class="border py-2 px-2 rounded-lg w-full max-w-fit">
+                  <div v-if="filter.range.end && filter.range.start" class="flex items-center gap-2 text-sm " >
+                    <p class="" >{{ inputValue.start }}</p>
+                    <span>~</span>
+                    <p class="" >{{ inputValue.end }}</p>
+                    <button @click="clearDateFilter" class="close font-black" type="button">&#x2715;</button>
+                  </div>
+                  <p class="text-black whitespace-nowrap" v-else >Filter by date</p>
+                </div>
+              </template>
+            </v-date-picker>
+            <button @click="downloadReport" :class="downloadLoader ? 'w-[130px]' : 'w-fit'" class="bg-black p-2 py-1 whitespace-nowrap text-white text-sm font-medium rounded">
+              <spinner v-if="downloadLoader"/>
+              <span v-else>Download Report</span>
+            </button>
           </div>
           <div class="space-y-5 ring-1 ring-gray-50 shadow-sm rounded-sm bg-white">
         <!--    <div class="flex items-center justify-end p-5">-->
@@ -108,6 +99,9 @@ import { mapGetters } from 'vuex';
 import CostEarnings from '@/models/cost-earnings-data';
 import TripHistory from '@/components/TripHistory.vue';
 import ItemNavigator from '@/components/ItemNavigator.vue';
+import spinner from '@/components/loader/spinner.vue'
+import { downloadFile, formatApiCallDate, formatDate, dateStringToDateObject } from '@/composables/utils'
+import Papa from 'papaparse'
 
 export default defineComponent({
   name: 'EarningInformation',
@@ -117,6 +111,7 @@ export default defineComponent({
     AppTable,
     TripHistory,
     ItemNavigator,
+    spinner
     // EarningsTableDataCard,
   },
   computed: {
@@ -128,14 +123,97 @@ export default defineComponent({
       partnerContext: 'auth/activeContext'
     }),
   },
-  mounted() {
-    this.init();
+  created () {
+    // this.init();
+    const query = this.$route.query
+    if (query.dateStart && query.dateEnd) {
+      this.filter.range.start = dateStringToDateObject(query.dateStart as string)
+      this.filter.range.end = dateStringToDateObject(query.dateEnd as string)
+      this.init();
+    }
+    if (Object.keys(query).length === 0) this.init();
+  },
+  watch: {
+    'filter.range' () {
+      if (this.filter.range.start && this.filter.range.end) {
+        this.addToQuery({
+          dateStart: formatDate(this.filter.range.start),
+          dateEnd: formatDate(this.filter.range.end)
+        })
+        this.listRevenues();
+      }
+    },
   },
   methods: {
-    async init() {
+    clearDateFilter () {
+      this.filter.range.start = null
+      this.filter.range.end = null
+      this.removeQueryParam(['dateStart', 'dateEnd'])
+      this.listRevenues()
+    },
+    downloadReport () {
+      this.downloadLoader = true
+      this.$axios
+        .get(
+          `/cost-revenue/v1/partners/${this.partnerContext.partner.account_sid}/revenues?from=${this.filter.range.start ? formatApiCallDate(this.filter.range.start) : null}&to=${this.filter.range.end ? formatApiCallDate(this.filter.range.end) : null}`
+        )
+        .then((res) => {
+          console.log(res)
+          if (res.data.result.length) {
+            const x = res.data.result
+            console.log(x)
+            const newArr = []
+            for (let i = 0; i < x.length; i++) {
+              const el = x[i]
+              const y = {
+                // Trip_date: moment(new Date(el.metadata.startTime)).format("MMMM D, YYYY"),
+                // Time_of_creation: moment(new Date(el.createdAt)).format("MMMM D, YYYY"),
+                Route_code: el.metadata.routeCode,
+                Pickup: el.metadata.pickup,
+                Destination: el.metadata.dropoff,
+                Itinerary: moment(new Date(el.createdAt)).format("h:mm A"),
+                Driver: `${el.metadata.driver.fname} ${el.metadata.driver.lname}`,
+                Vehicle: el.metadata.vehicle.name,
+                // Deductions: el.totalDeductedAmount,
+                Supply_cost: el.finalPartnersRevenue,
+              }
+              newArr.push(y)
+            }
+            const csv = Papa.unparse(newArr);
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            downloadFile(url, 'downloaded-cost_configuration-report')
+          } else {
+            this.$toast.error('No data to download');
+          }
+        })
+        .catch((err) => {
+          this.$toast.error(
+            err?.response?.data?.message || 'An error occured'
+          );
+        })
+        .finally(() => {
+          this.downloadLoader = false;
+        });
+    },
+    addToQuery (obj:any) {
+      const oldQuery = this.$route.query
+      const newQuery = { ...oldQuery, ...obj };
+      this.$router.push({ query: newQuery });
+    },
+    removeQueryParam (queryNames:string[]) {
+      const queries = this.$route.query
+      const query = { ...queries };
+      for (let i = 0; i < queryNames.length; i++) {
+        const el = queryNames[i];
+        delete query[el];
+      }
+      this.$router.push({ query });
+    },
+    async init () {
       await this.listRevenues();
     },
-    formatTableData(data: Array<any>) {
+    formatTableData (data: Array<any>) {
       const result = [];
       for (const e of data) {
         const obj = {} as any;
@@ -179,11 +257,11 @@ export default defineComponent({
       }
       return result;
     },
-    async listRevenues() {
+    async listRevenues () {
       try {
         this.isFetchingCostRevenue = true;
         const response = await this.$axios.get(
-          `/cost-revenue/v1/partners/${this.partnerContext.partner.account_sid}/revenues`
+          `/cost-revenue/v1/partners/${this.partnerContext.partner.account_sid}/revenues?from=${this.filter.range.start ? formatApiCallDate(this.filter.range.start) : null}&to=${this.filter.range.end ? formatApiCallDate(this.filter.range.end) : null}`
         );
         console.log(response);
         if (response.status === 200) {
@@ -196,22 +274,24 @@ export default defineComponent({
         this.isFetchingCostRevenue = false;
       }
     },
-    viewTableDetails(e: {e: any}) {
+    viewTableDetails (e: {e: any}) {
       console.log(e);
       this.$router.push(`/earnings/cost-configuration/vehicle/${e}`);
     },
-    gotoEarning() {
+    gotoEarning () {
       this.$router.push('/earnings');
     }
   },
-  data() {
+  data () {
     return {
       searchText: '',
       isFetchingCostRevenue: false,
       errorLoading: false,
       filter: {
         sortBy: '',
+        range: { start: null as null|Date, end: null as null|Date }
       },
+      downloadLoader: false,
       headers: [
         { label: 'Route code', key: 'routeCode' },
         { label: 'Route', key: 'route' },
