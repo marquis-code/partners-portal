@@ -1,6 +1,6 @@
 <template>
   <div class="h-full absolute -top-7 -right-10 -left-7 bottom-0">
-    <single-google-maps/>
+    <VehicleMap :vehicleId="singleVehicleData.id"/>
   </div>
   <div
   class="relative"
@@ -270,12 +270,17 @@ import Notification from '../../../../components/Notification.vue';
 import Spinner from '@/components/layout/Spinner.vue';
 import { axiosInstance } from '@/plugins/axios';
 import emitter from '@/libs/emitter';
-import SingleGoogleMaps from '@/components/map/SingleGoogleMaps.vue';
+import VehicleMap from './VehicleMap.vue';
 
 export default defineComponent({
   emits: ['vehicleUpdated'],
   props: {
-    singleVehicleData: Object
+    singleVehicleData: {
+      type: Object,
+      default: () => {
+        return {}
+      }
+    }
   },
   data () {
     return {
@@ -458,7 +463,7 @@ export default defineComponent({
         });
     }
   },
-  components: { AppModal, Notification, Spinner, SingleGoogleMaps }
+  components: { AppModal, Notification, Spinner, VehicleMap }
 });
 </script>
 
