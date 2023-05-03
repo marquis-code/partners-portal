@@ -1,6 +1,7 @@
 import axios, {axiosInstance} from './plugins/axios';
 import { createApp } from 'vue'
 import App from './App.vue'
+import socketController from './services/socketio.service'
 import router from './router'
 import store from './store'
 import PluginService from './services/plugin.service';
@@ -18,8 +19,10 @@ import 'v-calendar/dist/style.css';
 
 new AppInitializerService(router, store, axiosInstance).initialize()
   .finally(() => {
+    socketController.boot()
     const app = createApp(App);
     app.config.globalProperties.emitter = emitter;
+    app.config.globalProperties.socketController = socketController;
     PluginService.registerPlugins(app)
       .use(axios)
       .use(store)

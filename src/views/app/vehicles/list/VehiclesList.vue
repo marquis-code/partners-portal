@@ -228,6 +228,13 @@
               </span>
               <span v-else>N/A</span>
             </template>
+
+            <template v-slot:tracker="{ item }">
+              <span :title="item.tracking_id" class="bg-green-500 px-1 py-1 rounded text-xs text-white text-center" v-if="item.tracking_id">
+                Yes
+              </span>
+              <span class="bg-orange-600 px-1 py-1 rounded text-xs text-white text-center" v-else>No</span>
+            </template>
           </app-table>
         </div>
       </div>
@@ -253,13 +260,13 @@ export default defineComponent({
     AppTable,
     spinner
   },
-  created() {
+  created () {
     const query = this.$route.query
     if (query.status) this.setStatusFilter(query.status as string)
     if (query.searchTerm) this.filters.search = query.searchTerm as string
     if (Object.keys(query).length === 0) this.fetchVehicles();
   },
-  data() {
+  data () {
     return {
       filters: {
         status: 'active',
@@ -281,7 +288,8 @@ export default defineComponent({
         { label: 'Plate No', key: 'registration_number' },
         { label: 'Type', key: 'type' },
         { label: 'Capacity', key: 'seats' },
-        { label: 'Driver', key: 'driver' }
+        { label: 'Driver', key: 'driver' },
+        { label: 'Has Tracker', key: 'tracker' },
       ],
       items: []
     };
@@ -292,7 +300,7 @@ export default defineComponent({
       partnerContext: 'auth/activeContext'
     }),
 
-    filteredVehicles(): any[] {
+    filteredVehicles (): any[] {
       const results = this.tableData as any[];
       const searchKeyword = this.search.toLowerCase();
       if (!searchKeyword) return results;
@@ -308,13 +316,13 @@ export default defineComponent({
     }
   },
   watch: {
-    'filters.pageNumber'() {
+    'filters.pageNumber' () {
       this.fetchVehicles();
     },
-    'filters.pageSize'() {
+    'filters.pageSize' () {
       this.fetchVehicles();
     },
-    'filters.search'() {
+    'filters.search' () {
       if (this.filters.search) this.addToQuery({searchTerm: this.filters.search})
       if (!this.filters.search) this.removeQueryParam(['searchTerm'])
       clearTimeout(this.debounce);
@@ -395,18 +403,18 @@ export default defineComponent({
       }
       this.$router.push({ query });
     },
-    changePage(pageNumber: any) {
+    changePage (pageNumber: any) {
       this.filters.pageNumber = pageNumber;
     },
-    showPageSize(pageSize: any) {
+    showPageSize (pageSize: any) {
       this.filters.pageSize = pageSize;
     },
-    setStatusFilter(value: string) {
+    setStatusFilter (value: string) {
       this.filters.status = value;
       this.addToQuery({status: value})
       this.fetchVehicles();
     },
-    fetchVehicles() {
+    fetchVehicles () {
       this.loading = true;
       const params = {
         related: 'driver',
