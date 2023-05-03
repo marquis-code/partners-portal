@@ -21,7 +21,7 @@
           items-center
           cursor-pointer
         "
-        @click="$refs.avatar.click()"
+        @click="avatar.click()"
       >
         <img src="@/assets/images/upload.svg" />
         <p class="text-sm text-green-400">Click to upload</p>
@@ -49,7 +49,7 @@
     <div class="flex flex-row">
       <p
         v-if="filesUploaded"
-        @click="$refs.avatar.click()"
+        @click="avatar.click()"
         class="text-sh-purple-700 font-medium text-sm mb- flex flex-row items-center mr-4"
       >
         <span
@@ -72,7 +72,7 @@
   </div>
 </template>
 
-<script lang="ts">
+<!-- <script lang="ts">
 
 import { defineComponent } from '@vue/runtime-core';
 
@@ -125,7 +125,60 @@ export default defineComponent({
     }
   }
 });
-</script>
+</script> -->
 
-<style scoped>
-</style>
+<script setup lang="ts">
+import { ref, Ref, defineProps, defineEmits } from 'vue';
+import {useToast} from 'vue-toast-notification';
+
+interface UploadOptions {
+  mimeTypes: string; // e.g *, image/jpg, pdf ...
+  multiple: boolean; // component should support multiple uploads
+  sizeLimit: number;
+}
+
+defineProps<{
+  field?: string
+  imageUrls: any[]
+}>()
+const toast = useToast();
+const emit = defineEmits(['filesSelected', 'fileRemoved'])
+const avatar = ref() as Ref<any>
+const selectedFile = ref({})
+const filesUploaded = ref(false)
+const fileName = ref('')
+const fileSize = ref('')
+const uploadType = ref('image')
+
+const uploadFiles = (event: any) => {
+  const objectContainingFiles = event.target.files;
+  checkAllFilesSize(objectContainingFiles);
+  filesUploaded.value = true;
+  emit('filesSelected', objectContainingFiles)
+  // this.$emit('filesSelected', objectContainingFiles);
+}
+
+const checkAllFilesSize = (objectContainingFiles: any) => {
+  for (const key in objectContainingFiles) {
+    if (!isFileSizeOk(objectContainingFiles[key].size)) {
+      toast.warning('Each file you select must be less than 10MB')
+    }
+  }
+}
+
+const isFileSizeOk = (fileSizeInBytes: number): boolean => {
+  if (fileSizeInBytes > 10000000) {
+    return false;
+  } else return true;
+}
+
+const removeFile = () => {
+  selectedFile.value = {};
+  filesUploaded.value = false;
+  fileName.value = '';
+  fileSize.value = '';
+  emit('fileRemoved')
+  // this.$emit('fileRemoved');
+}
+
+</script>

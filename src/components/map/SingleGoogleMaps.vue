@@ -10,19 +10,12 @@
   </GoogleMap>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 /// <reference types="google.maps" />
-import { defineComponent } from 'vue';
+// import { ref } from 'vue';
 import { GoogleMap, Marker } from 'vue3-google-map';
 
-export default defineComponent({
-  name: 'GoogleMaps',
-  components: { GoogleMap, Marker },
-  data() {
-    return {
-      center: { lat: 3.64003, lng: 6.46767 },
-      mapAPIKey: process.env.VUE_APP_GOOGLE_API_KEY || ('' as string)
-    };
-  },
-});
+const center = { lat: 3.64003, lng: 6.46767 }
+const mapAPIKey = process.env.VUE_APP_GOOGLE_API_KEY || ('' as string)
+
 </script>

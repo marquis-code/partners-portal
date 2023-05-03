@@ -24,7 +24,7 @@
   </main>
 </template>
 
-<script>
+<!-- <script>
 export default {
   name: 'AlertNotification',
   props: {
@@ -32,6 +32,14 @@ export default {
     showAlert: Boolean
   }
 };
+</script> -->
+
+<script setup lang="ts">
+import { defineProps } from 'vue';
+defineProps<{
+  message: string
+  showAlert: boolean
+}>()
 </script>
 
 <style>

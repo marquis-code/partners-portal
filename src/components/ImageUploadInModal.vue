@@ -22,7 +22,7 @@
           items-center
           cursor-pointer
         "
-        @click="$refs.avatar.click()"
+        @click="avatar.click()"
       >
         <img src="@/assets/images/upload.svg" />
         <p class="text-sm text-green-400">Click to upload</p>
@@ -65,7 +65,7 @@
     </div>
     <p
       v-if="fileUploaded && !uploading"
-      @click="$refs.avatar.click()"
+      @click="avatar.click()"
       class="text-sh-purple-700 font-medium text-sm mb-4"
     >
       Change Document
@@ -76,7 +76,8 @@
     </div>
   </div>
 </template>
-<script lang="ts">
+
+<!-- <script lang="ts">
 import Spinner from './layout/Spinner.vue';
 import { defineComponent } from '@vue/runtime-core';
 interface UploadOptions {
@@ -152,6 +153,79 @@ export default defineComponent({
   },
   components: { Spinner }
 });
+</script> -->
+
+<script setup lang="ts">
+import Spinner from './layout/Spinner.vue';
+import { ref, Ref, defineEmits, defineProps, watch } from 'vue';
+import {useToast} from 'vue-toast-notification';
+
+interface UploadOptions {
+  mimeTypes: string; // e.g *, image/jpg, pdf ...
+  multiple: boolean; // component should support multiple uploads
+  sizeLimit: number;
+}
+
+const props = defineProps<{
+  field: string
+  uploading: boolean
+  uploadStatus: boolean
+}>()
+const toast = useToast();
+const emit = defineEmits(['fileSelected', 'fileRemoved'])
+const existingImage = ref({
+  name: 'Vehicle License',
+  size: '10'
+})
+const avatar = ref() as Ref<any>
+const selectedFile = ref({})
+const fileUploaded = ref(false)
+const fileName = ref('')
+const fileSize = ref('')
+const uploadType = ref('image')
+
+watch(() => props.uploadStatus, (newVal, oldVal) => {
+  if (newVal === true) {
+    fileName.value = existingImage.value.name;
+    fileSize.value = existingImage.value.size;
+  }
+})
+
+const uploadFile = (event: any) => {
+  console.log('working');
+  if (isFileSizeOk(event.target.files[0].size)) {
+    selectedFile.value = event.target.files[0];
+    fileSize.value = (event.target.files[0].size / 1000000)
+      .toFixed(1)
+      .toString();
+    fileUploaded.value = true;
+    fileName.value = event.target.files[0].name;
+    if (event.target.files[0].type === 'application/pdf') {
+      uploadType.value = 'pdf';
+    } else {
+      uploadType.value = 'image';
+    }
+    emit('fileSelected', selectedFile.value)
+    // this.$emit('fileSelected', this.selectedFile);
+  } else {
+    toast.warning('File must be less than 10 MB');
+  }
+}
+
+const isFileSizeOk = (fileSizeInBytes: number): boolean => {
+  if (fileSizeInBytes > 10000000) {
+    return false;
+  } else {
+    return true;
+  }
+}
+
+const removeFile = () => {
+  selectedFile.value = {};
+  fileUploaded.value = false;
+  fileName.value = '';
+  fileSize.value = '';
+  emit('fileRemoved')
+  // this.$emit('fileRemoved');
+}
 </script>
-<style scoped>
-</style>
