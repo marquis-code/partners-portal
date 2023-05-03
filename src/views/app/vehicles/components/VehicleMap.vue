@@ -1,19 +1,22 @@
 <template>
   <GoogleMap ref="googleMapInstance" :api-key="mapAPIKey" style="width: 100vw; height: 100vh" :center="center"
     :zoom="zoomLevel">
-    <Polyline :options="recentTravelPath" />
+    <Polyline ref="trailOfTripPath" :options="recentTravelPath" />
     <CustomMarker ref="customVehicleMarker" :options="customVehiclePosition" v-if="isVehicleTrackingOnline">
       <div style="text-align: center">
         <img alt="marker-bus-icon" :src="markerIconUrl" width="11.5" height="22.5" :style="busIconStyles" />
       </div>
     </CustomMarker>
+    <InfoWindow ref="vehicleInfoWindow"
+      :options="{ content: `${vehicleRegNumber || 'Vehicle'}`, position: customVehiclePosition.position }">
+    </InfoWindow>
   </GoogleMap>
 </template>
 
 <script lang="ts">
 /// <reference types="google.maps" />
 import { defineComponent } from 'vue';
-import { GoogleMap, CustomMarker, Polyline } from 'vue3-google-map';
+import { GoogleMap, CustomMarker, InfoWindow, Polyline } from 'vue3-google-map';
 import socketioService from '@/services/socketio.service';
 
 const markerIconUrl = "https://api.shuttlers.africa/telemetry/images/sedan.png"
@@ -22,8 +25,9 @@ export default defineComponent({
   name: 'VehicleGoogleMap',
   props: {
     vehicleId: [String, Number],
+    vehicleRegNumber: [String],
   },
-  components: { GoogleMap, CustomMarker, Polyline },
+  components: { GoogleMap, CustomMarker, InfoWindow, Polyline },
 
   data (): { [key: string]: any } {
     return {
@@ -52,15 +56,15 @@ export default defineComponent({
       this.recentTravelPath = {
         path: flightPlanCoordinates,
         geodesic: true,
-        strokeColor: "#000000",
+        strokeColor: "#4848ed",
         strokeOpacity: 1.0,
         strokeWeight: 4,
       };
 
       if (flightPlanCoordinates.length) {
         this.onPositionChanged({
-          position_latitude: flightPlanCoordinates[0].lat,
-          position_longitude: flightPlanCoordinates[0].lng,
+          position_latitude: flightPlanCoordinates[flightPlanCoordinates.length - 1].lat,
+          position_longitude: flightPlanCoordinates[flightPlanCoordinates.length - 1].lng,
         }, { ignoreOnPolyline: true })
       }
     },
@@ -78,14 +82,27 @@ export default defineComponent({
       }).then(({ data }) => {
         return data.map((item: number[]) => {
           return { lat: item[0], lng: item[1] }
-        })
+        }).reverse()
       });
     },
 
     async setupPositionListener () {
       if (!this.vehicleId) return;
+
+      this.$watch(() => {
+        const mapInstance: any = this.$refs.googleMapInstance;
+        return mapInstance.ready;
+      }, (val: boolean) => {
+        if (val) {
+          const customVehicleMarker: any = this.$refs.customVehicleMarker;
+          customVehicleMarker?.marker?.addListener('click', () => {
+            this.vehicleInfoWindow?.infoWindow?.open();
+          })
+        }
+      })
+
       this.loadRecentTravel(this.vehicleId);
-      socketioService.joinRoom([`vehicles:${this.vehicleId}`, 'vehicles:*']).finally(() => {
+      socketioService.joinRoom([`vehicles:${this.vehicleId}`]).finally(() => {
         socketioService.on(`vehicles:${this.vehicleId}:new-position`, (event: any) => {
           this.onPositionChanged(event)
         })
@@ -105,7 +122,7 @@ export default defineComponent({
         lng: event.position_longitude,
       }
 
-      const customVehicleMarker : any = this.$refs.customVehicleMarker;
+      const customVehicleMarker: any = this.$refs.customVehicleMarker;
       customVehicleMarker?.marker?.setPosition(this.customVehiclePosition.position);
 
       if (event.position_direction) {
@@ -128,6 +145,8 @@ export default defineComponent({
           lng: event.position_longitude,
         })
       }
+      const trailOfTripPath: any = this.$refs.trailOfTripPath;
+      trailOfTripPath?.polyline?.setPath(this.recentTravelPath.path);
     }
   }
 });
