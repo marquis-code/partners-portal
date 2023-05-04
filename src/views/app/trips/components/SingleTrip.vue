@@ -1,6 +1,13 @@
 <template>
   <div class="h-full absolute -top-7 -right-10 -left-7 bottom-0">
-  <google-maps :routeLine="polyline" :startLocation="startPoint" :endtLocation="endPoint"/>
+  <TripMap v-if="tripData && !upcomingTrip"
+      :vehicleRegNumber="tripData.vehicle?.registration_number"
+      :endtLocation="endPoint"
+      :startedAt="$moment(tripData.start_trip)"
+      :endedAt="$moment(tripData.end_trip)"
+      :tripVehicleId="tripData.vehicle?.tracking_id ? tripData.vehicle?.id : null"
+      :tripId="tripData.id"/>
+      <google-maps v-if="tripData && upcomingTrip" :routeLine="polyline" :startLocation="startPoint" :endtLocation="endPoint"/>
   </div>
   <main class="relative">
     <section
@@ -179,6 +186,7 @@
 
 <script>
 import TripHistory from '@/components/TripHistory.vue';
+import TripMap from './TripMap';
 import GoogleMaps from '@/components/map/GoogleMaps.vue';
 import { formatGeometry } from '@/utils/mapFunctions';
 
@@ -186,15 +194,16 @@ export default {
   name: 'SingleTrip',
   components: {
     TripHistory,
-    GoogleMaps
+    TripMap,
+    GoogleMaps,
   },
-  props: ['tripData'],
+  props: ['tripData', 'upcomingTrip'],
   watch: {
-    tripData(newValue) {
+    tripData (newValue) {
       console.log(newValue, 'driver here');
     }
   },
-  data() {
+  data () {
     return {
       showTripChange: false,
       polyline: [],
@@ -213,15 +222,20 @@ export default {
       ]
     };
   },
-  created() {
+  created () {
     this.getRouteGeometry()
   },
   methods: {
-    toggleTripChange() {
+    $moment (dateStr) {
+      if (!dateStr) return null;
+      return new Date(dateStr)
+    },
+    toggleTripChange () {
       this.showTripChange = !this.showTripChange;
     },
     getRouteGeometry () {
-      this.polyline = formatGeometry(this.tripData.route.geometry);
+      this.polyline = this.tripData?.route?.geometry ? formatGeometry(this.tripData.route.geometry) : [];
+      if (!this.polyline || !this.polyline.length) return;
       this.startPoint = this.polyline[0];
       this.endPoint = this.polyline[this.polyline.length - 1];
       this.centerPoint = this.polyline[parseInt(this.polyline.length / 2)];
