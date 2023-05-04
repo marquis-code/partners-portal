@@ -1,17 +1,17 @@
 <template>
-  <GoogleMap ref="googleMapInstance" :api-key="mapAPIKey" style="width: 100vw; height: 100vh" :center="center"
-    :zoom="zoomLevel">
-    <Polyline ref="trailOfTripPath" :options="recentTravelPath" />
-    <CustomMarker ref="customVehicleMarker" :options="customVehiclePosition" v-if="isVehicleTrackingOnline">
-      <div style="text-align: center">
-        <img alt="marker-bus-icon" :src="markerIconUrl" width="11.5" height="22.5" :style="busIconStyles" />
-      </div>
-    </CustomMarker>
-    <InfoWindow ref="vehicleInfoWindow" v-if="isVehicleTrackingOnline"
-      :options="{ content: `${vehicleRegNumber || 'Vehicle'}`, position: customVehiclePosition.position }">
-    </InfoWindow>
-  </GoogleMap>
-</template>
+    <GoogleMap ref="googleMapInstance" :api-key="mapAPIKey" style="width: 100vw; height: 100vh" :center="center"
+      :zoom="zoomLevel">
+      <Polyline ref="trailOfTripPath" :options="recentTravelPath" />
+      <CustomMarker ref="customVehicleMarker" :options="customVehiclePosition" v-if="isVehicleTrackingOnline">
+        <div style="text-align: center">
+          <img alt="marker-bus-icon" :src="markerIconUrl" width="11.5" height="22.5" :style="busIconStyles" />
+        </div>
+      </CustomMarker>
+      <InfoWindow ref="vehicleInfoWindow" v-if="isVehicleTrackingOnline"
+        :options="{ content: `${vehicleRegNumber || 'Vehicle'}`, position: customVehiclePosition.position }">
+      </InfoWindow>
+    </GoogleMap>
+  </template>
 
 <script lang="ts">
 /// <reference types="google.maps" />
@@ -22,20 +22,26 @@ import socketioService from '@/services/socketio.service';
 const markerIconUrl = "https://api.shuttlers.africa/telemetry/images/sedan.png"
 
 export default defineComponent({
-  name: 'VehicleGoogleMap',
+  name: 'TripGoogleMap',
   props: {
-    vehicleId: [String, Number],
+    startedAt: [String, Date],
+    endedAt: [String, Date],
+    tripId: [String, Number],
+    tripVehicleId: [String, Number],
     vehicleRegNumber: [String],
   },
   components: { GoogleMap, CustomMarker, InfoWindow, Polyline },
 
   data (): { [key: string]: any } {
     return {
+      tripEndDate: null,
+      loadedVehileRecentTravel: false,
       isVehicleTrackingOnline: false,
       recentTravelPath: null,
       busIconStyles: {
         transform: "rotate(0deg)"
       },
+      vehicleId: null,
       markerIconUrl,
       zoomLevel: 15,
       vehiclePosition: { position: { lat: 6.427282, lng: 3.458658 } },
@@ -44,15 +50,34 @@ export default defineComponent({
       mapAPIKey: process.env.VUE_APP_GOOGLE_API_KEY || ('' as string)
     };
   },
+  watch: {
+    tripId () {
+      this.tripEndDate = this.endedAt;
+      if (!this.endedAt) {
+        this.setupPositionListener();
+      } else {
+        if (this.tripVehicleId) {
+          this.loadRecentTravel(this.tripVehicleId, true)
+        }
+      }
+    }
+  },
   mounted () {
-    this.setupPositionListener();
+    this.tripEndDate = this.endedAt;
+    if (!this.endedAt) {
+      this.setupPositionListener();
+    } else {
+      if (this.tripVehicleId) {
+        this.loadRecentTravel(this.tripVehicleId, true)
+      }
+    }
   },
   beforeUnmount () {
-    socketioService.off(`vehicles:${this.vehicleId}:new-position`);
+    socketioService.off(`trips:${this.tripId}`);
   },
   methods: {
-    async loadRecentTravel (vehicleId: string | number) {
-      const flightPlanCoordinates = await this.fetchLastestTravelPath(vehicleId);
+    async loadRecentTravel (vehicleId: string | number, isTripVehicleId = false) {
+      const flightPlanCoordinates = await this.fetchLastestTravelPath(vehicleId, isTripVehicleId);
       this.recentTravelPath = {
         path: flightPlanCoordinates,
         geodesic: true,
@@ -68,11 +93,28 @@ export default defineComponent({
         }, { ignoreOnPolyline: true })
       }
     },
-    async fetchLastestTravelPath (vehicleId: string | number) {
+    async fetchLastestTravelPath (vehicleId: string | number, isTripVehicleId = false) {
       let path: string = process.env.VUE_APP_WS_SOCKET_PATH || "";
       path = path.replaceAll('/socket.io', '')
 
-      return fetch(`${process.env.VUE_APP_API_BASE_URL}${path}/api/v1/vehicles/${vehicleId}/positions?compress=1&direction=desc`, {
+      let q = ""
+      if (this.startedAt) {
+        const dateString = this.startedAt && this.startedAt instanceof Date ? this.startedAt?.toISOString() : this.startedAt
+        q = `&startAt=${dateString}`
+      }
+
+      if (this.tripEndDate) {
+        const dateString = this.tripEndDate && this.tripEndDate instanceof Date ? this.tripEndDate?.toISOString() : this.tripEndDate
+        q = `${q}&endAt=${dateString}`
+      }
+
+      let url = `/vehicles/${vehicleId}/positions`
+
+      if (isTripVehicleId) {
+        url = `/api/v1/vehicles/${vehicleId}/positions`
+      }
+
+      return fetch(`${process.env.VUE_APP_API_BASE_URL}${path}${url}?compress=1&direction=desc${q}`, {
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
@@ -87,7 +129,17 @@ export default defineComponent({
     },
 
     async setupPositionListener () {
-      if (!this.vehicleId) return;
+      console.log('setupPositionListener called', this.tripId)
+      if (!this.tripId) return;
+
+      console.log('setupPositionListener with tripId')
+      if (this.endedAt) return;
+      console.log('setupPositionListener without endedAt')
+
+      if (this.tripVehicleId) {
+        this.tripEndDate = new Date();
+        await this.loadRecentTravel(this.tripVehicleId, true)
+      }
 
       this.$watch(() => {
         const mapInstance: any = this.$refs.googleMapInstance;
@@ -101,15 +153,25 @@ export default defineComponent({
         }
       })
 
-      this.loadRecentTravel(this.vehicleId);
-      socketioService.joinRoom([`vehicles:${this.vehicleId}`]).finally(() => {
-        socketioService.on(`vehicles:${this.vehicleId}:new-position`, (event: any) => {
+      if (this.vehicleId) {
+        this.loadedVehileRecentTravel = true;
+        this.loadRecentTravel(this.vehicleId);
+      }
+
+      socketioService.joinRoom([`trips:${this.tripId}`]).finally(() => {
+        socketioService.on(`trips:${this.tripId}`, (event: any) => {
           this.onPositionChanged(event)
         })
       })
     },
     onPositionChanged (event: { [key: string]: any, position_latitude: number, position_longitude: number }, options?: { ignoreOnPolyline: boolean }): void {
+      console.log(event);
+
       if (!this.isVehicleTrackingOnline) {
+        if (event.vehicle_id && !this.tripVehicleId && !this.vehicleId) {
+          this.vehicleId = event.vehicle_id;
+          this.loadRecentTravel(this.vehicleId);
+        }
         this.isVehicleTrackingOnline = true
       }
 
