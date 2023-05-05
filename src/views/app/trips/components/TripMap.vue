@@ -1,5 +1,7 @@
 <template>
-    <GoogleMap ref="googleMapInstance" :api-key="mapAPIKey" style="width: 100vw; height: 100vh" :center="center"
+    <GoogleMap
+    :map-id="googleMapStyleId"
+    ref="googleMapInstance" :api-key="mapAPIKey" style="width: 100vw; height: 100vh" :center="center"
       :zoom="zoomLevel">
       <Polyline ref="trailOfTripPath" :options="recentTravelPath" />
       <CustomMarker ref="customVehicleMarker" :options="customVehiclePosition" v-if="isVehicleTrackingOnline">
@@ -18,6 +20,7 @@
 import { defineComponent } from 'vue';
 import { GoogleMap, CustomMarker, InfoWindow, Polyline } from 'vue3-google-map';
 import socketioService from '@/services/socketio.service';
+import { googleMapStyleId } from '@/utils/mapFunctions'
 
 const markerIconUrl = "https://api.shuttlers.africa/telemetry/images/sedan.png"
 
@@ -34,6 +37,7 @@ export default defineComponent({
 
   data (): { [key: string]: any } {
     return {
+      googleMapStyleId,
       tripEndDate: null,
       loadedVehileRecentTravel: false,
       isVehicleTrackingOnline: false,
