@@ -24,7 +24,7 @@
   </on-click-outside>
 </template>
 
-<script>
+<!-- <script>
 import OnClickOutside from "./OnCickOutside";
 
 export default {
@@ -46,8 +46,41 @@ export default {
     }
   }
 }
-</script>
+</script> -->
 
+<script setup lang="ts">
+import OnClickOutside from "./OnCickOutside.vue";
+import { useRoute } from "vue-router";
+import {ref, watch} from 'vue'
+
+const route = useRoute()
+const isOpen = ref(false)
+
+watch(route, () => {
+  isOpen.value = false
+})
+
+const toggleState = () => {
+  isOpen.value = !isOpen.value
+}
+
+//   watch: {
+//     '$route' () {
+//       this.isOpen = false;
+//     }
+//   },
+//   data () {
+//     return {
+//       isOpen: false
+//     }
+//   },
+//   methods: {
+//     toggleState () {
+//       this.isOpen = !this.isOpen;
+//     }
+//   }
+// }
+</script>
 <style scoped>
 
 </style>

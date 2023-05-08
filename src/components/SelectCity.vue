@@ -46,7 +46,7 @@
   </form>
 </template>
 
-<script>
+<!-- <script>
 import SelectedCityBadge from '@/components/SelectedCityBadge.vue';
 export default {
   props: {
@@ -95,7 +95,52 @@ export default {
     }
   }
 };
-</script>
+</script> -->
 
-<style>
-</style>
+<script setup lang="ts">
+import { defineProps, ref, Ref } from 'vue'
+import SelectedCityBadge from '@/components/SelectedCityBadge.vue';
+import {useToast} from 'vue-toast-notification';
+
+const toast = useToast();
+const props = defineProps<{
+  placeholder: string
+  title: string
+  cities: any[]
+}>()
+const selectedCities = ref([]) as Ref<any[]>
+const selectedIndex = ref(-1)
+
+const selectThisCity = (event:any) => {
+  if (selectedCities.value.length > 0) {
+    if (!selectedThisCityBefore(event.target.value)) {
+      const newAddition = props.cities[event.target.value];
+      selectedCities.value.push(newAddition);
+    } else toast.warning('You cannot select a city twice');
+  } else {
+    const newAddition = props.cities[event.target.value];
+    selectedCities.value.push(newAddition);
+  }
+}
+
+const removeThisCity = (cityName:string) => {
+  const index = selectedCities.value.findIndex(
+    (city) => city.city === `${cityName}`
+  );
+  selectedCities.value.splice(index, 1);
+}
+
+const selectedThisCityBefore = (cityIndex:any) => {
+  const cityName = getSelectedCityName(cityIndex);
+  const index = selectedCities.value.findIndex(
+    (city) => city.city === `${cityName}`
+  );
+  if (index !== -1) {
+    return true;
+  } else return false;
+}
+
+const getSelectedCityName = (cityIndex:number) => {
+  return props.cities[cityIndex].city;
+}
+</script>
