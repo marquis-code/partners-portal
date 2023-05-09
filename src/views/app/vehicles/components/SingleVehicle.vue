@@ -1,23 +1,25 @@
 <template>
-  <div class="h-full absolute -top-7 -right-10 -left-7 bottom-0">
-    <single-google-maps/>
-  </div>
+
   <div
   class="relative"
   >
+  <div class="h-full absolute -top-7 -right-10 -left-7 bottom-0">
+    <VehicleMap :vehicleId="singleVehicleData.id" :vehicleRegNumber="singleVehicleData.registration_number"/>
+  </div>
+   <div class="vehicle-info-panel">
     <Transition>
       <Notification
         v-if="haspendingDocuments"
         type="action"
-        message="You have documents left to upload"
+        message="You have documents left to upload "
         actionRequired="true"
         @click="viewVehicleDocuments"
       />
     </Transition>
     <section
       class="
-        lg:w-4/12
-        md:w-7/12
+        lg:w-12/12
+        md:w-12/12
         ring-1 ring-gray-50
         rounded-md
         bg-white
@@ -259,6 +261,7 @@
         </div>
       </app-modal>
     </section>
+   </div>
   </div>
 </template>
 
@@ -270,12 +273,17 @@ import Notification from '../../../../components/Notification.vue';
 import Spinner from '@/components/layout/Spinner.vue';
 import { axiosInstance } from '@/plugins/axios';
 import emitter from '@/libs/emitter';
-import SingleGoogleMaps from '@/components/map/SingleGoogleMaps.vue';
+import VehicleMap from './VehicleMap.vue';
 
 export default defineComponent({
   emits: ['vehicleUpdated'],
   props: {
-    singleVehicleData: Object
+    singleVehicleData: {
+      type: Object,
+      default: () => {
+        return {}
+      }
+    }
   },
   data () {
     return {
@@ -458,7 +466,7 @@ export default defineComponent({
         });
     }
   },
-  components: { AppModal, Notification, Spinner, SingleGoogleMaps }
+  components: { AppModal, Notification, Spinner, VehicleMap }
 });
 </script>
 
@@ -471,5 +479,10 @@ export default defineComponent({
 .v-enter-from,
 .v-leave-to {
   opacity: 0;
+}
+
+.vehicle-info-panel {
+  position: absolute;
+  top: 0;
 }
 </style>

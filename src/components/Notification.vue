@@ -1,5 +1,5 @@
 <template>
-  <div v-if="showNotification" class="mb-12 bg-sh-purple-700 p-3 rounded-xl flex flex-row items-center justify-between">
+  <div v-if="showNotification" class="mb-6 bg-sh-purple-700 p-3 rounded-xl flex flex-row items-center justify-between">
     <div class="flex flex-row items-center">
       <img v-if="type === 'action'" class="mr-4" src="@/assets/icons/doc-to-upload.svg">
       <img v-else class="mr-4" src="@/assets/icons/wait.svg">
