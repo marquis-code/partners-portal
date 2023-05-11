@@ -5,6 +5,7 @@
     style="width: 100vw; height: 100vh"
     :center="centerLocation"
     :zoom="6"
+    :map-id="googleMapStyleId"
   >
     <Marker :options="{ position: startLocation }" />
     <Marker :options="{ position: endLocation }" />
@@ -16,6 +17,7 @@
 /// <reference types="google.maps" />
 import { defineComponent } from 'vue';
 import { GoogleMap, Marker, Polyline } from 'vue3-google-map';
+import { googleMapStyleId } from '@/utils/mapFunctions'
 
 interface LocationType {
   lat: number;
@@ -38,8 +40,9 @@ export default defineComponent({
       type: Object as () => LocationType
     }
   },
-  data() {
+  data () {
     return {
+      googleMapStyleId,
       center: { lat: 6.42083, lng: 4.09894 },
       flightPath: {
         path: [] as LocationType[],
@@ -51,16 +54,16 @@ export default defineComponent({
       map: process.env.VUE_APP_GOOGLE_API_KEY || ('' as string)
     };
   },
-  created() {
+  created () {
     this.flightPath.path = this.routeLine || [];
   },
-  mounted() {
+  mounted () {
     this.$nextTick(() => {
       this.zoomToBounds();
     });
   },
   methods: {
-    zoomToBounds(attempts = 0) {
+    zoomToBounds (attempts = 0) {
       if (attempts > 20) return;
 
       if (!(this.$refs.googleMapInstance as any)?.ready) {

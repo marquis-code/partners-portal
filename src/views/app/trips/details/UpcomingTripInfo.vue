@@ -44,7 +44,7 @@
     <template v-else>
       <div class="relative">
         <div class="w-full relative rounded-sm shadow-sm">
-          <singleTrip :tripData="tripInfo"/>
+          <singleTrip :upcomingTrip="true" :tripData="tripInfo"/>
         </div>
       </div>
     </template>
