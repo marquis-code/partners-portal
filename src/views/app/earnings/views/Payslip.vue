@@ -25,7 +25,7 @@
     <div class="flex justify-end py-2">
       <select v-model="filterBy" class="border rounded p-2">
         <option value="">No filter</option>
-        <option v-for="n in filterData" :key="n.val" :value="n.val">{{ n.key }}</option>
+        <option v-for="n in filterData" :key="n" :value="n">{{ n }}</option>
       </select>
     </div>
     <app-table
@@ -33,6 +33,7 @@
       :error-loading="loading"
       :items="filteredTableData"
       :fields="headers"
+      @rowClicked="(e:any) => viewPaymentDetails(e)"
     >
 
       <template v-slot:payoutDate="{item}">
@@ -62,16 +63,7 @@ const headers = [
   { label: 'Deduction', key: 'totalDeduction' }
 ]
 const filterBy = ref('')
-const filterData = [
-  {key: '2023', val: '2023'},
-  {key: '2022', val: '2022'},
-  {key: '2021', val: '2021'},
-  {key: '2020', val: '2020'},
-  {key: '2019', val: '2019'},
-  {key: '2018', val: '2018'},
-  {key: '2017', val: '2017'},
-  {key: '2016', val: '2016'},
-]
+const filterData = ['2023', '2022', '2021', '2020', '2019', '2018', '2017', '2016', '2015']
 const tableData = ref([]) as Ref<any[]>
 const loading = ref(false)
 
@@ -80,6 +72,10 @@ const gotoEarning = () => {
 }
 const gotoConfig = () => {
   router.push('/earnings/cost-configuration');
+}
+const viewPaymentDetails = (item:any) => {
+  console.log(item)
+  router.push(`/earnings/payslip/details/${item.id}`)
 }
 const partnerContext:any = computed(() => store.getters['auth/activeContext'])
 const filteredTableData = computed(() => {

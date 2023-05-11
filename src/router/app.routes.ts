@@ -275,14 +275,22 @@ export const AppRoutes: Array<RouteRecordRaw> = [
           },
           {
             path: '/earnings/payslip',
-            name: 'earnings.slip',
+            name: 'earnings.payslip',
             component: loadRouteComponent('app/earnings/views/Payslip'),
             meta: {
               title: 'Earnings-Payslip',
               requiresAuth: true,
             },
           },
-
+          {
+            path: '/earnings/payslip/details/:id',
+            name: 'earnings.payslip-details',
+            component: loadRouteComponent('app/earnings/views/Payslip_details'),
+            meta: {
+              title: 'Payslip-Details',
+              requiresAuth: true,
+            },
+          },
         ]
       },
       {
