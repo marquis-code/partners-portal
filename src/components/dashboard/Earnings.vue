@@ -30,19 +30,15 @@
   </main>
 </template>
 
-<script>
-import { defineComponent } from "vue-demi";
+<script setup lang="ts">
+import { defineProps } from 'vue';
 import Spinner from '@/components/layout/Spinner.vue';
 
-export default defineComponent({
-  props: {
-    accruedEarnings: Number,
-    loading: Boolean
-  },
-  components: {
-    Spinner
-  }
-});
+defineProps<{
+  loading: boolean
+  accruedEarnings: number
+}>()
+
 </script>
 
 <style>

@@ -18,7 +18,7 @@
   </Teleport>
 </template>
 
-<script lang="ts">
+<!-- <script lang="ts">
 import {defineComponent} from "vue";
 
 export default defineComponent({
@@ -30,6 +30,18 @@ export default defineComponent({
   },
   components: { }
 });
+</script> -->
+
+<script setup lang="ts">
+import {defineProps, withDefaults} from "vue";
+
+export interface Props {
+  modalActive?: boolean
+}
+
+withDefaults(defineProps<Props>(), {
+  modalActive: false
+})
 </script>
 
 <style scoped>

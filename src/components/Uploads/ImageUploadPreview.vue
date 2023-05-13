@@ -26,7 +26,7 @@
   </main>
 </template>
 
-<script>
+<!-- <script>
 import { defineComponent } from 'vue';
 export default defineComponent({
   name: 'ImageUploadPreview',
@@ -51,6 +51,28 @@ export default defineComponent({
     }
   }
 });
+</script> -->
+
+<script setup lang="ts">
+import { ref, defineProps } from 'vue';
+
+defineProps<{
+  images: []
+}>()
+const selectedImage = ref('')
+
+const onFileChanged = (event:any) => {
+  selectedImage.value = event.target.files[0];
+  // this.images.push({ image: this.selectedImage });
+}
+
+// handleImageUpload () {
+//   // this.uploadedImages.push(this.selectedImage);
+// },
+
+// onUpload () {
+//   // TODO: Impl this
+// }
 </script>
 
 <style>

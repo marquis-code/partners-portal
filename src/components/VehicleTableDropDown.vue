@@ -22,7 +22,7 @@
   </div>
 </template>
 
-<script lang="ts">
+<!-- <script lang="ts">
 import {defineComponent} from "vue";
 import { mapGetters } from "vuex";
 export default defineComponent({
@@ -72,6 +72,56 @@ export default defineComponent({
     },
   }
 })
+</script> -->
+
+<script setup lang="ts">
+import {ref, Ref, defineProps, computed} from "vue";
+import { useStore } from "vuex";
+import { useRouter } from "vue-router";
+
+const router = useRouter()
+const store = useStore()
+const props = defineProps<{
+  docId: any
+  docUrl: string
+  selectedDropDown: any
+}>()
+const isOpen = ref(false)
+const visibleRef = ref(false)
+const indexRef = ref(0)
+const imgsRef = ref([]) as Ref<string[]>
+
+const partnerContext:any = computed(() => store.getters['auth/activeContext'])
+const vehicleData:any = computed(() => store.getters['vehicle/getVehicleData'])
+const isLoading:any = computed(() => store.getters['vehicle/getVehicleLoading'])
+
+const previewDocument = () => {
+  imgsRef.value = [props.docUrl]
+  onShow()
+}
+const goToUpdateDocumentView = () => {
+  router.push({
+    name: 'EditVehicleDocument',
+    params: {
+      vehicleId: vehicleData.value.id,
+      documentId: props.docId
+    }
+  })
+}
+const onShow = () => {
+  console.log(props.selectedDropDown, props.docId)
+  if (props.selectedDropDown === props.docId) {
+    console.log("ture")
+    visibleRef.value = true;
+  } else {
+    console.log("false")
+    visibleRef.value = false;
+  }
+}
+const onHide = () => {
+  visibleRef.value = false;
+}
+
 </script>
 
 <style>

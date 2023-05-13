@@ -17,6 +17,9 @@
               <div class="flex flex-row items-center mr-[30px] cursor-pointer" @click="gotoCostConfig">
                 <p class="text-[#ACAFAE] text-[14px] pb-[10px]">Cost Configuration</p>
               </div>
+              <div class="flex flex-row items-center mr-[30px] cursor-pointer" @click="gotoPayslip">
+                <p class="text-[#ACAFAE] text-[14px] pb-[10px]">Payslip</p>
+              </div>
             </div>
           </div>
           </template>
@@ -356,6 +359,9 @@ export default defineComponent({
     },
     gotoCostConfig() {
       this.$router.push('/earnings/cost-configuration');
+    },
+    gotoPayslip() {
+      this.$router.push('/earnings/payslip');
     },
     async getEarningsSummary() {
       try {

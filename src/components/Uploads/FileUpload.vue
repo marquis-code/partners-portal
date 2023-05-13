@@ -50,18 +50,16 @@
   </main>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
-export default defineComponent({
-  name: 'FileUpload',
-  props: {
-    fileType: String,
-    fileName: String,
-    fileSize: String,
-    uploadProgress: Number,
-    documentTitle: String
-  }
-});
+<script setup lang="ts">
+import { defineProps } from 'vue';
+
+defineProps<{
+  fileType: string
+  fileName: string
+  fileSize: string
+  uploadProgress: string
+  documentTitle: string
+}>()
 </script>
 
 <style>

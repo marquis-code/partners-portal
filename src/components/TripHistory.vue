@@ -16,7 +16,7 @@
   </div>
 </template>
 
-<script>
+<!-- <script>
 export default {
   props: {
     pickup: {
@@ -27,7 +27,14 @@ export default {
     }
   }
 };
-</script>
+</script> -->
 
-<style>
-</style>
+<script setup lang="ts">
+import { defineProps } from 'vue'
+
+defineProps<{
+  pickup: string
+  destination: string
+}>()
+
+</script>

@@ -350,7 +350,7 @@ export default defineComponent({
         company_phone: '',
         country: ''
       },
-      countries: [],
+      countries: [] as any[],
       isPhoneValid: false,
       businessOptions: [
         'Business Name',

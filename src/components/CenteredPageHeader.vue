@@ -6,7 +6,7 @@
   </div>
 </template>
 
-<script lang="ts">
+<!-- <script lang="ts">
 import { defineComponent } from "@vue/runtime-core"
 
 export default defineComponent({
@@ -16,6 +16,14 @@ export default defineComponent({
     description: String,
   },
 });
-</script>
+</script> -->
 
-<style scoped></style>
+<script setup lang="ts">
+import { defineProps } from "vue"
+
+defineProps<{
+  title: string
+  description: string
+}>()
+
+</script>
