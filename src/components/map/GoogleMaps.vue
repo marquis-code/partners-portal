@@ -13,7 +13,7 @@
   </GoogleMap>
 </template>
 
-<script lang="ts">
+<!-- <script lang="ts">
 /// <reference types="google.maps" />
 import { defineComponent } from 'vue';
 import { GoogleMap, Marker, Polyline } from 'vue3-google-map';
@@ -85,4 +85,60 @@ export default defineComponent({
     }
   }
 });
+</script> -->
+
+<script setup lang="ts">
+/// <reference types="google.maps" />
+import { ref, Ref, defineProps, onMounted } from 'vue';
+import { GoogleMap, Marker, Polyline } from 'vue3-google-map';
+import { googleMapStyleId } from '@/utils/mapFunctions'
+
+interface LocationType {
+  lat: number;
+  lng: number;
+}
+
+const props = defineProps<{
+  startLocation: LocationType
+  endLocation: LocationType
+  routeLine: LocationType[]
+  centerLocation: LocationType
+}>()
+
+const googleMapInstance = ref() as Ref<any>
+// const center = { lat: 3.64003, lng: 6.46767 }
+const flightPath = ref({
+  path: [] as LocationType[],
+  geodesic: true,
+  strokeColor: '#0DAC5C',
+  strokeOpacity: 1.0,
+  strokeWeight: 4
+})
+const mapAPIKey = process.env.VUE_APP_GOOGLE_API_KEY || ('' as string)
+
+flightPath.value.path = props.routeLine || []
+
+onMounted(() => {
+  zoomToBounds()
+})
+const zoomToBounds = (attempts = 0) => {
+  if (attempts > 20) return;
+
+  if (!(googleMapInstance.value as any)?.ready) {
+    setTimeout(() => {
+      zoomToBounds(attempts++);
+    }, 500);
+  }
+  let bounds = new window.google.maps.LatLngBounds();
+  props.routeLine?.forEach((entry) => {
+    bounds = bounds.extend(entry);
+  });
+
+  // console.log(
+  //   this.$refs.googleMapInstance,
+  //   bounds.getNorthEast(),
+  //   bounds.getSouthWest()
+  // );
+  (googleMapInstance.value as any)?.map?.fitBounds(bounds, 250);
+}
 </script>

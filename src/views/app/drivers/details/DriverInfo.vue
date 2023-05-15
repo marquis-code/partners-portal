@@ -10,7 +10,7 @@
   </div>
 </template>
 
-<script lang="ts">
+<!-- <script lang="ts">
 import { defineComponent } from 'vue';
 import { extractErrorMessage } from '@/utils/helper';
 import SingleDriver from '@/views/app/drivers/components/SingleDriver.vue';
@@ -42,7 +42,27 @@ export default defineComponent({
     }
   }
 });
-</script>
+</script> -->
 
-<style scoped>
-</style>
+<script setup lang="ts">
+import { ref, computed, defineEmits } from 'vue';
+import { extractErrorMessage } from '@/utils/helper';
+import SingleDriver from '@/views/app/drivers/components/SingleDriver.vue';
+import { useStore } from 'vuex';
+import {useToast} from 'vue-toast-notification';
+
+const toast = useToast()
+const store = useStore()
+const emit = defineEmits(['AssignVehicleToDriver'])
+const driverInformation = ref(null)
+const loading = ref(false)
+
+const driverData:any = computed(() => store.getters['driver/getDriverData'])
+const isLoading:any = computed(() => store.getters['driver/getDriverLoading'])
+
+const getDriverData = () => {
+  store.dispatch('driver/getDriverInfo').catch((e) => {
+    toast.error(extractErrorMessage(e));
+  });
+}
+</script>

@@ -96,7 +96,7 @@
               >
               <a
                 href.prevent="#"
-                @click="removeDriver(driverData)"
+                @click="removeDriver()"
                 class="
                   text-red-500
                   cursor-pointer
@@ -143,7 +143,7 @@
             v-model="selected"
             :options="partnerVehicles"
             label="brand"
-            :reduce="(vehicle) => vehicle.id"
+            :reduce="(vehicle:any) => vehicle.id"
             @input="console.log($event)"
             @option:selected="selectThisDriver($event)"
             class="form-group mb-3"
@@ -285,7 +285,7 @@
             Cancel
           </button>
           <button
-            @click="proceedToUnassign(driverData.vehicle_id)"
+            @click="proceedToUnassign()"
             class="
               text-black
               bg-sh-green-500
@@ -361,7 +361,7 @@
   </page-layout>
 </template>
 
-<script>
+<!-- <script>
 import PageLayout from '@/components/layout/PageLayout';
 import { mapGetters } from 'vuex';
 import Spinner from '@/components/layout/Spinner';
@@ -388,7 +388,7 @@ export default {
     })
   },
   mounted() {
-    console.log(this.driverData);
+    console.log('hello', this.driverData, this.$attrs.driverId);
   },
   data() {
     return {
@@ -577,4 +577,205 @@ export default {
     }
   }
 };
+</script> -->
+
+<script setup lang="ts">
+import PageLayout from '@/components/layout/PageLayout.vue';
+import { useStore } from 'vuex';
+import Spinner from '@/components/layout/Spinner.vue';
+import { extractErrorMessage } from '../../../../utils/helper';
+import PageActionHeader from '@/components/PageActionHeader.vue';
+import AppModal from '@/components/Modals/AppModal.vue';
+import TabContainer from '@/components/tab/TabContainer.vue';
+import TabItem from '@/components/tab/TabItem.vue';
+import {ref, Ref, computed} from 'vue'
+import {useRoute} from 'vue-router'
+import router from '@/router';
+import {axiosInstance as axios} from '@/plugins/axios';
+import {useToast} from 'vue-toast-notification';
+
+const toast = useToast();
+const route = useRoute()
+const store = useStore()
+const loading = ref(true)
+const showDropdown = ref(false)
+const openAssignModal = ref(false)
+const confirmedAssignModal = ref(false)
+const confirmAssignModal = ref(false)
+const confirmUnassignModal = ref(false)
+const confirmedUnassignModal = ref(false)
+const confirmRemoveDriverModal = ref(false)
+const confirmRemovedDriverModal = ref(false)
+const partnerVehicles = ref([])
+const selected = ref(null) as Ref<any>
+const vehicleId = ref(null) as Ref<any>
+const pickedVehicle = ref({}) as Ref<any>
+const driverId = route.params.driverId as string
+// console.log(driverId)
+const driverData:any = computed(() => store.getters['driver/getDriverData'])
+const isLoading:any = computed(() => store.getters['driver/getDriverLoading'])
+const partnerContext:any = computed(() => store.getters['auth/activeContext'])
+
+const selectThisDriver = (event:any) => {
+  selected.value = event.id;
+  pickedVehicle.value = event;
+}
+const fetchDriverDetails = () => {
+  store
+    .dispatch('driver/fetchDriverInfo', driverId)
+    .finally(() => {
+      loading.value = false;
+    });
+}
+const toggleDropdown = () => {
+  showDropdown.value = !showDropdown.value;
+}
+const editDriver = (item:any) => {
+  // console.log(item);
+  router.push({
+    name: 'EditDriver',
+    params: { driverId: item.id }
+  });
+  showDropdown.value = false;
+}
+const assignDriver = (item:any) => {
+  vehicleId.value = item.vehicle_id;
+  showDropdown.value = false;
+  if (item.vehicle_id) {
+    handleOpenUnassignModal();
+  }
+
+  if (!item.vehicle_id) {
+    handleOpenAssignModal();
+  }
+}
+const removeDriver = async () => {
+  showDropdown.value = false;
+  confirmRemoveDriverModal.value = true;
+}
+const proceedToRemove = async (item:any) => {
+  confirmRemoveDriverModal.value = false;
+  await axios
+    .delete(
+      `/v1/partners/${partnerContext.value.partner.id}/drivers/${route.params.driverId}`
+    )
+    .then((res) => {
+      confirmRemovedDriverModal.value = true;
+      router.push({
+        name: 'drivers.list'
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
+const closeDriverRemoveModal = () => {
+  confirmRemovedDriverModal.value = false;
+}
+const handleOpenAssignModal = () => {
+  openAssignModal.value = true;
+}
+const handleCloseAssignModal = () => {
+  openAssignModal.value = false;
+}
+const handleOpenConfirmedAssignModal = () => {
+  confirmedAssignModal.value = true;
+}
+const handleCloseConfirmedAssignModal = () => {
+  confirmedAssignModal.value = false;
+}
+const handleOpenConfirmAssignModal = () => {
+  confirmAssignModal.value = true;
+}
+const handleCloseConfirmAssignModal = () => {
+  confirmAssignModal.value = false;
+}
+const assignVehicle = () => {
+  handleCloseAssignModal();
+  handleOpenConfirmAssignModal();
+}
+const handleOpenUnassignModal = () => {
+  confirmUnassignModal.value = true;
+}
+const handleCloseConfirmUnassignModal = () => {
+  confirmUnassignModal.value = false;
+}
+const handleOpenConfirmedUnassignModal = () => {
+  confirmedUnassignModal.value = true;
+}
+const closeUnassignSuccessModal = () => {
+  confirmedUnassignModal.value = false;
+}
+const handleCloseConfirmRemoveModal = () => {
+  showDropdown.value = false;
+  confirmRemoveDriverModal.value = false;
+}
+const proceedToAssign = async() => {
+  handleCloseConfirmAssignModal();
+  loading.value = true;
+  await axios
+    .put(
+      `/v1/partners/${partnerContext.value.partner.id}/drivers/${route.params.driverId}/vehicle-assignments?status=assign`,
+      {
+        vehicle_id: selected.value
+      }
+    )
+    .then((res) => {
+      fetchDriverDetails();
+      handleOpenConfirmedAssignModal();
+    })
+    .catch((err) => {
+      const errorMessage = extractErrorMessage(
+        err,
+        null,
+        'Oops! An error occurred, please try again.'
+      );
+      toast.error(errorMessage);
+    })
+    .finally(() => {
+      loading.value = false;
+    });
+}
+const proceedToUnassign = async () => {
+  handleCloseConfirmUnassignModal();
+  loading.value = true;
+  await axios
+    .put(
+      `/v1/partners/${partnerContext.value.partner.id}/drivers/${route.params.driverId}/vehicle-assignments?status=unassign`,
+      {
+        vehicle_id: vehicleId.value
+      }
+    )
+    .then(() => {
+      fetchDriverDetails();
+      handleOpenConfirmedUnassignModal();
+    })
+    .catch((err) => {
+      const errorMessage = extractErrorMessage(
+        err,
+        null,
+        'Oops! An error occurred, please try again.'
+      );
+      toast.error(errorMessage);
+    })
+    .finally(() => {
+      loading.value = false;
+    });
+}
+const closeModal = () => {
+  handleCloseConfirmedAssignModal();
+}
+const fetchVehicles = async () => {
+  await axios
+    .get(`/v1/partner/${partnerContext.value.partner.id}/vehicles`)
+    .then((res) => {
+      partnerVehicles.value = res.data.data;
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
+
+fetchDriverDetails();
+fetchVehicles();
 </script>
