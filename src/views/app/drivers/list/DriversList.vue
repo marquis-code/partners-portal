@@ -63,7 +63,9 @@
                 placeholder="Search"
               />
             </div>
-            <button @click="downloadReport" :class="downloadLoader ? 'w-[130px]' : 'w-fit'" class="bg-black p-2 py-1 whitespace-nowrap text-white text-sm font-medium rounded">
+            <button @click="downloadReport" :class="downloadLoader ? 'w-[130px]' : 'w-fit'"
+              class="bg-black p-2 py-1 whitespace-nowrap text-white text-sm font-medium rounded"
+            >
               <spinner v-if="downloadLoader"/>
               <span v-else>Download Report</span>
             </button>
@@ -306,7 +308,7 @@
   </page-layout>
 </template>
 
-<script lang="ts">
+<!-- <script lang="ts">
 import { defineComponent } from 'vue';
 import AppTable from '@/components/AppTable.vue';
 import { mapGetters } from 'vuex';
@@ -583,4 +585,446 @@ export default defineComponent({
     }
   }
 });
+</script> -->
+
+<script setup lang="ts">
+import { ref, Ref, watch, computed } from 'vue';
+import AppTable from '@/components/AppTable.vue';
+import { useStore } from 'vuex';
+import PageActionHeader from '@/components/PageActionHeader.vue';
+import PageLayout from '@/components/layout/PageLayout.vue';
+import AppModal from '@/components/Modals/AppModal.vue';
+import { extractErrorMessage } from '@/utils/helper';
+import spinner from '@/components/loader/spinner.vue'
+import {downloadFile, addToQuery, removeQueryParam} from '@/composables/utils'
+import Papa from 'papaparse';
+import {useRoute} from 'vue-router'
+import {axiosInstance as axios} from '@/plugins/axios';
+import {useToast} from 'vue-toast-notification';
+import router from '@/router';
+// import { vue3Debounce } from 'vue-debounce'
+
+const toast = useToast()
+const store = useStore()
+const route = useRoute()
+const filters = ref({
+  status: 'active',
+  search: '',
+  pageNumber: 1,
+  pageSize: 10
+})
+const downloadLoader = ref(false)
+const debounce = ref(null) as Ref<any>
+const showInfoModal = ref(false)
+const search = ref('')
+const showSuccessModal = ref(false)
+const selectedDriverId = ref(null) as Ref<any>
+const driverToRemoveId = ref(null) as Ref<any>
+const showDropdown = ref(false)
+const loading = ref(false)
+const modalLoading = ref(false)
+const tableData = ref([]) as Ref<any[]>
+const tableRecords = ref(null) as Ref<any>
+const errorLoading = ref(false)
+const headers = [
+  { label: 'Driver', key: 'name' },
+  { label: 'Email', key: 'email' },
+  { label: 'Route Assigned', key: 'routeVehicles' },
+  { label: 'Phone Number', key: 'phone' },
+  { label: 'Actions', key: 'actions' }
+]
+const totalRecords = ref(null) as Ref<any>
+const items = ref([]) as Ref<any[]>
+
+const partnerContext:any = computed(() => store.getters['auth/activeContext'])
+const userSessionData:any = computed(() => store.getters['auth/userSessionData'])
+const filteredDrivers = computed(() => {
+  const results = tableData.value;
+  const searchKeyword = search.value.toLowerCase();
+  if (!searchKeyword) return results;
+
+  const searchResult = results.filter((item) => {
+    return (
+      item?.fname?.toLowerCase().includes(searchKeyword) ||
+      item?.lname?.toLowerCase().includes(searchKeyword) ||
+      item?.email?.toLowerCase().includes(searchKeyword) ||
+      item?.phone?.includes(searchKeyword)
+    );
+  });
+  return searchResult;
+})
+
+// created () {
+//   const query = this.$route.query
+//   if (query.status) this.setStatusFilter(query.status as string)
+//   if (query.searchTerm) this.filters.search = query.searchTerm as string
+//   if (Object.keys(query).length === 0) this.fetchDrivers();
+// },
+// props: {
+//   rowClicked: Function
+// },
+
+watch(() => filters.value.pageNumber, () => {
+  fetchDrivers()
+})
+watch(() => filters.value.pageSize, () => {
+  fetchDrivers()
+})
+watch(() => filters.value.search, () => {
+  if (filters.value.search) addToQuery(route, router, {searchTerm: filters.value.search})
+  if (!filters.value.search) removeQueryParam(route, router, ['searchTerm'])
+  clearTimeout(debounce.value);
+  debounce.value = setTimeout(() => {
+    fetchDrivers();
+  }, 600);
+})
+
+const checkForFiltersOnLoad = () => {
+  const query = route.query
+  if (query.status) setStatusFilter(query.status as string)
+  if (query.searchTerm) filters.value.search = query.searchTerm as string
+  if (Object.keys(query).length === 0) fetchDrivers();
+}
+const downloadReport = () => {
+  downloadLoader.value = true
+  axios
+    .get(
+      `/v1/partners/${userSessionData.value.activeContext.partner.account_sid}/drivers?status=${filters.value.status}&page=${filters.value.pageNumber}&limit=${filters.value.pageSize}&search=${filters.value.search}`
+    )
+    .then((res) => {
+      const total = res?.data?.metadata?.total;
+      // console.log(total)
+      axios.get(
+        `/v1/partners/${userSessionData.value.activeContext.partner.account_sid}/drivers?status=${filters.value.status}&page=${filters.value.pageNumber}&limit=${total}&search=${filters.value.search}`
+      ).then((res) => {
+        if (res.data.data.length) {
+          const x = res.data.data
+          console.log(x)
+          const newArr = []
+          for (let i = 0; i < x.length; i++) {
+            const el = x[i]
+            const assigned_route = []
+            if (el.routeVehicles && el.routeVehicles.length) {
+              for (let j = 0; j < el.routeVehicles.length; j++) {
+                const z = el.routeVehicles[j];
+                assigned_route.push(z.route.route_code)
+              }
+            }
+            const y = {
+              Driver: `${el.driver.fname} ${el.driver.lname}`,
+              Email: el.driver.email,
+              Route_assigned: assigned_route.length ? assigned_route.join(' ') : 'N/A',
+              Phone: el.driver.phone,
+
+            }
+            newArr.push(y)
+          }
+          const csv = Papa.unparse(newArr);
+          const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+          const url = URL.createObjectURL(blob);
+          downloadFile(url, 'downloaded-drivers-report')
+        } else {
+          toast.error(
+            'No data to download'
+          );
+        }
+      })
+    })
+    .catch((err) => {
+      toast.error(
+        err?.response?.data?.message || 'An error occured'
+      );
+    })
+    .finally(() => {
+      downloadLoader.value = false;
+    });
+}
+// const addToQuery = (obj:any) => {
+//   const oldQuery = route.query
+//   const newQuery = { ...oldQuery, ...obj };
+//   router.push({ query: newQuery });
+// }
+// const removeQueryParam = (queryNames:string[]) => {
+//   const queries = route.query
+//   const query = { ...queries };
+//   for (let i = 0; i < queryNames.length; i++) {
+//     const el = queryNames[i];
+//     delete query[el];
+//   }
+//   router.push({ query });
+// }
+const changePage = (pageNumber: any) => {
+  filters.value.pageNumber = pageNumber;
+}
+const showPageSize = (pageSize: any) => {
+  filters.value.pageSize = pageSize;
+}
+const proceed = async() => {
+  modalLoading.value = true;
+  await axios
+    .delete(
+      `/v1/partners/${partnerContext.value.partner.id}/drivers/${driverToRemoveId.value}`
+    )
+    .then(() => {
+      modalLoading.value = false;
+      handleHideInfoModal();
+      handleShowSuccessModal();
+      fetchDrivers();
+    })
+    .catch((err) => {
+      const errorMessage = extractErrorMessage(
+        err,
+        null,
+        'Oops! An error occurred, please try again.'
+      );
+      toast.error(errorMessage);
+    })
+    .finally(() => {
+      modalLoading.value = false;
+      handleHideInfoModal();
+    });
+}
+const setStatusFilter = (value: string) => {
+  filters.value.status = value
+  fetchDrivers();
+  addToQuery(route, router, {status: value})
+}
+const fetchDrivers = () => {
+  loading.value = true;
+  axios
+    .get(
+      `/v1/partners/${userSessionData.value.activeContext.partner.account_sid}/drivers?status=${filters.value.status}&page=${filters.value.pageNumber}&limit=${filters.value.pageSize}&search=${filters.value.search}`
+    )
+    .then((res) => {
+      tableData.value = (formatApiFormData(res.data.data) as any) || [];
+      totalRecords.value = res.data.metadata?.total;
+    })
+    .finally(() => {
+      loading.value = false;
+    });
+}
+const handleDriver = (eachDriver: any) => {
+  showDropdown.value = !showDropdown.value;
+  selectedDriverId.value = eachDriver.id;
+}
+const editDriver = () => {
+  router.push({
+    name: 'EditDriver',
+    params: { driverId: selectedDriverId.value }
+  });
+}
+const formatApiFormData = (apiFormData: Array<any>) => {
+  const newTableData: any = [];
+  apiFormData.forEach((eachDriver) => {
+    newTableData.push({
+      id: eachDriver.driver.id,
+      name: eachDriver.driver.fname + ' ' + eachDriver.driver.lname,
+      fname: eachDriver.driver.fname,
+      lname: eachDriver.driver.lname,
+      phone: eachDriver.driver.phone,
+      email: eachDriver.driver.email,
+      routeVehicles: eachDriver?.routeVehicles || null,
+      avatar: eachDriver.driver.avatar,
+      active: eachDriver.driver.active,
+      deleted_at: eachDriver.driver.deleted_at,
+      created_at: eachDriver.driver.created_at,
+      dob: eachDriver.driver.dob,
+      residential_address: eachDriver.driver.residential_address,
+      license_number: eachDriver.driver.license_number,
+      expiry_date: eachDriver.driver.expiry_date,
+      files: eachDriver.driver.files
+    });
+  });
+  return newTableData;
+}
+const removeDriver = (id: any) => {
+  driverToRemoveId.value = id;
+  handleShowInfoModal();
+  showDropdown.value = false;
+}
+const handleShowInfoModal = () => {
+  showInfoModal.value = true;
+}
+const handleShowSuccessModal = () => {
+  showSuccessModal.value = true;
+}
+const handleHideInfoModal = () => {
+  showInfoModal.value = false;
+}
+const handleHideSuccessModal = () => {
+  showSuccessModal.value = false;
+}
+
+// methods: {
+//   downloadReport () {
+//     this.downloadLoader = true
+//     this.$axios
+//       .get(
+//         `/v1/partners/${this.userSessionData.activeContext.partner.account_sid}/drivers?status=${this.filters.status}&page=${this.filters.pageNumber}&limit=${this.filters.pageSize}&search=${this.filters.search}`
+//       )
+//       .then((res) => {
+//         const total = res?.data?.metadata?.total;
+//         // console.log(total)
+//         this.$axios.get(
+//           `/v1/partners/${this.userSessionData.activeContext.partner.account_sid}/drivers?status=${this.filters.status}&page=${this.filters.pageNumber}&limit=${total}&search=${this.filters.search}`
+//         ).then((res) => {
+//           if (res.data.data.length) {
+//             const x = res.data.data
+//             console.log(x)
+//             const newArr = []
+//             for (let i = 0; i < x.length; i++) {
+//               const el = x[i]
+//               const assigned_route = []
+//               if (el.routeVehicles && el.routeVehicles.length) {
+//                 for (let j = 0; j < el.routeVehicles.length; j++) {
+//                   const z = el.routeVehicles[j];
+//                   assigned_route.push(z.route.route_code)
+//                 }
+//               }
+//               const y = {
+//                 Driver: `${el.driver.fname} ${el.driver.lname}`,
+//                 Email: el.driver.email,
+//                 Route_assigned: assigned_route.length ? assigned_route.join(' ') : 'N/A',
+//                 Phone: el.driver.phone,
+
+//               }
+//               newArr.push(y)
+//             }
+//             const csv = Papa.unparse(newArr);
+//             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+//             const url = URL.createObjectURL(blob);
+//             downloadFile(url, 'downloaded-drivers-report')
+//           } else {
+//             this.$toast.error(
+//               'No data to download'
+//             );
+//           }
+//         })
+//       })
+//       .catch((err) => {
+//         this.$toast.error(
+//           err?.response?.data?.message || 'An error occured'
+//         );
+//       })
+//       .finally(() => {
+//         this.downloadLoader = false;
+//       });
+//   },
+//   addToQuery (obj:any) {
+//     const oldQuery = this.$route.query
+//     const newQuery = { ...oldQuery, ...obj };
+//     this.$router.push({ query: newQuery });
+//   },
+//   removeQueryParam (queryNames:string[]) {
+//     const queries = this.$route.query
+//     const query = { ...queries };
+//     for (let i = 0; i < queryNames.length; i++) {
+//       const el = queryNames[i];
+//       delete query[el];
+//     }
+//     this.$router.push({ query });
+//   },
+//   changePage(pageNumber: any) {
+//     this.filters.pageNumber = pageNumber;
+//   },
+//   showPageSize(pageSize: any) {
+//     this.filters.pageSize = pageSize;
+//   },
+//   async proceed() {
+//     this.modalLoading = true;
+//     await this.$axios
+//       .delete(
+//         `/v1/partners/${this.partnerContext.partner.id}/drivers/${this.driverToRemoveId}`
+//       )
+//       .then(() => {
+//         this.modalLoading = false;
+//         this.handleHideInfoModal();
+//         this.handleShowSuccessModal();
+//         this.fetchDrivers();
+//       })
+//       .catch((err) => {
+//         const errorMessage = extractErrorMessage(
+//           err,
+//           null,
+//           'Oops! An error occurred, please try again.'
+//         );
+//         this.$toast.error(errorMessage);
+//       })
+//       .finally(() => {
+//         this.modalLoading = false;
+//         this.handleHideInfoModal();
+//       });
+//   },
+//   setStatusFilter(value: string) {
+//     this.filters.status = value
+//     this.fetchDrivers();
+//     this.addToQuery({status: value})
+//   },
+//   fetchDrivers() {
+//     this.loading = true;
+//     this.$axios
+//       .get(
+//         `/v1/partners/${this.userSessionData.activeContext.partner.account_sid}/drivers?status=${this.filters.status}&page=${this.filters.pageNumber}&limit=${this.filters.pageSize}&search=${this.filters.search}`
+//       )
+//       .then((res) => {
+//         this.tableData = (this.formatApiFormData(res.data.data) as any) || [];
+//         this.totalRecords = res.data.metadata?.total;
+//       })
+//       .finally(() => {
+//         this.loading = false;
+//       });
+//   },
+//   handleDriver(eachDriver: any) {
+//     this.showDropdown = !this.showDropdown;
+//     this.selectedDriverId = eachDriver.id;
+//   },
+//   editDriver() {
+//     this.$router.push({
+//       name: 'EditDriver',
+//       params: { driverId: this.selectedDriverId }
+//     });
+//   },
+//   formatApiFormData(apiFormData: Array<any>) {
+//     const newTableData: any = [];
+//     apiFormData.forEach((eachDriver) => {
+//       newTableData.push({
+//         id: eachDriver.driver.id,
+//         name: eachDriver.driver.fname + ' ' + eachDriver.driver.lname,
+//         fname: eachDriver.driver.fname,
+//         lname: eachDriver.driver.lname,
+//         phone: eachDriver.driver.phone,
+//         email: eachDriver.driver.email,
+//         routeVehicles: eachDriver?.routeVehicles || null,
+//         avatar: eachDriver.driver.avatar,
+//         active: eachDriver.driver.active,
+//         deleted_at: eachDriver.driver.deleted_at,
+//         created_at: eachDriver.driver.created_at,
+//         dob: eachDriver.driver.dob,
+//         residential_address: eachDriver.driver.residential_address,
+//         license_number: eachDriver.driver.license_number,
+//         expiry_date: eachDriver.driver.expiry_date,
+//         files: eachDriver.driver.files
+//       });
+//     });
+//     return newTableData;
+//   },
+//   removeDriver(id: any) {
+//     this.driverToRemoveId = id;
+//     this.handleShowInfoModal();
+//     this.showDropdown = false;
+//   },
+//   handleShowInfoModal() {
+//     this.showInfoModal = true;
+//   },
+//   handleShowSuccessModal() {
+//     this.showSuccessModal = true;
+//   },
+//   handleHideInfoModal() {
+//     this.showInfoModal = false;
+//   },
+//   handleHideSuccessModal() {
+//     this.showSuccessModal = false;
+//   }
+// }
+checkForFiltersOnLoad()
 </script>
