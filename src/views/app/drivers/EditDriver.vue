@@ -411,7 +411,7 @@
   </page-layout>
 </template>
 
-<script lang="ts">
+<!-- <script lang="ts">
 import ImageUpload from '@/components/ImageUpload.vue';
 import { defineComponent } from 'vue';
 import useVuelidate from '@vuelidate/core';
@@ -547,6 +547,238 @@ export default defineComponent({
       const parsedArray = JSON.parse(stringifiedArray);
       if (parsedArray.length > 0) {
         return parsedArray[0];
+      }
+      return null;
+    },
+    async updateDriver() {
+      this.v$.form.$touch();
+      if (this.processing || this.v$.form.$errors.length) {
+        return;
+      }
+      this.processing = true;
+      try {
+        const payload = {
+          fname: this.form.fname,
+          lname: this.form.lname,
+          phone: this.form.phone,
+          email: this.form.email,
+          residential_address: this.form.residential_address,
+          dob: this.form.dob,
+          license_number: this.form.license_number,
+          files: this.form.files,
+          avatar: this.form.avatar,
+          document_type: 'drivers_license',
+          document_id: this.docId,
+          password: 'shuttlers'
+        };
+        await this.$axios.patch(
+          `/v1/partners/${this.userSessionData.activeContext.partner.account_sid}/drivers/${this.$route.params.driverId}`, //  Endpoint to update driver
+          payload
+        );
+        this.openModal();
+        this.$router.push({ name: 'driver.detail.info' });
+        this.closeModal();
+        this.$toast.success('Drivers details was successfully updated');
+      } catch (err) {
+        const errorMessage = extractErrorMessage(
+          err,
+          null,
+          'Oops! An error occurred, please try again.'
+        );
+        this.$toast.error(errorMessage);
+      } finally {
+        this.processing = false;
+      }
+    },
+    async fileSelected(selectedImage: any) {
+      const imageDbUrl = (await this.uploadTos3andGetDocumentUrl(
+        selectedImage
+      )) as string;
+      // this.form.files.push(imageDbUrl);
+    },
+    async handleProfileUpload(e: any) {
+      const selectedProfile = e.target.files[0];
+      this.uploadingProfile = true;
+      await this.uploadTos3andGetDocumentUrl(selectedProfile)
+        .then((res) => {
+          this.form.avatar = res;
+          this.profilePreview = URL.createObjectURL(selectedProfile);
+          this.$toast.success('Profile picture was uploaded successfully');
+        })
+        .catch(() => {
+          this.$toast.error('Something went wrong while uploading profile');
+        })
+        .finally(() => {
+          this.uploadingProfile = false;
+        });
+    },
+
+    async uploadTos3andGetDocumentUrl(file: any) {
+      this.uploadingFile = true;
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+        const response = await this.$axios.post(
+          `/v1/upload/identity/files`,
+          formData
+        );
+        if (response.data?.files?.length) {
+          return response.data.files[0].Location;
+        }
+      } catch (error) {
+        this.$toast.warning(
+          'An error occured while uploading your file, please try again'
+        );
+      } finally {
+        this.uploadingFile = false;
+      }
+    }
+  }
+});
+</script> -->
+
+<script lang="ts">
+import ImageUpload from '@/components/ImageUpload.vue';
+import { defineComponent } from 'vue';
+import useVuelidate from '@vuelidate/core';
+import { email, required } from '@vuelidate/validators';
+import { mapGetters } from 'vuex';
+import { extractErrorMessage } from '@/utils/helper';
+import { format } from 'date-fns';
+import PageLayout from '@/components/layout/PageLayout.vue';
+import PageActionHeader from '@/components/PageActionHeader.vue';
+import Spinner from '@/components/layout/Spinner.vue';
+import AppModal from '@/components/Modals/AppModal.vue';
+import { getDefaultDatePickerDate } from '@/utils/dateFormatters';
+
+interface Driver {
+  fname?: string;
+  lname?: string;
+  phone?: string;
+  email?: string;
+  residential_address?: string;
+  dob?: string;
+  license_number?: string;
+  expiry_date?: string;
+  files?: Array<string>;
+  avatar?: string;
+}
+
+export default defineComponent({
+  name: 'AddDriver',
+  components: {
+    ImageUpload,
+    PageActionHeader,
+    PageLayout,
+    Spinner,
+    AppModal
+  },
+  data() {
+    return {
+      docId: null,
+      fetchingDriver: false,
+      format,
+      uploadingFile: false,
+      v$: useVuelidate(),
+      showModal: false,
+      profilePreview: '',
+      form: {} as Driver,
+      processing: false,
+      documentId: null,
+      isUploaded: false,
+      uploadingProfile: false
+    };
+  },
+  validations() {
+    return {
+      form: {
+        fname: { required },
+        lname: { required },
+        phone: { required },
+        email: { required, email },
+        residential_address: { required },
+        dob: { required },
+        license_number: { required },
+        expiry_date: { required },
+        files: { required },
+        avatar: { required }
+      }
+    };
+  },
+  computed: {
+    ...mapGetters({
+      userSessionData: 'auth/userSessionData',
+      user: 'auth/user',
+      getDriverData: 'driver/getDriverData',
+      driverData: 'driver/getDriverData'
+    })
+  },
+  created() {
+    this.loadDriver();
+  },
+  methods: {
+    handleFileRemoval() {
+      this.form.files = [];
+      this.isUploaded = false;
+    },
+    openModal() {
+      this.showModal = true;
+    },
+    closeModal() {
+      this.showModal = false;
+    },
+    loadDriver() {
+      this.fetchingDriver = true;
+      this.$axios
+        .get(`/v1/drivers/${this.$route.params.driverId}`)
+        .then((res) => {
+          console.log(res)
+          this.docId = res.data.documents[0].id;
+          const result = this.getUploadedFileUrlFromStringifiedArray(
+            res.data.documents[0].files
+          );
+          if (result.length > 1) {
+            this.isUploaded = true;
+          } else {
+            this.isUploaded = false;
+          }
+          this.form.fname = res.data.fname || 'N/A';
+          this.form.lname = res.data.lname || 'N/A';
+          this.form.phone = res.data.phone || 'N/A';
+          this.form.email = res.data.email || 'N/A';
+          this.form.residential_address = res.data.residential_address || 'N/A';
+          this.form.dob = res.data.dob;
+          this.form.license_number =
+            res.data.documents[0].registration_number || 'N/A';
+          this.form.expiry_date = getDefaultDatePickerDate(
+            res.data.documents[0].expiry_date
+          );
+          console.log(res.data.documents[0].files)
+          // this.form.files = [JSON.parse(res.data.documents[0].files)[0]];
+          this.form.files = res.data.documents[0].files;
+          this.form.avatar = res.data.avatar;
+          this.profilePreview = res.data.avatar;
+          this.documentId = res.data.documents[0].id;
+        })
+        .catch((err) => {
+          const errorMessage = extractErrorMessage(
+            err,
+            null,
+            'Oops! An error occurred, please try again.'
+          );
+          this.$toast.error(errorMessage);
+        })
+        .finally(() => {
+          this.fetchingDriver = false;
+        });
+    },
+    getUploadedFileUrlFromStringifiedArray(stringifiedArray: any) {
+      // const parsedArray = JSON.parse(stringifiedArray);
+      // if (parsedArray.length > 0) {
+      //   return parsedArray[0];
+      // }
+      if (stringifiedArray.length > 0) {
+        return stringifiedArray[0];
       }
       return null;
     },
