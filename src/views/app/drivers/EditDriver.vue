@@ -13,7 +13,7 @@
             <router-link
               :to="{
                 name: 'driver.detail.info',
-                params: { driverId: this.$route.params.driverId }
+                params: { driverId: route.params.driverId }
               }"
               class="text-gray-400 text-sm hover:text-gray-900"
               >Driver management</router-link
@@ -506,232 +506,6 @@ export default defineComponent({
       this.$axios
         .get(`/v1/drivers/${this.$route.params.driverId}`)
         .then((res) => {
-          this.docId = res.data.documents[0].id;
-          const result = this.getUploadedFileUrlFromStringifiedArray(
-            res.data.documents[0].files
-          );
-          if (result.length > 1) {
-            this.isUploaded = true;
-          } else {
-            this.isUploaded = false;
-          }
-          this.form.fname = res.data.fname || 'N/A';
-          this.form.lname = res.data.lname || 'N/A';
-          this.form.phone = res.data.phone || 'N/A';
-          this.form.email = res.data.email || 'N/A';
-          this.form.residential_address = res.data.residential_address || 'N/A';
-          this.form.dob = res.data.dob;
-          this.form.license_number =
-            res.data.documents[0].registration_number || 'N/A';
-          this.form.expiry_date = getDefaultDatePickerDate(
-            res.data.documents[0].expiry_date
-          );
-          this.form.files = [JSON.parse(res.data.documents[0].files)[0]];
-          this.form.avatar = res.data.avatar;
-          this.profilePreview = res.data.avatar;
-          this.documentId = res.data.documents[0].id;
-        })
-        .catch((err) => {
-          const errorMessage = extractErrorMessage(
-            err,
-            null,
-            'Oops! An error occurred, please try again.'
-          );
-          this.$toast.error(errorMessage);
-        })
-        .finally(() => {
-          this.fetchingDriver = false;
-        });
-    },
-    getUploadedFileUrlFromStringifiedArray(stringifiedArray: any) {
-      const parsedArray = JSON.parse(stringifiedArray);
-      if (parsedArray.length > 0) {
-        return parsedArray[0];
-      }
-      return null;
-    },
-    async updateDriver() {
-      this.v$.form.$touch();
-      if (this.processing || this.v$.form.$errors.length) {
-        return;
-      }
-      this.processing = true;
-      try {
-        const payload = {
-          fname: this.form.fname,
-          lname: this.form.lname,
-          phone: this.form.phone,
-          email: this.form.email,
-          residential_address: this.form.residential_address,
-          dob: this.form.dob,
-          license_number: this.form.license_number,
-          files: this.form.files,
-          avatar: this.form.avatar,
-          document_type: 'drivers_license',
-          document_id: this.docId,
-          password: 'shuttlers'
-        };
-        await this.$axios.patch(
-          `/v1/partners/${this.userSessionData.activeContext.partner.account_sid}/drivers/${this.$route.params.driverId}`, //  Endpoint to update driver
-          payload
-        );
-        this.openModal();
-        this.$router.push({ name: 'driver.detail.info' });
-        this.closeModal();
-        this.$toast.success('Drivers details was successfully updated');
-      } catch (err) {
-        const errorMessage = extractErrorMessage(
-          err,
-          null,
-          'Oops! An error occurred, please try again.'
-        );
-        this.$toast.error(errorMessage);
-      } finally {
-        this.processing = false;
-      }
-    },
-    async fileSelected(selectedImage: any) {
-      const imageDbUrl = (await this.uploadTos3andGetDocumentUrl(
-        selectedImage
-      )) as string;
-      // this.form.files.push(imageDbUrl);
-    },
-    async handleProfileUpload(e: any) {
-      const selectedProfile = e.target.files[0];
-      this.uploadingProfile = true;
-      await this.uploadTos3andGetDocumentUrl(selectedProfile)
-        .then((res) => {
-          this.form.avatar = res;
-          this.profilePreview = URL.createObjectURL(selectedProfile);
-          this.$toast.success('Profile picture was uploaded successfully');
-        })
-        .catch(() => {
-          this.$toast.error('Something went wrong while uploading profile');
-        })
-        .finally(() => {
-          this.uploadingProfile = false;
-        });
-    },
-
-    async uploadTos3andGetDocumentUrl(file: any) {
-      this.uploadingFile = true;
-      try {
-        const formData = new FormData();
-        formData.append('file', file);
-        const response = await this.$axios.post(
-          `/v1/upload/identity/files`,
-          formData
-        );
-        if (response.data?.files?.length) {
-          return response.data.files[0].Location;
-        }
-      } catch (error) {
-        this.$toast.warning(
-          'An error occured while uploading your file, please try again'
-        );
-      } finally {
-        this.uploadingFile = false;
-      }
-    }
-  }
-});
-</script> -->
-
-<script lang="ts">
-import ImageUpload from '@/components/ImageUpload.vue';
-import { defineComponent } from 'vue';
-import useVuelidate from '@vuelidate/core';
-import { email, required } from '@vuelidate/validators';
-import { mapGetters } from 'vuex';
-import { extractErrorMessage } from '@/utils/helper';
-import { format } from 'date-fns';
-import PageLayout from '@/components/layout/PageLayout.vue';
-import PageActionHeader from '@/components/PageActionHeader.vue';
-import Spinner from '@/components/layout/Spinner.vue';
-import AppModal from '@/components/Modals/AppModal.vue';
-import { getDefaultDatePickerDate } from '@/utils/dateFormatters';
-
-interface Driver {
-  fname?: string;
-  lname?: string;
-  phone?: string;
-  email?: string;
-  residential_address?: string;
-  dob?: string;
-  license_number?: string;
-  expiry_date?: string;
-  files?: Array<string>;
-  avatar?: string;
-}
-
-export default defineComponent({
-  name: 'AddDriver',
-  components: {
-    ImageUpload,
-    PageActionHeader,
-    PageLayout,
-    Spinner,
-    AppModal
-  },
-  data() {
-    return {
-      docId: null,
-      fetchingDriver: false,
-      format,
-      uploadingFile: false,
-      v$: useVuelidate(),
-      showModal: false,
-      profilePreview: '',
-      form: {} as Driver,
-      processing: false,
-      documentId: null,
-      isUploaded: false,
-      uploadingProfile: false
-    };
-  },
-  validations() {
-    return {
-      form: {
-        fname: { required },
-        lname: { required },
-        phone: { required },
-        email: { required, email },
-        residential_address: { required },
-        dob: { required },
-        license_number: { required },
-        expiry_date: { required },
-        files: { required },
-        avatar: { required }
-      }
-    };
-  },
-  computed: {
-    ...mapGetters({
-      userSessionData: 'auth/userSessionData',
-      user: 'auth/user',
-      getDriverData: 'driver/getDriverData',
-      driverData: 'driver/getDriverData'
-    })
-  },
-  created() {
-    this.loadDriver();
-  },
-  methods: {
-    handleFileRemoval() {
-      this.form.files = [];
-      this.isUploaded = false;
-    },
-    openModal() {
-      this.showModal = true;
-    },
-    closeModal() {
-      this.showModal = false;
-    },
-    loadDriver() {
-      this.fetchingDriver = true;
-      this.$axios
-        .get(`/v1/drivers/${this.$route.params.driverId}`)
-        .then((res) => {
           console.log(res)
           this.docId = res.data.documents[0].id;
           const result = this.getUploadedFileUrlFromStringifiedArray(
@@ -867,4 +641,371 @@ export default defineComponent({
     }
   }
 });
+</script> -->
+
+<script setup lang="ts">
+import ImageUpload from '@/components/ImageUpload.vue';
+import { ref, Ref, computed } from 'vue';
+import useVuelidate from '@vuelidate/core';
+import { email, required } from '@vuelidate/validators';
+import { useStore } from 'vuex';
+import { extractErrorMessage } from '@/utils/helper';
+import { format } from 'date-fns';
+import PageLayout from '@/components/layout/PageLayout.vue';
+import PageActionHeader from '@/components/PageActionHeader.vue';
+import Spinner from '@/components/layout/Spinner.vue';
+import AppModal from '@/components/Modals/AppModal.vue';
+import { getDefaultDatePickerDate } from '@/utils/dateFormatters';
+import {axiosInstance as axios} from '@/plugins/axios';
+import {useToast} from 'vue-toast-notification';
+import router from '@/router';
+import { useRoute } from 'vue-router';
+
+interface Driver {
+  fname?: string;
+  lname?: string;
+  phone?: string;
+  email?: string;
+  residential_address?: string;
+  dob?: string;
+  license_number?: string;
+  expiry_date?: string;
+  files?: Array<string>;
+  avatar?: string;
+}
+
+const validations = {
+  form: {
+    fname: { required },
+    lname: { required },
+    phone: { required },
+    email: { required, email },
+    residential_address: { required },
+    dob: { required },
+    license_number: { required },
+    expiry_date: { required },
+    files: { required },
+    avatar: { required }
+  }
+}
+const toast = useToast()
+const route = useRoute()
+const store = useStore()
+const docId = ref(null)
+const fetchingDriver = ref(false)
+const uploadingFile = ref(false)
+const form = ref({}) as Ref<Driver>
+const v$ = useVuelidate(validations, {form})
+const showModal = ref(false)
+const profilePreview = ref('')
+const processing = ref(false)
+const documentId = ref(null)
+const isUploaded = ref(false)
+const uploadingProfile = ref(false)
+
+const userSessionData:any = computed(() => store.getters['auth/userSessionData'])
+const user:any = computed(() => store.getters['auth/user'])
+const getDriverData:any = computed(() => store.getters['driver/getDriverData'])
+const driverData:any = computed(() => store.getters['driver/getDriverData'])
+
+const handleFileRemoval = () => {
+  form.value.files = [];
+  isUploaded.value = false;
+}
+const openModal = () => {
+  showModal.value = true;
+}
+const closeModal = () => {
+  showModal.value = false;
+}
+const loadDriver = () => {
+  fetchingDriver.value = true;
+  axios
+    .get(`/v1/drivers/${route.params.driverId}`)
+    .then((res) => {
+      console.log(res)
+      docId.value = res.data.documents[0].id;
+      const result = getUploadedFileUrlFromStringifiedArray(
+        res.data.documents[0].files
+      );
+      if (result.length > 1) {
+        isUploaded.value = true;
+      } else {
+        isUploaded.value = false;
+      }
+      form.value.fname = res.data.fname || 'N/A';
+      form.value.lname = res.data.lname || 'N/A';
+      form.value.phone = res.data.phone || 'N/A';
+      form.value.email = res.data.email || 'N/A';
+      form.value.residential_address = res.data.residential_address || 'N/A';
+      form.value.dob = res.data.dob;
+      form.value.license_number =
+        res.data.documents[0].registration_number || 'N/A';
+      form.value.expiry_date = getDefaultDatePickerDate(
+        res.data.documents[0].expiry_date
+      );
+      console.log(res.data.documents[0].files)
+      // this.form.files = [JSON.parse(res.data.documents[0].files)[0]];
+      form.value.files = res.data.documents[0].files;
+      form.value.avatar = res.data.avatar;
+      profilePreview.value = res.data.avatar;
+      documentId.value = res.data.documents[0].id;
+    })
+    .catch((err) => {
+      const errorMessage = extractErrorMessage(
+        err,
+        null,
+        'Oops! An error occurred, please try again.'
+      );
+      toast.error(errorMessage);
+    })
+    .finally(() => {
+      fetchingDriver.value = false;
+    });
+}
+const getUploadedFileUrlFromStringifiedArray = (stringifiedArray: any) => {
+  // const parsedArray = JSON.parse(stringifiedArray);
+  // if (parsedArray.length > 0) {
+  //   return parsedArray[0];
+  // }
+  if (stringifiedArray.length > 0) {
+    return stringifiedArray[0];
+  }
+  return null;
+}
+const updateDriver = async () => {
+  v$.value.form.$touch();
+  if (processing.value || v$.value.form.$errors.length) {
+    return;
+  }
+  processing.value = true;
+  try {
+    const payload = {
+      fname: form.value.fname,
+      lname: form.value.lname,
+      phone: form.value.phone,
+      email: form.value.email,
+      residential_address: form.value.residential_address,
+      dob: form.value.dob,
+      license_number: form.value.license_number,
+      files: form.value.files,
+      avatar: form.value.avatar,
+      document_type: 'drivers_license',
+      document_id: docId.value,
+      password: 'shuttlers'
+    };
+    await axios.patch(
+      `/v1/partners/${userSessionData.value.activeContext.partner.account_sid}/drivers/${route.params.driverId}`, //  Endpoint to update driver
+      payload
+    );
+    openModal();
+    router.push({ name: 'driver.detail.info' });
+    closeModal();
+    toast.success('Drivers details was successfully updated');
+  } catch (err) {
+    const errorMessage = extractErrorMessage(
+      err,
+      null,
+      'Oops! An error occurred, please try again.'
+    );
+    toast.error(errorMessage);
+  } finally {
+    processing.value = false;
+  }
+}
+const fileSelected = async (selectedImage: any) => {
+  const imageDbUrl = (await uploadTos3andGetDocumentUrl(
+    selectedImage
+  )) as string;
+  // this.form.files.push(imageDbUrl);
+}
+const handleProfileUpload = async (e: any) => {
+  const selectedProfile = e.target.files[0];
+  uploadingProfile.value = true;
+  await uploadTos3andGetDocumentUrl(selectedProfile)
+    .then((res) => {
+      form.value.avatar = res;
+      profilePreview.value = URL.createObjectURL(selectedProfile);
+      toast.success('Profile picture was uploaded successfully');
+    })
+    .catch(() => {
+      toast.error('Something went wrong while uploading profile');
+    })
+    .finally(() => {
+      uploadingProfile.value = false;
+    });
+}
+const uploadTos3andGetDocumentUrl = async (file: any) => {
+  uploadingFile.value = true;
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await axios.post(
+      `/v1/upload/identity/files`,
+      formData
+    );
+    if (response.data?.files?.length) {
+      return response.data.files[0].Location;
+    }
+  } catch (error) {
+    toast.warning(
+      'An error occured while uploading your file, please try again'
+    );
+  } finally {
+    uploadingFile.value = false;
+  }
+}
+
+// methods: {
+//   handleFileRemoval() {
+//     this.form.files = [];
+//     this.isUploaded = false;
+//   },
+//   openModal() {
+//     this.showModal = true;
+//   },
+//   closeModal() {
+//     this.showModal = false;
+//   },
+//   loadDriver() {
+//     this.fetchingDriver = true;
+//     this.$axios
+//       .get(`/v1/drivers/${this.$route.params.driverId}`)
+//       .then((res) => {
+//         console.log(res)
+//         this.docId = res.data.documents[0].id;
+//         const result = this.getUploadedFileUrlFromStringifiedArray(
+//           res.data.documents[0].files
+//         );
+//         if (result.length > 1) {
+//           this.isUploaded = true;
+//         } else {
+//           this.isUploaded = false;
+//         }
+//         this.form.fname = res.data.fname || 'N/A';
+//         this.form.lname = res.data.lname || 'N/A';
+//         this.form.phone = res.data.phone || 'N/A';
+//         this.form.email = res.data.email || 'N/A';
+//         this.form.residential_address = res.data.residential_address || 'N/A';
+//         this.form.dob = res.data.dob;
+//         this.form.license_number =
+//           res.data.documents[0].registration_number || 'N/A';
+//         this.form.expiry_date = getDefaultDatePickerDate(
+//           res.data.documents[0].expiry_date
+//         );
+//         console.log(res.data.documents[0].files)
+//         // this.form.files = [JSON.parse(res.data.documents[0].files)[0]];
+//         this.form.files = res.data.documents[0].files;
+//         this.form.avatar = res.data.avatar;
+//         this.profilePreview = res.data.avatar;
+//         this.documentId = res.data.documents[0].id;
+//       })
+//       .catch((err) => {
+//         const errorMessage = extractErrorMessage(
+//           err,
+//           null,
+//           'Oops! An error occurred, please try again.'
+//         );
+//         this.$toast.error(errorMessage);
+//       })
+//       .finally(() => {
+//         this.fetchingDriver = false;
+//       });
+//   },
+//   getUploadedFileUrlFromStringifiedArray(stringifiedArray: any) {
+//     // const parsedArray = JSON.parse(stringifiedArray);
+//     // if (parsedArray.length > 0) {
+//     //   return parsedArray[0];
+//     // }
+//     if (stringifiedArray.length > 0) {
+//       return stringifiedArray[0];
+//     }
+//     return null;
+//   },
+//   async updateDriver() {
+//     this.v$.form.$touch();
+//     if (this.processing || this.v$.form.$errors.length) {
+//       return;
+//     }
+//     this.processing = true;
+//     try {
+//       const payload = {
+//         fname: this.form.fname,
+//         lname: this.form.lname,
+//         phone: this.form.phone,
+//         email: this.form.email,
+//         residential_address: this.form.residential_address,
+//         dob: this.form.dob,
+//         license_number: this.form.license_number,
+//         files: this.form.files,
+//         avatar: this.form.avatar,
+//         document_type: 'drivers_license',
+//         document_id: this.docId,
+//         password: 'shuttlers'
+//       };
+//       await this.$axios.patch(
+//         `/v1/partners/${this.userSessionData.activeContext.partner.account_sid}/drivers/${this.$route.params.driverId}`, //  Endpoint to update driver
+//         payload
+//       );
+//       this.openModal();
+//       this.$router.push({ name: 'driver.detail.info' });
+//       this.closeModal();
+//       this.$toast.success('Drivers details was successfully updated');
+//     } catch (err) {
+//       const errorMessage = extractErrorMessage(
+//         err,
+//         null,
+//         'Oops! An error occurred, please try again.'
+//       );
+//       this.$toast.error(errorMessage);
+//     } finally {
+//       this.processing = false;
+//     }
+//   },
+//   async fileSelected(selectedImage: any) {
+//     const imageDbUrl = (await this.uploadTos3andGetDocumentUrl(
+//       selectedImage
+//     )) as string;
+//     // this.form.files.push(imageDbUrl);
+//   },
+//   async handleProfileUpload(e: any) {
+//     const selectedProfile = e.target.files[0];
+//     this.uploadingProfile = true;
+//     await this.uploadTos3andGetDocumentUrl(selectedProfile)
+//       .then((res) => {
+//         this.form.avatar = res;
+//         this.profilePreview = URL.createObjectURL(selectedProfile);
+//         this.$toast.success('Profile picture was uploaded successfully');
+//       })
+//       .catch(() => {
+//         this.$toast.error('Something went wrong while uploading profile');
+//       })
+//       .finally(() => {
+//         this.uploadingProfile = false;
+//       });
+//   },
+
+//   async uploadTos3andGetDocumentUrl(file: any) {
+//     this.uploadingFile = true;
+//     try {
+//       const formData = new FormData();
+//       formData.append('file', file);
+//       const response = await this.$axios.post(
+//         `/v1/upload/identity/files`,
+//         formData
+//       );
+//       if (response.data?.files?.length) {
+//         return response.data.files[0].Location;
+//       }
+//     } catch (error) {
+//       this.$toast.warning(
+//         'An error occured while uploading your file, please try again'
+//       );
+//     } finally {
+//       this.uploadingFile = false;
+//     }
+//   }
+// }
+
+loadDriver()
 </script>
