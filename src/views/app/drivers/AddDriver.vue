@@ -211,7 +211,7 @@
                   >Expiry date
                 </label>
                 <datepicker
-                  v-model="v$.form.expiry_date.$model"
+                  v-model="(v$.form.expiry_date as any).$model"
                   class="text-xs border-none outline-none w-full rounded-md p-3 placeholder-gray-500 placeholder-opacity-25 ring-1 ring-gray-300"
                   placeholder="Select expiry date"
                 />
@@ -234,7 +234,6 @@
               <image-upload
                 :uploading="uploadingFile"
                 @fileSelected="fileSelected"
-                :isUploadSuccessful="isUploadSuccessful"
               ></image-upload>
             </div>
           </section>
@@ -283,7 +282,7 @@
   </page-layout>
 </template>
 
-<script lang="ts">
+<!-- <script lang="ts">
 import ImageUpload from '@/components/ImageUpload.vue';
 import { defineComponent } from 'vue';
 import Datepicker from 'vue3-datepicker';
@@ -520,6 +519,221 @@ export default defineComponent({
     }
   }
 });
+</script> -->
+
+<script setup lang="ts">
+import ImageUpload from '@/components/ImageUpload.vue';
+import { ref, Ref, watch, computed } from 'vue';
+import Datepicker from 'vue3-datepicker';
+import useVuelidate from '@vuelidate/core';
+import { email, required } from '@vuelidate/validators';
+import countryCodeEmoji from 'country-code-emoji';
+import { CountryCode, isValidPhoneNumber } from 'libphonenumber-js/mobile';
+import { useStore } from 'vuex';
+import { extractErrorMessage } from '@/utils/helper';
+import { format } from 'date-fns';
+import PageLayout from '@/components/layout/PageLayout.vue';
+import Spinner from '@/components/layout/Spinner.vue';
+import PageActionHeader from '@/components/PageActionHeader.vue';
+import AppModal from '@/components/Modals/AppModal.vue';
+import AddressAutocomplete from './components/AddressAutocomplete.vue';
+import {axiosInstance as axios} from '@/plugins/axios';
+import {useToast} from 'vue-toast-notification';
+import router from '@/router';
+
+const validations = {
+  form: {
+    fname: { required },
+    lname: { required },
+    phone: { required },
+    email: { required, email },
+    residential_address: { required },
+    dob: { required },
+    license_number: { required },
+    expiry_date: { required },
+    files: { required },
+    avatar: { required }
+  }
+}
+const toast = useToast()
+const store = useStore()
+const uploadingFile = ref(false)
+const uploadingProfile = ref(false)
+const showModal = ref(false)
+const profilePreview = ref('')
+const form = ref({
+  fname: '',
+  lname: '',
+  phone: '',
+  email: '',
+  residential_address: '',
+  dob: '',
+  license_number: '',
+  expiry_date: '',
+  files: [] as string[],
+  avatar: '',
+  country: ''
+})
+const processing = ref(false)
+const countries = ref([]) as Ref<any[]>
+const isPhoneValid = ref(false)
+const v$ = useVuelidate(validations, {form})
+const userSessionData:any = computed(() => store.getters['auth/userSessionData'])
+const user:any = computed(() => store.getters['auth/user'])
+
+const selectedAddress = (value: any) => {
+  form.value.residential_address = value;
+}
+const setDefaultCountry = () => {
+  const code =
+    countries.value && countries.value.length
+      ? (countries.value[0] as any).code
+      : null;
+  if (code) {
+    form.value.country = code;
+  }
+}
+const fetchCountries = async () => {
+  const response = await axios.get(`v1/countries`);
+  countries.value = response.data || [];
+}
+const validatePhoneNumber = () => {
+  isPhoneValid.value = isValidPhoneNumber(
+    form.value.phone.toString(),
+    form.value.country as CountryCode
+  );
+}
+const countryCodeToEmoji = (code: string) => {
+  return countryCodeEmoji(code);
+}
+const openModal = () => {
+  showModal.value = true;
+}
+const closeModal = () => {
+  showModal.value = false;
+}
+const saveForm = async () => {
+  v$.value.form.$touch();
+  if (processing.value || v$.value.form.$errors.length) {
+    return;
+  }
+  processing.value = true;
+  try {
+    const newDriverPayload = {
+      fname: form.value.fname,
+      lname: form.value.lname,
+      phone: form.value.phone,
+      email: form.value.email,
+      password: 'shuttlers',
+      avatar: form.value.avatar,
+      dob: form.value.dob,
+      residential_address: form.value.residential_address
+    };
+    await axios.post('/v1/drivers', newDriverPayload).then((res) => {
+      return createPartnerDriver(res.data.id);
+    });
+  } catch (err) {
+    const errorMessage = extractErrorMessage(
+      err,
+      null,
+      'Oops! An error occurred, please try again.'
+    );
+    toast.error(errorMessage);
+  } finally {
+    processing.value = false;
+  }
+}
+const createPartnerDriver = async (driverId: any) => {
+  const expiryDate = form.value.expiry_date;
+  const partnerDriverPayload = {
+    registration_number: form.value.license_number,
+    expiry_date: format(expiryDate as any, 'yyyy-MM-dd HH:mm:ss') as any,
+    files: form.value.files,
+    driver_id: driverId.toString(),
+    document_type: 'drivers_license'
+  };
+  await axios
+    .post(
+      `/v1/partners/${
+        userSessionData.value.activeContext.account_sid
+      }/drivers/${driverId.toString()}`,
+      partnerDriverPayload
+    )
+    .then((response) => {
+      openModal();
+      router.push({
+        name: 'driver.detail.info',
+        params: { driverId: response.data.driver_id }
+      });
+      closeModal();
+    })
+    .catch((err) => {
+      const errorMessage = extractErrorMessage(
+        err,
+        null,
+        'Oops! An error occurred, please try again.'
+      );
+      toast.error(errorMessage);
+    });
+}
+const fileSelected = async (selectedImage: any) => {
+  uploadingFile.value = true;
+  await uploadTos3andGetDocumentUrl(selectedImage)
+    .then((res) => {
+      form.value.files.push(res);
+      toast.success('Driver’s License was uploaded successfully');
+    })
+    .catch(() => {
+      uploadingFile.value = false;
+    })
+    .finally(() => {
+      uploadingFile.value = false;
+    });
+}
+const handleProfileUpload = async (e: any) => {
+  const selectedProfile = e.target.files[0];
+  uploadingProfile.value = true;
+  await uploadTos3andGetDocumentUrl(selectedProfile)
+    .then((res) => {
+      form.value.avatar = res;
+      profilePreview.value = URL.createObjectURL(selectedProfile);
+      toast.success('Profile picture was uploaded successfully');
+    })
+    .catch(() => {
+      profilePreview.value = '';
+    })
+    .finally(() => {
+      uploadingProfile.value = false;
+    });
+}
+const uploadTos3andGetDocumentUrl = async (file: any) => {
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await axios.post(
+      `/v1/upload/identity/files`,
+      formData
+    );
+    if (response.data?.files?.length) {
+      return response.data.files[0].Location;
+    }
+  } catch (error) {
+    toast.error(
+      'An error occured while uploading your file, please try again'
+    );
+    profilePreview.value = '';
+  }
+}
+
+watch(() => form.value.phone, () => {
+  validatePhoneNumber()
+})
+watch(countries, () => {
+  setDefaultCountry()
+})
+
+setDefaultCountry();
+fetchCountries();
 </script>
 
 <style>

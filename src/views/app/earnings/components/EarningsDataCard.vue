@@ -83,7 +83,8 @@
     </div>
   </div>
 </template>
-<script lang="ts">
+
+<!-- <script lang="ts">
 import { defineComponent } from 'vue';
 import Spinner from '@/components/layout/Spinner.vue';
 
@@ -117,4 +118,51 @@ export default defineComponent({
     return {};
   }
 });
+</script> -->
+
+<script setup lang="ts">
+import { defineProps, computed } from 'vue';
+import Spinner from '@/components/layout/Spinner.vue';
+
+const props = defineProps<{
+  isRouteable: boolean
+  desc: string
+  value: number | string
+  link: string
+  bottomDesc: string
+  bottomDescValue: string
+  isLoading: boolean
+  formater: any
+  currency: string
+}>()
+
+const val = computed(() => {
+  let v: any = props.formater ? props.formater(props.value) : props.value;
+  if (props.currency) {
+    v = props.currency + ' ' + v;
+  }
+  return v;
+})
+
+// computed: {
+//   val: function () {
+//     let v: any = this.formater ? this.formater(this.value) : this.value;
+
+//     if (this.currency) {
+//       v = this.currency + ' ' + v;
+//     }
+//     return v;
+//   }
+// },
+// props: {
+//   isRouteable: Boolean,
+//   desc: String,
+//   value: Number || String,
+//   link: String,
+//   bottomDesc: String,
+//   bottomDescValue: String,
+//   isLoading: Boolean,
+//   formater: Function,
+//   currency: String
+// },
 </script>
