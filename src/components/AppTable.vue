@@ -208,7 +208,7 @@
   </div>
 </template>
 
-<script>
+<!-- <script>
 import {defineComponent} from "vue";
 import Spinner from "@/components/layout/Spinner";
 
@@ -365,4 +365,137 @@ export default defineComponent({
     }
   }
 });
+</script> -->
+
+<script setup lang="ts">
+import {ref, Ref, defineProps, withDefaults, watch, computed, defineEmits} from "vue";
+import Spinner from "@/components/layout/Spinner.vue";
+
+export interface Props {
+  items: any[]
+  fields: any[]
+  loading: boolean
+  errorLoading: boolean
+  layout?: string
+  usePagination?: boolean
+  extraOptions?: any
+}
+
+const emit = defineEmits(['pageChange', 'sizeChange', 'rowClicked'])
+const props = withDefaults(defineProps<Props>(), {
+  errorLoading: false,
+  layout: 'auto',
+  usePagination: true,
+  extraOptions: null
+})
+const pagination = ref({
+  itemsPerPage: 10,
+  currentPage: 1
+})
+const tableOptions = ref(null) as Ref<any>
+
+watch(() => pagination.value.itemsPerPage, (value, oldValue) => {
+  // alert(`itemsperpage = ${value}`)
+  if (value !== oldValue && value !== tableOptions.value.itemsPerPage) {
+    emit('sizeChange', value)
+    pagination.value.currentPage = 1
+    tableOptions.value.itemsPerPage = value
+  }
+})
+
+watch(() => props.extraOptions?.totalSize, (value, oldValue) => {
+  // alert(`extra.totalsize = ${value}`)
+  if (value !== oldValue) {
+    tableOptions.value.totalSize = value;
+  }
+})
+
+const total = computed(() => {
+  return tableOptions.value.serverSide ? tableOptions.value.totalSize : props.items.length
+})
+const paginationStartIndex = computed(() => {
+  return (paginationItemsPerPage.value * pagination.value.currentPage - paginationItemsPerPage.value + 1);
+})
+const paginationItemsPerPage = computed(() => {
+  return pagination.value.itemsPerPage
+})
+const tableItems = computed(() => {
+  if (props.usePagination && !tableOptions.value.serverSide) {
+    return props.items.slice(
+      paginationStartIndex.value - 1,
+      paginationStartIndex.value + paginationItemsPerPage.value - 1
+    );
+  }
+  return props.items;
+})
+const paginationTotalPages = computed(() => {
+  return Math.ceil(
+    (tableOptions.value.serverSide
+      ? tableOptions.value.totalSize
+      : props.items.length) / paginationItemsPerPage.value
+  );
+})
+const paginationIsInLastPage = computed(() => {
+  return pagination.value.currentPage === paginationTotalPages.value;
+})
+const paginationIsInFirstPage = computed(() => {
+  return pagination.value.currentPage === 1;
+})
+
+const handleRowClick = (item:any) => {
+  emit('rowClicked', item)
+}
+const initDefaultOptions = (options:any) => {
+  tableOptions.value = Object.assign(
+    {},
+    {
+      serverSide: false,
+      itemsPerPage: 10,
+      currentPage: 1,
+      totalSize: 0
+    },
+    options || {}
+  );
+  pagination.value.currentPage = tableOptions.value.currentPage;
+  pagination.value.itemsPerPage = tableOptions.value.itemsPerPage;
+  console.log(tableOptions.value)
+}
+const getPropPath = (obj:any, path:any) => {
+  if (!path) {
+    return;
+  }
+  const units = path.split(',');
+  const vals:any = [];
+  units.forEach((i:any) => {
+    vals.push(getProp(obj, i.split('.')));
+  });
+  return vals.join(' ');
+}
+const getProp:any = (obj:any, props:any) => {
+  const prop = props.shift();
+  if (!obj[prop] || !props.length) {
+    return obj[prop];
+  }
+  return getProp(obj[prop], props);
+}
+const prevPage = () => {
+  let page = pagination.value.currentPage - 1;
+  if (page < 1) {
+    page = 1;
+  }
+  pagination.value.currentPage = page;
+  emit('pageChange', pagination.value.currentPage)
+}
+const nextPage = () => {
+  let page = pagination.value.currentPage + 1;
+  console.log(page)
+  if (page > paginationTotalPages.value) {
+    page = paginationTotalPages.value;
+  }
+  pagination.value.currentPage = page;
+  console.log({ page });
+  emit('pageChange', pagination.value.currentPage)
+}
+
+initDefaultOptions(props.extraOptions);
 </script>

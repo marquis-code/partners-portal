@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-gray-50 w-full min-h-screen">
+  <div class="bg-gray-50 w-full min-h-screen overflow-x-hidden">
     <div>
       <div class="w-full pt-2 bg-white">
         <div
@@ -27,7 +27,7 @@
   </div>
 </template>
 
-<script lang="ts">
+<!-- <script lang="ts">
 import { defineComponent } from "vue";
 import { mapGetters } from "vuex";
 
@@ -73,6 +73,46 @@ export default defineComponent({
     },
   },
 });
+</script> -->
+
+<script setup lang="ts">
+import { ref, defineProps, withDefaults, computed } from "vue";
+import { useStore } from "vuex";
+import {axiosInstance as axios} from '@/plugins/axios';
+import router from "@/router";
+
+const store = useStore()
+const companyName = ref('')
+export interface Props {
+  pageTitle: string
+  hasTabs?: boolean
+  hasBreadCrumbs?: boolean
+}
+
+withDefaults(defineProps<Props>(), {
+  hasTabs: false,
+  hasBreadCrumbs: false
+})
+
+const userSessionData = computed(() => store.getters['auth/userSessionData'])
+const setCompany = () => {
+  companyName.value = userSessionData.value.activeContext.partner.company_name.slice(0, 15)
+}
+
+const logout = async () => {
+  // TODO: block UI with overlay while logout api is called
+  try {
+    window.$zoho.salesiq.reset();
+    await axios.delete("/logout");
+  } catch (e) {
+    console.info("An error occurred while logging out");
+  } finally {
+    await store.dispatch("auth/clearSessionData");
+    await router.push("/login");
+  }
+}
+
+setCompany()
 </script>
 
 <style scoped>

@@ -38,19 +38,15 @@
   </main>
 </template>
 
-<script>
-import { defineComponent } from "vue-demi";
+<script setup lang="ts">
+import { defineProps } from "vue";
 import Spinner from '@/components/layout/Spinner.vue';
 
-export default defineComponent({
-  props: {
-    driversCount: Number,
-    loading: Boolean
-  },
-  components: {
-    Spinner
-  }
-});
+defineProps<{
+  loading: boolean
+  driversCount: number
+}>()
+
 </script>
 
 <style scoped>

@@ -24,7 +24,7 @@
   </div>
 </template>
 
-<script>
+<!-- <script>
 export default {
   props: {
     item: String,
@@ -32,8 +32,15 @@ export default {
     actionRoute: String
   }
 };
-</script>
+</script> -->
 
-<!-- add.settlement.account -->
-<style>
-</style>
+<script setup lang="ts">
+import {defineProps} from 'vue'
+
+defineProps<{
+  item: string
+  status: string
+  actionRoute: string
+}>()
+
+</script>

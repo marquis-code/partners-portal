@@ -17,6 +17,9 @@
               <div class="mr-[20px]">
                 <p class="font-[500] text-[14px] pb-[10px] border-b-4 border-[#15CD70] rounded-t-3xl ">Cost Configuration</p>
               </div>
+              <div class="flex flex-row items-center mr-[30px] cursor-pointer" @click="gotoPayslip">
+                <p class="text-[#ACAFAE] text-[14px] pb-[10px]">Payslip</p>
+              </div>
             </div>
           </div>
           </template>
@@ -280,6 +283,9 @@ export default defineComponent({
     },
     gotoEarning () {
       this.$router.push('/earnings');
+    },
+    gotoPayslip () {
+      this.$router.push('/earnings/payslip');
     }
   },
   data () {

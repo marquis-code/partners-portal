@@ -29,3 +29,7 @@ export function downloadFile (url:string, fileName:string) {
   link.click();
   document.body.removeChild(link);
 }
+
+export const formatNaira = (amount:number) => {
+  return amount.toLocaleString("en-NG", { style: "currency", currency: "NGN" });
+}

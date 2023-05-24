@@ -14,7 +14,7 @@
   </div>
 </template>
 
-<script lang="ts">
+<!-- <script lang="ts">
 import {defineComponent} from '@vue/runtime-core';
 
 export default defineComponent({
@@ -35,4 +35,20 @@ export default defineComponent({
     },
   }
 });
+</script> -->
+
+<script setup lang="ts">
+import {defineProps, ref} from 'vue';
+
+defineProps<{
+  message: string
+  type: string
+  actionRequired: string
+}>()
+const showNotification = ref(true)
+
+const closeNotificaition = () => {
+  showNotification.value = false
+}
+
 </script>

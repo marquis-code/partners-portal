@@ -84,7 +84,7 @@
   </main>
 </template>
 
-<script>
+<!-- <script>
 import NotificationModalContent from './NotificationModalContent.vue';
 export default {
   components: { NotificationModalContent },
@@ -108,6 +108,26 @@ export default {
     }
   }
 };
+</script> -->
+
+<script setup lang="ts">
+import {ref, defineProps} from 'vue'
+import NotificationModalContent from './NotificationModalContent.vue';
+
+defineProps<{
+  type: string
+  title: string
+  description: string
+  modalExtras: boolean
+}>()
+const showModal = ref(true)
+
+const openModal = () => {
+  showModal.value = true
+}
+const closeModal = () => {
+  showModal.value = false
+}
 </script>
 
 <style scoped>
