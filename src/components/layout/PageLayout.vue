@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-gray-50 w-full min-h-screen">
+  <div class="bg-gray-50 w-full min-h-screen overflow-x-hidden">
     <div>
       <div class="w-full pt-2 bg-white">
         <div

@@ -1,5 +1,5 @@
 <template>
-  <div class="home flex flex-row">
+  <div class="home flex flex-row overflow-x-hidden">
     <sidebar @sideBarNavigationClicked="changeNavigation"/>
     <div class="w-full pb-[80px]">
       <router-view/>
