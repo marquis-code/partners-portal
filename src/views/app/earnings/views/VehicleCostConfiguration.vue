@@ -117,7 +117,8 @@
     </page-layout>
   </main>
 </template>
-<script lang="ts">
+
+<!-- <script lang="ts">
 import { defineComponent } from 'vue'
 import PageLayout from '@/components/layout/PageLayout.vue';
 import TripHistory from '@/components/TripHistory.vue';
@@ -213,5 +214,97 @@ export default defineComponent({
       },
     }
   }
+})
+</script> -->
+
+<script setup lang="ts">
+import { ref, Ref, onMounted } from 'vue'
+import PageLayout from '@/components/layout/PageLayout.vue';
+import TripHistory from '@/components/TripHistory.vue';
+import { useRoute } from 'vue-router';
+import {axiosInstance as axios} from '@/plugins/axios';
+
+const $route = useRoute()
+const isFetchingInformation = ref(true);
+const cost = ref(0) as Ref<any>
+const city = ref('Lagos');
+const daysAvailable = ref('Everyday');
+const netIncome = ref(0);
+const currency = ref('₦');
+const vehicle = ref({
+  vehicleId: undefined,
+  name: '',
+  licenseNumber: ''
+})
+const driver = ref({
+  driverId: undefined,
+  name: '',
+  avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80'
+})
+const route = ref({
+  id: undefined,
+  pickup: "",
+  destination: "",
+  route_code: '',
+})
+
+const init = async() => {
+  await getVehicleInformation();
+}
+const getVehicleInformation = async() => {
+  try {
+    const params = $route.params;
+    // console.log(params);
+    isFetchingInformation.value = true;
+    const response = await axios.get(
+      `/cost-revenue/v1/trips/${params?.id}/revenues`
+    );
+    if (response.status === 200) {
+      console.log(response.data.metadata)
+      const {
+        driver: driverObj,
+        vehicle: vehicleObj,
+        driverId,
+        vehicleId,
+        dropoff,
+        pickup,
+        routeCode,
+      } = response.data.metadata;
+
+      const {
+        totalDeductedAmount,
+        deductions,
+        partnersRevenue,
+      } = response.data;
+
+      cost.value = Intl.NumberFormat('en-us').format(partnersRevenue ?? 0);
+
+      driver.value = {
+        driverId,
+        name: `${driverObj?.fname} ${driverObj?.lname}`,
+        avatar: driverObj?.avatar ?? driver.value.avatar,
+      };
+      vehicle.value = {
+        ...vehicle.value,
+        vehicleId,
+        name: vehicleObj?.name,
+        licenseNumber: vehicleObj?.registration_number,
+      };
+      route.value = {
+        ...route.value,
+        pickup,
+        destination: dropoff,
+        route_code: routeCode,
+      };
+    }
+  } catch (e) {
+    console.log(e);
+  } finally {
+    isFetchingInformation.value = false;
+  }
+}
+
+onMounted(() => {
+  init()
 })
 </script>

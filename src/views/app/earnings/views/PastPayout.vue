@@ -49,7 +49,8 @@
     </page-layout>
   </main>
 </template>
-<script lang="ts">
+
+<!-- <script lang="ts">
 import { defineComponent } from 'vue';
 import PageLayout from '@/components/layout/PageLayout.vue';
 import AppTable from '@/components/AppTable.vue';
@@ -138,7 +139,78 @@ export default defineComponent({
     }
   }
 })
-</script>
+</script> -->
 
-<style>
-</style>
+<script setup lang="ts">
+import { ref, Ref, computed, onMounted } from 'vue';
+import PageLayout from '@/components/layout/PageLayout.vue';
+import AppTable from '@/components/AppTable.vue';
+import moment from 'moment';
+import { useStore } from 'vuex';
+import router from '@/router'
+import {axiosInstance as axios} from '@/plugins/axios';
+
+const store = useStore()
+const searchText = ref('');
+const isFetchingPayouts = ref(true);
+const errorLoading = ref(false);
+const filter = ref({ sortBy: '' });
+const headers = [
+  { label: 'Date', key: 'date' },
+  { label: 'Time', key: 'time' },
+  { label: 'Bank Name', key: 'bankName' },
+  { label: 'Account Number', key: 'accountNumber' },
+  { label: 'Amount (₦)', key: 'amount' },
+]
+const tableData = ref([]) as Ref<any[]>
+const isFetchingAllEarnings = ref(false);
+const isFetchingSettlements = ref(false);
+const isFetchingNextPaydate = ref(false);
+
+const partnerContext:any = computed(() => store.getters['auth/activeContext'])
+
+const init = async() => {
+  await getAllPayouts();
+}
+const gotoEarning = () => {
+  router.push('/earnings');
+}
+const getAllPayouts = async() => {
+  try {
+    isFetchingPayouts.value = true;
+    const response = await axios.get(
+      `/cost-revenue/v1/partners/${partnerContext.value.partner.account_sid}/payouts`
+    );
+    if (response.status === 200) {
+      tableData.value = formatTableData(response.data.result) as Array<any>;
+    }
+  } catch (e) {
+    console.log(e);
+  } finally {
+    isFetchingPayouts.value = false;
+  }
+}
+const formatTableData = (data: Array<any>) => {
+  try {
+    const result = [];
+    for (const d of data) {
+      const obj = {} as any;
+      obj.id = d.id;
+      obj.date = moment(d.createdAt).format('DD MMMM YYYY');
+      obj.time = moment(d.createdAt).format('hh:mm A');
+      obj.bankName = d.settlementAccount.bankName;
+      obj.accountNumber = d.settlementAccount.accountNumber;
+      obj.amount = d.amount;
+
+      result.push(obj);
+    }
+    return result;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+onMounted(() => {
+  init()
+})
+</script>
