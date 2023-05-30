@@ -125,15 +125,15 @@ import { defineProps, computed } from 'vue';
 import Spinner from '@/components/layout/Spinner.vue';
 
 const props = defineProps<{
-  isRouteable: boolean
-  desc: string
-  value: number | string
-  link: string
-  bottomDesc: string
-  bottomDescValue: string
-  isLoading: boolean
-  formater: any
-  currency: string
+  isRouteable?: boolean
+  desc?: string
+  value?: number | string
+  link?: string
+  bottomDesc?: string
+  bottomDescValue?: string
+  isLoading?: boolean
+  formater?: any
+  currency?: string
 }>()
 
 const val = computed(() => {
