@@ -87,6 +87,10 @@
           Join now
         </p>
       </div>
+      <router-link to="/faq" class="mt-4 w-fit mx-auto text-sm py-2 px-3 flex items-center gap-2 border border-[#0DAC5C] text-[#0DAC5C] rounded-lg font-medium">
+        <img src="@/assets/images/faqs/question_mark.svg" alt="">
+        Go to FAQ
+      </router-link>
     </div>
   </form>
   <!-- </main> -->

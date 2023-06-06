@@ -74,6 +74,10 @@
     <div v-else>
       <p class="text-center tex-sm font-medium text-indigo-600" @click="backToStep1()">Back</p>
     </div>
+    <router-link to="/faq" class="w-fit mx-auto text-sm py-2 px-3 flex items-center gap-2 border border-[#0DAC5C] text-[#0DAC5C] rounded-lg font-medium">
+      <img src="@/assets/images/faqs/question_mark.svg" alt="">
+      Go to FAQ
+    </router-link>
   </form>
 </template>
 
