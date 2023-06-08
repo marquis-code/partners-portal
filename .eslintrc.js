@@ -31,6 +31,7 @@ module.exports = {
       }
     ],
     camelcase: "off",
+    'no-tabs': 'off'
   },
   overrides: [
     {
