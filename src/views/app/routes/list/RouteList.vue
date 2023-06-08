@@ -126,7 +126,7 @@
   </page-layout>
 </template>
 
-<script lang="ts">
+<!-- <script lang="ts">
 import { defineComponent } from 'vue';
 import AppTable from '@/components/AppTable.vue';
 import { mapGetters } from 'vuex';
@@ -340,6 +340,183 @@ export default defineComponent({
     }
   }
 });
-</script>
+</script> -->
 
-<style lang="scss" scoped></style>
+<script setup lang="ts">
+import { ref, computed, Ref, watch, defineProps } from 'vue';
+import AppTable from '@/components/AppTable.vue';
+import { useStore } from 'vuex';
+import PageLayout from '@/components/layout/PageLayout.vue';
+import TripHistory from '@/components/TripHistory.vue';
+import { extractErrorMessage } from '@/utils/helper';
+import Papa from 'papaparse'
+import spinner from '@/components/loader/spinner.vue'
+import moment from 'moment';
+import { downloadFile, addToQuery, removeQueryParam } from '@/composables/utils'
+import { useRoute } from 'vue-router';
+import router from '@/router';
+import {axiosInstance as axios} from '@/plugins/axios';
+import {useToast} from 'vue-toast-notification';
+
+const toast = useToast()
+const store = useStore()
+const route = useRoute()
+const props = defineProps<{
+  routeId: number|string
+}>()
+const headers = [
+  { label: 'Route Code', key: 'route_code' },
+  { label: 'Route', key: 'route' },
+  { label: 'Start Time', key: 'start_time' },
+  { label: 'Driver Assigned', key: 'driver_assigned' },
+  { label: 'Vehicle Assigned', key: 'vehicle' },
+  { label: 'Cost of Supply', key: 'cost' }
+]
+const filters = ref({
+  pageNumber: 1,
+  pageSize: 10,
+  search: ''
+})
+const downloadLoader = ref(false);
+const result = ref([]) as Ref<any[]>
+const search = ref('');
+const loading = ref(false);
+const debounce = ref(null) as Ref<any>
+const tableData = ref([]) as Ref<any[]>
+const totalRecords = ref(null) as Ref<any>
+const errorLoading = ref(false);
+const items = ref([]) as Ref<any[]>
+const trips = ref([]) as Ref<any[]>
+
+const partnerContext:any = computed(() => store.getters['auth/activeContext'])
+
+watch(() => filters.value.pageNumber, () => {
+  fetchPartnerRoutes()
+})
+
+watch(() => filters.value.pageSize, () => {
+  fetchPartnerRoutes()
+})
+
+watch(() => filters.value.search, () => {
+  if (filters.value.search) addToQuery(route, router, {searchTerm: filters.value.search})
+  if (!filters.value.search) removeQueryParam(route, router, ['searchTerm'])
+  clearTimeout(debounce.value)
+  debounce.value = setTimeout(() => {
+    fetchPartnerRoutes()
+  }, 600)
+})
+
+const downloadReport = () => {
+  downloadLoader.value = true
+  axios
+    .get(
+      `/v1/partners/${partnerContext.value.partner.id}/routes?page=${filters.value.pageNumber}&limit=${filters.value.pageSize}&search=${filters.value.search}`
+    )
+    .then((res) => {
+      const total = res?.data?.metadata?.total;
+      // console.log(total)
+      axios.get(
+        `/v1/partners/${partnerContext.value.partner.id}/routes?page=${filters.value.pageNumber}&limit=${total}&search=${filters.value.search}`
+      ).then((res) => {
+        if (res.data.data.length) {
+          const x = res.data.data
+          console.log(x)
+          const newArr = []
+          for (let i = 0; i < x.length; i++) {
+            const el = x[i]
+            const y = {
+              Route_code: el.route.route_code,
+              Pickup: el.route.pickup,
+              Destination: el.route.destination,
+              Start_time: el.route_itinerary.trip_time,
+              Driver: `${el.driver.fname} ${el.driver.lname}`,
+              Vehicle_assigned: `${el.vehicle.seats ?? ''} seater - ${el.vehicle.brand ?? ''} ${el.vehicle.name ?? ''} ${el.vehicle.registration_number ?? ''}`,
+              Cost_of_supply: el.cost_of_supply
+
+            }
+            newArr.push(y)
+          }
+          const csv = Papa.unparse(newArr);
+          const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+          const url = URL.createObjectURL(blob);
+          downloadFile(url, 'downloaded-trips-report')
+        } else {
+          toast.error(
+            'No data to download'
+          );
+        }
+      })
+    })
+    .catch((err) => {
+      toast.error(
+        err?.response?.data?.message || 'An error occured'
+      );
+    })
+    .finally(() => {
+      downloadLoader.value = false;
+    });
+}
+const changePage = (pageNumber: any) => {
+  filters.value.pageNumber = pageNumber;
+}
+const showPageSize = (pageSize: any) => {
+  filters.value.pageSize = pageSize;
+}
+const fetchPartnerRoutes = async () => {
+  loading.value = true;
+  try {
+    const response = await axios.get(
+      `/v1/partners/${partnerContext.value.partner.id}/routes?page=${filters.value.pageNumber}&limit=${filters.value.pageSize}&search=${filters.value.search}`
+    );
+    tableData.value = structureRouteFromResponse(response.data.data);
+    totalRecords.value = response.data.metadata?.total;
+  } catch (error) {
+    const errorMessage = extractErrorMessage(
+      error,
+      null,
+      'Oops! An error occurred, please try again.'
+    );
+    toast.error(errorMessage);
+  } finally {
+    loading.value = false;
+  }
+}
+const structureRouteFromResponse = (routeList: any[]) => {
+  const newRoute: any[] = routeList.map((route) => {
+    return {
+      route_code: route.route.route_code,
+      route: route?.route,
+      destination: route?.route.destination,
+      start_time: route.route_itinerary.trip_time,
+      driver_assigned: route?.driver?.fname + ' ' + route?.driver?.lname,
+      driver_id: route?.driver?.id,
+      vehicle_id: route.vehicle.id,
+      plate_number: route?.vehicle?.registration_number,
+      vehicle_name: route?.vehicle?.name,
+      vehicle_brand: route?.vehicle?.name,
+      vehicle:
+        '' +
+        route.vehicle.seats +
+        ' seater - ' +
+        route.vehicle.brand +
+        ' ' +
+        route.vehicle.name +
+        ' ' +
+        route.vehicle.registration_number,
+      cost: route.cost_of_supply,
+      routeId: '' + route.id,
+      route_id: route.id
+    };
+  });
+  return newRoute;
+}
+
+const checkForExistingFilters = () => {
+  const query = route.query
+  if (query.searchTerm) filters.value.search = query.searchTerm as string
+  fetchPartnerRoutes();
+}
+
+checkForExistingFilters()
+</script>

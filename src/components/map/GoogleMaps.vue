@@ -102,7 +102,7 @@ const props = defineProps<{
   startLocation: LocationType
   endLocation: LocationType
   routeLine: LocationType[]
-  centerLocation: LocationType
+  centerLocation?: LocationType
 }>()
 
 const googleMapInstance = ref() as Ref<any>
