@@ -51,7 +51,7 @@
   </page-layout>
 </template>
 
-<script lang="ts">
+<!-- <script lang="ts">
 import { defineComponent } from 'vue';
 import { extractErrorMessage } from '@/utils/helper';
 import SingleTrip from '@/views/app/trips/components/SingleTrip.vue';
@@ -117,7 +117,65 @@ export default defineComponent({
     }
   }
 });
-</script>
+</script> -->
 
-<style scoped>
-</style>
+<script lang="ts">
+import { ref, Ref } from 'vue';
+import { extractErrorMessage } from '@/utils/helper';
+import SingleTrip from '@/views/app/trips/components/SingleTrip.vue';
+import { getDefaultDatePickerDate } from '@/utils/dateFormatters';
+import PageLayout from '@/components/layout/PageLayout.vue';
+import PageActionHeader from '@/components/PageActionHeader.vue';
+import {axiosInstance as axios} from '@/plugins/axios';
+import {useToast} from 'vue-toast-notification';
+import { useRoute } from 'vue-router';
+
+interface fetchPassengerParamInterface {
+  created_at: string,
+  route: {
+    route_code: any,
+    itineraries: any,
+    id: number
+  },
+  driver: {
+    id: number
+  }
+}
+
+const route = useRoute()
+const toast = useToast()
+const tripInfo = ref({}) as Ref<fetchPassengerParamInterface>
+const loading = ref(false)
+
+const fetchTrip = async () => {
+  loading.value = true;
+  await axios
+    .get(`/v1/upcoming-trips/${route.params.tripId}`)
+    .then((res) => {
+      tripInfo.value = res.data;
+      setParamsToFetchTripPassengers()
+    })
+    .catch((err) => {
+      const errorMessage = extractErrorMessage(
+        err,
+        null,
+        'Oops! An error occurred, please try again.'
+      );
+      toast.error(errorMessage);
+    })
+    .finally(() => {
+      loading.value = false;
+    });
+}
+const setParamsToFetchTripPassengers = () => {
+  const params = {
+    booking_days: [getDefaultDatePickerDate(tripInfo.value?.created_at)],
+    itinerary_id: tripInfo.value?.route.itineraries?.[0].id,
+    driver_id: tripInfo.value?.driver?.id,
+    route_id: tripInfo.value?.route?.id
+  };
+  localStorage.setItem('TRIP_PASSENGER_PARAM', JSON.stringify(params));
+}
+
+fetchTrip()
+</script>

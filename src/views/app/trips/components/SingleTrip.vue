@@ -184,7 +184,7 @@
   </main>
 </template>
 
-<script>
+<!-- <script>
 import TripHistory from '@/components/TripHistory.vue';
 import TripMap from './TripMap';
 import GoogleMaps from '@/components/map/GoogleMaps.vue';
@@ -242,4 +242,55 @@ export default {
     }
   }
 };
+</script> -->
+
+<script setup lang="ts">
+import TripHistory from '@/components/TripHistory.vue';
+import TripMap from './TripMap.vue';
+import GoogleMaps from '@/components/map/GoogleMaps.vue';
+import { formatGeometry } from '@/utils/mapFunctions';
+import {ref, Ref, watch, defineProps} from 'vue'
+
+const props = defineProps<{
+  tripData: any
+  upcomingTrip: any
+}>()
+const tripChangeList = [
+  {
+    itemChanged: 'Driver',
+    date: '20th October, 2022 10:53 AM'
+  },
+  {
+    itemChanged: 'Vehicle',
+    date: '22th October, 2022 13:53 PM'
+  }
+]
+const showTripChange = ref(false);
+const polyline = ref([]) as Ref<any[]>
+const startPoint = ref({}) as Ref<any>
+const endPoint = ref({}) as Ref<any>
+const centerPoint = ref({}) as Ref<any>
+
+// watch: {
+//   tripData (newValue) {
+//     console.log(newValue, 'driver here');
+//   }
+// },
+
+const $moment = (dateStr:string) => {
+  if (!dateStr) return null;
+  return new Date(dateStr)
+}
+const toggleTripChange = () => {
+  showTripChange.value = !showTripChange.value;
+}
+const getRouteGeometry = () => {
+  polyline.value = props.tripData.value?.route?.geometry ? formatGeometry(props.tripData.value.route.geometry) : [];
+  if (!polyline.value || !polyline.value.length) return;
+  startPoint.value = polyline.value[0];
+  endPoint.value = polyline.value[polyline.value.length - 1];
+  centerPoint.value = polyline.value[Math.ceil(polyline.value.length / 2)];
+}
+
+getRouteGeometry()
 </script>
