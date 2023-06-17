@@ -119,7 +119,7 @@ export default defineComponent({
 });
 </script> -->
 
-<script lang="ts">
+<script setup lang="ts">
 import { ref, Ref } from 'vue';
 import { extractErrorMessage } from '@/utils/helper';
 import SingleTrip from '@/views/app/trips/components/SingleTrip.vue';

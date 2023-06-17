@@ -128,7 +128,7 @@
   </page-layout>
 </template>
 
-<script>
+<!-- <script>
 import PageLayout from '../../../../components/layout/PageLayout';
 import { mapGetters } from 'vuex';
 import Spinner from '../../../../components/layout/Spinner';
@@ -186,6 +186,50 @@ export default {
     }
   }
 };
+</script> -->
+
+<script setup lang="ts">
+import PageLayout from '../../../../components/layout/PageLayout.vue';
+import { useStore } from 'vuex';
+import Spinner from '../../../../components/layout/Spinner.vue';
+import PageActionHeader from '../../../../components/PageActionHeader.vue';
+import emitter from '@/libs/emitter';
+import TabContainer from '@/components/tab/TabContainer.vue';
+import TabItem from '@/components/tab/TabItem.vue';
+import {ref, Ref, computed, useAttrs} from 'vue'
+
+const store = useStore()
+const attrs = useAttrs()
+const vehicleData:any = computed(() => store.getters['vehicle/getVehicleData'])
+const isLoading:any = computed(() => store.getters['vehicle/getVehicleLoading'])
+const loading = ref(true)
+const showDropdown = ref(false)
+
+const toggleDropdown = () => {
+  showDropdown.value = !showDropdown.value;
+}
+const editVehicle = () => {
+  emitter.emit('vehicles:edit-vehicle' as any);
+  showDropdown.value = false;
+}
+const assignDriver = (item:any) => {
+  emitter.emit('vehicles:assign-driver', item?.id);
+  showDropdown.value = false;
+}
+const unassignDriver = (item:any) => {
+  emitter.emit('vehicles:unassign-driver', item?.id);
+  showDropdown.value = false;
+}
+const removeVehicle = (item:any) => {
+  console.log(item);
+  showDropdown.value = false;
+}
+
+store
+  .dispatch('vehicle/fetchVehicleInfo', attrs.vehicleId)
+  .finally(() => {
+    loading.value = false;
+  })
 </script>
 
 <style scoped>

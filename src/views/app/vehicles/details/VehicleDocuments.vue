@@ -4,7 +4,7 @@
     <div class="space-y-5 ring-1 ring-gray-50 shadow-sm rounded-sm bg-white">
       <app-table
         :loading="loading"
-        :error-loading="errorLoading"
+        :error-loading="(errorLoading as any)"
         :items="documentTableData"
         :fields="headers"
       >
