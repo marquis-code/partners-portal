@@ -58,7 +58,7 @@
   </form>
 </template>
 
-<script lang="ts">
+<!-- <script lang="ts">
 import { defineComponent } from 'vue';
 import MultipleImageUpload from '@/components/MultipleImageUpload.vue';
 import { mapGetters } from 'vuex';
@@ -173,7 +173,116 @@ export default defineComponent({
     };
   }
 });
-</script>
+</script> -->
 
-<style>
-</style>
+<script setup lang="ts">
+import { ref, Ref, computed } from 'vue';
+import MultipleImageUpload from '@/components/MultipleImageUpload.vue';
+import { useStore } from 'vuex';
+import { extractErrorMessage } from '@/utils/helper';
+import Spinner from '@/components/layout/Spinner.vue';
+import router from '@/router';
+import {axiosInstance as axios} from '@/plugins/axios';
+import {useToast} from 'vue-toast-notification';
+
+const store = useStore()
+const toast = useToast()
+const submittingFinalForm = ref(false);
+const uploadingFile = ref(false);
+const interiorImages = ref([] as Array<any>);
+const exteriorImages = ref([] as Array<any>);
+
+const partnerContext:any = computed(() => store.getters['auth/activeContext'])
+const user:any = computed(() => store.getters['auth/user'])
+const vehicleFormData:any = computed(() => store.getters['vehicle/getVehicleData'])
+const getVehicleFormData:any = computed(() => store.getters['vehicle/getVehicleFormData'])
+
+const selectFile = async ($event: File, type: string) => {
+  const multipleDocumentObjects = $event;
+  const multipleDocumentList = convertImageObjectToList(
+    multipleDocumentObjects
+  );
+  uploadTos3andGetDocumentUrlList(multipleDocumentList, type);
+}
+const removeFiles = (type: any) => {
+  if (type === 'interior') {
+    interiorImages.value = [];
+  }
+  if (type === 'exterior') {
+    exteriorImages.value = [];
+  }
+}
+const uploadTos3andGetDocumentUrlList = (multipleImages: Array<File>, type: string) => {
+  uploadingFile.value = true;
+  multipleImages.forEach(async (file) => {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const response = await axios.post(
+        `/v1/upload/identity/files`,
+        formData
+      );
+      if (response.data?.files?.length) {
+        if (type === 'interior') {
+          interiorImages.value.push(response.data.files[0].Location);
+        }
+        if (type === 'exterior') {
+          exteriorImages.value.push(response.data.files[0].Location);
+        }
+      }
+    } catch (error) {
+      toast.warning(
+        'An error occured while uploading your file, please try again'
+      );
+    }
+  });
+  uploadingFile.value = false;
+  toast.success(`${type} images uploaded`);
+}
+const convertImageObjectToList = (imageObject: any) => {
+  const imageList = [];
+  for (const key in imageObject) {
+    if (imageObject[key].size) {
+      imageList.push(imageObject[key]);
+    }
+  }
+  return imageList;
+}
+const viewVehicleDetails = (id: number) => {
+  router.push({
+    name: 'vehicle.detail.info',
+    params: { vehicleId: id }
+  });
+}
+const submitFinalForm = async () => {
+  submittingFinalForm.value = true;
+  try {
+    await axios.post(
+      `/v1/partners/${partnerContext.value.partner.id}/vehicle/${getVehicleFormData.value.id}/vehicle-images`,
+      {
+        uploads: [...interiorImages.value]
+      }
+    );
+    await axios.post(
+      `/v1/partners/${partnerContext.value.partner.id}/vehicle/${getVehicleFormData.value.id}/vehicle-images`,
+      {
+        uploads: [...exteriorImages.value]
+      }
+    );
+    viewVehicleDetails(getVehicleFormData.value.id);
+  } catch (error) {
+    const errorMessage = extractErrorMessage(
+      error,
+      null,
+      'Oops! An error occurred, please try again.'
+    );
+    if (errorMessage === '"uploads" must contain at least 1 items') {
+      toast.error('All Vehicle Images must be uploaded');
+    } else {
+      toast.error(errorMessage);
+    }
+  } finally {
+    submittingFinalForm.value = false;
+  }
+}
+</script>

@@ -11,7 +11,8 @@
     </div>
   </div>
 </template>
-<script lang="ts">
+
+<!-- <script lang="ts">
 import {defineComponent} from 'vue';
 import Breadcrumbs from './Breadcrumbs.vue';
 export default defineComponent({
@@ -26,4 +27,13 @@ export default defineComponent({
   methods: {},
   components: { Breadcrumbs }
 })
+</script> -->
+
+<script setup lang="ts">
+import { defineProps} from 'vue';
+import Breadcrumbs from './Breadcrumbs.vue';
+
+defineProps<{
+  activeSection?: string
+}>()
 </script>

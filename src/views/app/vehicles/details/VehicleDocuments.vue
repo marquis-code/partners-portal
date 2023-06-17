@@ -312,7 +312,7 @@
   </div>
 </template>
 
-<script lang="ts">
+<!-- <script lang="ts">
 import { defineComponent } from 'vue';
 import { mapGetters } from 'vuex';
 import AppTable from '@/components/AppTable.vue';
@@ -617,7 +617,305 @@ export default defineComponent({
     }
   }
 });
-</script>
+</script> -->
 
-<style scoped>
-</style>
+<script setup lang="ts">
+import { ref, Ref, computed, onMounted } from 'vue';
+import { useStore } from 'vuex';
+import AppTable from '@/components/AppTable.vue';
+import { getExpiryDate, getUserReadableDate } from '@/utils/dateFormatters';
+import AppModal from '@/components/Modals/AppModal.vue';
+import ImageUploadInModal from '@/components/ImageUploadInModal.vue';
+import Spinner from '@/components/layout/Spinner.vue';
+import moment from 'moment';
+import router from '@/router';
+import {axiosInstance as axios} from '@/plugins/axios';
+import {useToast} from 'vue-toast-notification';
+import { useRoute } from 'vue-router';
+
+interface AddVehicleDocumentType {
+  files?: string[];
+  document_type?: string;
+  expiry_date?: string;
+}
+
+const route = useRoute()
+const toast = useToast()
+const store = useStore()
+const headers = [
+  { label: 'Type', key: 'type' },
+  { label: 'Category', key: 'category' },
+  { label: 'Expiry Date', key: 'expiry' },
+  { label: 'Status', key: 'status' },
+  { label: 'Date Created', key: 'date' },
+  { label: '', key: 'actions' }
+]
+const docToUpdate = ref({
+  id: null,
+  partner_id: null,
+  files: '',
+  document_type: '',
+  status: '',
+  document_slug: '',
+  vehicle_id: null,
+  expiry_date: '',
+  require_expiration_date: false
+});
+const docToAdd = ref({
+  document_type: '',
+  expiry_date: '',
+  files: '',
+  require_expiration_date: false
+});
+const loadingCityDoc = ref(false);
+const errorLoadingCityDoc = ref(false);
+const showDocumentAddingModal = ref(false);
+const loading = ref(false);
+const totalRecords = ref(null);
+const uploadingDoc = ref(false);
+const savingForm = ref(false);
+const showDocumentUpdateModal = ref(false);
+const vehicleTableData = ref([] as Array<any>);
+const documentTableData = ref([] as Array<any>);
+const cityDocumentTableData = ref([] as Array<any>);
+const errorLoading = ref(null);
+const selectedDropDown = ref(-1);
+const visibleRef = ref(false);
+const indexRef = ref(0);
+const imgsRef = ref([] as Array<string>);
+const updateForm = ref({
+  documentType: '',
+  documentImage: ''
+});
+
+const partnerContext:any = computed(() => store.getters['auth/activeContext'])
+const vehicleData:any = computed(() => store.getters['vehicle/getVehicleData'])
+const isLoading:any = computed(() => store.getters['vehicle/getVehicleLoading'])
+
+onMounted(() => {
+  fetchAllDocuments()
+})
+
+const openDocumentUploadModal = (doc: any) => {
+  // open the modal
+  showDocumentUpdateModal.value = true;
+  // initialize the docs to update
+  const mainDoc = doc?.documents?.[0];
+  docToUpdate.value.id = mainDoc.id;
+  docToUpdate.value.partner_id = mainDoc.partner_id;
+  docToUpdate.value.files = mainDoc.files[0];
+  docToUpdate.value.document_type = mainDoc.document_type;
+  docToUpdate.value.status = mainDoc.status;
+  docToUpdate.value.document_slug = mainDoc.document_slug;
+  docToUpdate.value.vehicle_id = mainDoc.vehicle_id;
+  docToUpdate.value.expiry_date = mainDoc.expiry_date
+    ? mainDoc.expiry_date.slice(0, 10)
+    : null;
+  docToUpdate.value.require_expiration_date = !!doc.require_expiration_date;
+}
+const openDocumentadditionModal = (doc: any) => {
+  // open the modal
+  showDocumentAddingModal.value = true;
+  // initialize the docs to update
+  docToAdd.value.document_type = doc?.type;
+  docToAdd.value.require_expiration_date = !!doc.require_expiration_date;
+}
+const updateThisDocument = async () => {
+  const payload = {
+    files: [docToUpdate.value.files],
+    document_type: docToUpdate.value.document_type,
+    status: docToUpdate.value.status,
+    document_slug: docToUpdate.value.document_slug,
+    vehicle_id: docToUpdate.value.vehicle_id,
+    expiry_date: docToUpdate.value.expiry_date
+  };
+  savingForm.value = true;
+  try {
+    await axios.patch(
+      `/v1/partners/${docToUpdate.value.partner_id}/vehicle-documents/${docToUpdate.value.id}`,
+      { ...payload }
+    );
+    toast.success(`${docToUpdate.value.document_type} updated`);
+    showDocumentUpdateModal.value = false;
+    fetchAllDocuments();
+  } catch (error) {
+    toast.warning('Unable to update this document, Please try again');
+  } finally {
+    savingForm.value = false;
+  }
+}
+const addThisNewDocument = async () => {
+  const payload: AddVehicleDocumentType = {
+    document_type: docToAdd.value.document_type,
+    files: [docToAdd.value.files]
+  };
+  if (docToAdd.value.expiry_date) {
+    payload.expiry_date = moment(docToAdd.value.expiry_date).format(
+      'YYYY-MM-DD HH:mm:ss'
+    );
+  }
+  savingForm.value = true;
+  try {
+    await axios.post(
+      `/v1/partners/${partnerContext.value.partner.id}/vehicle/${vehicleData.value.id}/vehicle-documents`,
+      {
+        vehicle_documents: [payload]
+      }
+    );
+    toast.success(`${docToUpdate.value.document_type} updated`);
+    showDocumentAddingModal.value = false;
+    fetchAllDocuments();
+  } catch (error) {
+    toast.warning('Unable to update this document, Please try again');
+  } finally {
+    savingForm.value = false;
+  }
+}
+const cancleDocumentChange = () => {
+  uploadingDoc.value = false;
+  showDocumentUpdateModal.value = false;
+}
+const uploadTos3andGetDocumentUrl = async (file: string | Blob): Promise<any> => {
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await axios.post(
+      `/v1/upload/identity/files`,
+      formData
+    );
+    if (response.data?.files?.length) {
+      return response.data.files[0].Location;
+    }
+  } catch (error) {
+    toast.warning(
+      'An error occured while uploading your file, please try again'
+    );
+  }
+}
+const selectThisNewDocument = async ($event: any) => {
+  const fileHolder = $event;
+  uploadingDoc.value = true;
+  const fileUrl = await uploadTos3andGetDocumentUrl(fileHolder);
+  uploadingDoc.value = false;
+  if (docToUpdate.value.files) {
+    docToUpdate.value.files = '';
+  }
+  docToUpdate.value.files = fileUrl;
+  toast.success(
+    `${docToUpdate.value.document_type} has been uploaded`
+  );
+}
+const removeExistingDoc = () => {
+  docToUpdate.value.files = '';
+  docToUpdate.value.expiry_date = '';
+}
+const onHide = () => {
+  visibleRef.value = false;
+}
+const showImage = (imgUrl: any) => {
+  imgsRef.value = [imgUrl];
+  onShow();
+}
+const onShow = () => {
+  visibleRef.value = true;
+}
+const closeDocumentUploadModal = () => {
+  uploadingDoc.value = false;
+}
+const fetchVehicleDocuments = () => {
+  loading.value = true;
+  axios
+    .get(
+      `v1/partners/${partnerContext.value.partner.id}/vehicle/${vehicleData.value.id}/vehicle-documents`
+    )
+    .then((r) => {
+      vehicleTableData.value =
+        structureDocumentTable(r.data.data) || [];
+    })
+    .finally(() => {
+      loading.value = false;
+    });
+}
+const fetchAllDocuments = () => {
+  loading.value = true;
+  axios
+    .get(
+      `v1/partners/${partnerContext.value.partner.id}/vehicle/${vehicleData.value.id}/vehicle-documents`
+    )
+    .then((r) => {
+      const vehicleDocuments = r.data.vehicleDocuments;
+      documentTableData.value =
+        structureDocumentTable(vehicleDocuments) || [];
+      // const cityDocuments = r.data.cityDocuments;
+      // console.log(cityDocuments);
+      // const cityDocuments = r.data.cityDocuments;
+      // const cityDocumentsObject =
+      //   this.structureCityDocuments(cityDocuments);
+      // if (cityDocumentsObject) {
+      //   this.documentTableData.unshift(cityDocumentsObject);
+      // }
+    })
+    .finally(() => {
+      loading.value = false;
+    });
+}
+const structureCityDocuments = (cityDocumentArray: Array<any>) => {
+  const cityRequiredDocuments = cityDocumentArray?.[0]?.required_document;
+  const cityDocumentObect = cityDocumentArray?.[0].documents?.[0];
+  const cityDoc = {
+    type: cityRequiredDocuments.document_type,
+    category: 'City Document',
+    expiry: 'N/A',
+    status: cityDocumentObect?.status
+      ? cityDocumentObect?.status
+      : 'not uploaded',
+    date: getUserReadableDate(cityDocumentObect?.created_at),
+    actions: {
+      docUrl: cityDocumentObect?.files[0]
+      // doc
+    }
+  };
+  return cityDoc;
+}
+const structureDocumentTable = (documentResponseResponse: Array<any>): [] => {
+  const newDocumentsList: any = [];
+  documentResponseResponse.forEach((doc) => {
+    const docRequireExpiryDate =
+      doc?.require_expiration_date && !!doc?.require_expiration_date;
+    const docProp = doc?.documents?.[0] || {};
+    newDocumentsList.push({
+      type: doc.document_type,
+      category: 'Vehicle Document',
+      expiry: docProp?.document_type
+        ? getExpiryDate(docProp.expiry_date)
+        : null,
+      status: docProp?.document_type ? docProp?.status : 'not uploaded',
+      date: docProp?.document_type
+        ? getUserReadableDate(docProp?.created_at)
+        : 'N/A',
+      actions: docProp.document_type
+        ? { docUrl: docProp?.files[0], doc }
+        : '',
+      require_expiration_date: docRequireExpiryDate
+    });
+  });
+  return newDocumentsList;
+}
+const selectThis = (dropDownId: number) => {
+  selectedDropDown.value = dropDownId;
+}
+const addYetToBeAddedDocument = async ($event: any) => {
+  const fileHolder = $event;
+  uploadingDoc.value = true;
+  const fileUrl = await uploadTos3andGetDocumentUrl(fileHolder);
+  uploadingDoc.value = false;
+  if (docToAdd.value.files) {
+    docToAdd.value.files = '';
+  }
+  docToAdd.value.files = fileUrl;
+  toast.success(`${docToAdd.value.document_type} uploaded`);
+}
+const removeYetToBeAddedDocument = () => {
+  docToAdd.value.files = '';
+}
+</script>
