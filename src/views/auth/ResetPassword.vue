@@ -342,7 +342,7 @@ const validations = {
 }
 const v$ = useVuelidate(validations, {form})
 const props = defineProps<{
-  token: any
+  token?: any
 }>()
 
 const toggleShow = () => {

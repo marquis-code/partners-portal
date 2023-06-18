@@ -19,7 +19,7 @@
   </div>
 </template>
 
-<script lang="ts">
+<!-- <script lang="ts">
 import { defineComponent } from 'vue';
 
 export default defineComponent({
@@ -30,6 +30,16 @@ export default defineComponent({
     extraClass: String
   }
 });
+</script> -->
+
+<script setup lang="ts">
+import { defineProps } from 'vue';
+
+defineProps<{
+  hasRing?: boolean
+  extraClass?: string
+}>()
+
 </script>
 
 <style lang="scss" scoped>
