@@ -50,7 +50,7 @@
           <p class="font-normal">Didn't receive code?</p>
           <div class="mt-1">
             <countdown-timer
-              value="120"
+              :value="120"
               @on-timer-restart="initiateOtp"
             />
           </div>
@@ -81,7 +81,7 @@
   </form>
 </template>
 
-<script lang="ts">
+<!-- <script lang="ts">
 import { defineComponent } from 'vue';
 import { setZohoUser } from '@/utils/zoho';
 import { required } from '@vuelidate/validators';
@@ -228,6 +228,151 @@ export default defineComponent({
     }
   }
 });
+</script> -->
+
+<script setup lang="ts">
+import { ref, Ref, computed, defineProps, defineEmits, watch } from 'vue';
+import { setZohoUser } from '@/utils/zoho';
+import { required } from '@vuelidate/validators';
+import countryCodeEmoji from 'country-code-emoji';
+import { CountryCode, isValidPhoneNumber } from 'libphonenumber-js/mobile';
+import LoginMixin from "@/mixins/LoginMixin";
+import VOtpInput from 'vue3-otp-input';
+import CountdownTimer from "@/components/CountdownTimer.vue";
+import {extractErrorMessage} from "@/utils/helper";
+import useVuelidate from '@vuelidate/core';
+import router from '@/router';
+import {axiosInstance as axios} from '@/plugins/axios';
+import {useToast} from 'vue-toast-notification';
+import { useRoute } from 'vue-router';
+import { useStore } from 'vuex';
+
+// mixins: [LoginMixin],s
+const store = useStore()
+const route = useRoute()
+const toast = useToast()
+const validations = {
+  form: {
+    phone: { required }
+  }
+}
+const emit = defineEmits(['otp-state-change', 'goToSignUp'])
+const props = defineProps<{
+  countries: any[]
+}>()
+const form = ref({
+  phone: '',
+  country: '',
+  otpValue: ''
+});
+const isPhoneValid = ref(false);
+const loginStep = ref(1);
+const otpReferenceId = ref(null) as Ref<any>
+const v$ = useVuelidate(validations, {form})
+const loading = ref(false)
+
+const countrySelectDisabled = computed(() => {
+  return props.countries?.length <= 1
+})
+
+const canProceed = computed(() => {
+  return loginStep.value === 1
+    ? !v$.value.form.phone.$error && isPhoneValid.value
+    : form.value.otpValue;
+})
+
+const setDefaultCountry = () => {
+  const code = props.countries && props.countries.length ? (props.countries[0] as any).code : null;
+  if (code) {
+    form.value.country = code;
+  }
+}
+const validatePhoneNumber = () => {
+  isPhoneValid.value = isValidPhoneNumber(
+    form.value.phone,
+    form.value.country as CountryCode
+  );
+}
+const countryCodeToEmoji = (code: string) => {
+  return countryCodeEmoji(code);
+}
+const login = () => {
+  if (form.value.otpValue) {
+    const payload = {
+      otpCode: form.value.otpValue,
+      type: "user",
+      referenceId: otpReferenceId.value,
+    };
+    loading.value = true;
+
+    axios.patch(`v1/otp-login/${payload.referenceId}`, {otp_code: payload.otpCode, type: payload.type})
+      .then(async (loginResponse) => {
+        form.value.otpValue = '';
+        form.value.phone = '';
+        setZohoUser(loginResponse.data)
+        await store.dispatch('auth/authSuccess', loginResponse.data);
+        window.$zoho.salesiq.reset();
+        const redirect: any = route.query.redirect;
+        if (redirect) {
+          router.push({path: redirect});
+        } else {
+          router.push({
+            name: "dashboard",
+            query: { ...route.query },
+          });
+        }
+      })
+      .catch((err) => {
+        const errorMessage = extractErrorMessage(err, null, 'Oops! An error occurred, please try again.');
+        toast.error(errorMessage);
+      })
+      .finally(() => (loading.value = false));
+  } else {
+    toast.error('Please enter a valid OTP');
+  }
+}
+const proceed = () => {
+  if (loginStep.value === 1) {
+    if (isPhoneValid.value && !v$.value.form.phone.$invalid) {
+      loginStep.value++;
+      emit('otp-state-change', `Please enter the 4-digit code sent to your phone number <b>${form.value.phone}</b>`);
+      initiateOtp();
+    }
+  } else {
+    login();
+  }
+}
+const backToStep1 = () => {
+  loginStep.value = 1;
+  emit('otp-state-change', null);
+}
+const handleOnChange = (data: string) => {
+  if (data.length < 4) {
+    form.value.otpValue = '';
+  }
+}
+const handleOnComplete = (data: string) => {
+  form.value.otpValue = data;
+}
+const initiateOtp = async () => {
+  const payload = {
+    phone: form.value.phone,
+    country_code: form.value.country,
+    type: "user",
+  };
+  const response = await axios.post(`v1/otp-login`, payload);
+  otpReferenceId.value = response.data.reference_id;
+}
+
+watch(() => form.value.phone, (value, oldValue) => {
+  validatePhoneNumber()
+})
+
+watch(() => props.countries, (value, oldValue) => {
+  setDefaultCountry()
+})
+
+setDefaultCountry()
 </script>
 
 <style lang="scss" scoped>

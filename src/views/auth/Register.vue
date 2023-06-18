@@ -319,7 +319,7 @@
   </main>
 </template>
 
-<script lang="ts">
+<!-- <script lang="ts">
 import { minLength, required } from '@vuelidate/validators';
 import { extractErrorMessage, hasRecaptchaKey } from '../../utils/helper';
 import useVuelidate from '@vuelidate/core';
@@ -544,6 +544,228 @@ export default defineComponent({
     }
   }
 });
+</script> -->
+
+<script setup lang="ts">
+import { minLength, required } from '@vuelidate/validators';
+import { extractErrorMessage, hasRecaptchaKey } from '../../utils/helper';
+import useVuelidate from '@vuelidate/core';
+import { ref, Ref, computed, onMounted, watch } from 'vue';
+import { useReCaptcha } from 'vue-recaptcha-v3';
+import { AxiosResponse } from 'axios';
+import { LoginResponse } from '@/models/login-response.model';
+import countryCodeEmoji from 'country-code-emoji';
+import { CountryCode, isValidPhoneNumber } from 'libphonenumber-js/mobile';
+import router from '@/router';
+import {axiosInstance as axios} from '@/plugins/axios';
+import {useToast} from 'vue-toast-notification';
+import { useRoute } from 'vue-router';
+import { useStore } from 'vuex';
+
+const phoneNumber = (value: string) => {
+  return /^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$/.test(
+    value
+  );
+};
+const validName = (value: string) => {
+  return /^[a-zA-Z]+(([ -][a-zA-Z])?[a-zA-Z]*)*$/.test(value);
+};
+
+const store = useStore()
+const route = useRoute()
+const toast = useToast()
+const validations = {
+  form: {
+    email: {
+      required
+    },
+    fname: {
+      required,
+      validName
+    },
+    lname: {
+      required,
+      validName
+    },
+    phone: {
+      required,
+      phoneNumber,
+      minLength: minLength(11)
+    },
+    password: {
+      required,
+      minLength: minLength(6)
+    }
+  }
+}
+const loadingData = ref(false);
+const showPassword = ref(false);
+const processing = ref(false);
+const form = ref({
+  email: '',
+  fname: '',
+  lname: '',
+  phone: '',
+  password: '',
+  country: ''
+});
+const errorMessage = ref('');
+const countries = ref([]) as Ref<any[]>
+const captchaInitialized = ref(false);
+const isPhoneValid = ref(false);
+const registrationContext = ref(null) as Ref<any>
+const cities = ref([]) as Ref<any[]>
+const reCaptchaComposition: any = useReCaptcha();
+const v$ = useVuelidate(validations, {form})
+
+// computed
+const termsOfUseLink = computed(() => {
+  return `${process.env.VUE_APP_WEBSITE_URL}/terms`;
+})
+const privacyPolicyLink = computed(() => {
+  return `${process.env.VUE_APP_WEBSITE_URL}/privacy-policy`;
+})
+
+const recaptcha = async () => {
+  await reCaptchaComposition?.recaptchaLoaded();
+};
+
+const showBadge = () => {
+  reCaptchaComposition?.instance?.value?.showBadge();
+};
+
+const hideBadge = () => {
+  reCaptchaComposition?.instance?.value?.hideBadge();
+};
+const execute = (action: string) => {
+  return reCaptchaComposition?.executeRecaptcha(action);
+};
+
+const recaptchaInstance = {
+  ...reCaptchaComposition?.instance?.value,
+  hideBadge,
+  showBadge,
+  execute
+}
+
+const getCaptchaToken = async () => {
+  if (hasRecaptchaKey()) {
+    try {
+      const token = await recaptchaInstance.execute(
+        'partner_registration'
+      );
+      return token;
+    } catch (error) {
+      console.error('Captcha token error:', error);
+      return '';
+    }
+  } else {
+    return '';
+  }
+}
+const verifyCaptcha = async () => {
+  const token = await getCaptchaToken();
+  if (captchaInitialized.value && token) {
+    return axios.post('/token/captcha/validate', { token });
+  } else {
+    return Promise.resolve({
+      data: {
+        success: !hasRecaptchaKey()
+      }
+    });
+  }
+}
+const register = async () => {
+  v$.value.form.$touch();
+  if (processing.value || v$.value.form.$error) {
+    return;
+  }
+  processing.value = true;
+  errorMessage.value = '';
+  const payload = { ...form.value };
+  try {
+    // const captchaResponse: any = await this.verifyCaptcha();
+    // if (captchaResponse.data.success) {
+    const loginResponse: AxiosResponse<LoginResponse> =
+      await axios.post('v1/users', payload);
+    if (loginResponse?.data) {
+      await store.dispatch('auth/authSuccess', loginResponse.data);
+      window.$zoho.salesiq.reset();
+      const redirect: any = route.query.redirect;
+      if (redirect) {
+        router.push({ path: redirect });
+      } else {
+        router.push({
+          name: 'dashboard',
+          query: { ...route.query }
+        });
+      }
+    }
+  } catch (e) {
+    // errorMessage.value = "Oops! An error occurred, please try again.";
+    toast.error(
+      extractErrorMessage(
+        e,
+        null,
+        'Oops! An error occurred, please try again.'
+      )
+    );
+  } finally {
+    processing.value = false;
+  }
+}
+const rejectCaptchaVerification = (message: string) => {
+  // eslint-disable-next-line prefer-promise-reject-errors
+  return Promise.reject({
+    response: {
+      data: {
+        message
+      }
+    }
+  });
+}
+const setDefaultCountry = () => {
+  const code =
+    countries.value && countries.value.length
+      ? (countries.value[0] as any).code
+      : null;
+  if (code) {
+    form.value.country = code;
+  }
+}
+const fetchCountries = async () => {
+  const response = await axios.get(`v1/countries`);
+  countries.value = response.data || [];
+}
+const validatePhoneNumber = () => {
+  isPhoneValid.value = isValidPhoneNumber(
+    form.value.phone.toString(),
+    form.value.country as CountryCode
+  );
+}
+const countryCodeToEmoji = (code: string) => {
+  return countryCodeEmoji(code);
+}
+
+watch(() => form.value.phone, (value, oldValue) => {
+  validatePhoneNumber()
+})
+
+watch(countries, (value, oldValue) => {
+  setDefaultCountry()
+})
+
+onMounted(async () => {
+  try {
+    await recaptcha();
+    captchaInitialized.value = true;
+  } catch (e) {
+    console.error(e);
+  }
+})
+
+setDefaultCountry();
+fetchCountries();
 </script>
 
 <style lang="scss" scoped>

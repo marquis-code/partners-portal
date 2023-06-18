@@ -83,7 +83,7 @@
   </main>
 </template>
 
-<script lang="ts">
+<!-- <script lang="ts">
 import { defineComponent } from 'vue';
 import EmailLogin from './EmailLogin.vue';
 import PhoneLogin from './PhoneLogin.vue';
@@ -114,6 +114,30 @@ export default defineComponent({
     }
   }
 });
+</script> -->
+
+<script setup lang="ts">
+import { ref, Ref, defineEmits } from 'vue';
+import EmailLogin from './EmailLogin.vue';
+import PhoneLogin from './PhoneLogin.vue';
+import {axiosInstance as axios} from '@/plugins/axios';
+
+const emit = defineEmits(['goToSignUp'])
+const activeForm = ref('EmailLogin');
+const otpActive = ref(false);
+const otpText = ref('');
+const countries = ref([]) as Ref<any[]>
+
+const setOtpActive = (value: string) => {
+  otpActive.value = !!value;
+  otpText.value = value;
+}
+const fetchCountries = async () => {
+  const response = await axios.get(`/v1/countries`);
+  countries.value = response.data;
+}
+
+fetchCountries()
 </script>
 
 <style lang="scss" scoped>
