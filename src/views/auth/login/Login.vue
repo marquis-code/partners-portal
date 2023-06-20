@@ -73,7 +73,7 @@
           @goToSignUp="$emit('goToSignUp')"
           @otp-state-change="setOtpActive($event)"
           :countries="countries || []"
-          :is="activeForm"
+          :is="activeForm === 'EmailLogin' ? EmailLogin : PhoneLogin"
         />
       </div>
     </transition>
