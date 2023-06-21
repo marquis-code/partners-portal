@@ -9,7 +9,7 @@
         <image-upload
           :uploading="uploadingCityDoc"
           @fileSelected="selectCityDocument($event)"
-          @fileRemoved="removeFile('cityDocument')"
+          @fileRemoved="removeFile(0,'cityDocument')"
           class="pt-3"
         ></image-upload>
       </div>
@@ -375,6 +375,3 @@ export default defineComponent({
   }
 });
 </script>
-
-<style>
-</style>

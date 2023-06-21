@@ -242,7 +242,7 @@
   </page-layout>
 </template>
 
-<script lang="ts">
+<!-- <script lang="ts">
 import { defineComponent } from 'vue';
 import AppTable from '@/components/AppTable.vue';
 import { mapGetters } from 'vuex';
@@ -438,7 +438,164 @@ export default defineComponent({
     }
   }
 });
-</script>
+</script> -->
 
-<style lang="scss" scoped>
-</style>
+<script setup lang="ts">
+import { ref, Ref, computed, watch } from 'vue';
+import AppTable from '@/components/AppTable.vue';
+import { useStore } from 'vuex';
+import PageActionHeader from '@/components/PageActionHeader.vue';
+import PageLayout from '@/components/layout/PageLayout.vue';
+import spinner from '@/components/loader/spinner.vue'
+import {downloadFile, addToQuery, removeQueryParam } from '@/composables/utils'
+import Papa from 'papaparse';
+import router from '@/router';
+import {axiosInstance as axios} from '@/plugins/axios';
+import {useToast} from 'vue-toast-notification';
+import { useRoute } from 'vue-router';
+
+const route = useRoute()
+const toast = useToast()
+const store = useStore()
+const headers = [
+  { label: 'Brand', key: 'brand' },
+  { label: 'Model', key: 'name' },
+  { label: 'Plate No', key: 'registration_number' },
+  { label: 'Type', key: 'type' },
+  { label: 'Capacity', key: 'seats' },
+  { label: 'Driver', key: 'driver' },
+  { label: 'Has Tracker', key: 'tracker' },
+]
+const filters = ref({
+  status: 'active',
+  search: '',
+  pageNumber: 1,
+  pageSize: 10
+});
+const downloadLoader = ref(false);
+const debounce = ref(null) as Ref<any>
+const serverTotal = ref(null) as Ref<any>
+const search = ref('');
+const loading = ref(false);
+const tableData = ref([]) as Ref<any[]>
+const totalRecords = ref(null) as Ref<any>
+const errorLoading = ref(false);
+const items = ref([]) as Ref<any[]>
+
+const partnerContext:any = computed(() => store.getters['auth/activeContext'])
+
+const checkForExistingQuery = () => {
+  const query = route.query
+  if (query.status) setStatusFilter(query.status as string)
+  if (query.searchTerm) filters.value.search = query.searchTerm as string
+  if (Object.keys(query).length === 0) fetchVehicles();
+}
+
+watch(() => filters.value.pageNumber, (value, oldValue) => {
+  fetchVehicles()
+})
+watch(() => filters.value.pageSize, (value, oldValue) => {
+  fetchVehicles()
+})
+watch(() => filters.value.search, (value, oldValue) => {
+  if (filters.value.search) addToQuery(route, router, {searchTerm: filters.value.search})
+  if (!filters.value.search) removeQueryParam(route, router, ['searchTerm'])
+  clearTimeout(debounce.value);
+  debounce.value = setTimeout(() => {
+    fetchVehicles();
+  }, 600);
+})
+
+const downloadReport = () => {
+  const params = {
+    related: 'driver',
+    status: filters.value.status,
+    metadata: true
+  };
+  downloadLoader.value = true
+  axios
+    .get(
+      `/v1/partner/${partnerContext.value.partner?.id}/vehicles?page=${filters.value.pageNumber}&limit=${filters.value.pageSize}&search=${filters.value.search}`,
+      {
+        params
+      }
+    )
+    .then((res) => {
+      const total = res?.data?.metadata?.total;
+      // console.log(total)
+      axios.get(
+        `/v1/partner/${partnerContext.value.partner?.id}/vehicles?page=${filters.value.pageNumber}&limit=${total}&search=${filters.value.search}`,
+        {
+          params
+        }
+      )
+        .then((res) => {
+          if (res.data.data) {
+            const x = res.data.data
+            console.log(x)
+            const newArr = []
+            for (let i = 0; i < x.length; i++) {
+              const el = x[i]
+              const y = {
+                Brand: el.brand,
+                Model: el.name,
+                Plate_no: el.registration_number,
+                Type: el.type,
+                Capacity: el.seats,
+                Driver: `${el.driver.fname} ${el.driver.lname}`
+
+              }
+              newArr.push(y)
+            }
+            const csv = Papa.unparse(newArr);
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            downloadFile(url, 'downloaded-vehicles-report')
+          }
+        })
+    })
+    .catch((err) => {
+      toast.error(
+        err?.response?.data?.message || 'An error occured'
+      );
+    })
+    .finally(() => {
+      downloadLoader.value = false;
+    });
+}
+const changePage = (pageNumber: any) => {
+  filters.value.pageNumber = pageNumber;
+}
+const showPageSize = (pageSize: any) => {
+  filters.value.pageSize = pageSize;
+}
+const setStatusFilter = (value: string) => {
+  filters.value.status = value;
+  addToQuery(route, router, {status: value})
+  fetchVehicles();
+}
+const fetchVehicles = () => {
+  loading.value = true;
+  const params = {
+    related: 'driver',
+    status: filters.value.status,
+    metadata: true
+  };
+  axios
+    .get(
+      `/v1/partner/${partnerContext.value.partner?.id}/vehicles?page=${filters.value.pageNumber}&limit=${filters.value.pageSize}&search=${filters.value.search}`,
+      {
+        params
+      }
+    )
+    .then((res) => {
+      tableData.value = res.data.data || [];
+      totalRecords.value = res.data.metadata?.total;
+    })
+    .finally(() => {
+      loading.value = false;
+    });
+}
+
+checkForExistingQuery()
+</script>

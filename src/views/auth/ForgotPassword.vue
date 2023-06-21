@@ -183,7 +183,7 @@
   </main>
 </template>
 
-<script lang="ts">
+<!-- <script lang="ts">
 import { defineComponent } from 'vue';
 import { required, email } from '@vuelidate/validators';
 import { extractErrorMessage } from '../../utils/helper';
@@ -252,4 +252,66 @@ export default defineComponent({
     }
   }
 });
+</script> -->
+
+<script setup lang="ts">
+import { ref } from 'vue';
+import { required, email } from '@vuelidate/validators';
+import { extractErrorMessage } from '../../utils/helper';
+import useVuelidate from '@vuelidate/core';
+import Spinner from '@/components/layout/Spinner.vue';
+import router from '@/router';
+import {axiosInstance as axios} from '@/plugins/axios';
+import {useToast} from 'vue-toast-notification';
+
+const toast = useToast()
+const validations = {
+  form: {
+    email: {
+      required,
+      email
+    }
+  }
+}
+const linkSent = ref(false);
+const errorMessage = ref('');
+const form = ref({
+  email: '',
+  type: 'user',
+  app: 'partners-portal'
+});
+const processing = ref(false);
+const v$ = useVuelidate(validations, {form})
+
+const goBack = () => {
+  router.go(-1);
+}
+const sendPasswordResetEmail = () => {
+  v$.value.form.$touch();
+
+  if (processing.value || v$.value.form.$errors.length) {
+    return;
+  }
+
+  processing.value = true;
+  errorMessage.value = '';
+  const payload = { ...form.value };
+
+  axios
+    .post('v1/password', payload)
+    .then(async () => {
+      linkSent.value = true;
+    })
+    .catch((err) => {
+      linkSent.value = false;
+      toast.error(
+        extractErrorMessage(
+          err,
+          null,
+          'Oops! An error occurred, please try again.'
+        )
+      );
+    })
+    .finally(() => (processing.value = false));
+}
 </script>

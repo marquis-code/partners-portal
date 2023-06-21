@@ -11,12 +11,3 @@
     >
   </div>
 </template>
-
-<script>
-export default {
-  name: 'DynamicTabs'
-};
-</script>
-
-<style>
-</style>

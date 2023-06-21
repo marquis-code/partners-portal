@@ -10,7 +10,7 @@
   </GoogleMap>
 </template>
 
-<script>
+<!-- <script>
 import { defineComponent } from 'vue';
 import { GoogleMap, Marker } from 'vue3-google-map';
 import { googleMapStyleId } from '@/utils/mapFunctions'
@@ -28,4 +28,13 @@ export default defineComponent({
     }
   }
 });
+</script> -->
+
+<script setup lang="ts">
+import { ref } from 'vue';
+import { GoogleMap, Marker } from 'vue3-google-map';
+import { googleMapStyleId } from '@/utils/mapFunctions'
+
+const center = ref({ lat: 40.689247, lng: -74.044502 });
+
 </script>

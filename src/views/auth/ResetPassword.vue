@@ -304,3 +304,84 @@ export default defineComponent({
   }
 });
 </script>
+
+<!-- <script setup lang="ts">
+import { ref, defineProps } from 'vue';
+import { required, sameAs, minLength } from '@vuelidate/validators';
+import { extractErrorMessage } from '../../utils/helper';
+import useVuelidate from '@vuelidate/core';
+import Spinner from '@/components/layout/Spinner.vue';
+import {axiosInstance as axios} from '@/plugins/axios';
+import {useToast} from 'vue-toast-notification';
+import { useRoute } from 'vue-router';
+
+const route = useRoute()
+const toast = useToast()
+const isSuccessful = ref(false);
+const errorMessage = ref('');
+const form = ref({
+  password: '',
+  confirmPassword: ''
+});
+const showPassword = ref(false);
+const showConfirmPassword = ref(false);
+const processing = ref(false);
+
+const validations = {
+  form: {
+    password: {
+      required,
+      minLength: minLength(6)
+    },
+    confirmPassword: {
+      required,
+      minLength: minLength(6),
+      sameAsPassword: sameAs(form.value.password)
+    }
+  }
+}
+const v$ = useVuelidate(validations, {form})
+const props = defineProps<{
+  token?: any
+}>()
+
+const toggleShow = () => {
+  showPassword.value = !showPassword.value;
+}
+const toggleShowConfirmPassword = () => {
+  showConfirmPassword.value = !showConfirmPassword.value;
+}
+const resetPassword = () => {
+  v$.value.form.$touch();
+
+  if (processing.value || v$.value.form.$error) {
+    return;
+  }
+
+  processing.value = true;
+  errorMessage.value = '';
+  const payload = {
+    password: form.value.password,
+    confirm_password: form.value.confirmPassword,
+    type: route.query.type,
+    token: props.token
+  };
+
+  axios
+    .post('v1/password/change', payload)
+    .then(async () => {
+      isSuccessful.value = true;
+    })
+    .catch((err) => {
+      isSuccessful.value = false;
+      toast.error(
+        extractErrorMessage(
+          err,
+          null,
+          'Oops! An error occurred, please try again.'
+        )
+      );
+    })
+    .finally(() => (processing.value = false));
+}
+</script> -->

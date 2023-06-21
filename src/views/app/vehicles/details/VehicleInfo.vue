@@ -6,7 +6,7 @@
 </div>
 </template>
 
-<script lang="ts">
+<!-- <script lang="ts">
 import {defineComponent} from "vue";
 import {extractErrorMessage} from "@/utils/helper";
 import SingleVehicle from "@/views/app/vehicles/components/SingleVehicle.vue";
@@ -38,8 +38,27 @@ export default defineComponent({
     }
   }
 })
+</script> -->
+
+<script setup lang="ts">
+import {ref, Ref, computed} from "vue";
+import {extractErrorMessage} from "@/utils/helper";
+import SingleVehicle from "@/views/app/vehicles/components/SingleVehicle.vue";
+import {useStore} from "vuex";
+import {useToast} from 'vue-toast-notification';
+
+const toast = useToast()
+const store = useStore()
+const vehicleInformation = ref(null) as Ref<any>
+const loading = ref(false)
+
+const vehicleData:any = computed(() => store.getters['vehicle/getVehicleData'])
+const isLoading:any = computed(() => store.getters['vehicle/getVehicleLoading'])
+
+const getVehicleData = () => {
+  store.dispatch('vehicle/getVehicleInfo')
+    .catch((e) => {
+      toast.error(extractErrorMessage(e));
+    });
+}
 </script>
-
-<style scoped>
-
-</style>

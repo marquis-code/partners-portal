@@ -168,7 +168,7 @@ interface UploadOptions {
 
 const props = defineProps<{
   field?: string
-  uploading: boolean
+  uploading?: boolean
   uploadStatus?: boolean
 }>()
 const toast = useToast();

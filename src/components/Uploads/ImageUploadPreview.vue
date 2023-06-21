@@ -9,7 +9,6 @@
       <input type="file" id="file" @change="onFileChanged" />
       <label
         for="file"
-        @click="onUpload"
         class="
           flex
           items-center
@@ -57,7 +56,7 @@ export default defineComponent({
 import { ref, defineProps } from 'vue';
 
 defineProps<{
-  images: []
+  images: any[]
 }>()
 const selectedImage = ref('')
 

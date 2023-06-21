@@ -167,7 +167,7 @@
   <!-- </page-layout> -->
 </template>
 
-<script lang="ts">
+<!-- <script lang="ts">
 import { defineComponent } from 'vue';
 import useVuelidate from '@vuelidate/core';
 import { email, required } from '@vuelidate/validators';
@@ -345,4 +345,168 @@ export default defineComponent({
     }
   }
 });
+</script> -->
+
+<script setup lang="ts">
+import { ref, Ref, computed, onMounted } from 'vue';
+import useVuelidate from '@vuelidate/core';
+import { email, required } from '@vuelidate/validators';
+import { useStore } from 'vuex';
+import { extractErrorMessage } from '@/utils/helper';
+import { format } from 'date-fns';
+import Spinner from '@/components/layout/Spinner.vue';
+import AppModal from '@/components/Modals/AppModal.vue';
+import AppTable from '@/components/AppTable.vue';
+import router from '@/router';
+import {axiosInstance as axios} from '@/plugins/axios';
+import {useToast} from 'vue-toast-notification';
+
+const store = useStore()
+const toast = useToast()
+const validations = {
+  form: {
+    accountNumber: { required },
+    bankName: { required },
+    accountName: { required },
+    isDefault: { required }
+  }
+}
+const headers = [
+  { label: 'Account Number', key: 'accountNumber' },
+  { label: 'Bank Name', key: 'bankName' },
+  { label: 'Account Name', key: 'accountName' },
+  { label: 'Assigned Account', key: 'isDefault' },
+  { label: 'Actions', key: 'actions' }
+]
+const docId = ref(null);
+const gettingAccounts = ref(false);
+const errorLoading = ref(false);
+const showSuccessModal = ref(false);
+const showConfirmationModal = ref(false);
+const showRemoveConfirmationModal = ref(false);
+const showRemoveSuccessModal = ref(false);
+const loading = ref(false);
+const tableData = ref([]) as Ref<any[]>
+const currentAccountId = ref(null);
+const accountToRemoveId = ref(null);
+const fetchingAccounts = ref(false);
+const uploadingFile = ref(false);
+const showModal = ref(false);
+const profilePreview = ref('');
+const form = ref({
+  accountNumber: '',
+  bankName: '',
+  accountName: '',
+  isDefault: null
+});
+const selectedAccountId = ref(null);
+const processing = ref(false);
+const documentId = ref(null);
+const isUploaded = ref(false);
+const uploadingProfile = ref(false);
+const v$ = useVuelidate(validations, {form})
+
+const partnerContext:any = computed(() => store.getters['auth/activeContext'])
+const userSessionData:any = computed(() => store.getters['auth/userSessionData'])
+const user:any = computed(() => store.getters['auth/user'])
+const getDriverData:any = computed(() => store.getters['driver/getDriverData'])
+const driverData:any = computed(() => store.getters['driver/getDriverData'])
+
+const setItemToRemoveAndOpenModal = (item: any) => {
+  accountToRemoveId.value = item.id
+  showRemoveConfirmationModal.value = true;
+}
+const startAccountAssignment = (item: any) => {
+  selectedAccountId.value = item.id;
+  form.value.accountName = item.accountName;
+  form.value.accountNumber = item.accountNumber;
+  form.value.bankName = item.bankName;
+  showConfirmationModal.value = true;
+}
+const fetchSettlementAccounts = async () => {
+  // this.showConfirmationModal = false;
+  // API call to assign an account
+  fetchingAccounts.value = true;
+  try {
+    const response = await axios.get(
+      `/cost-revenue/v1/settlement-accounts?partnerId=${partnerContext.value.partner.account_sid}`
+    );
+    tableData.value = response.data;
+  } catch (error) {
+    const errorMessage = extractErrorMessage(
+      error,
+      null,
+      'Oops! An error occurred, please try again.'
+    );
+    toast.error(errorMessage);
+  } finally {
+    fetchingAccounts.value = false;
+  }
+}
+const assignAsDefault = async () => {
+  // API call to make an account a default
+  loading.value = true;
+  try {
+    await axios.patch(
+      `/cost-revenue/v1/settlement-accounts/${selectedAccountId.value}`,
+      {
+        ...form.value,
+        isDefault: true
+      }
+    );
+    const response = await axios.get(
+      `/cost-revenue/v1/settlement-accounts?partnerId=${partnerContext.value.partner.account_sid}`
+    );
+    tableData.value = response.data;
+    showConfirmationModal.value = false;
+  } catch (error) {
+    const errorMessage = extractErrorMessage(
+      error,
+      null,
+      'Oops! An error occurred, please try again.'
+    );
+    toast.error(errorMessage);
+  } finally {
+    loading.value = false;
+  }
+}
+const handleFileRemoval = () => {
+  isUploaded.value = false;
+}
+const openModal = () => {
+  showModal.value = true;
+}
+const closeModal = () => {
+  showSuccessModal.value = true;
+}
+const getUploadedFileUrlFromStringifiedArray = (stringifiedArray: any) => {
+  const parsedArray = JSON.parse(stringifiedArray);
+  if (parsedArray.length > 0) {
+    return parsedArray[0];
+  }
+  return null;
+}
+const removeThisAccount = async () => {
+  try {
+    loading.value = true;
+    await axios.delete(`/cost-revenue/v1/settlement-accounts/${accountToRemoveId.value}`);
+    const response = await axios.get(
+      `/cost-revenue/v1/settlement-accounts?partnerId=${partnerContext.value.partner.account_sid}`
+    );
+    tableData.value = response.data;
+    showRemoveConfirmationModal.value = false;
+    showRemoveSuccessModal.value = true;
+  } catch (error) {
+    const errorMessage = extractErrorMessage(
+      error,
+      null,
+      'Oops! An error occurred, please try again.'
+    );
+    toast.error(errorMessage);
+  } finally {
+    loading.value = false;
+  }
+}
+
+fetchSettlementAccounts()
 </script>

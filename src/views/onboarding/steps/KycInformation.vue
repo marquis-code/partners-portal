@@ -76,7 +76,7 @@
             This field is required
           </span>
         </div>
-        {{ selectedDocument }}
+        <!-- {{ selectedDocument }} -->
         <div class="space-y-2 w-full">
           <label class="text-xs font-medium text-grays-black-5">{{
             getDocumentLabel
@@ -125,7 +125,7 @@
               ring-1 ring-gray-300
             "
             placeholder="Choose a date"
-            v-model="v$.identityForm.document.dob.$model"
+            v-model="(v$.identityForm.document.dob as any).$model"
           />
           <span
             class="text-sm font-light text-red-500"
@@ -272,7 +272,7 @@
   </main>
 </template>
 
-<script lang="ts">
+<!-- <script lang="ts">
 import { defineComponent } from 'vue';
 import { mapGetters } from 'vuex';
 import Datepicker from 'vue3-datepicker';
@@ -533,6 +533,261 @@ export default defineComponent<any, any, any>({
     }
   }
 });
+</script> -->
+
+<script setup lang="ts">
+import { ref, Ref, computed, onMounted } from 'vue';
+import { useStore } from 'vuex';
+import Datepicker from 'vue3-datepicker';
+import ImageUpload from '@/components/ImageUpload.vue';
+import { required, minLength } from '@vuelidate/validators';
+import { extractErrorMessage } from '@/utils/helper';
+import useVuelidate from '@vuelidate/core';
+import { UserData } from '@/models/user-session.model';
+import Spinner from '@/components/layout/Spinner.vue';
+import { PartnerOrganization, OnboardingState } from '@/models/organisation.model';
+import router from '@/router';
+import {axiosInstance as axios} from '@/plugins/axios';
+import {useToast} from 'vue-toast-notification';
+import { useRoute } from 'vue-router';
+
+const route = useRoute()
+const toast = useToast()
+const store = useStore()
+const identificationOptions = [
+  {
+    key: 'nin',
+    label: 'NIN',
+    desc: 'National Identification Number'
+    // maxLength: 11
+  },
+  {
+    key: 'bvn',
+    label: 'BVN',
+    desc: 'Bank Verification Number'
+    // maxLength: 11
+  }
+  /*        {
+    key: 'drivers-license',
+    label: 'Drivers License',
+    desc: 'Drivers License'
+  },
+  {
+    key: 'passport',
+    label: 'Passport',
+    desc: 'Passport'
+  },
+  {
+    key: 'voters-card',
+    label: 'Voters card',
+    desc: 'Voters Card'
+  } */
+]
+const identityForm = ref({
+  user: {
+    document_owner_id: null as any,
+    partner_type: null as any
+  },
+  document: {
+    document_id: null as any,
+    type: null as any,
+    dob: '',
+    fname: null as any,
+    lname: null as any
+  }
+})
+const addressForm = ref({
+  user: {
+    document_owner_id: null as any,
+    partner_type: null as any
+  },
+  document: {
+    full_address: null as any,
+    files: [] as any[]
+  }
+});
+const loading = ref(false);
+const identityDocumentLength = ref(11);
+const activeView = ref(0);
+const file = ref('') as Ref<any>
+const fileData = ref(null) as Ref<any>
+const selectedIdentityDoc = ref(null) as Ref<any>
+const addressProgress = ref(false);
+const validations = {
+  identityForm: {
+    user: {
+      document_owner_id: { required },
+      partner_type: { required }
+    },
+    document: {
+      document_id: {
+        required,
+        minLength: minLength(identityDocumentLength.value)
+      },
+      type: { required },
+      dob: { required },
+      fname: { required },
+      lname: { required }
+    }
+  },
+  addressForm: {
+    user: {
+      document_owner_id: { required },
+      partner_type: { required }
+    },
+    document: {
+      full_address: { required }
+    }
+  }
+}
+const v$ = useVuelidate(validations, {identityForm, addressForm})
+const avatar = ref(null) as Ref<any>
+const uploadingAvatar = ref(false)
+
+const user:any = computed(() => store.getters['auth/user'])
+const contextOrganization:any = computed(() => store.getters['auth/activeContext'])
+const getDocumentLabel = computed(() => {
+  if (activeView.value === 0) {
+    return identityForm.value.document.type
+      ? selectedIdentityDoc.value?.desc
+      : 'Document ID';
+  }
+  return '';
+})
+
+onMounted(async () => {
+  await store.dispatch('auth/refreshActiveContext', user.value.id);
+})
+
+const setFormDefaults = () => {
+  const _user: UserData = user.value;
+  const existingBusinessMode = contextOrganization.value?.partner?.mode;
+  identityForm.value.user.document_owner_id = _user.id;
+  identityForm.value.user.partner_type = existingBusinessMode || (route.query.type === 'individual' ? 'individual' : 'business');
+  identityForm.value.document.fname = _user.fname;
+  identityForm.value.document.lname = _user.lname;
+
+  addressForm.value.user.document_owner_id = _user.id;
+  addressForm.value.user.partner_type = existingBusinessMode || (route.query.type === 'individual' ? 'individual' : 'business');
+}
+const previous = () => {
+  activeView.value -= 1;
+}
+const uploadFile = () => {
+  file.value = avatar.value.files[0];
+  const reader = new FileReader();
+  reader.addEventListener('load', () => {
+    uploadingAvatar.value = true;
+  });
+  reader.readAsDataURL(file.value);
+}
+const handleIdentityChange = () => {
+  selectedIdentityDoc.value = identificationOptions.find(
+    (obj: any) => obj.key === identityForm.value.document.type
+  );
+}
+const saveIdentityForm = async () => {
+  v$.value.identityForm.$touch();
+  if (loading.value || v$.value.identityForm.$errors.length) {
+    return;
+  }
+  try {
+    loading.value = true;
+    await store.dispatch('auth/refreshActiveContext', user.value.id);
+    await axios.post(
+      `/v1/partners/${contextOrganization.value.account_sid}/identity-verification`,
+      identityForm.value
+    );
+    await store.dispatch('auth/setActiveContext', {
+      onboardingState: {
+        ...store.getters['auth/activeContext'].onboardingState,
+        identity: 'completed'
+      } as OnboardingState
+    } as PartnerOrganization);
+    activeView.value += 1;
+  } catch (err) {
+    const errorMessage = extractErrorMessage(
+      err,
+      null,
+      'Oops! An error occurred, please try again.'
+    );
+    toast.error(errorMessage);
+  } finally {
+    loading.value = false;
+  }
+}
+const saveAddressForm = async () => {
+  v$.value.addressForm.$touch();
+  if (loading.value || v$.value.addressForm.$errors.length) {
+    return;
+  }
+  if (!file.value) {
+    toast.error('Kindly select a file');
+    return;
+  }
+  try {
+    loading.value = true;
+    const formData = new FormData();
+    formData.append('file', file.value);
+    const response = await axios.post(
+      `/v1/upload/identity/files`,
+      formData
+    );
+    if (response.data?.files?.length) {
+      addressForm.value.document.files = [response.data.files[0].Location];
+    }
+    await store.dispatch('auth/refreshActiveContext', user.value.id);
+    const verifyResponse = await axios.post(
+      `/v1/partners/${contextOrganization.value.account_sid}/address-verification`,
+      addressForm.value
+    );
+    if (verifyResponse.status === 200) {
+      await store.dispatch('auth/setActiveContext', {
+        onboardingState: {
+          ...store.getters['auth/activeContext'].onboardingState,
+          address: 'completed'
+        } as OnboardingState
+      } as PartnerOrganization);
+      await router.push({ name: 'CitySelection' });
+    }
+  } catch (err) {
+    const errorMessage = extractErrorMessage(
+      err,
+      null,
+      'Oops! An error occurred, please try again.'
+    );
+    toast.error(errorMessage);
+  } finally {
+    loading.value = false;
+  }
+}
+const setPageState = () => {
+  if (!contextOrganization.value) {
+    router.push({ name: 'PartnerSignUp' });
+    return;
+  }
+  const identityFormStatus =
+    contextOrganization.value.onboardingState?.identity;
+  if (contextOrganization.value && identityFormStatus === 'completed') {
+    activeView.value = 1;
+    addressProgress.value = true;
+  }
+}
+const selectFile = ($event: File) => {
+  file.value = $event;
+}
+const removeFile = () => {
+  file.value = '';
+}
+const logout = () => {
+  window.$zoho.salesiq.reset();
+  localStorage.clear();
+  router.push('/login');
+  router.go(0);
+}
+
+setPageState();
+setFormDefaults();
 </script>
 
 <style lang="scss" scoped>
