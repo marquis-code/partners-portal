@@ -207,6 +207,7 @@ const savePartnerCities = async () => {
         )
       ]);
       toast.success('Partner account created');
+      router.push('/dashboard')
       await router.push({ name: 'dashboard' });
       // router.go();
     } catch (e) {

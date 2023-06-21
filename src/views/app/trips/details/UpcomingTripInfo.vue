@@ -122,7 +122,7 @@ export default defineComponent({
 <script setup lang="ts">
 import { ref, Ref } from 'vue';
 import { extractErrorMessage } from '@/utils/helper';
-import SingleTrip from '@/views/app/trips/components/SingleTrip.vue';
+import singleTrip from '@/views/app/trips/components/SingleTrip.vue';
 import { getDefaultDatePickerDate } from '@/utils/dateFormatters';
 import PageLayout from '@/components/layout/PageLayout.vue';
 import PageActionHeader from '@/components/PageActionHeader.vue';

@@ -3,8 +3,8 @@
   <TripMap v-if="tripData && !upcomingTrip"
       :vehicleRegNumber="tripData.vehicle?.registration_number"
       :endtLocation="endPoint"
-      :startedAt="$moment(tripData.start_trip)"
-      :endedAt="$moment(tripData.end_trip)"
+      :startedAt="$moment(tripData.start_trip) as any"
+      :endedAt="$moment(tripData.end_trip) as any"
       :tripVehicleId="tripData.vehicle?.tracking_id ? tripData.vehicle?.id : null"
       :tripId="tripData.id"/>
       <google-maps v-if="tripData && upcomingTrip" :routeLine="polyline" :startLocation="startPoint" :endtLocation="endPoint"/>
@@ -252,8 +252,8 @@ import { formatGeometry } from '@/utils/mapFunctions';
 import {ref, Ref, watch, defineProps} from 'vue'
 
 const props = defineProps<{
-  tripData: any
-  upcomingTrip: any
+  tripData?: any
+  upcomingTrip?: any
 }>()
 const tripChangeList = [
   {

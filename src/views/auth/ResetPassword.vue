@@ -219,7 +219,7 @@
   </main>
 </template>
 
-<!-- <script lang="ts">
+<script lang="ts">
 import { defineComponent } from 'vue';
 import { required, sameAs, minLength } from '@vuelidate/validators';
 import { extractErrorMessage } from '../../utils/helper';
@@ -303,9 +303,9 @@ export default defineComponent({
     }
   }
 });
-</script> -->
+</script>
 
-<script setup lang="ts">
+<!-- <script setup lang="ts">
 import { ref, defineProps } from 'vue';
 import { required, sameAs, minLength } from '@vuelidate/validators';
 import { extractErrorMessage } from '../../utils/helper';
@@ -384,4 +384,4 @@ const resetPassword = () => {
     })
     .finally(() => (processing.value = false));
 }
-</script>
+</script> -->

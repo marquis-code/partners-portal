@@ -73,7 +73,7 @@ export default defineComponent({
 <script setup lang="ts">
 import { ref, Ref } from 'vue';
 import { extractErrorMessage } from '@/utils/helper';
-import SingleTrip from '@/views/app/trips/components/SingleTrip.vue';
+import singleTrip from '@/views/app/trips/components/SingleTrip.vue';
 import { getDefaultDatePickerDate } from '@/utils/dateFormatters';
 import {axiosInstance as axios} from '@/plugins/axios';
 import {useToast} from 'vue-toast-notification';

@@ -446,17 +446,17 @@ const viewVehicleDetails = (id : number) => {
   });
 }
 const showVehicleData = () => {
-  form.value.brand = vehicleData.value.brand;
-  form.value.name = vehicleData.value.name;
-  form.value.year = vehicleData.value.year;
-  form.value.seats = vehicleData.value.seats;
-  vehicleData.value.cities.forEach((city:{
+  form.value.brand = vehicleData.value?.brand;
+  form.value.name = vehicleData.value?.name;
+  form.value.year = vehicleData.value?.year;
+  form.value.seats = vehicleData.value?.seats;
+  vehicleData.value?.cities.forEach((city:{
     id: number
   }) => {
     form.value.city_ids.push(city.id)
   });
-  form.value.registration_number = vehicleData.value.registration_number;
-  form.value.partner_id = vehicleData.value.partner_id
+  form.value.registration_number = vehicleData.value?.registration_number;
+  form.value.partner_id = vehicleData.value?.partner_id
 }
 const fetchPageData = () => {
   loading.value = true;
