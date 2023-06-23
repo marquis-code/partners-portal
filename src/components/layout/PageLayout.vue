@@ -5,7 +5,8 @@
         <div
           class="px-3 md:px-7 top-part flex flex-row justify-between items-center py-3"
         >
-          <div class="dashboard-name text-xl font-medium">
+          <div class="dashboard-name text-xl font-medium flex items-center gap-4">
+            <img @click="openSidebar" class="flex md:hidden" src="@/assets/images/toggle.svg" alt="">
             {{ pageTitle }}
           </div>
           <div class="py-3 px-5 text-black rounded-lg font-medium flex items-center gap-4">
@@ -86,7 +87,9 @@ import { ref, defineProps, withDefaults, computed } from "vue";
 import { useStore } from "vuex";
 import {axiosInstance as axios} from '@/plugins/axios';
 import router from "@/router";
+import {useSidebar} from '@/composables/sidebar'
 
+const { openSidebar } = useSidebar()
 const store = useStore()
 const companyName = ref('')
 export interface Props {

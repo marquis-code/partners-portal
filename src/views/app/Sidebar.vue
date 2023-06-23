@@ -9,6 +9,7 @@
       py-6
       sticky
       top-0
+      bg-white
     "
   >
     <div
@@ -38,6 +39,8 @@
             transition
             ease-out
             duration-500
+            hidden
+            md:flex
           "
           src="@/assets/images/toggle.svg"
         />
@@ -353,8 +356,8 @@ const logout = () => {
   router.go(0);
 }
 
-window.addEventListener('resize', checkScreen);
-checkScreen();
+// window.addEventListener('resize', checkScreen);
+// checkScreen();
 </script>
 
 <style scoped lang="scss">
