@@ -5,7 +5,7 @@
   <div class="w-full p-4 py-8 mb-[50px] max-w-[700px] mx-auto flex flex-col gap-8">
     <div class="flex flex-col gap-1">
       <h2 class="text-[#101828] text-xl md:text-2xl font-medium text-center">Frequently asked questions</h2>
-      <p class="text-sm text-center text-[#667085]">Everything you need to know about the product and billing.</p>
+      <p class="text-sm text-center text-[#667085]">Everything you need to know about being a Vehicle Partner.</p>
     </div>
 
     <div class="flex flex-col gap-2">
