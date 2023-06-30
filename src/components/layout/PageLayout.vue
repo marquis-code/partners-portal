@@ -10,7 +10,7 @@
             {{ pageTitle }}
           </div>
           <div class="py-3 px-5 text-black rounded-lg font-medium flex items-center gap-4">
-            <router-link to="/faq" class="w-fit mx-auto text-sm py-2 px-3 hidden md:flex items-center gap-2 border border-[#0DAC5C] text-[#0DAC5C] rounded-lg font-medium">
+            <router-link to="/faq" class="w-fit mx-auto text-sm py-2 px-3 hidden md:flex items-center gap-2 text-[#0DAC5C] rounded-lg font-medium">
               <img src="@/assets/images/faqs/question_mark.svg" alt="">
               Go to FAQ
             </router-link>
