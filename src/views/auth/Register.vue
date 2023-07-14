@@ -297,6 +297,10 @@
             >Privacy Policy</a
           >
         </div>
+        <router-link to="/faq" class="mt-6 w-fit mx-auto text-sm py-2 px-3 flex items-center gap-2 text-[#0DAC5C] rounded-lg font-medium">
+          <img src="@/assets/images/faqs/question_mark.svg" alt="">
+          Go to FAQ
+        </router-link>
       </form>
 
       <div class="w-full text-center mt-16">
