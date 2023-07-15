@@ -135,7 +135,6 @@
               >
                 Passwords must be identical
               </span>
-
               <span
                 class="text-sm font-light text-red-500"
                 v-if="!v$.form.confirmPassword.required"
@@ -219,7 +218,7 @@
   </main>
 </template>
 
-<script lang="ts">
+<!-- <script lang="ts">
 import { defineComponent } from 'vue';
 import { required, sameAs, minLength } from '@vuelidate/validators';
 import { extractErrorMessage } from '../../utils/helper';
@@ -303,10 +302,10 @@ export default defineComponent({
     }
   }
 });
-</script>
+</script> -->
 
-<!-- <script setup lang="ts">
-import { ref, defineProps } from 'vue';
+<script setup lang="ts">
+import { ref, Ref, defineProps, computed } from 'vue';
 import { required, sameAs, minLength } from '@vuelidate/validators';
 import { extractErrorMessage } from '../../utils/helper';
 import useVuelidate from '@vuelidate/core';
@@ -315,8 +314,10 @@ import {axiosInstance as axios} from '@/plugins/axios';
 import {useToast} from 'vue-toast-notification';
 import { useRoute } from 'vue-router';
 
+const props = defineProps(['token'])
 const route = useRoute()
 const toast = useToast()
+
 const isSuccessful = ref(false);
 const errorMessage = ref('');
 const form = ref({
@@ -336,14 +337,11 @@ const validations = {
     confirmPassword: {
       required,
       minLength: minLength(6),
-      sameAsPassword: sameAs(form.value.password)
+      // sameAsPassword: sameAs(form.password.value)
     }
   }
 }
 const v$ = useVuelidate(validations, {form})
-const props = defineProps<{
-  token?: any
-}>()
 
 const toggleShow = () => {
   showPassword.value = !showPassword.value;
@@ -352,8 +350,10 @@ const toggleShowConfirmPassword = () => {
   showConfirmPassword.value = !showConfirmPassword.value;
 }
 const resetPassword = () => {
+  if (form.value.password !== form.value.confirmPassword) {
+    return toast.error('Password does not match', {position: 'top-right'});
+  }
   v$.value.form.$touch();
-
   if (processing.value || v$.value.form.$error) {
     return;
   }
@@ -384,4 +384,4 @@ const resetPassword = () => {
     })
     .finally(() => (processing.value = false));
 }
-</script> -->
+</script>

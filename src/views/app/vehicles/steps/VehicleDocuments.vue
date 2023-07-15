@@ -89,19 +89,34 @@
   </form>
 </template>
 
-<script>
-import { defineComponent } from 'vue';
+<script setup lang="ts">
+import { ref, Ref, defineEmits } from 'vue';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
-import { mapGetters } from 'vuex';
+import { useStore } from 'vuex';
 import { extractErrorMessage } from '@/utils/helper';
 import moment from 'moment';
 // import Datepicker from 'vue3-datepicker';
 import Spinner from '@/components/layout/Spinner.vue';
 import ImageUpload from '@/components/ImageUpload.vue';
-export default defineComponent({
-  components: { ImageUpload, Spinner },
-  emits: ['next', 'goBack'],
+import router from '@/router';
+import {axiosInstance as axios} from '@/plugins/axios';
+import {useToast} from 'vue-toast-notification';
+import { useRoute } from 'vue-router';
+
+const emit = defineEmits(['next', 'goBack'])
+const route = useRoute()
+const store = useStore()
+const toast = useToast()
+const validations = {
+  form: {
+    email: { required, email },
+    password: { required }
+  }
+}
+
+const v$ = useVuelidate(validations, {form})
+
   data() {
     return {
       v$: useVuelidate(),
@@ -373,5 +388,5 @@ export default defineComponent({
       }
     }
   }
-});
+
 </script>
