@@ -114,6 +114,74 @@ const validations = {
     password: { required }
   }
 }
+const uploadingCityDoc = ref(false);
+const savingVehicleDocuments = ref(false);
+const documentsToSave = ref({
+  city_documents: [],
+  vehicle_documents: []
+});
+const city_documents_order = ref([]);
+const vehicle_documents_order = ref([
+  {
+    expires: true
+  },
+  {
+    expires: false
+  },
+  {
+    expires: false
+  },
+  {
+    expires: true
+  },
+  {
+    expires: true
+  },
+  {
+    expires: true
+  }
+]);
+const payload = ref({
+  city_documents: [],
+  vehicle_documents: [
+    {
+      document_type: 'Vehicle Information',
+      expiry_date: '',
+      files: [],
+      loading: false
+    },
+    {
+      document_type: 'Central Motor Registry (CMR)',
+      files: [],
+      loading: false
+    },
+    {
+      document_type: 'Proof of Ownership',
+      files: [],
+      loading: false
+    },
+    {
+      document_type: 'Vehicle Insurance',
+      expiry_date: '',
+      files: [],
+      loading: false
+    },
+    {
+      document_type: 'Road worthiness',
+      expiry_date: '',
+      files: [],
+      loading: false
+    },
+    {
+      document_type: 'Hackney permit',
+      expiry_date: '',
+      files: [],
+      loading: false
+    }
+  ]
+});
+const processing = ref(false);
+const requiredDocuments = ref(null);
 
 const v$ = useVuelidate(validations, {form})
 
