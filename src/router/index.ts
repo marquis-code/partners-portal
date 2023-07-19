@@ -12,6 +12,7 @@ import Login from "@/views/LandingPage/Login.vue";
 import ForgotPassword from "@/views/LandingPage/ForgotPassword.vue";
 import ResetPassword from "@/views/LandingPage/ResetPassword.vue";
 import Register from "@/views/LandingPage/Register.vue";
+import Faq from '@/views/faq.vue'
 import LandingPage from "@/views/LandingPage/Base.vue";
 import {ContextGuard} from "@/router/guards/context.guard";
 import MemberInvite from "@/views/MemberInvite.vue";
@@ -78,6 +79,17 @@ const routes: Array<RouteRecordRaw> = [
         }
       },
     ]
+  },
+  {
+    path: '/faq',
+    name: 'faq',
+    component: Faq,
+    meta: {
+      title: 'Faqs',
+      requiresAuth: false,
+      openPage: true
+      // isGuest: true
+    }
   },
   {
     path: '/invitations',

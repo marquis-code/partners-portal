@@ -136,7 +136,7 @@
   </page-layout>
 </template>
 
-<script lang="ts">
+<!-- <script lang="ts">
 import { defineComponent } from 'vue';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
@@ -290,4 +290,145 @@ export default defineComponent({
     }
   }
 });
+</script> -->
+
+<script setup lang="ts">
+import { ref, Ref, computed, watch } from 'vue';
+import useVuelidate from '@vuelidate/core';
+import { required } from '@vuelidate/validators';
+import { useStore } from 'vuex';
+import { extractErrorMessage } from '@/utils/helper';
+import { format } from 'date-fns';
+import Spinner from '@/components/layout/Spinner.vue';
+import AppModal from '@/components/Modals/AppModal.vue';
+import PageLayout from '@/components/layout/PageLayout.vue';
+import banks from 'ng-banks';
+import router from '@/router';
+import {axiosInstance as axios} from '@/plugins/axios';
+import {useToast} from 'vue-toast-notification';
+
+interface USSD {
+  code: string | null;
+}
+interface Bank {
+  name: string;
+  code: string | null;
+  slug: string;
+  ussd: USSD;
+}
+interface Account {
+  bankObject?: Bank;
+  accountNumber?: string;
+  accountName?: string;
+  partnerId?: string;
+  entityType?: string;
+  isDefault?: boolean;
+}
+
+const validations = {
+  form: {
+    bankObject: { required },
+    accountNumber: { required },
+    accountName: { required }
+  }
+}
+const toast = useToast()
+const store = useStore()
+const showModal = ref(false);
+const isValidAccountNumber = ref(true);
+const allBanks = ref([]) as Ref<Bank[]>
+const accountNameError = ref('');
+const form = ref({
+  bankObject: {} as Bank,
+  accountNumber: '',
+  accountName: '',
+  partnerId: '',
+  entityType: '',
+  isDefault: false
+}) as Ref<Account>
+const debounce = ref(null);
+const processing = ref(false);
+const showSuccessModal = ref(false);
+const fetchingAccountName = ref(false);
+const v$ = useVuelidate(validations, {form})
+
+const partnerContext:any = computed(() => store.getters['auth/activeContext'])
+const userSessionData:any = computed(() => store.getters['auth/userSessionData'])
+const user:any = computed(() => store.getters['auth/user'])
+const getDriverData:any = computed(() => store.getters['driver/getDriverData'])
+const driverData:any = computed(() => store.getters['driver/getDriverData'])
+
+const validateAccountNumber = () => {
+  fetchingAccountName.value = true;
+  axios
+    .get(
+      `/v1/banks/resolve-accounts?bank_code=${form.value.bankObject?.code}&account_number=${form.value.accountNumber}`
+    )
+    .then((res) => {
+      form.value.accountName = res?.data?.account_name;
+      isValidAccountNumber.value = true;
+      accountNameError.value = '';
+      fetchingAccountName.value = false;
+    })
+    .catch((error) => {
+      accountNameError.value = error.response.data.message;
+      isValidAccountNumber.value = false;
+      fetchingAccountName.value = false;
+    });
+}
+const showBanks = () => {
+  const ngBanks = banks.getBanks();
+  allBanks.value = ngBanks || [];
+}
+const setPartnerId = () => {
+  form.value.partnerId = partnerContext.value.partner.account_sid;
+}
+const AddNewAccount = async () => {
+  processing.value = true;
+  const payload = {
+    accountNumber: form.value.accountNumber,
+    accountName: form.value.accountName,
+    bankCode: form.value.bankObject?.code,
+    bankName: form.value.bankObject?.name,
+    partnerId: form.value.partnerId
+  };
+  try {
+    await axios.post(`/cost-revenue/v1/settlement-accounts`, {
+      ...payload
+    });
+    showSuccessModal.value = true;
+  } catch (error) {
+    const errorMessage = extractErrorMessage(
+      error,
+      null,
+      'Oops! An error occurred, please try again.'
+    );
+    toast.error(errorMessage);
+  } finally {
+    processing.value = false;
+  }
+}
+const closeSuccessModal = () => {
+  showSuccessModal.value = false;
+  router.push({ name: 'settings.edit.settlement.account' });
+}
+
+watch(() => form.value.accountNumber, (value) => {
+  if (value?.length === 10) {
+    validateAccountNumber();
+  }
+
+  if (value?.length !== 10) {
+    isValidAccountNumber.value = false;
+    form.value.accountName = '';
+    accountNameError.value = '';
+  }
+
+  if (value?.length === 0) {
+    accountNameError.value = '';
+  }
+})
+
+setPartnerId()
+showBanks()
 </script>

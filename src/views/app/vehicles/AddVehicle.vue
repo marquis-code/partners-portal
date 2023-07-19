@@ -102,7 +102,7 @@
   </page-layout>
 </template>
 
-<script lang="ts">
+<!-- <script lang="ts">
 import { defineComponent, markRaw } from 'vue';
 import VehicleDocuments from './/steps/VehicleDocuments.vue';
 import VehicleInformation from './/steps/VehicleInformation.vue';
@@ -134,19 +134,49 @@ export default defineComponent({
   },
   methods: {
     next() {
-      this.currentStep += 1;
+      currentStep.value += 1;
     },
     goBack(): void {
-      this.currentStep = 0;
+      currentStep.value = 0;
     },
     previous(): void {
-      if (this.currentStep !== 0) {
-        this.currentStep -= 1;
+      if (currentStep.value !== 0) {
+        currentStep.value -= 1;
       }
     }
   }
 });
-</script>
+</script> -->
 
-<style lang="scss" module>
-</style>
+<script setup lang="ts">
+import { ref, markRaw } from 'vue';
+import VehicleDocuments from './/steps/VehicleDocuments.vue';
+import VehicleInformation from './/steps/VehicleInformation.vue';
+import VehicleImages from './/steps/VehicleImages.vue';
+import PageLayout from '@/components/layout/PageLayout.vue';
+
+const steps = [
+  {
+    component: markRaw(VehicleInformation)
+  },
+  {
+    component: markRaw(VehicleDocuments)
+  },
+  {
+    component: markRaw(VehicleImages)
+  }
+]
+const currentStep = ref(0)
+
+const next = () => {
+  currentStep.value += 1;
+}
+const goBack = (): void => {
+  currentStep.value = 0;
+}
+const previous = (): void => {
+  if (currentStep.value !== 0) {
+    currentStep.value -= 1;
+  }
+}
+</script>

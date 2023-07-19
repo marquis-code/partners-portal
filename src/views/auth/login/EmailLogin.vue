@@ -87,12 +87,16 @@
           Join now
         </p>
       </div>
+      <router-link to="/faq" class="mt-4 w-fit mx-auto text-sm py-2 px-3 flex items-center gap-2 text-[#0DAC5C] rounded-lg font-medium">
+        <img src="@/assets/images/faqs/question_mark.svg" alt="">
+        Go to FAQ
+      </router-link>
     </div>
   </form>
   <!-- </main> -->
 </template>
 
-<script lang="ts">
+<!-- <script lang="ts">
 import { defineComponent } from 'vue';
 import { setZohoUser } from '@/utils/zoho';
 import { mapActions } from 'vuex';
@@ -175,6 +179,87 @@ export default defineComponent({
     }
   }
 });
+</script> -->
+
+<script setup lang="ts">
+import { ref, defineEmits } from 'vue';
+import { setZohoUser } from '@/utils/zoho';
+import { useStore } from 'vuex';
+import { required, email } from '@vuelidate/validators';
+import LoginMixin from '@/mixins/LoginMixin';
+import { LoginResponse } from '@/models/login-response.model';
+import { AxiosResponse } from 'axios';
+import { extractErrorMessage } from '@/utils/helper';
+import Spinner from '@/components/layout/Spinner.vue';
+import router from '@/router';
+import {axiosInstance as axios} from '@/plugins/axios';
+import {useToast} from 'vue-toast-notification';
+import useVuelidate from "@vuelidate/core";
+import { useRoute } from 'vue-router';
+
+const validations = {
+  form: {
+    email: { required, email },
+    password: { required }
+  }
+}
+const route = useRoute()
+const store = useStore()
+const toast = useToast()
+const emit = defineEmits(['goToSignUp'])
+const form = ref({
+  email: '',
+  password: ''
+});
+const showPassword = ref(false);
+const processing = ref(false);
+const v$ = useVuelidate(validations, {form})
+// mixins: [LoginMixin],
+
+const toggleShow = () => {
+  showPassword.value = !showPassword.value;
+}
+// ...mapActions('auth', ['setSessionData']),
+const submitForm = async () => {
+  v$.value.form.$touch();
+  if (processing.value || v$.value.form.$errors.length) {
+    return;
+  }
+  const payload = {
+    email: form.value.email,
+    password: form.value.password
+  };
+  try {
+    processing.value = true;
+    const loginResponse: AxiosResponse<LoginResponse> =
+      await axios.post('v1/login', payload);
+    if (loginResponse?.data) {
+      await store.dispatch('auth/authSuccess', loginResponse.data);
+      window.$zoho.salesiq.reset();
+      setZohoUser(loginResponse?.data);
+      const redirect: any = route.query.redirect;
+      if (redirect) {
+        router.push({ path: redirect });
+      } else {
+        router.push({
+          name: 'dashboard',
+          query: { ...route.query }
+        });
+      }
+    } else {
+      toast.error('Login failed!');
+    }
+  } catch (e) {
+    const errorMessage = extractErrorMessage(
+      e,
+      null,
+      'Oops! An error occurred, please try again.'
+    );
+    toast.error(errorMessage);
+  } finally {
+    processing.value = false;
+  }
+}
 </script>
 
 <style lang="scss" scoped>

@@ -415,7 +415,7 @@
   <!-- </page-layout> -->
 </template>
 
-<script lang="ts">
+<!-- <script lang="ts">
 import { defineComponent } from 'vue';
 import useVuelidate from '@vuelidate/core';
 import { email, required } from '@vuelidate/validators';
@@ -615,4 +615,191 @@ export default defineComponent({
     }
   }
 });
+</script> -->
+
+<script setup lang="ts">
+import { ref, Ref, computed, onMounted } from 'vue';
+import useVuelidate from '@vuelidate/core';
+import { email, required } from '@vuelidate/validators';
+import { useStore } from 'vuex';
+import { extractErrorMessage } from '@/utils/helper';
+import { format } from 'date-fns';
+import Spinner from '@/components/layout/Spinner.vue';
+import AppModal from '@/components/Modals/AppModal.vue';
+import emitter from '@/libs/emitter';
+import router from '@/router';
+import {axiosInstance as axios} from '@/plugins/axios';
+import {useToast} from 'vue-toast-notification';
+import { useRoute } from 'vue-router';
+
+interface Driver {
+  fname?: string;
+  lname?: string;
+  phone?: string;
+  email?: string;
+  residential_address?: string;
+  dob?: string;
+  age_of_business?: string;
+  doc_type?: string;
+  doc_id?: Array<string>;
+  avatar?: string;
+}
+
+const route = useRoute()
+const toast = useToast()
+const store = useStore()
+const validations = {
+  form: {
+    fname: { required },
+    lname: { required },
+    phone: { required },
+    email: { required, email },
+    residential_address: { required },
+    dob: { required },
+    age_of_business: { required },
+    doc_type: { required },
+    doc_id: { required },
+    avatar: { required }
+  }
+}
+const docId = ref(null) as Ref<any>
+const fetchingPartner = ref(false)
+const uploadingFile = ref(false)
+const showModal = ref(false)
+const profilePreview = ref('')
+const form = ref({} as Driver)
+const processing = ref(false)
+const documentId = ref(null) as Ref<any>
+const isUploaded = ref(false)
+const uploadingProfile = ref(false)
+const v$ = useVuelidate(validations, {form})
+
+const partnerContext:any = computed(() => store.getters['auth/activeContext'])
+const userSessionData:any = computed(() => store.getters['auth/userSessionData'])
+const user:any = computed(() => store.getters['auth/user'])
+const getDriverData:any = computed(() => store.getters['driver/getDriverData'])
+const driverData:any = computed(() => store.getters['driver/getDriverData'])
+
+const setCurrentDetails = () => {
+  form.value.residential_address = partnerContext.value.onboardingState.address.address.slice(1, partnerContext.value.onboardingState.address.address.length - 1);
+  form.value.fname = userSessionData.value.user.fname;
+  form.value.lname = userSessionData.value.user.lname;
+  form.value.phone = userSessionData.value.user.phone;
+  form.value.email = userSessionData.value.user.email;
+  form.value.doc_type = partnerContext.value.onboardingState.identity.document_type
+  form.value.dob = partnerContext.value.onboardingState.identity.dob;
+  form.value.doc_id = partnerContext.value.onboardingState.identity.document_id;
+}
+const handleFileRemoval = () => {
+  isUploaded.value = false;
+}
+const openModal = () => {
+  showModal.value = true;
+}
+const closeModal = () => {
+  showModal.value = false;
+}
+const getUploadedFileUrlFromStringifiedArray = (stringifiedArray: any) => {
+  const parsedArray = JSON.parse(stringifiedArray);
+  if (parsedArray.length > 0) {
+    return parsedArray[0];
+  }
+  return null;
+}
+const updatePartnerInfo = async () => {
+  v$.value.form.$touch();
+  if (processing.value || v$.value.form.$errors.length) {
+    return;
+  }
+  processing.value = true;
+  try {
+    const payload = {
+      fname: form.value.fname,
+      lname: form.value.lname,
+      phone: form.value.phone,
+      email: form.value.email,
+      residential_address: form.value.residential_address,
+      dob: form.value.dob,
+      avatar: form.value.avatar,
+      document_type: 'drivers_license',
+      document_id: docId.value,
+      password: 'shuttlers'
+    };
+    await axios.patch(
+      `/v1/partners/${userSessionData.value.activeContext.partner.account_sid}/drivers/${route.params.driverId}`, //  Endpoint to update driver
+      payload
+    );
+    openModal();
+    router.push({ name: 'drivers.list' });
+    closeModal();
+    toast.success('Drivers details was successfully updated');
+  } catch (err) {
+    console.log(err);
+    const errorMessage = extractErrorMessage(
+      err,
+      null,
+      'Oops! An error occurred, please try again.'
+    );
+    toast.error(errorMessage);
+  } finally {
+    processing.value = false;
+  }
+}
+const fileSelected = async (selectedImage: any) => {
+  const imageDbUrl = (await uploadTos3andGetDocumentUrl(
+    selectedImage
+  )) as string;
+}
+const handleProfileUpload = async (e: any) => {
+  const selectedProfile = e.target.files[0];
+  uploadingProfile.value = true;
+  await uploadTos3andGetDocumentUrl(selectedProfile)
+    .then((res) => {
+      form.value.avatar = res;
+      profilePreview.value = URL.createObjectURL(selectedProfile);
+      toast.success('Profile picture was uploaded successfully');
+    })
+    .catch(() => {
+      toast.error('Something went wrong while uploading profile');
+    })
+    .finally(() => {
+      uploadingProfile.value = false;
+    });
+}
+const uploadTos3andGetDocumentUrl = async (file: any) => {
+  uploadingFile.value = true;
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await axios.post(
+      `/v1/upload/identity/files`,
+      formData
+    );
+    if (response.data?.files?.length) {
+      return response.data.files[0].Location;
+    }
+  } catch (error) {
+    toast.warning(
+      'An error occured while uploading your file, please try again'
+    );
+  } finally {
+    uploadingFile.value = false;
+  }
+}
+
+onMounted(() => {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  emitter.on("settings:go-to-profile", () => {
+    router.push('/settings')
+  });
+  emitter.on("settings:go-to-company", () => {
+    router.push('/settings/company')
+  });
+  emitter.on("settings:go-to-settlement", () => {
+    router.push('/settings/accounts')
+  });
+})
+
+setCurrentDetails()
 </script>

@@ -9,6 +9,7 @@
       py-6
       sticky
       top-0
+      bg-white
     "
   >
     <div
@@ -38,6 +39,8 @@
             transition
             ease-out
             duration-500
+            hidden
+            md:flex
           "
           src="@/assets/images/toggle.svg"
         />
@@ -141,7 +144,8 @@
     </div>
   </div>
 </template>
-<script lang="ts">
+
+<!-- <script lang="ts">
 // @click.prevent="selectThisSection(groupIndex, index)"
 import { defineComponent } from 'vue';
 import { mapGetters } from 'vuex';
@@ -250,6 +254,110 @@ export default defineComponent({
     }
   }
 });
+</script> -->
+
+<script setup lang="ts">
+// @click.prevent="selectThisSection(groupIndex, index)"
+import { ref, computed, defineEmits } from 'vue';
+import { useStore } from 'vuex';
+import router from '@/router';
+
+const store = useStore()
+const emit = defineEmits(['sideBarNavigationClicked'])
+const menuGroup = [
+  {
+    sectionTitle: 'GENERAL',
+    menus: [
+      {
+        title: 'Dashboard',
+        routeName: 'dashboard',
+        icon: 'home',
+        selected: true
+      },
+      {
+        title: 'Vehicles',
+        routeName: 'vehicles.list',
+        icon: 'directions_car',
+        selected: false
+      },
+      {
+        title: 'Drivers',
+        routeName: 'drivers.list',
+        icon: 'group',
+        selected: false
+      },
+      {
+        title: 'Trips',
+        routeName: 'trips.list',
+        icon: 'route',
+        selected: false
+      },
+      {
+        title: 'Routes',
+        routeName: 'routes.list',
+        icon: 'location_on',
+        selected: false
+      },
+      {
+        title: 'Earnings',
+        routeName: 'earnings.information',
+        icon: 'payments',
+        selected: false
+      }
+    ]
+  },
+  {
+    sectionTitle: 'SYSTEM',
+    menus: [
+      {
+        title: 'Settings',
+        routeName: 'settings.edit.partner',
+        icon: 'settings',
+        selected: false
+      }
+    ]
+  }
+]
+const isSidebarFolded = ref(false);
+const windowWidth = ref(0);
+const isMobileScreen = ref(false);
+
+const user:any = computed(() => store.getters['auth/user'])
+
+const selectThisSection = (groupIndex: number, itemIndex: number) => {
+  for (let index = 0; index < menuGroup.length; index++) {
+    const groupMenus = menuGroup[index].menus;
+    for (let indexJ = 0; indexJ < groupMenus.length; indexJ++) {
+      const section = groupMenus[indexJ];
+      if (index === groupIndex && indexJ === itemIndex) {
+        emit('sideBarNavigationClicked', section.title);
+        section.selected = true;
+      } else section.selected = false;
+    }
+  }
+}
+const toggleSidebar = () => {
+  isSidebarFolded.value = !isSidebarFolded.value;
+}
+const checkScreen = () => {
+  windowWidth.value = window.innerWidth;
+  if (windowWidth.value <= 768) {
+    isSidebarFolded.value = true;
+    isMobileScreen.value = true;
+  } else {
+    isSidebarFolded.value = false;
+    isMobileScreen.value = false;
+  }
+}
+const logout = () => {
+  window.$zoho.salesiq.reset();
+  localStorage.clear();
+  router.push('/login');
+  router.go(0);
+}
+
+// window.addEventListener('resize', checkScreen);
+// checkScreen();
 </script>
 
 <style scoped lang="scss">

@@ -48,7 +48,7 @@
     </div>
   </section>
 </template>
-<script lang="ts">
+<!-- <script lang="ts">
 import 'vue3-carousel/dist/carousel.css';
 import { Carousel, Slide, Pagination } from 'vue3-carousel';
 
@@ -92,7 +92,37 @@ export default defineComponent({
     }
   }
 });
+</script> -->
+
+<script setup lang="ts">
+import 'vue3-carousel/dist/carousel.css';
+import { Carousel, Slide, Pagination } from 'vue3-carousel';
+import {computed } from 'vue';
+import LoginOrSignup from './auth/LoginOrSignup.vue';
+import Register from './auth/Register.vue';
+import Login from './auth/login/Login.vue';
+
+const step = 0
+const highlights = [
+  {
+    label: 'Manage your assets',
+    description:
+      'Keep track of all your Drivers and Vehicles in one place.',
+    image: require('@/assets/images/banners/manage_banner.svg')
+  },
+  {
+    label: 'Earn from your Vehicles',
+    description:
+      'Move shuttlers using your Vehicles and earn while doing so',
+    image: require('@/assets/images/banners/earn_banner.svg')
+  }
+]
+
+const registrationLink = computed(() => {
+  return `${process.env.VUE_APP_WEB_APP_BASE_URL}/register?ref=partner`;
+})
 </script>
+
 <style lang="scss" scoped>
 .carousel-wrapper {
   overflow-x: hidden;

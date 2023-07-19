@@ -51,7 +51,7 @@
   </page-layout>
 </template>
 
-<script>
+<!-- <script>
 import PageLayout from '@/components/layout/PageLayout';
 import { mapGetters } from 'vuex';
 import Spinner from '@/components/layout/Spinner';
@@ -105,4 +105,49 @@ export default {
     }
   }
 };
+</script> -->
+
+<script setup lang="ts">
+import PageLayout from '@/components/layout/PageLayout.vue';
+import { useStore } from 'vuex';
+import Spinner from '@/components/layout/Spinner.vue';
+import PageActionHeader from '@/components/PageActionHeader.vue';
+import { extractErrorMessage } from '@/utils/helper';
+import TabContainer from '@/components/tab/TabContainer.vue';
+import TabItem from '@/components/tab/TabItem.vue';
+import {ref, Ref, computed} from 'vue'
+import {axiosInstance as axios} from '@/plugins/axios';
+import {useToast} from 'vue-toast-notification';
+import { useRoute } from 'vue-router';
+
+const route = useRoute()
+const store = useStore()
+const loading = ref(true)
+const trip = ref({}) as Ref<any>
+const toast = useToast()
+
+const partnerContext:any = computed(() => store.getters['auth/activeContext'])
+const isLoading:any = computed(() => store.getters['driver/getDriverLoading'])
+
+const fetchTrip = async () => {
+  loading.value = true;
+  await axios
+    .get(`/v1/trips/${route.params.tripId}`)
+    .then((res) => {
+      trip.value = res.data;
+    })
+    .catch((err) => {
+      const errorMessage = extractErrorMessage(
+        err,
+        null,
+        'Oops! An error occurred, please try again.'
+      );
+      toast.error(errorMessage);
+    })
+    .finally(() => {
+      loading.value = false;
+    });
+}
+
+fetchTrip()
 </script>

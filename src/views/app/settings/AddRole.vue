@@ -118,7 +118,7 @@
   </app-modal>
 </template>
 
-<script lang="ts">
+<!-- <script lang="ts">
 import { defineComponent } from 'vue';
 import useVuelidate from '@vuelidate/core';
 import { mapGetters } from 'vuex';
@@ -195,4 +195,72 @@ export default defineComponent({
     }
   }
 });
+</script> -->
+
+<script setup lang="ts">
+import { ref, Ref, computed, defineEmits } from 'vue';
+import useVuelidate from '@vuelidate/core';
+import { useStore } from 'vuex';
+import { email, required } from '@vuelidate/validators';
+import { extractErrorMessage } from '@/utils/helper';
+import Spinner from '@/components/layout/Spinner.vue';
+import AppModal from '@/components/Modals/AppModal.vue';
+import router from '@/router';
+import {axiosInstance as axios} from '@/plugins/axios';
+import {useToast} from 'vue-toast-notification';
+
+interface Role {
+  email?: string;
+  role?: string;
+}
+
+const toast = useToast()
+const store = useStore()
+const emit = defineEmits(['reloadPage'])
+const validations = {
+  form: {
+    email: { required, email },
+    role: { required }
+  }
+}
+const showModal = ref(false)
+const form = ref({}) as Ref<Role>
+const processing = ref(false)
+const v$ = useVuelidate(validations, {form})
+
+const partnerContext:any = computed(() => store.getters['auth/activeContext'])
+const userSessionData:any = computed(() => store.getters['auth/userSessionData'])
+const user:any = computed(() => store.getters['auth/user'])
+
+const goToMembersView = () => {
+  showModal.value = false;
+  router.push({name: 'settings.edit.role.management'})
+}
+const openModal = () => {
+  showModal.value = true;
+}
+const closeModal = () => {
+  showModal.value = false;
+  emit('reloadPage');
+}
+const createPartnerRoles = async () => {
+  v$.value.form.$touch();
+  if (processing.value || v$.value.form.$errors.length) {
+    return;
+  }
+  processing.value = true;
+  try {
+    await axios.post(`/v1/partners/${partnerContext.value.partner.account_sid}/member-invitations`, {...form.value})
+    showModal.value = true;
+  } catch (err) {
+    const errorMessage = extractErrorMessage(
+      err,
+      null,
+      'Oops! An error occurred, please try again.'
+    );
+    toast.error(errorMessage);
+  } finally {
+    processing.value = false;
+  }
+}
 </script>

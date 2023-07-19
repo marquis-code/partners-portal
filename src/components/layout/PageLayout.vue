@@ -5,10 +5,17 @@
         <div
           class="px-3 md:px-7 top-part flex flex-row justify-between items-center py-3"
         >
-          <div class="dashboard-name text-xl font-medium">
+          <div class="dashboard-name text-xl font-medium flex items-center gap-4">
+            <img @click="openSidebar" class="flex md:hidden" src="@/assets/images/toggle.svg" alt="">
             {{ pageTitle }}
           </div>
-          <div class="py-3 px-5 text-black rounded-lg font-medium">{{companyName}}</div>
+          <div class="py-3 px-5 text-black rounded-lg font-medium flex items-center gap-4">
+            <router-link to="/faq" class="w-fit mx-auto text-sm py-2 px-3 hidden md:flex items-center gap-2 text-[#0DAC5C] rounded-lg font-medium">
+              <img src="@/assets/images/faqs/question_mark.svg" alt="">
+              Go to FAQ
+            </router-link>
+            {{companyName}}
+          </div>
         </div>
         <slot name="breadcrumbs"></slot>
         <hr class="mt-5 mb-0 hidden" />
@@ -80,7 +87,9 @@ import { ref, defineProps, withDefaults, computed } from "vue";
 import { useStore } from "vuex";
 import {axiosInstance as axios} from '@/plugins/axios';
 import router from "@/router";
+import {useSidebar} from '@/composables/sidebar'
 
+const { openSidebar } = useSidebar()
 const store = useStore()
 const companyName = ref('')
 export interface Props {

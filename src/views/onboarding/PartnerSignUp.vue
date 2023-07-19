@@ -52,7 +52,7 @@
   </OnboardingLayout>
 </template>
 
-<script lang="ts">
+<!-- <script lang="ts">
 import { defineComponent } from 'vue';
 import CenteredPageHeader from '../../components/CenteredPageHeader.vue';
 import OnboardingLayout from '../layouts/OnboardingLayout.vue';
@@ -118,6 +118,64 @@ export default defineComponent({
     }
   }
 });
+</script> -->
+
+<script setup lang="ts">
+import { ref, computed } from 'vue';
+import CenteredPageHeader from '../../components/CenteredPageHeader.vue';
+import OnboardingLayout from '../layouts/OnboardingLayout.vue';
+import { extractErrorMessage } from '@/utils/helper';
+import { useStore } from 'vuex';
+import router from '@/router';
+import {axiosInstance as axios} from '@/plugins/axios';
+import {useToast} from 'vue-toast-notification';
+import { useRoute } from 'vue-router';
+
+const route = useRoute()
+const toast = useToast()
+const store = useStore()
+const activeIndex = ref(null);
+const loading = ref(false);
+const headerTitle = ref('Create a partner account');
+const headerDescription = ref('Select a category to sign up as');
+const signupOptions = ref([
+  {
+    title: 'Registered Business',
+    description: 'You own a company that rents vehicles for an agreed time and fee.'
+  },
+  {
+    title: 'An Individual',
+    description: 'You are not a company but you rent out one or more vehicles for an agreed time and fee.'
+  }
+]);
+
+const user:any = computed(() => store.getters['auth/user'])
+const userSessionData:any = computed(() => store.getters['auth/userSessionData'])
+
+const selected = (index: any) => {
+  activeIndex.value = index;
+}
+const handleRedirection = async () => {
+  if (activeIndex.value === 0) {
+    await router.push({ name: 'GetStarted', query: { type: 'company' }});
+  }
+
+  if (activeIndex.value === 1) {
+    try {
+      loading.value = true;
+      const response = await axios.post('/v1/partners', { mode: 'individual'});
+      if (response.data) {
+        await store.dispatch('auth/refreshActiveContext', user.value.id);
+        await router.push({ name: 'GetStarted', query: { type: 'individual' }});
+      }
+    } catch (err) {
+      const errorMessage = extractErrorMessage(err, null, 'Oops! An error occurred, please try again.');
+      toast.error(errorMessage);
+    } finally {
+      loading.value = false;
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped></style>

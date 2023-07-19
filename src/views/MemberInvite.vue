@@ -43,85 +43,73 @@
   </main>
 </template>
 
-<script lang="ts">
-
+<script setup lang="ts">
 import {Partner} from "@/models/organisation.model";
-import {defineComponent} from "vue";
+import {ref, Ref, computed} from "vue";
 import {extractErrorMessage} from "@/utils/helper";
+import {axiosInstance as axios} from '@/plugins/axios';
+import {useToast} from 'vue-toast-notification';
 
 interface InvitePageData {
   partnerInvitations: Partial<Partner>[] | null;
 }
 
-export default defineComponent<any, any, Partial<InvitePageData>>({
-  name: "MemberInvite",
-  data () {
-    return {
-      partnerInvitations: [],
-      loadingPageData: false,
-      processingDecision: false,
-    }
-  },
-  computed: {
-    inviteTitle () {
-      return (this.partnerInvitations?.length
-        ? (this.partnerInvitations.length > 1
-            ? 'Please make a decision on your pending invitations'
-            : `Join <span class="text-sh-green-500">${this.partnerInvitations[0].company_name}</span> on Shuttlers`)
-        : 'No partner invitations');
-    }
-  },
-  created () {
-    this.fetchPartnerInvitationData();
-  },
-  methods: {
-    fetchPartnerInvitationData () {
-      // const user: UserData = this.$store.getters['auth/user'];
-      this.$axios.get(`v1/partner/invitations`)
-        .then((response: any) => {
-          this.partnerInvitations = response.data.data;
-        }).catch((err: any) => {
-          this.partnerInvitations = [{
-            id: '',
-            company_name: 'John doe limited',
-          }]
-          this.$toast.error(extractErrorMessage(err))
-        }).finally(() => {
-          this.loadingPageData = false;
-        });
-    },
-    rejectInvitation () {
-      const partner_account_sid = 1;
-      this.processingDecision = true;
-      this.$axios.post(`v1/partners/${partner_account_sid}/member-invitations/reject`)
-        .then((res: any) => {
-          // TODO: handle redirection after confirming design workflow
-        })
-        .catch((err: any) => {
-          this.$toast.error(extractErrorMessage(err))
-        })
-        .finally(() => {
-          this.processingDecision = false;
-        });
-    },
-    acceptInvitation () {
-      const partner_account_sid = 1;
-      this.processingDecision = true;
-      this.$axios.post(`v1/partners/${partner_account_sid}/member-invitations/reject`)
-        .then((res: any) => {
-          // TODO: handle redirection after confirming design workflow
-        })
-        .catch((err: any) => {
-          this.$toast.error(extractErrorMessage(err))
-        })
-        .finally(() => {
-          this.processingDecision = false;
-        });
-    }
-  }
+const toast = useToast()
+const partnerInvitations = ref([]) as Ref<any[]>
+const loadingPageData = ref(false);
+const processingDecision = ref(false);
+
+const inviteTitle = computed(() => {
+  return (partnerInvitations.value?.length
+    ? (partnerInvitations.value.length > 1
+        ? 'Please make a decision on your pending invitations'
+        : `Join <span class="text-sh-green-500">${partnerInvitations.value[0].company_name}</span> on Shuttlers`)
+    : 'No partner invitations');
 })
+
+const fetchPartnerInvitationData = () => {
+  // const user: UserData = this.$store.getters['auth/user'];
+  axios.get(`v1/partner/invitations`)
+    .then((response: any) => {
+      partnerInvitations.value = response.data.data;
+    }).catch((err: any) => {
+      partnerInvitations.value = [{
+        id: '',
+        company_name: 'John doe limited',
+      }]
+      toast.error(extractErrorMessage(err))
+    }).finally(() => {
+      loadingPageData.value = false;
+    });
+}
+const rejectInvitation = () => {
+  const partner_account_sid = 1;
+  processingDecision.value = true;
+  axios.post(`v1/partners/${partner_account_sid}/member-invitations/reject`)
+    .then((res: any) => {
+      // TODO: handle redirection after confirming design workflow
+    })
+    .catch((err: any) => {
+      toast.error(extractErrorMessage(err))
+    })
+    .finally(() => {
+      processingDecision.value = false;
+    });
+}
+const acceptInvitation = () => {
+  const partner_account_sid = 1;
+  processingDecision.value = true;
+  axios.post(`v1/partners/${partner_account_sid}/member-invitations/reject`)
+    .then((res: any) => {
+      // TODO: handle redirection after confirming design workflow
+    })
+    .catch((err: any) => {
+      toast.error(extractErrorMessage(err))
+    })
+    .finally(() => {
+      processingDecision.value = false;
+    });
+}
+
+fetchPartnerInvitationData()
 </script>
-
-<style scoped>
-
-</style>

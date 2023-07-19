@@ -253,7 +253,7 @@
   </form>
 </template>
 
-<script lang="ts">
+<!-- <script lang="ts">
 import { defineComponent } from 'vue';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
@@ -449,6 +449,196 @@ export default defineComponent<any, any, any>({
     }
   }
 });
+</script> -->
+
+<script setup lang="ts">
+import { ref, Ref, defineEmits, watch, computed } from 'vue';
+import useVuelidate from '@vuelidate/core';
+import { required } from '@vuelidate/validators';
+import { useStore } from 'vuex';
+import { extractErrorMessage } from '@/utils/helper';
+import { AxiosResponse } from 'axios';
+import Spinner from '@/components/layout/Spinner.vue';
+import router from '@/router';
+import {axiosInstance as axios} from '@/plugins/axios';
+import {useToast} from 'vue-toast-notification';
+import { useRoute } from 'vue-router';
+
+const validations = {
+  form: {
+    brand: { required },
+    name: { required },
+    year: { required },
+    seats: { required },
+    city_ids: { required },
+    registration_number: { required },
+    partner_id: { required }
+  }
+}
+const route = useRoute()
+const toast = useToast()
+const store = useStore()
+const emit = defineEmits(['next'])
+const validPlateNumber = ref(false);
+const form = ref({
+  brand: '',
+  name: '',
+  // type: 'Sedan',
+  year: '',
+  seats: '',
+  city_ids: [] as any[],
+  registration_number: '',
+  partner_id: ''
+});
+const dashAdded = ref(false);
+const fetchingModels = ref(false);
+const cities = ref([]);
+const vehicleYears = ref([]) as Ref<any[]>
+const vehicleModels = ref([]) as Ref<any[]>
+const vehicleBrands = ref([]) as Ref<any[]>
+const vehicleModelMap = new Map();
+const processing = ref(false);
+const loading = ref(false);
+const capacityList = ref([]);
+const v$ = useVuelidate(validations, {form})
+
+const partnerContext:any = computed(() => store.getters['auth/activeContext'])
+const user:any = computed(() => store.getters['auth/user'])
+
+watch(() => form.value.registration_number, (value, oldValue) => {
+  if (checkPlateNumberFormat(form.value.registration_number)) {
+    validPlateNumber.value = true;
+  } else {
+    validPlateNumber.value = false;
+  }
+})
+
+const selectThisCity = (city: any) => {
+  const cityId = city.city.id;
+  form.value.city_ids = [cityId];
+}
+const uppercase = ($event: any) => {
+  form.value.registration_number =
+    form.value.registration_number.toUpperCase();
+  getKeyStroke($event);
+}
+const getKeyStroke = ($event: any) => {
+  const pressedKey = $event.key;
+  if (
+    pressedKey === 'Backspace' &&
+    form.value.registration_number.length === 3
+  ) {
+    console.log('Do nothing');
+  } else if (form.value.registration_number.length === 3) {
+    form.value.registration_number += '-';
+    dashAdded.value = true;
+  } else {
+    console.log(0);
+  }
+}
+const checkPlateNumberFormat = (plateNumber: string): boolean => {
+  if (/^[a-zA-Z]{3}-[0-9]{3}[a-zA-Z]{2}$/gi.test(plateNumber)) {
+    return true;
+  } else {
+    return false;
+  }
+}
+const fetchPageData = () => {
+  loading.value = true;
+  vehicleYears.value = getYearsFrom('1980');
+  cities.value = partnerContext.value.supportedCities;
+  axios
+    .get('/v1/vehicle-makes?limit=1000')
+    .then((r: AxiosResponse) => {
+      vehicleBrands.value = r.data.data || [];
+    })
+    .catch((e: any) => {
+      toast.error(extractErrorMessage(e));
+    })
+    .finally(() => {
+      loading.value = false;
+    });
+}
+const onCarModelChanged = (carModel: any) => {
+  form.value.name = carModel.name;
+  capacityList.value = carModel.capacity_list || [];
+  if (form.value.name) {
+    // TODO: Memoize
+    vehicleYears.value = getYearsFrom(`${carModel.start_year}`);
+  } else {
+    vehicleYears.value = [];
+    form.value.year = '';
+  }
+}
+const getYearsFrom = (year: string): number[] => {
+  const date = new Date(Number(year), 0);
+  let iterationYear = date.getFullYear();
+  const iterationEndYear = new Date().getFullYear();
+  const dateRange = iterationEndYear - iterationYear;
+  const years = [];
+  for (let i = 0; i <= dateRange; i++) {
+    years[i] = iterationYear++;
+  }
+  return years;
+}
+const saveForm = async () => {
+  v$.value.form.$touch();
+  if (!validPlateNumber.value) {
+    toast.warning('Plate number must be in the right format');
+    return;
+  }
+  if (processing.value || v$.value.form.$errors.length) {
+    return;
+  }
+  processing.value = true;
+  try {
+    const payload = {
+      brand: form.value.brand,
+      name: form.value.name,
+      // type: 'Sedan',
+      year: form.value.year,
+      seats: form.value.seats,
+      city_ids: form.value.city_ids,
+      registration_number: form.value.registration_number,
+      partner_id: form.value.partner_id
+    };
+    const response = await axios.post('/v1/vehicles', payload);
+    await store.dispatch('vehicle/setVehicleFormData', response.data);
+    emit('next');
+  } catch (err) {
+    const errorMessage = extractErrorMessage(
+      err,
+      null,
+      'Oops! An error occurred, please try again.'
+    );
+    toast.error(errorMessage);
+  } finally {
+    processing.value = false;
+  }
+}
+const getVehiclesForBrand = async (brandId: any) => {
+  if (vehicleModelMap.has(brandId)) {
+    vehicleModels.value = vehicleModelMap.get(brandId);
+  } else {
+    try {
+      const vehicleModelsResponse = await axios.get(
+        `v1/vehicle-makes/${brandId}/vehicle-models?limit=1000`
+      );
+      vehicleModels.value = vehicleModelsResponse.data.data;
+    } catch (e) {
+      toast.error(extractErrorMessage(e, null, 'An error occurred!'));
+    }
+  }
+}
+const onCarBrandChanged = (brand: any) => {
+  form.value.brand = brand?.name || null;
+  if (brand) {
+    getVehiclesForBrand(brand.id);
+  }
+}
+
+fetchPageData();
+form.value.partner_id = partnerContext?.value.partner?.id;
 </script>
 
 <style lang="scss" scoped>
