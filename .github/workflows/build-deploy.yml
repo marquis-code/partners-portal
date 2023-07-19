@@ -23,6 +23,7 @@ jobs:
     - name: Build
       run: |
         yarn install
+        yarn test:unit
         yarn build
   deploy:
     runs-on: ubuntu-latest
