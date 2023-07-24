@@ -689,7 +689,7 @@ const getDocumentLabel = computed(() => {
   return '';
 })
 
-const checkIfIdentityKYCHasBeenDone = async() => {
+const checkIfIdentityKYCHasBeenDone = async () => {
   try {
     console.log(1);
   } catch (err: any) {
@@ -702,7 +702,7 @@ const checkIfIdentityKYCHasBeenDone = async() => {
     toast.error(errorMessage);
   }
 }
-const checkIfAddressKYCHasBeenDone = async() => {
+const checkIfAddressKYCHasBeenDone = async () => {
   try {
     console.log(1);
   } catch (err: any) {
@@ -715,7 +715,7 @@ const checkIfAddressKYCHasBeenDone = async() => {
     toast.error(errorMessage);
   }
 }
-const setFormDefaults = async() => {
+const setFormDefaults = async () => {
   try {
     const response = await axios.get(
       `/v1/partner-share-holders/${props.id}`
@@ -756,7 +756,7 @@ const handleIdentityChange = () => {
     (obj: any) => obj.key === identityForm.value.document.type
   );
 }
-const saveIdentityForm = async() => {
+const saveIdentityForm = async () => {
   v$.value.identityForm.$touch();
   if (loading.value || v$.value.identityForm.$errors.length) {
     return;
@@ -780,7 +780,7 @@ const saveIdentityForm = async() => {
     loading.value = false;
   }
 }
-const saveAddressForm = async() => {
+const saveAddressForm = async () => {
   v$.value.addressForm.$touch();
   if (loading.value || v$.value.addressForm.$errors.length) {
     return;

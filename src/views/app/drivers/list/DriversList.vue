@@ -759,7 +759,7 @@ const changePage = (pageNumber: any) => {
 const showPageSize = (pageSize: any) => {
   filters.value.pageSize = pageSize;
 }
-const proceed = async() => {
+const proceed = async () => {
   modalLoading.value = true;
   await axios
     .delete(

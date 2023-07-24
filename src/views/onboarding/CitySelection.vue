@@ -169,7 +169,7 @@ const city_ids = ref([]) as Ref<any[]>
 const contextOrg:any = computed(() => store.getters['auth/activeContext'])
 const user:any = computed(() => store.getters['auth/user'])
 
-onMounted(async() => {
+onMounted(async () => {
   await store.dispatch('auth/refreshActiveContext', user.value.id);
 })
 

@@ -26,7 +26,7 @@ import { usePlacesAutocomplete } from 'v-use-places-autocomplete';
 
 export default defineComponent({
   name: 'AddressAutocomplete',
-  setup(props, { emit }) {
+  setup (props, { emit }) {
     const query = ref('');
     const showDropdown = ref(false);
     const { suggestions } = usePlacesAutocomplete(query, {
@@ -34,7 +34,7 @@ export default defineComponent({
       minLengthAutocomplete: 3
     });
 
-    function handleSelected(selectedAddressValue:any) {
+    function handleSelected (selectedAddressValue:any) {
       query.value = selectedAddressValue;
       emit('autoCompleteAddress', selectedAddressValue);
       showDropdown.value = false;

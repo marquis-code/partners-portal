@@ -463,7 +463,7 @@ const getBarChartTripsData = async () => {
     toast.warning(errorMessage);
   }
 }
-const getPartnerEarning = async() => {
+const getPartnerEarning = async () => {
   try {
     const response = await axios.get(
       `cost-revenue/v1/partners/${partnerContext.value.partner.account_sid}/earnings-summary`
