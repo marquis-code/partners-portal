@@ -80,7 +80,8 @@
     </button>
   </OnboardingLayout>
 </template>
-<script lang="ts">
+
+<!-- <script lang="ts">
 import { defineComponent } from 'vue';
 import OnboardingLayout from '@/views/layouts/OnboardingLayout.vue';
 import CenteredPageHeader from '@/components/CenteredPageHeader.vue';
@@ -133,4 +134,51 @@ export default defineComponent({
     CenteredPageHeader
   }
 });
+</script> -->
+
+<script setup lang="ts">
+import { ref, Ref, } from 'vue';
+import OnboardingLayout from '@/views/layouts/OnboardingLayout.vue';
+import CenteredPageHeader from '@/components/CenteredPageHeader.vue';
+import { PartnerOrganization } from '@/models/organisation.model';
+import { useStore } from 'vuex';
+import router from '@/router';
+import {useToast} from 'vue-toast-notification';
+
+const toast = useToast()
+const store = useStore()
+const title = ref("Who's using Shuttlers?");
+const description = ref("With Shuttlers Vehicle partner portal, you can shuffle between your organisations.");
+const activeIndex = ref(-1);
+const organizations = ref([]) as Ref<any[]>
+
+const getPartnerMembers = () => {
+  const members = store.getters['auth/userSessionData'];
+  organizations.value = members.associatedOrganizations;
+}
+const selected = (index: number, partner: PartnerOrganization) => {
+  if (partner.role !== 'owner' && !partner.supportedCities) {
+    toast.info('This profile setup is yet to be completed');
+    return;
+  }
+  store.dispatch('auth/setActiveContext', partner);
+  activeIndex.value = index;
+}
+const gotoDashBoard = () => {
+  router.push('/dashboard');
+}
+const getOrganizationRole = (role: PartnerOrganization['role']) => {
+  switch (role) {
+    case 'owner':
+      return 'Owner';
+    case 'admin':
+      return 'Admin';
+    case 'staff':
+      return 'Staff';
+    case 'super-admin':
+      return 'Super Admin';
+  }
+}
+
+getPartnerMembers()
 </script>

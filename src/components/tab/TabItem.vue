@@ -9,22 +9,19 @@
   </router-link>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
-export default defineComponent({
-  props: {
-    to: {
-      type: [Object, String],
-      required: false,
-      default: () => "/settings"
-    },
-    title: String,
-    isActive: {
-      default: () => false,
-      type: Boolean,
-    },
-  },
-});
+<script setup lang="ts">
+import { defineProps, withDefaults } from "vue";
+export interface Props {
+  to?: any
+  title: string
+  isActive?: boolean
+}
+
+withDefaults(defineProps<Props>(), {
+  to: '/settings',
+  isActive: false
+})
+
 </script>
 
 <style scoped lang="scss">

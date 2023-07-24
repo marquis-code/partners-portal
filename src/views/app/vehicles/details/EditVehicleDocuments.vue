@@ -83,7 +83,7 @@
   </page-layout>
 </template>
 
-<script lang="ts">
+<!-- <script lang="ts">
 import { defineComponent } from 'vue';
 import PageLayout from '@/components/layout/PageLayout.vue';
 import PageActionHeader from '@/components/PageActionHeader.vue';
@@ -142,4 +142,56 @@ export default defineComponent<any, any, any>({
     this.setExistingFormDate();
   }
 });
+</script> -->
+
+<script setup lang="ts">
+import { ref, Ref } from 'vue';
+import PageLayout from '@/components/layout/PageLayout.vue';
+import PageActionHeader from '@/components/PageActionHeader.vue';
+import ImageUpload from '@/components/ImageUpload.vue';
+import router from '@/router';
+
+const document = ref({
+  document_type: 'Vehicle Information',
+  documents: [
+    {
+      id: 27,
+      partner_id: 63,
+      files: [
+        'https://shuttlers-avatars.s3.us-east-2.amazonaws.com/admin-vWPsb5VLK.jpeg'
+      ],
+      document_type: 'Vehicle Information',
+      verified_at: null,
+      expiry_date: '2022-10-21T00:00:00.000Z',
+      verified_by: null,
+      status: 'submitted',
+      document_slug: 'vehicle-',
+      vehicle_id: 413,
+      created_at: '2022-10-20 13:36:47',
+      updated_at: '2022-10-20 13:36:47'
+    }
+  ]
+})
+const edit_id = ref(null) as Ref<any>
+const edit_document_type = ref('');
+const edit_expiry_date = ref('');
+const edit_files = ref([]) as Ref<any>
+
+const viewMyVehiclesDocuments = () => {
+  router.push({ name: 'vehicle.detail.documents' });
+}
+const setExistingFormDate = () => {
+  edit_document_type.value = document.value.document_type;
+  edit_expiry_date.value = document.value.documents[0].expiry_date?.slice(
+    0,
+    10
+  );
+  edit_files.value = document.value.documents[0].files[0];
+  edit_id.value = document.value.documents[0].id;
+}
+const updateThisDocument = () => {
+  console.log(edit_id.value);
+}
+
+setExistingFormDate()
 </script>

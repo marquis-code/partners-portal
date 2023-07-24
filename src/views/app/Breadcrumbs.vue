@@ -29,7 +29,8 @@
       </div>
     </nav>
 </template>
-<script lang="ts">
+
+<!-- <script lang="ts">
 import { defineComponent } from 'vue';
 import DynamicTabs from '../app/DynamicTabs.vue';
 export default defineComponent({
@@ -50,4 +51,18 @@ export default defineComponent({
     }
   }
 });
+</script> -->
+
+<script setup lang="ts">
+import { defineProps } from 'vue';
+import DynamicTabs from '../app/DynamicTabs.vue';
+import router from '@/router'
+
+defineProps<{
+  activeSection?: string
+}>()
+
+const handleVehicle = () => {
+  router.push({ name: 'AddVehicle', path: '/add-vehicle' });
+}
 </script>

@@ -11,7 +11,7 @@
   </div>
 </template>
 
-<script lang="ts">
+<!-- <script lang="ts">
 import ImageUploadPreview from '../../components/Uploads/ImageUploadPreview.vue';
 import FileUpload from '../../components/Uploads/FileUpload.vue';
 import { defineComponent } from 'vue';
@@ -46,6 +46,33 @@ export default defineComponent({
     };
   }
 });
+</script> -->
+
+<script setup lang="ts">
+import ImageUploadPreview from '../../components/Uploads/ImageUploadPreview.vue';
+import FileUpload from '../../components/Uploads/FileUpload.vue';
+import { } from 'vue';
+
+const fileType = 'png'
+const fileName = 'file_001.pdf'
+const uploadProgress = '100'
+const fileSize = '1MB'
+const documentTitle = 'Upload vehicle license document'
+const images = [
+  {
+    image: require('@/assets/images/vehicleInteriors.svg')
+  },
+  {
+    image: require('@/assets/images/vehicleInteriors.svg')
+  },
+  {
+    image: require('@/assets/images/vehicleInteriors.svg')
+  },
+  {
+    image: require('@/assets/images/vehicleInteriors.svg')
+  }
+]
+
 </script>
 
 <style lang="scss" scoped>

@@ -38,7 +38,7 @@
   </main>
 </template>
 
-<script lang="ts">
+<!-- <script lang="ts">
 import { defineComponent } from 'vue';
 import 'core-js/actual/array/group-by';
 import Spinner from '@/components/layout/Spinner.vue'
@@ -79,7 +79,36 @@ export default defineComponent({
     },
   }
 });
-</script>
+</script> -->
 
-<style lang="scss" scoped>
-</style>
+<script setup lang="ts">
+import { ref, Ref } from 'vue';
+import 'core-js/actual/array/group-by';
+import Spinner from '@/components/layout/Spinner.vue'
+import {axiosInstance as axios} from '@/plugins/axios';
+
+const loading = ref(false);
+const manifest = ref(null) as Ref<any>
+const routeId = ref(null) as Ref<any>
+const passengers = ref({}) as Ref<any>
+
+const fetchPassengers = async () => {
+  const fetchPassengersParams = JSON.parse(localStorage.getItem('TRIP_PASSENGER_PARAM') || '');
+  const response = await axios.get(
+    `v1/routes/${fetchPassengersParams.route_id}/bookings`, {
+      params: {
+        ...fetchPassengersParams
+      }
+    }
+  );
+  passengers.value = groupPassengersByPickup(response.data.data[0].data);
+}
+const groupPassengersByPickup = (passengersResponseList: any) => {
+  const groupPassengers = passengersResponseList.groupBy((user: any) => {
+    return user.pickup.location;
+  });
+  return groupPassengers;
+}
+
+fetchPassengers()
+</script>

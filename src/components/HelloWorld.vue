@@ -34,7 +34,7 @@
   </div>
 </template>
 
-<script lang="ts">
+<!-- <script lang="ts">
 import { defineComponent } from 'vue'
 
 export default defineComponent({
@@ -43,6 +43,14 @@ export default defineComponent({
     msg: String
   }
 })
+</script> -->
+<script  setup lang="ts">
+import { defineProps } from 'vue'
+
+defineProps<{
+  msg: string
+}>()
+
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

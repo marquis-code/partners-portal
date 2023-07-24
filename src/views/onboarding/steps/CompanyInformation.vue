@@ -165,7 +165,7 @@
             ring-1 ring-gray-300
           "
           placeholder="Choose a date"
-          v-model="v$.form.experience_start_date.$model"
+          v-model="(v$.form.experience_start_date as any).$model"
         />
         <span
           class="text-sm font-light text-red-500"
@@ -316,7 +316,7 @@
   </form>
 </template>
 
-<script lang="ts">
+<!-- <script lang="ts">
 import { defineComponent } from 'vue';
 import Datepicker from 'vue3-datepicker';
 import useVuelidate from '@vuelidate/core';
@@ -350,7 +350,7 @@ export default defineComponent({
         company_phone: '',
         country: ''
       },
-      countries: [],
+      countries: [] as any[],
       isPhoneValid: false,
       businessOptions: [
         'Business Name',
@@ -451,6 +451,133 @@ export default defineComponent({
     }
   }
 });
+</script> -->
+
+<script setup lang="ts">
+import { ref, Ref, defineEmits, watch, computed } from 'vue';
+import Datepicker from 'vue3-datepicker';
+import useVuelidate from '@vuelidate/core';
+import { email, required } from '@vuelidate/validators';
+import countryCodeEmoji from 'country-code-emoji';
+import { CountryCode, isValidPhoneNumber } from 'libphonenumber-js/mobile';
+import { useStore } from 'vuex';
+import { extractErrorMessage } from '@/utils/helper';
+import router from '@/router';
+import {axiosInstance as axios} from '@/plugins/axios';
+import {useToast} from 'vue-toast-notification';
+import { useRoute } from 'vue-router';
+
+const emit = defineEmits(['companySignUpSuccessful'])
+const route = useRoute()
+const toast = useToast()
+const store = useStore()
+const validations = {
+  form: {
+    mode: { required },
+    experience_start_date: { required },
+    company_name: { required },
+    rc_number: { required },
+    company_address: { required },
+    business_type: { required },
+    company_email: { required, email },
+    company_phone: { required }
+  }
+}
+const form = ref({
+  mode: route.query.type,
+  experience_start_date: new Date(),
+  company_name: '',
+  rc_number: '',
+  company_address: '',
+  business_type: '',
+  company_email: '',
+  company_phone: '',
+  country: ''
+});
+const countries = ref([]) as Ref<any[]>
+const isPhoneValid = ref(false);
+const businessOptions = [
+  'Business Name',
+  'Company',
+  'Incorporated Trustee',
+  'Limited Partnership',
+  'Limited Liability Partnership'
+];
+const processing = ref(false);
+const v$ = useVuelidate(validations, {form})
+
+const userSessionData:any = computed(() => store.getters['auth/userSessionData'])
+const user:any = computed(() => store.getters['auth/user'])
+const countrySelectDisabled = computed(() => {
+  return countries.value.length <= 1;
+})
+
+watch(() => form.value.company_phone, () => {
+  validatePhoneNumber()
+})
+
+watch(countries, () => {
+  setDefaultCountry()
+})
+
+const setDefaultCountry = () => {
+  const code =
+    countries.value && countries.value.length
+      ? (countries.value[0] as any).code
+      : null;
+  if (code) {
+    form.value.country = code;
+  }
+}
+const fetchCountries = async () => {
+  const response = await axios.get(`v1/countries`);
+  countries.value = response.data || [];
+}
+const validatePhoneNumber = () => {
+  isPhoneValid.value = isValidPhoneNumber(
+    form.value.company_phone.toString(),
+    form.value.country as CountryCode
+  );
+}
+const countryCodeToEmoji = (code: string) => {
+  return countryCodeEmoji(code);
+}
+const saveForm = async () => {
+  v$.value.form.$touch();
+  if (processing.value || v$.value.form.$errors.length) {
+    return;
+  }
+  processing.value = true;
+  try {
+    const payload = {
+      ...form.value,
+      mode: 'business'
+    };
+    const response = await axios.post('/v1/partners', { ...payload });
+    if (response.data) {
+      await store.dispatch('auth/refreshActiveContext', user.value.id);
+      emit('companySignUpSuccessful');
+    }
+  } catch (err) {
+    const errorMessage = extractErrorMessage(
+      err,
+      null,
+      'Oops! An error occurred, please try again.'
+    );
+    toast.error(errorMessage);
+  } finally {
+    processing.value = false;
+  }
+}
+const logout = () => {
+  window.$zoho.salesiq.reset();
+  localStorage.clear();
+  router.push('/login');
+  router.go(0);
+}
+
+setDefaultCountry();
+fetchCountries();
 </script>
 
 <style>

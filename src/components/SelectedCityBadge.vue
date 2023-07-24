@@ -7,13 +7,20 @@
     </span>
 </template>
 
-<script>
+<!-- <script>
 export default {
   name: "SelectedCityBadge",
   props: {
     value: Object
   }
 }
+</script> -->
+
+<script setup lang="ts">
+import {defineProps} from 'vue'
+
+defineProps<{
+  value: any
+}>()
+
 </script>
-<style scoped>
-</style>

@@ -33,7 +33,7 @@
   </page-layout>
 </template>
 
-<script>
+<!-- <script>
 import PageLayout from '@/components/layout/PageLayout.vue';
 import PageActionHeader from '@/components/PageActionHeader.vue';
 import TabContainer from '@/components/tab/TabContainer.vue';
@@ -52,7 +52,17 @@ export default {
     })
   },
 };
-</script>
+</script> -->
 
-<style>
-</style>
+<script setup lang="ts">
+import PageLayout from '@/components/layout/PageLayout.vue';
+import PageActionHeader from '@/components/PageActionHeader.vue';
+import TabContainer from '@/components/tab/TabContainer.vue';
+import TabItem from '@/components/tab/TabItem.vue';
+import { useStore } from 'vuex';
+import { computed } from 'vue'
+
+const store = useStore()
+const partnerContext:any = computed(() => store.getters['auth/activeContext'])
+
+</script>

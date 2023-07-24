@@ -147,7 +147,7 @@
                   @input="console.log($event)"
                   v-model="v$.form.city_ids.$model"
                   class="form-group"
-                  :reduce="(option) => option.city.id"
+                  :reduce="(option:any) => option.city.id"
                   :options="cities"
                   label="id"
                   required>
@@ -201,7 +201,7 @@
   </page-layout>
 </template>
 
-<script lang="ts">
+<!-- <script lang="ts">
 import { defineComponent } from 'vue';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
@@ -378,6 +378,173 @@ export default defineComponent<any, any, any>({
     },
   }
 });
+</script> -->
+
+<script setup lang="ts">
+import { ref, Ref, computed, defineEmits } from 'vue';
+import useVuelidate from '@vuelidate/core';
+import { required } from '@vuelidate/validators';
+import { useStore } from 'vuex';
+import { extractErrorMessage } from '@/utils/helper';
+import {AxiosResponse} from "axios";
+import Spinner from "@/components/layout/Spinner.vue";
+import PageLayout from '@/components/layout/PageLayout.vue';
+import PageActionHeader from '@/components/PageActionHeader.vue';
+import router from '@/router';
+import {axiosInstance as axios} from '@/plugins/axios';
+import {useToast} from 'vue-toast-notification';
+
+const toast = useToast()
+const store = useStore()
+const validations = {
+  form: {
+    brand: { required },
+    name: { required },
+    year: { required },
+    seats: { required },
+    city_ids: { required },
+    registration_number: { required },
+    partner_id: { required }
+  }
+}
+const emit = defineEmits(['next'])
+const form = ref({
+  brand: '',
+  name: '',
+  // type: 'Sedan',
+  year: '',
+  seats: '',
+  city_ids: [] as any[],
+  registration_number: '',
+  partner_id: ''
+});
+const fetchingModels = ref(false);
+const cities = ref([]);
+const vehicleYears = ref([]) as Ref<any[]>
+const vehicleModels = ref([]) as Ref<any[]>
+const vehicleBrands = ref([]) as Ref<any[]>
+const vehicleModelMap = new Map();
+const processing = ref(false);
+const loading = ref(false);
+const v$ = useVuelidate(validations, {form})
+
+const partnerContext:any = computed(() => store.getters['auth/activeContext'])
+const user:any = computed(() => store.getters['auth/user'])
+const vehicleData:any = computed(() => store.getters['vehicle/getVehicleData'])
+const isLoading:any = computed(() => store.getters['vehicle/getVehicleLoading'])
+
+const getVehicleData = () => {
+  store.dispatch('vehicle/getVehicleInfo')
+    .catch((e: any) => {
+      toast.error(extractErrorMessage(e));
+    });
+}
+const viewVehicleDetails = (id : number) => {
+  router.push({
+    name: 'vehicle.detail.info',
+    params: {vehicleId: id}
+  });
+}
+const showVehicleData = () => {
+  form.value.brand = vehicleData.value?.brand;
+  form.value.name = vehicleData.value?.name;
+  form.value.year = vehicleData.value?.year;
+  form.value.seats = vehicleData.value?.seats;
+  vehicleData.value?.cities.forEach((city:{
+    id: number
+  }) => {
+    form.value.city_ids.push(city.id)
+  });
+  form.value.registration_number = vehicleData.value?.registration_number;
+  form.value.partner_id = vehicleData.value?.partner_id
+}
+const fetchPageData = () => {
+  loading.value = true;
+  vehicleYears.value = getYearsFrom('1980');
+  cities.value = partnerContext.value.supportedCities;
+  axios.get('/v1/vehicle-makes').then((r: AxiosResponse) => {
+    vehicleBrands.value = r.data.data || [];
+  })
+    .catch((e: any) => {
+      toast.error(extractErrorMessage(e));
+    })
+    .finally(() => {
+      loading.value = false;
+    })
+}
+const onCarModelChanged = (carModel: any) => {
+  form.value.name = carModel.name;
+  if (form.value.name) {
+    // TODO: Memoize
+    vehicleYears.value = getYearsFrom(`${carModel.start_year}`);
+  } else {
+    vehicleYears.value = [];
+    form.value.year = '';
+  }
+}
+const getYearsFrom = (year: string): number[] => {
+  const date = new Date(Number(year), 0);
+  let iterationYear = date.getFullYear();
+  const iterationEndYear = new Date().getFullYear();
+  const dateRange = iterationEndYear - iterationYear;
+  const years = [];
+  for (let i = 0; i <= dateRange; i++) {
+    years[i] = iterationYear++;
+  }
+  return years;
+}
+const saveForm = async () => {
+  v$.value.form.$touch();
+  if (processing.value || v$.value.form.$errors.length) {
+    return;
+  }
+  processing.value = true;
+  try {
+    const payload = {
+      ...form.value
+    };
+    const response = await axios.patch(
+      `/v1/vehicles/${vehicleData.value.id}`,
+      payload
+    );
+    await store.dispatch('vehicle/setVehicleData', response.data);
+    setTimeout(() => {
+      viewVehicleDetails(vehicleData.value.id);
+    }, 300)
+    toast.success('Vehicle Information Update');
+  } catch (err) {
+    const errorMessage = extractErrorMessage(
+      err,
+      null,
+      'Oops! An error occurred, please try again.'
+    );
+    toast.error(errorMessage);
+  } finally {
+    processing.value = false;
+  }
+}
+const getVehiclesForBrand = async (brandId: any) => {
+  if (vehicleModelMap.has(brandId)) {
+    vehicleModels.value = vehicleModelMap.get(brandId);
+  } else {
+    try {
+      const vehicleModelsResponse = await axios.get(`v1/vehicle-makes/${brandId}/vehicle-models`);
+      vehicleModels.value = vehicleModelsResponse.data.data;
+    } catch (e) {
+      toast.error(extractErrorMessage(e, null, 'An error occurred!'));
+    }
+  }
+}
+const onCarBrandChanged = (brand: any) => {
+  form.value.brand = brand?.name || null;
+  if (brand) {
+    getVehiclesForBrand(brand.id);
+  }
+}
+
+fetchPageData();
+showVehicleData();
+form.value.partner_id = partnerContext.value.partner?.id;
 </script>
 
 <style lang="scss" scoped>

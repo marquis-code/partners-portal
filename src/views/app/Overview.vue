@@ -4,10 +4,7 @@
   </page-layout>
 </template>
 
-<script>
-import {defineComponent} from "vue";
+<script setup lang="ts">
 import PageLayout from '@/components/layout/PageLayout.vue'
-export default defineComponent({
-  components: {PageLayout}
-})
+
 </script>

@@ -20,7 +20,7 @@
   </ul>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent, ref, watch } from 'vue';
 import { usePlacesAutocomplete } from 'v-use-places-autocomplete';
 
@@ -34,7 +34,7 @@ export default defineComponent({
       minLengthAutocomplete: 3
     });
 
-    function handleSelected(selectedAddressValue) {
+    function handleSelected(selectedAddressValue:any) {
       query.value = selectedAddressValue;
       emit('autoCompleteAddress', selectedAddressValue);
       showDropdown.value = false;

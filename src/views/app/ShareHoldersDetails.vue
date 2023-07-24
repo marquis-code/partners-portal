@@ -367,7 +367,7 @@
   </page-layout>
 </template>
 
-<script lang="ts">
+<!-- <script lang="ts">
 import { defineComponent } from 'vue';
 import PageLayout from '@/components/layout/PageLayout.vue';
 import ImageUpload from '@/components/ImageUpload.vue';
@@ -621,6 +621,249 @@ export default defineComponent({
     }
   }
 });
+</script> -->
+
+<script setup lang="ts">
+import { ref, Ref, watch, computed } from 'vue';
+import PageLayout from '@/components/layout/PageLayout.vue';
+import ImageUpload from '@/components/ImageUpload.vue';
+import AppTable from '@/components/AppTable.vue';
+import { useStore } from 'vuex';
+import Spinner from '@/components/layout/Spinner.vue';
+import router from '@/router';
+import {axiosInstance as axios} from '@/plugins/axios';
+import {useToast} from 'vue-toast-notification';
+
+const toast = useToast()
+const store = useStore()
+const headers = [
+  { label: 'Stakeholders name', key: 'name' },
+  { label: 'Stakeholder share (%)', key: 'percent' },
+  { label: 'KYC Status', key: 'status' },
+  { label: 'Action', key: 'action' }
+]
+const step = ref(0);
+const loading = ref(false);
+const uploadingInc = ref(false);
+const uploadingMem = ref(false);
+const uploadingToS3 = ref(false);
+const incorporationCertificateUrl = ref([]) as Ref<string[]>
+const mermorandumUrl = ref([]) as Ref<string[]>
+const allDocumentsUploaded = ref(false);
+const checkLoading = ref(false);
+const stakeholders = ref([
+  {
+    name: '',
+    share_amount: 0
+  }
+]);
+const errorLoading = ref(0);
+const tableData = ref([
+  {
+    name: 'Ahmed Hassani',
+    percent: '60%',
+    status: 'Pending',
+    action: 'http'
+  }
+]);
+
+const partnerContext:any = computed(() => store.getters['auth/activeContext'])
+
+watch(incorporationCertificateUrl, (value, oldValue) => {
+  if (incorporationCertificateUrl.value[0] && mermorandumUrl.value[0]) {
+    allDocumentsUploaded.value = true;
+  }
+})
+
+watch(mermorandumUrl, (value, oldValue) => {
+  if (incorporationCertificateUrl.value[0] && mermorandumUrl.value[0]) {
+    allDocumentsUploaded.value = true;
+  }
+})
+
+// functions for step 1, uploading the company documents
+const selectThisDocument = async ($event: any, type: string) => {
+  const fileHolder = $event;
+  if (type === 'IncorporationCertificate') {
+    uploadingInc.value = true;
+  }
+  if (type === 'Mermorandum') {
+    uploadingMem.value = true;
+  }
+  const fileUrl: string = await uploadTos3andGetDocumentUrl(fileHolder);
+  if (type === 'IncorporationCertificate') {
+    incorporationCertificateUrl.value = [];
+    incorporationCertificateUrl.value.push(fileUrl);
+    toast.success(`Incorporation Certificate uploaded`);
+    uploadingInc.value = false;
+  }
+  if (type === 'Mermorandum') {
+    mermorandumUrl.value = [];
+    mermorandumUrl.value.push(fileUrl);
+    toast.success(`Mermorandum of association uploaded`);
+    uploadingMem.value = false;
+  }
+}
+const removeFile = () => {
+  incorporationCertificateUrl.value = [];
+}
+const uploadTos3andGetDocumentUrl = async (file:any) => {
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await axios.post(
+      `/v1/upload/identity/files`,
+      formData
+    );
+    if (response.data?.files?.length) {
+      return response.data.files[0].Location;
+    }
+  } catch (error) {
+    toast.warning(
+      'An error occured while uploading your file, please try again'
+    );
+  } finally {
+    console.log('uploading');
+  }
+}
+const saveCompanyDocuments = async () => {
+  const incPayload = {
+    user_id: partnerContext.value.user_id.toString(),
+    document: {
+      files: incorporationCertificateUrl.value,
+      type: 'Incorportation Certification'
+    }
+  };
+  const memPayload = {
+    user_id: partnerContext.value.user_id.toString(),
+    document: {
+      files: mermorandumUrl.value,
+      type: 'Mermorandum of Association'
+    }
+  };
+  loading.value = true;
+  try {
+    await axios.post(
+      `/v1/partners/${partnerContext.value.partner.account_sid}/corporate-documents`,
+      {...incPayload}
+    );
+    await axios.post(
+      `/v1/partners/${partnerContext.value.partner.id}/corporate-documents`,
+      {...memPayload}
+    );
+    toast.success("Company documents uploaded");
+    loading.value = false;
+    step.value += 1;
+  } catch (error) {
+    toast.warning("An error occured, Please try again");
+  } finally {
+    loading.value = false;
+  }
+}
+const checkIfDocuumentsHaveBeenProvided = async () => {
+  try {
+    const response = await axios.get(`/v1/partners/${partnerContext.value.partner.id}/corporate-documents`);
+    if (response.data.data.length > 0) {
+      step.value = 1;
+    }
+  } catch (error) {
+    toast.warning('An error occured, Please refresh this page ')
+  }
+}
+const checkIfShareHoldersHaveBeenProvided = async () => {
+  checkLoading.value = true
+  try {
+    const response = await axios.get(`/v1/partners/${partnerContext.value.partner.account_sid}/share-holders`);
+    console.log(response.data.data)
+    if (response.data.data.length > 0) {
+      tableData.value = structureShareSholders(response.data.data);
+      step.value = 2;
+    } else {
+      await checkIfDocuumentsHaveBeenProvided()
+    }
+  } catch (error) {
+    toast.warning('An error occured, Please refresh this page ')
+  } finally {
+    checkLoading.value = false
+  }
+}
+// functionos for step two: adding stake holders
+const removeStakeHolder = (index: number) => {
+  if (index !== 0) {
+    stakeholders.value.splice(index, 1);
+    return;
+  }
+  return 0;
+}
+const SaveStakeHolders = async () => {
+  if (checkStakeSum()) {
+    const newPayload = structurePayload();
+    try {
+      for (let index = 0; index < newPayload.length; index++) {
+        const payload = newPayload[index];
+        await axios.post(`/v1/partners/${partnerContext.value.partner.account_sid}/share-holders`, {
+          ...payload
+        })
+      }
+      step.value += 1;
+    } catch (error) {
+      toast.warning('An error occured');
+    }
+    toast.success('Partners saved');
+  } else {
+    return 0
+  }
+}
+const checkStakeSum = () => {
+  const totalSum = stakeholders.value.reduce((init, stake) => {
+    return init + stake.share_amount;
+  }, 0)
+  if (totalSum !== 100) {
+    toast.warning('The sum of all share must be 100%')
+    return false;
+  } else {
+    return true;
+  }
+}
+const structurePayload = () => {
+  const newPayload = stakeholders.value.map(stake => {
+    return {
+      fname: stake?.name?.split(" ")[0],
+      lname: stake?.name?.split(" ")[1] || '-',
+      share_amount: stake.share_amount
+    }
+  });
+  return newPayload;
+}
+const goBack = () => {
+  step.value -= 1;
+}
+const goForward = () => {
+  step.value += 1;
+}
+const addNewStakeHolder = () => {
+  stakeholders.value.push({
+    name: '',
+    share_amount: 0
+  });
+}
+// functions for step 3
+const structureShareSholders = (shareholderslist: any[]) => {
+  const stakeholders = shareholderslist.map(stake => {
+    return {
+      name: stake?.profile?.fname + ' ' + stake?.profile?.lname,
+      percent: stake?.profile.share_amount || '',
+      status: 'pending',
+      action: stake?.profile?.id
+    }
+  });
+  return stakeholders;
+}
+const proceedToCoperateKYC = (shareholderId: number) => {
+  router.push({name: 'dashboard.start-kyc', params: {id: `${shareholderId}`}})
+}
+
+checkIfShareHoldersHaveBeenProvided()
 </script>
 
 <style lang="scss" scoped>

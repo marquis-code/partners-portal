@@ -1,7 +1,8 @@
 <template>
   <forgot-password />
 </template>
-<script lang="ts">
+
+<!-- <script lang="ts">
 import 'vue3-carousel/dist/carousel.css';
 
 import { defineComponent } from 'vue';
@@ -31,7 +32,30 @@ export default defineComponent({
     };
   }
 });
+</script> -->
+
+<script setup lang="ts">
+import 'vue3-carousel/dist/carousel.css';
+import { } from 'vue';
+import ForgotPassword from '@/views/auth/ForgotPassword.vue';
+
+const step = 0
+const highlights = [
+  {
+    label: 'Manage your assets',
+    description:
+      'Keep track of all your Drivers and Vehicles in one place.',
+    image: require('@/assets/images/banners/manage_banner.svg')
+  },
+  {
+    label: 'Earn from your Vehicles',
+    description:
+      'Move shuttlers using your Vehicles and earn while doing so',
+    image: require('@/assets/images/banners/earn_banner.svg')
+  }
+]
 </script>
+
 <style lang="scss" scoped>
 .carousel-wrapper {
   overflow-x: hidden;

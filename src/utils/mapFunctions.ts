@@ -15,3 +15,5 @@ export const formatGeometry = (pointList: Geometry[]): LocationType[] => {
     }
   })
 }
+
+export const googleMapStyleId = process.env.VUE_APP_GOOGLE_MAP_STYLE_ID || '33d190257c86f190'

@@ -46,7 +46,7 @@
               @goBack="goBack()"
               @kycCompleted="redirectToCitySelection"
               :is="steps[currentStep].component"
-              :partnersFormData="partnersFormData[steps[currentStep].label]"
+              :partnersFormData="(partnersFormData as any)[steps[currentStep].label]"
             />
           </div>
         </keep-alive>
@@ -56,7 +56,7 @@
   </OnboardingLayout>
 </template>
 
-<script lang="ts">
+<!-- <script>
 import { defineComponent } from 'vue';
 import CompanyInformation from '../onboarding/steps/CompanyInformation.vue';
 import KycInformation from '../onboarding/steps/KycInformation.vue';
@@ -73,10 +73,10 @@ export default defineComponent({
     OnboardingLayout,
     FormContainer
   },
-  created() {
+  created () {
     this.initializePageState();
   },
-  data() {
+  data () {
     return {
       currentStep: 0,
       routeType: '',
@@ -112,19 +112,19 @@ export default defineComponent({
     })
   },
   methods: {
-    next() {
+    next () {
       this.currentStep += 1;
     },
-    goBack(): void {
+    goBack () {
       this.currentStep = 0;
     },
-    redirectToCitySelection() {
+    redirectToCitySelection () {
       this.$router.push('/city-selection');
     },
-    handleCompanyData() {
+    handleCompanyData () {
       this.currentStep = 1;
     },
-    initializePageState() {
+    initializePageState () {
       if (this.$route.query.type === 'company' && !this.contextOrg) {
         this.currentStep = 0;
         this.routeType = 'company';
@@ -136,7 +136,72 @@ export default defineComponent({
     }
   }
 });
-</script>
+</script> -->
 
-<style scoped>
-</style>
+<script setup lang="ts">
+import { ref, Ref, computed } from 'vue';
+import CompanyInformation from '../onboarding/steps/CompanyInformation.vue';
+import KycInformation from '../onboarding/steps/KycInformation.vue';
+import CenteredPageHeader from '../../components/CenteredPageHeader.vue';
+import OnboardingLayout from '../layouts/OnboardingLayout.vue';
+import FormContainer from '../layouts/FormContainer.vue';
+import { useStore } from 'vuex';
+import { useRoute } from 'vue-router';
+import router from '@/router'
+
+const route = useRoute()
+const store = useStore()
+const currentStep = ref(0);
+const routeType = ref('');
+const title = ref('Create a partner account');
+const description = ref('Select a category to sign up as');
+const steps = ref([
+  {
+    component: CompanyInformation,
+    label: 'companyData'
+  },
+  {
+    component: KycInformation,
+    label: 'kycIData'
+  }
+]);
+const partnersFormData = ref({
+  companyData: {
+    name: '',
+    rcNumber: '',
+    address: '',
+    typeOfIncorporatedBusiness: ''
+  },
+  kycData: {
+    name: '',
+    phone: ''
+  }
+});
+
+const contextOrg:any = computed(() => store.getters['auth/activeContext'])
+
+const next = () => {
+  currentStep.value += 1;
+}
+const goBack = () => {
+  currentStep.value = 0;
+}
+const redirectToCitySelection = () => {
+  router.push('/city-selection');
+}
+const handleCompanyData = () => {
+  currentStep.value = 1;
+}
+const initializePageState = () => {
+  if (route.query.type === 'company' && !contextOrg.value) {
+    currentStep.value = 0;
+    routeType.value = 'company';
+  } else {
+    route.query.type = 'individual';
+    routeType.value = 'individual';
+    currentStep.value = 1;
+  }
+}
+
+initializePageState()
+</script>

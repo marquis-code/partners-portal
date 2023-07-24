@@ -18,7 +18,7 @@
   </div>
 </template>
 
-<script lang="ts">
+<!-- <script lang="ts">
 import { defineComponent } from 'vue';
 import Spinner from '@/components/layout/Spinner.vue';
 import AppTable from '@/components/AppTable.vue';
@@ -94,10 +94,70 @@ export default defineComponent({
     this.fetchTrips();
   }
 });
+</script> -->
+
+<script setup lang="ts">
+import { ref, Ref, computed } from 'vue';
+import Spinner from '@/components/layout/Spinner.vue';
+import AppTable from '@/components/AppTable.vue';
+import moment from 'moment';
+import { useStore } from 'vuex';
+import {axiosInstance as axios} from '@/plugins/axios';
+import {useRoute} from 'vue-router'
+
+const route = useRoute()
+const store = useStore()
+const loading = ref(false)
+const totalRecords = ref(null)
+const tableData = ref([]) as Ref<any[]>
+const errorLoading = ref(false)
+const headers = [
+  { label: 'Date', key: 'date' },
+  { label: 'Start Point', key: 'pickup' },
+  { label: 'Destination', key: 'dropoff' },
+  { label: 'Route Code', key: 'routeCode' },
+  { label: 'End Time', key: 'endTime' },
+  { label: 'Passangers', key: 'passangers' }
+]
+
+const userSessionData:any = computed(() => store.getters['auth/userSessionData'])
+const fetchTrips = async () => {
+  loading.value = true;
+  // TODO: Support server side pagination
+  await axios
+    .get(
+      // TODO change this endpoint
+      `/cost-revenue/v1/partners/${userSessionData.value.activeContext.partner.account_sid}/vehicles/${route.params.driverId}/revenues?metadata=true`
+    )
+    .then((res) => {
+      // console.log(res);
+      const trips = transformedTrips(res.data.result) || [];
+      // console.log(trips);
+      tableData.value = trips;
+      totalRecords.value = res.data.metadata?.total;
+    })
+    .finally(() => {
+      loading.value = false;
+    });
+}
+const transformedTrips = (payload: Array<any>): any[] => {
+  const newTrips: any = [];
+  payload.forEach((trip) => {
+    newTrips.push({
+      startTime: moment(trip.metadata.startTime).format('LT'),
+      date: moment(trip.metadata.startTime).format('LL'),
+      pickup: trip.metadata.pickup,
+      dropoff: trip.metadata.dropoff,
+      createdAt: moment(trip.createdAt).format('LL'),
+      driver: trip.metadata.driver.fname + ' ' + trip.metadata.driver.lname,
+      routeCode: trip.metadata.routeCode,
+      partnersRevenue: trip.partnersRevenue,
+      endTime: moment(trip.metadata.endTime).format('LT'),
+      passengersCount: trip.passengersCount
+    });
+  });
+  return newTrips;
+}
+
+fetchTrips();
 </script>
-
-<style scoped>
-</style>
-
-<style>
-</style>

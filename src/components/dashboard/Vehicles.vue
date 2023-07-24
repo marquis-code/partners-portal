@@ -36,19 +36,15 @@
   </main>
 </template>
 
-<script>
-import { defineComponent } from 'vue-demi';
+<script setup lang=ts>
+import { defineProps } from 'vue';
 import Spinner from '@/components/layout/Spinner.vue';
 
-export default defineComponent({
-  props: {
-    vehiclesCount: Number,
-    loading: Boolean
-  },
-  components: {
-    Spinner
-  }
-});
+defineProps<{
+  vehiclesCount: number
+  loading: boolean
+}>()
+
 </script>
 
 <style scoped>
