@@ -167,9 +167,9 @@ interface UploadOptions {
 }
 
 const props = defineProps<{
-  field: string
-  uploading: boolean
-  uploadStatus: boolean
+  field?: string
+  uploading?: boolean
+  uploadStatus?: boolean
 }>()
 const toast = useToast();
 const emit = defineEmits(['fileSelected', 'fileRemoved'])

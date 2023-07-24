@@ -66,7 +66,7 @@
   </main>
 </template>
 
-<script>
+<!-- <script>
 export default {
   data () {
     return {
@@ -115,7 +115,51 @@ export default {
     };
   }
 };
-</script>
+</script> -->
 
-<style>
-</style>
+<script setup lang="ts">
+
+const tableContents = [
+  {
+    type: 'Vehicle’s license',
+    name: 'File001.pdf',
+    expiryDate: '20 May 2022',
+    status: 'Uploaded',
+    dateCreated: '20 May 2022',
+    action: ''
+  },
+  {
+    type: 'Central Motor Registry',
+    name: 'crm004.pdf',
+    expiryDate: '21 May 2022',
+    status: 'Uploaded',
+    dateCreated: '21 May 2022',
+    action: ''
+  },
+  {
+    type: 'Road Worthiness',
+    name: 'worthiness_copy004.pdf',
+    expiryDate: '21 May 2022',
+    status: 'Uploaded',
+    dateCreated: '22 May 2022',
+    action: ''
+  },
+  {
+    type: 'Proof of Ownership',
+    name: 'proof_of_ownership004.pdf',
+    expiryDate: '21 May 2022',
+    status: 'Uploaded',
+    dateCreated: '25 May 2022',
+    action: ''
+  }
+]
+const fields = [
+  'Type',
+  'Name',
+  'Expiry Date',
+  'Status',
+  'Date Created',
+  'Action'
+]
+
+</script>

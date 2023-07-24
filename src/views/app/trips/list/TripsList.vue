@@ -255,7 +255,7 @@
   </page-layout>
 </template>
 
-<script lang="ts">
+<!-- <script lang="ts">
 import { defineComponent } from 'vue';
 import AppTable from '@/components/AppTable.vue';
 import { mapGetters } from 'vuex';
@@ -541,6 +541,240 @@ export default defineComponent({
     }
   }
 });
-</script>
+</script> -->
 
-<style lang="scss" scoped></style>
+<script setup lang="ts">
+import { ref, Ref, computed, watch } from 'vue';
+import AppTable from '@/components/AppTable.vue';
+import { useStore } from 'vuex';
+import PageLayout from '@/components/layout/PageLayout.vue';
+import TripHistory from '@/components/TripHistory.vue';
+import moment from 'moment';
+import { formatDate, dateStringToDateObject, formatApiCallDate, downloadFile, addToQuery, removeQueryParam } from '@/composables/utils'
+import spinner from '@/components/loader/spinner.vue'
+import Papa from 'papaparse';
+import {useRoute} from 'vue-router'
+import router from '@/router'
+import {axiosInstance as axios} from '@/plugins/axios';
+import {useToast} from 'vue-toast-notification';
+
+const toast = useToast()
+const route = useRoute()
+const store = useStore()
+const filters = ref({
+  status: 'active-trips',
+  search: '',
+  pageNumber: 1,
+  pageSize: 10,
+  range: { start: null as null|Date, end: null as null|Date }
+})
+const activeAndUpcomingTripsHeaders = [
+  { label: 'Route Code', key: 'routeCode' },
+  { label: 'Route', key: 'route' },
+  { label: 'Date', key: 'createdAt' },
+  { label: 'Driver', key: 'driver' },
+  { label: 'Start Time', key: 'startTime' },
+  { label: 'End Time', key: 'endTime' },
+  { label: 'Passengers', key: 'passengersCount' },
+  { label: 'Expected earning', key: 'revenue' }
+] as Array<any>
+const completedTripsHeaders = [
+  { label: 'Route Code', key: 'routeCode' },
+  { label: 'Route', key: 'route' },
+  { label: 'Date', key: 'createdAt' },
+  { label: 'Driver', key: 'driver' },
+  { label: 'Start Time', key: 'startTime' },
+  { label: 'End Time', key: 'endTime' },
+  { label: 'Passengers', key: 'passengersCount' },
+  { label: 'Revenue', key: 'revenue' }
+] as Array<any>
+const result = ref([]);
+const debounce = ref(null) as Ref<any>
+const downloadLoader = ref(false);
+const search = ref('');
+const loading = ref(false);
+const tableData = ref([]) as Ref<any[]>
+const totalRecords = ref(null) as Ref<any>
+const errorLoading = ref(false);
+const items = ref([]) as Ref<any[]>
+
+const partnerContext:any = computed(() => store.getters['auth/activeContext'])
+
+const checkForExistingQuery = () => {
+  const query = route.query
+  if (query.status) setStatusFilter(query.status as string)
+  if (query.searchTerm) filters.value.search = query.searchTerm as string
+  if (query.dateStart && query.dateEnd) {
+    filters.value.range.start = dateStringToDateObject(query.dateStart as string)
+    filters.value.range.end = dateStringToDateObject(query.dateEnd as string)
+    fetchPartnerTripsFromRevenue();
+  }
+  if (Object.keys(query).length === 0) fetchPartnerTripsFromRevenue();
+}
+
+// watchers
+watch(() => filters.value.status, (value, oldValue) => {
+  filters.value.status = value;
+})
+
+watch(() => filters.value.pageNumber, (value, oldValue) => {
+  fetchPartnerTripsFromRevenue()
+})
+
+watch(() => filters.value.pageSize, (value, oldValue) => {
+  fetchPartnerTripsFromRevenue()
+})
+
+watch(() => filters.value.search, (value, oldValue) => {
+  if (filters.value.search) addToQuery(route, router, {searchTerm: filters.value.search})
+  if (!filters.value.search) removeQueryParam(route, router, ['searchTerm'])
+  clearTimeout(debounce.value);
+  debounce.value = setTimeout(() => {
+    fetchPartnerTripsFromRevenue();
+  }, 600);
+})
+
+watch(() => filters.value.range, (value, oldValue) => {
+  if (filters.value.range.start && filters.value.range.end) {
+    addToQuery(route, router, {
+      dateStart: formatDate(filters.value.range.start),
+      dateEnd: formatDate(filters.value.range.end)
+    })
+    fetchPartnerTripsFromRevenue();
+  }
+})
+
+const clearDateFilter = () => {
+  filters.value.range.start = null
+  filters.value.range.end = null
+  removeQueryParam(route, router, ['dateStart', 'dateEnd'])
+  fetchPartnerTripsFromRevenue()
+}
+const downloadReport = () => {
+  downloadLoader.value = true
+  axios
+    .get(
+      `/v1/partners/${partnerContext.value.partner.id}/${filters.value.status}?metadata=true&page=${filters.value.pageNumber}&limit=${filters.value.pageSize}&search=${filters.value.search}&from=${filters.value.range.start ? formatApiCallDate(filters.value.range.start) : null}&to=${filters.value.range.end ? formatApiCallDate(filters.value.range.end) : null}`
+    )
+    .then((res) => {
+      const total = res?.data?.metadata?.total;
+      console.log(total)
+      axios.get(
+        `/v1/partners/${partnerContext.value.partner.id}/${filters.value.status}?metadata=true&page=${filters.value.pageNumber}&limit=${total}&search=${filters.value.search}&from=${filters.value.range.start ? formatApiCallDate(filters.value.range.start) : null}&to=${filters.value.range.end ? formatApiCallDate(filters.value.range.end) : null}`
+      ).then((res) => {
+        if (res.data.data) {
+          const x = res.data.data
+          // console.log(x)
+          const newArr = []
+          for (let i = 0; i < x.length; i++) {
+            const el = x[i]
+            const y = {
+              Route_code: el.route.route_code,
+              Pickup: el.route.pickup,
+              Destination: el.route.destination,
+              Date: moment(new Date(el.start_trip)).format("MMMM D, YYYY"),
+              Driver: `${el.driver.fname} ${el.driver.lname}`,
+              Start_time: moment(new Date(el.start_trip)).format("h:mm A"),
+              End_time: moment(new Date(el.end_trip)).format("h:mm A"),
+              Passengers: el.passengers_count,
+              Revenue: el.cost_of_supply
+
+            }
+            newArr.push(y)
+          }
+          const csv = Papa.unparse(newArr);
+          const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+          const url = URL.createObjectURL(blob);
+          downloadFile(url, 'downloaded-trips-report')
+        }
+      })
+    })
+    .catch((err) => {
+      toast.error(
+        err?.response?.data?.message || 'An error occured'
+      );
+    })
+    .finally(() => {
+      downloadLoader.value = false;
+    });
+}
+const changePage = (pageNumber: any) => {
+  filters.value.pageNumber = pageNumber;
+}
+const showPageSize = (pageSize: any) => {
+  filters.value.pageSize = pageSize;
+}
+const setStatusFilter = (value: string) => {
+  filters.value.status = value;
+  fetchPartnerTripsFromRevenue();
+  addToQuery(route, router, {status: value})
+}
+const fetchPartnerTripsFromRevenue = async () => {
+  loading.value = true;
+  const params = {
+    related: 'driver,vehicle',
+    status: filters.value.status,
+    metadata: true
+  };
+  if (params.status === 'completed-trips') {
+    axios
+      .get(
+        `/v1/partners/${partnerContext.value.partner.id}/${params.status}?metadata=${params.metadata}&page=${filters.value.pageNumber}&limit=${filters.value.pageSize}&search=${filters.value.search}&from=${filters.value.range.start ? formatApiCallDate(filters.value.range.start) : null}&to=${filters.value.range.end ? formatApiCallDate(filters.value.range.end) : null}`
+        // `cost-revenue/v1/partners/${this.partnerContext.partner.account_sid}/revenues`
+      )
+      .then((res) => {
+        const trips = transformActiveOrUpcomingTrips(res?.data?.data);
+        // const trips = this.transformedTrips(res.data.result);
+        tableData.value = trips;
+        totalRecords.value = res.data.metadata?.total;
+      })
+      .catch((err) => {
+        toast.error(err.response.data.message || 'An error occured');
+      })
+      .finally(() => {
+        loading.value = false;
+      });
+  } else {
+    axios
+      .get(
+        `/v1/partners/${partnerContext.value.partner.id}/${params.status}?metadata=${params.metadata}&page=${filters.value.pageNumber}&limit=${filters.value.pageSize}&search=${filters.value.search}&from=${filters.value.range.start ? formatApiCallDate(filters.value.range.start) : null}&to=${filters.value.range.end ? formatApiCallDate(filters.value.range.end) : null}`
+      )
+      .then((res) => {
+        const trips = transformActiveOrUpcomingTrips(res?.data?.data);
+        tableData.value = trips;
+        totalRecords.value = res?.data?.metadata?.total;
+      })
+      .catch((err) => {
+        toast.error(
+          err?.response?.data?.message || 'An error occured'
+        );
+      })
+      .finally(() => {
+        loading.value = false;
+      });
+  }
+}
+const getFormattedDate = (date: any) => {
+  return moment(date).format('LL');
+}
+const transformActiveOrUpcomingTrips = (payload: Array<any>) => {
+  const newTrips: any = [];
+  payload.forEach((trip) => {
+    newTrips.push({
+      createdAt: moment(trip.trip_start_time).format('LL'),
+      driver: trip.driver.fname + ' ' + trip.driver.lname,
+      driverId: trip.driver.id,
+      routeCode: trip.route.route_code,
+      startTime: trip.start_trip ? moment(trip.trip_start_time).subtract(1, 'h').format('LT') : 'MARKED',
+      endTime: moment(trip.end_trip).format('h:mm a'),
+      passengersCount: trip.passengers_count,
+      revenue: trip.cost_of_supply,
+      id: trip.id,
+      route: trip.route
+    });
+  });
+  return newTrips;
+}
+
+checkForExistingQuery()
+</script>

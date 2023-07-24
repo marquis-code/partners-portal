@@ -131,7 +131,8 @@
     </page-layout>
   </main>
 </template>
-<script lang="ts">
+
+<!-- <script lang="ts">
 import { defineComponent } from 'vue'
 import PageLayout from '@/components/layout/PageLayout.vue';
 import TripHistory from '@/components/TripHistory.vue';
@@ -244,5 +245,112 @@ export default defineComponent({
       expand: false,
     }
   }
+})
+</script> -->
+
+<script setup lang="ts">
+import { ref, Ref, onMounted } from 'vue'
+import PageLayout from '@/components/layout/PageLayout.vue';
+import TripHistory from '@/components/TripHistory.vue';
+import { useRoute } from 'vue-router';
+import {axiosInstance as axios} from '@/plugins/axios';
+
+const $route = useRoute()
+const isFetchingInformation = ref(true);
+const supplyCost = ref(0);
+const netIncome = ref(0);
+const currency = ref('₦');
+const vehicle = ref({
+  vehicleId: undefined,
+  name: '',
+  licenseNumber: ''
+})
+const deductions = ref({
+  totalDeduction: 0,
+  allDeductions: [] as Array<any>,
+})
+const driver = ref({
+  driverId: undefined,
+  name: '',
+  avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80'
+})
+const route = ref({
+  id: undefined,
+  pickup: "",
+  destination: "",
+  route_code: '',
+})
+const expand = ref(false)
+
+const triggerDeductionExpand = () => {
+  expand.value = !expand.value;
+}
+const init = async () => {
+  await getVehicleInformation();
+}
+const getVehicleInformation = async () => {
+  try {
+    const params = $route.params;
+    isFetchingInformation.value = true;
+    const response = await axios.get(
+      `/cost-revenue/v1/trips/${params?.id}/revenues`
+    );
+    console.log(response.data);
+    if (response.status === 200) {
+      const {
+        driver: driverObj,
+        vehicle: vehicleObj,
+        driverId,
+        vehicleId,
+        dropoff,
+        pickup,
+        routeCode,
+      } = response.data.metadata;
+
+      const {
+        totalDeductedAmount,
+        deductions: deductionsObj,
+        partnersRevenue,
+        finalPartnersRevenue,
+      } = response.data;
+
+      netIncome.value = finalPartnersRevenue;
+      supplyCost.value = partnersRevenue;
+      driver.value = {
+        driverId,
+        name: `${driverObj?.fname} ${driverObj?.lname}`,
+        avatar: driverObj?.avatar ?? driver.value.avatar,
+      };
+      vehicle.value = {
+        ...vehicle.value,
+        vehicleId,
+        name: vehicleObj?.name,
+        licenseNumber: vehicleObj?.registration_number,
+      };
+      route.value = {
+        ...route.value,
+        pickup,
+        destination: dropoff,
+        route_code: routeCode,
+      };
+
+      deductions.value = {
+        ...deductions.value,
+        totalDeduction: totalDeductedAmount,
+        allDeductions: deductionsObj.map((d: any) => ({
+          dedution: d.amount,
+          cause: d.description,
+        }))
+      };
+    }
+  } catch (e) {
+    console.log(e);
+  } finally {
+    isFetchingInformation.value = false;
+  }
+}
+
+onMounted(() => {
+  init()
 })
 </script>

@@ -15,7 +15,7 @@
     </GoogleMap>
   </template>
 
-<script lang="ts">
+<!-- <script lang="ts">
 /// <reference types="google.maps" />
 import { defineComponent } from 'vue';
 import { GoogleMap, CustomMarker, InfoWindow, Polyline } from 'vue3-google-map';
@@ -216,4 +216,201 @@ export default defineComponent({
     }
   }
 });
+</script> -->
+
+<script setup lang="ts">
+/// <reference types="google.maps" />
+import { ref, Ref, defineProps, onMounted, onBeforeUnmount, watch } from 'vue';
+import { GoogleMap, CustomMarker, InfoWindow, Polyline } from 'vue3-google-map';
+import socketioService from '@/services/socketio.service';
+import { googleMapStyleId } from '@/utils/mapFunctions'
+
+const markerIconUrl = "https://api.shuttlers.africa/telemetry/images/sedan.png"
+
+const props = defineProps<{
+  startedAt: string|Date
+  endedAt: string|Date
+  tripId: string|number
+  tripVehicleId: string|number
+  vehicleRegNumber: string
+}>()
+
+const mapAPIKey = process.env.VUE_APP_GOOGLE_API_KEY || ('' as string)
+const tripEndDate = ref(null) as Ref<any>
+const loadedVehileRecentTravel = ref(false);
+const isVehicleTrackingOnline = ref(false);
+const recentTravelPath = ref(null) as Ref<any>
+const busIconStyles = ref({
+  transform: "rotate(0deg)"
+});
+const vehicleId = ref(null) as Ref<any>
+const zoomLevel = ref(15);
+const vehiclePosition = ref({ position: { lat: 6.427282, lng: 3.458658 } });
+const customVehiclePosition = ref({ position: { lat: 6.427282, lng: 3.458658 } });
+const center = ref({ lat: 6.427282, lng: 3.458658 });
+const googleMapInstance = ref(null) as Ref<any>
+const customVehicleMarker = ref(null) as Ref<any>
+const vehicleInfoWindow = ref(null) as Ref<any>
+const trailOfTripPath = ref(null) as Ref<any>
+
+watch(() => props.tripId, () => {
+  tripEndDate.value = props.endedAt;
+  if (!props.endedAt) {
+    setupPositionListener();
+  } else {
+    if (props.tripVehicleId) {
+      loadRecentTravel(props.tripVehicleId, true)
+    }
+  }
+})
+
+onMounted(() => {
+  tripEndDate.value = props.endedAt;
+  if (!props.endedAt) {
+    setupPositionListener();
+  } else {
+    if (props.tripVehicleId) {
+      loadRecentTravel(props.tripVehicleId, true)
+    }
+  }
+})
+
+onBeforeUnmount(() => {
+  socketioService.off(`trips:${props.tripId}`);
+})
+
+const loadRecentTravel = async (vehicleId: string | number, isTripVehicleId = false) => {
+  const flightPlanCoordinates = await fetchLastestTravelPath(vehicleId, isTripVehicleId);
+  recentTravelPath.value = {
+    path: flightPlanCoordinates,
+    geodesic: true,
+    strokeColor: "#4848ed",
+    strokeOpacity: 1.0,
+    strokeWeight: 4,
+  };
+
+  if (flightPlanCoordinates.length) {
+    onPositionChanged({
+      position_latitude: flightPlanCoordinates[flightPlanCoordinates.length - 1].lat,
+      position_longitude: flightPlanCoordinates[flightPlanCoordinates.length - 1].lng,
+    }, { ignoreOnPolyline: true })
+  }
+}
+const fetchLastestTravelPath = async (vehicleId: string | number, isTripVehicleId = false) => {
+  let path: string = process.env.VUE_APP_WS_SOCKET_PATH || "";
+  path = path.replaceAll('/socket.io', '')
+
+  let q = ""
+  if (props.startedAt) {
+    const dateString = props.startedAt && props.startedAt instanceof Date ? props.startedAt?.toISOString() : props.startedAt
+    q = `&startAt=${dateString}`
+  }
+
+  if (tripEndDate.value) {
+    const dateString = tripEndDate.value && tripEndDate.value instanceof Date ? tripEndDate.value?.toISOString() : tripEndDate.value
+    q = `${q}&endAt=${dateString}`
+  }
+
+  let url = `/vehicles/${vehicleId}/positions`
+
+  if (isTripVehicleId) {
+    url = `/api/v1/vehicles/${vehicleId}/positions`
+  }
+
+  return fetch(`${process.env.VUE_APP_API_BASE_URL}${path}${url}?compress=1&direction=desc${q}`, {
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    }
+  }).then((result) => {
+    return result.json()
+  }).then(({ data }) => {
+    return data.map((item: number[]) => {
+      return { lat: item[0], lng: item[1] }
+    }).reverse()
+  });
+}
+const setupPositionListener = async () => {
+  console.log('setupPositionListener called', props.tripId)
+  if (!props.tripId) return;
+
+  console.log('setupPositionListener with tripId')
+  if (props.endedAt) return;
+  console.log('setupPositionListener without endedAt')
+
+  if (props.tripVehicleId) {
+    tripEndDate.value = new Date();
+    await loadRecentTravel(props.tripVehicleId, true)
+  }
+
+  watch(() => {
+    const mapInstance = googleMapInstance.value;
+    return mapInstance.ready;
+  }, (val) => {
+    if (val) {
+      const _customVehicleMarker = customVehicleMarker.value;
+      _customVehicleMarker?.marker?.addListener('click', () => {
+        vehicleInfoWindow.value?.infoWindow?.open();
+      });
+    }
+  });
+
+  if (vehicleId.value) {
+    loadedVehileRecentTravel.value = true;
+    loadRecentTravel(vehicleId.value);
+  }
+
+  socketioService.joinRoom([`trips:${props.tripId}`]).finally(() => {
+    socketioService.on(`trips:${props.tripId}`, (event: any) => {
+      onPositionChanged(event)
+    })
+  })
+}
+const onPositionChanged = (event: { [key: string]: any, position_latitude: number, position_longitude: number }, options?: { ignoreOnPolyline: boolean }): void => {
+  console.log(event);
+
+  if (!isVehicleTrackingOnline.value) {
+    if (event.vehicle_id && !props.tripVehicleId && !vehicleId.value) {
+      vehicleId.value = event.vehicle_id;
+      loadRecentTravel(vehicleId.value);
+    }
+    isVehicleTrackingOnline.value = true
+  }
+
+  vehiclePosition.value.position = {
+    lat: event.position_latitude,
+    lng: event.position_longitude,
+  }
+  customVehiclePosition.value.position = {
+    lat: event.position_latitude,
+    lng: event.position_longitude,
+  }
+
+  const _customVehicleMarker: any = customVehicleMarker.value;
+  _customVehicleMarker?.marker?.setPosition(customVehiclePosition.value.position);
+
+  if (event.position_direction) {
+    busIconStyles.value.transform = `rotate(${event.position_direction}deg)`
+  }
+
+  (googleMapInstance.value as any)?.map?.panTo(vehiclePosition.value.position)
+
+  if (!recentTravelPath.value) {
+    recentTravelPath.value = {}
+  }
+
+  if (!recentTravelPath.value.path) {
+    recentTravelPath.value.path = [];
+  }
+
+  if (!options || !options?.ignoreOnPolyline) {
+    recentTravelPath.value.path.push({
+      lat: event.position_latitude,
+      lng: event.position_longitude,
+    })
+  }
+  const _trailOfTripPath: any = trailOfTripPath.value;
+  _trailOfTripPath?.polyline?.setPath(recentTravelPath.value.path);
+}
+
 </script>

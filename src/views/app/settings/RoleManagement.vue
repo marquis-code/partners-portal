@@ -133,7 +133,7 @@
   <!-- </page-layout> -->
 </template>
 
-<script lang="ts">
+<!-- <script lang="ts">
 import { defineComponent } from 'vue';
 import { mapGetters } from 'vuex';
 import { format } from 'date-fns';
@@ -256,4 +256,120 @@ export default defineComponent({
     }
   }
 });
+</script> -->
+
+<script setup lang="ts">
+import { ref, Ref, computed } from 'vue';
+import { useStore } from 'vuex';
+import { format } from 'date-fns';
+import Spinner from '@/components/layout/Spinner.vue';
+import AppModal from '@/components/Modals/AppModal.vue';
+import AppTable from '@/components/AppTable.vue';
+import AddRole from '@/views/app/settings/AddRole.vue';
+import { getUserReadableDate } from '@/utils/dateFormatters';
+import { extractErrorMessage } from '@/utils/helper';
+import router from '@/router';
+import {axiosInstance as axios} from '@/plugins/axios';
+import {useToast} from 'vue-toast-notification';
+import { useRoute } from 'vue-router';
+
+const store = useStore()
+const route = useRoute()
+const toast = useToast()
+const tableData = ref([
+  {
+    id: 1,
+    fname: 'Victor',
+    lname: 'Abang',
+    admin_class: 'Owner',
+    email: 'Victor.abang@gmail.com',
+    created_at: '20 May 2022',
+    is_default: true
+  }
+])
+const headers = [
+  { label: 'First Name', key: 'fname' },
+  { label: 'Last Name', key: 'lname' },
+  { label: 'Admin Class', key: 'admin_class' },
+  { label: 'Email', key: 'email' },
+  { label: 'Created', key: 'created_at' },
+  { label: 'Actions', key: 'actions' }
+]
+const modalStatus = ref('success')
+const activeView = ref('role_table')
+const errorLoading = ref(false)
+const fetchingMembers = ref(false)
+const fetchingRoles = ref(false)
+const showModal = ref(false)
+const processing = ref(false)
+const selectedIndividual = ref({}) as Ref<any>
+
+const partnerContext:any = computed(() => store.getters['auth/activeContext'])
+const userSessionData:any = computed(() => store.getters['auth/userSessionData'])
+const user:any = computed(() => store.getters['auth/user'])
+
+const fetchPartnerMembers = async () => {
+  try {
+    fetchingMembers.value = true;
+    const response = await axios.get(
+      `/v1/partners/${partnerContext.value.partner.account_sid}/members`
+    );
+    tableData.value = structureData(response.data.data);
+  } catch (error) {
+    const errorMessage = extractErrorMessage(
+      error,
+      null,
+      'Oops! An error occurred, please try again.'
+    );
+    toast.error(errorMessage);
+  } finally {
+    fetchingMembers.value = false;
+  }
+}
+const handleRoleDelete = async (item: any) => {
+  modalStatus.value = 'warning';
+  selectedIndividual.value = item;
+  // console.log(item);
+  showModal.value = true;
+  // await this.$axios.delete(`/v1/delete${item.id}`);
+}
+const structureData = (memberList: any) => {
+  const newMemberList: any[] = memberList.map(
+    (member: {
+      user: { fname: any; lname: any; email: any };
+      role: any;
+      created_at: string;
+      id: any;
+    }) => {
+      return {
+        fname: member?.user?.fname,
+        lname: member?.user?.lname,
+        admin_class: member?.role,
+        email: member?.user?.email,
+        created_at: getUserReadableDate(member?.created_at),
+        actions: member?.id
+      };
+    }
+  );
+  return newMemberList;
+}
+const handleViewChange = () => {
+  activeView.value = 'add_role';
+}
+const reloadPage = () => {
+  activeView.value = 'role_table';
+  // this.fetchRoles();
+}
+const proceed = () => {
+  modalStatus.value = 'warning-success';
+}
+const closeWarningSuccess = () => {
+  showModal.value = false;
+}
+const closeModal = () => {
+  showModal.value = false
+}
+
+activeView.value = 'role_table';
+fetchPartnerMembers();
 </script>

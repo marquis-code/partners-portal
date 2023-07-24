@@ -23,7 +23,7 @@
         </template>
       </page-action-header>
     </template>
-    <div v-if="loading || isLoading">
+    <div v-if="loading">
       <spinner></spinner>
     </div>
     <template v-else>
@@ -164,7 +164,7 @@
   </page-layout>
 </template>
 
-<script>
+<!-- <script>
 import PageLayout from '@/components/layout/PageLayout';
 import { mapGetters } from 'vuex';
 import Spinner from '@/components/layout/Spinner';
@@ -253,4 +253,80 @@ export default {
     }
   }
 };
+</script> -->
+
+<script setup lang="ts">
+import PageLayout from '@/components/layout/PageLayout.vue';
+import { useStore } from 'vuex';
+import Spinner from '@/components/layout/Spinner.vue';
+import PageActionHeader from '@/components/PageActionHeader.vue';
+import { extractErrorMessage } from '@/utils/helper';
+import TripHistory from '@/components/TripHistory.vue';
+import GoogleMaps from '@/components/map/GoogleMaps.vue';
+import { formatGeometry } from '@/utils/mapFunctions';
+import { ref, Ref, computed, defineProps } from 'vue'
+import {axiosInstance as axios} from '@/plugins/axios';
+import {useToast} from 'vue-toast-notification';
+
+const toast = useToast()
+const store = useStore()
+const props = defineProps<{
+  routeId: number|string
+}>()
+const partnerContext:any = computed(() => store.getters['auth/activeContext'])
+const loading = ref(false);
+const trip = ref({})
+const routeDetails = ref({}) as Ref<any>
+const polyline = ref([]) as Ref<any[]>
+const startPoint = ref({}) as Ref<any>
+const endPoint = ref({}) as Ref<any>
+const centerPoint = ref({}) as Ref<any>
+
+const getDaysCount = (stringifiedList:any) => {
+  const days = JSON.parse(stringifiedList);
+  return days;
+}
+const getDays = (daysList:any) => {
+  let days = '';
+  for (let index = 0; index < daysList.length; index++) {
+    const element = daysList[index];
+    // eslint-disable-next-line no-const-assign
+    days += element + ', ';
+  }
+  return days;
+}
+const fetchPartnerRouteDetails = async () => {
+  loading.value = true;
+  try {
+    const response = await axios.get(
+      `/v1/partners/${partnerContext.value.partner.id}/routes/${props.routeId}`
+    );
+    routeDetails.value = response.data;
+    getRouteGeometry();
+  } catch (error) {
+    const errorMessage = extractErrorMessage(
+      error,
+      null,
+      'Oops! An error occurred, please try again.'
+    );
+    toast.error(errorMessage);
+  } finally {
+    loading.value = false;
+  }
+}
+const getRouteGeometry = () => {
+  console.log(1)
+  polyline.value = formatGeometry(routeDetails.value.route.geometry);
+  // console.log(this.routeDetails.route.geometry)
+  // console.log(this.polyline)
+  startPoint.value = polyline.value[0];
+  endPoint.value = polyline.value[polyline.value.length - 1];
+  centerPoint.value = polyline.value[Math.ceil(polyline.value.length / 2)];
+  console.log(startPoint.value)
+  console.log(endPoint.value)
+  console.log(centerPoint.value)
+  console.log(2)
+}
+
+fetchPartnerRouteDetails()
 </script>

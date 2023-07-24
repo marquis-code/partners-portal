@@ -265,7 +265,7 @@
   </div>
 </template>
 
-<script lang="ts">
+<!-- <script lang="ts">
 import { defineComponent } from 'vue';
 import { mapGetters } from 'vuex';
 import AppModal from '@/components/Modals/AppModal.vue';
@@ -468,6 +468,197 @@ export default defineComponent({
   },
   components: { AppModal, Notification, Spinner, VehicleMap }
 });
+</script> -->
+
+<script setup lang="ts">
+import { ref, Ref, computed, onMounted, defineProps, withDefaults, defineEmits } from 'vue';
+import { useStore } from 'vuex';
+import AppModal from '@/components/Modals/AppModal.vue';
+import Notification from '../../../../components/Notification.vue';
+import Spinner from '@/components/layout/Spinner.vue';
+import emitter from '@/libs/emitter';
+import VehicleMap from './VehicleMap.vue';
+import router from '@/router'
+import {axiosInstance as axios} from '@/plugins/axios';
+import {useToast} from 'vue-toast-notification';
+
+export interface Props {
+  singleVehicleData?: any
+}
+
+const emit = defineEmits(['vehicleUpdated'])
+const props = withDefaults(defineProps<Props>(), {
+  singleVehicleData: {},
+})
+const store = useStore()
+const toast = useToast()
+const assignStep = ref(0);
+const unassignStep = ref(0);
+const assignDriverModal = ref(false);
+const unassignDriverModal = ref(false);
+const assigningDriver = ref(false);
+const unassigningDriver = ref(false);
+const selectedDriverId = ref(null) as Ref<any>
+const vehiclePartnersDrivers = ref([]);
+const fetchingVehiclePartnersDriver = ref(false);
+const haspendingDocuments = ref(false);
+
+const partnerContext:any = computed(() => store.getters['auth/activeContext'])
+const userSessionData:any = computed(() => store.getters['auth/userSessionData'])
+const vehicleData:any = computed(() => store.getters['vehicle/getVehicleData'])
+const isLoading:any = computed(() => store.getters['vehicle/getVehicleLoading'])
+
+onMounted(() => {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  emitter.on('vehicles:assign-driver', () => {
+    showAssignDriverModal();
+  });
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  emitter.on('vehicles:unassign-driver', () => {
+    showUnassignDriverModal();
+  });
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  emitter.on('vehicles:edit-vehicle', () => {
+    editVehicle();
+  });
+})
+
+const viewVehicleDocuments = () => {
+  router.push({
+    name: 'vehicle.detail.documents'
+  });
+}
+const checkIfVehicleHasPendingDocuments = () => {
+  axios
+    .get(
+      `v1/partners/${partnerContext.value.partner.id}/vehicle/${vehicleData.value.id}/vehicle-documents`
+    )
+    .then((r) => {
+      const vehicleDocuments: any[] = r.data.vehicleDocuments || [];
+      for (let index = 0; index < vehicleDocuments.length; index++) {
+        const element = vehicleDocuments[index];
+        if (element.documents === null) {
+          haspendingDocuments.value = true;
+          return 0;
+        }
+      }
+    });
+}
+const nextAssignStep = () => {
+  assignStep.value += 1;
+}
+const nextUnassignStep = () => {
+  unassignStep.value += 1;
+}
+const cancelAssignment = () => {
+  assignDriverModal.value = false;
+  assignStep.value = 0;
+  selectedDriverId.value = null;
+}
+const finishAssignment = () => {
+  assignDriverModal.value = false;
+  assignStep.value = 0;
+  selectedDriverId.value = null;
+}
+const cancelUnassignment = () => {
+  unassignDriverModal.value = false;
+  unassignStep.value = 0;
+  selectedDriverId.value = null;
+}
+const finishUnassignment = () => {
+  unassignDriverModal.value = false;
+  unassignStep.value = 0;
+  selectedDriverId.value = null;
+}
+const assignDriverToThisVehicle = async () => {
+  assigningDriver.value = true;
+  try {
+    const response = await axios.put(
+      `/v1/partners/${userSessionData.value.activeContext.partner.id}/drivers/${selectedDriverId.value}/vehicle-assignments?status=assign`,
+      {
+        vehicle_id: vehicleData.value.id
+      }
+    );
+    await updateVehicleInfo(vehicleData.value.id);
+    nextAssignStep();
+  } catch (error: any) {
+    toast.warning(
+      error.response.data.message ||
+        'Error occurred while assigning this driver'
+    );
+  } finally {
+    assigningDriver.value = false;
+  }
+}
+const unassignDriverToThisVehicle = async () => {
+  unassigningDriver.value = true;
+  try {
+    const response = await axios.put(
+      `/v1/partners/${userSessionData.value.activeContext.partner.id}/drivers/${selectedDriverId.value}/vehicle-assignments?status=unassign`,
+      {
+        vehicle_id: vehicleData.value.id
+      }
+    );
+    await updateVehicleInfo(vehicleData.value.id);
+    nextUnassignStep();
+  } catch (error: any) {
+    toast.warning(
+      error.response.data.message ||
+        'Error occurred while assigning this driver'
+    );
+  } finally {
+    unassigningDriver.value = false;
+  }
+}
+const updateVehicleInfo = async (vehicleId: number) => {
+  try {
+    const response = await axios.get(`/v1/vehicles/${vehicleId}`);
+    await store.dispatch('vehicle/setVehicleData', response.data);
+    toast.success('Vehicle Informaion ');
+  } finally {
+    console.log('done');
+  }
+}
+const editVehicle = () => {
+  router.push({
+    name: 'EditVehicle',
+    params: { vehicleId: vehicleData.value.id }
+  });
+}
+const selectThisDriver = (driver: any) => {
+  // console.log(id)
+  selectedDriverId.value = driver.driver_id;
+}
+const showAssignDriverModal = () => {
+  assignDriverModal.value = true;
+}
+const showUnassignDriverModal = () => {
+  unassignDriverModal.value = true;
+  selectedDriverId.value = props.singleVehicleData?.driver?.id;
+}
+const fetchVehiclePartnerDrivers = () => {
+  fetchingVehiclePartnersDriver.value = true;
+  axios
+    .get(
+      `/v1/partners/${userSessionData.value.activeContext.partner.account_sid}/drivers`
+    )
+    .then((res) => {
+      vehiclePartnersDrivers.value = res.data.data;
+    })
+    .catch((err) => {
+      console.log(err);
+      toast.warning('Error occured while fetching your drivers');
+    })
+    .finally(() => {
+      fetchingVehiclePartnersDriver.value = false;
+    });
+}
+
+fetchVehiclePartnerDrivers()
+checkIfVehicleHasPendingDocuments()
 </script>
 
 <style>

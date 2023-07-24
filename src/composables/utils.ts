@@ -1,4 +1,5 @@
 import moment from 'moment';
+import { RouteLocationNormalizedLoaded, Router } from 'vue-router';
 
 export const formatTime = (time:any) => {
   return moment(time).format('LT');
@@ -32,4 +33,19 @@ export function downloadFile (url:string, fileName:string) {
 
 export const formatNaira = (amount:number) => {
   return amount.toLocaleString("en-NG", { style: "currency", currency: "NGN" });
+}
+
+export const addToQuery = (route:RouteLocationNormalizedLoaded, router:Router, obj:any) => {
+  const oldQuery = route.query
+  const newQuery = { ...oldQuery, ...obj };
+  router.push({ query: newQuery });
+}
+export const removeQueryParam = (route:RouteLocationNormalizedLoaded, router: Router, queryNames:string[]) => {
+  const queries = route.query
+  const query = { ...queries };
+  for (let i = 0; i < queryNames.length; i++) {
+    const el = queryNames[i];
+    delete query[el];
+  }
+  router.push({ query });
 }

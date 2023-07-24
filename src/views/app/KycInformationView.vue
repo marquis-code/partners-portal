@@ -140,7 +140,7 @@
                   ring-1 ring-gray-300
                 "
                 placeholder="Choose a date"
-                v-model="v$.identityForm.document.dob.$model"
+                v-model="(v$.identityForm.document.dob as any).$model"
               />
               <span
                 class="text-sm font-light text-red-500"
@@ -215,7 +215,6 @@
                 ring-1 ring-gray-400
                 font-medium
               "
-              @click="handleLogout()"
             >
               Continue Later
             </button>
@@ -258,7 +257,6 @@
                 ring-1 ring-gray-400
                 font-medium
               "
-              @click.prevent="hanndleLogout()"
             >
               Continue Later
             </button>
@@ -297,7 +295,7 @@
   </page-layout>
 </template>
 
-<script lang="ts">
+<!-- <script lang="ts">
 import PageLayout from '@/components/layout/PageLayout.vue';
 import { defineComponent } from 'vue';
 import { mapGetters } from 'vuex';
@@ -564,4 +562,269 @@ export default defineComponent<any, any, any>({
     }
   }
 });
+</script> -->
+
+<script setup lang="ts">
+import PageLayout from '@/components/layout/PageLayout.vue';
+import { ref, Ref, computed, defineProps } from 'vue';
+import { useStore } from 'vuex';
+import Datepicker from 'vue3-datepicker';
+import ImageUpload from '@/components/ImageUpload.vue';
+import { required } from '@vuelidate/validators';
+import { extractErrorMessage } from '@/utils/helper';
+import useVuelidate from '@vuelidate/core';
+import { UserData } from '@/models/user-session.model';
+import Spinner from '@/components/layout/Spinner.vue';
+import router from '@/router';
+import {axiosInstance as axios} from '@/plugins/axios';
+import {useToast} from 'vue-toast-notification';
+import { useRoute } from 'vue-router';
+
+const props = defineProps<{
+  id: string
+}>()
+const route = useRoute()
+const toast = useToast()
+const store = useStore()
+const validations = {
+  identityForm: {
+    user: {
+      document_owner_id: { required },
+      user_id: { required },
+      partner_type: { required }
+    },
+    document: {
+      document_id: { required },
+      type: { required },
+      dob: { required },
+      fname: { required },
+      lname: { required }
+    }
+  },
+  addressForm: {
+    user: {
+      document_owner_id: { required },
+      user_id: { required },
+      partner_type: { required }
+    },
+    document: {
+      full_address: { required }
+    }
+  }
+}
+const identificationOptions = [
+  {
+    key: 'nin',
+    label: 'NIN',
+    desc: 'National Identification Number',
+    maxLength: 11
+  },
+  {
+    key: 'bvn',
+    label: 'BVN',
+    desc: 'Bank Verification Number',
+    maxLength: 11
+  }
+  /*        {
+    key: 'drivers-license',
+    label: 'Drivers License',
+    desc: 'Drivers License'
+  },
+  {
+    key: 'passport',
+    label: 'Passport',
+    desc: 'Passport'
+  },
+  {
+    key: 'voters-card',
+    label: 'Voters card',
+    desc: 'Voters Card'
+  } */
+]
+const identityForm = ref({
+  user: {
+    document_owner_id: null as any,
+    user_id: null as any,
+    partner_type: null as any
+  },
+  document: {
+    document_id: null as any,
+    type: null as any,
+    dob: '' as any,
+    fname: null as any,
+    lname: null as any
+  }
+});
+const addressForm = ref({
+  user: {
+    document_owner_id: null as any,
+    user_id: null as any,
+    partner_type: null as any
+  },
+  document: {
+    full_address: null as any,
+    files: [] as any[]
+  }
+});
+const loading = ref(false);
+const activeView = ref(0);
+const file = ref('') as Ref<any>
+const fileData = ref(null) as Ref<any>
+const selectedIdentityDoc = ref(null) as Ref<any>
+const addressProgress = ref(false);
+const avatar = ref(null) as Ref<any>
+const uploadingAvatar = ref(false)
+const v$ = useVuelidate(validations, {identityForm, addressForm})
+
+// computed
+const user:any = computed(() => store.getters['auth/user'])
+const contextOrganization:any = computed(() => store.getters['auth/activeContext'])
+const partnerContext:any = computed(() => store.getters['auth/activeContext'])
+const getDocumentLabel = computed(() => {
+  if (activeView.value === 0) {
+    return identityForm.value.document.type
+      ? selectedIdentityDoc.value.desc
+      : 'Document ID';
+  }
+  return '';
+})
+
+const checkIfIdentityKYCHasBeenDone = async() => {
+  try {
+    console.log(1);
+  } catch (err: any) {
+    console.log(err);
+    const errorMessage = extractErrorMessage(
+      err,
+      null,
+      'Oops! An error occurred, please try again.'
+    );
+    toast.error(errorMessage);
+  }
+}
+const checkIfAddressKYCHasBeenDone = async() => {
+  try {
+    console.log(1);
+  } catch (err: any) {
+    console.log(err);
+    const errorMessage = extractErrorMessage(
+      err,
+      null,
+      'Oops! An error occurred, please try again.'
+    );
+    toast.error(errorMessage);
+  }
+}
+const setFormDefaults = async() => {
+  try {
+    const response = await axios.get(
+      `/v1/partner-share-holders/${props.id}`
+    );
+    const user = response.data;
+    identityForm.value.user.document_owner_id = user.id;
+    identityForm.value.user.user_id = '' + user.id;
+    identityForm.value.user.partner_type = 'business';
+    identityForm.value.document.fname = user.fname;
+    identityForm.value.document.lname = user.lname;
+
+    addressForm.value.user.document_owner_id = user.id;
+    addressForm.value.user.user_id = '' + user.id;
+    addressForm.value.user.partner_type = 'business';
+  } catch (err: any) {
+    console.log(err);
+    const errorMessage = extractErrorMessage(
+      err,
+      null,
+      'Oops! An error occurred, please try again.'
+    );
+    toast.error(errorMessage);
+  }
+}
+const previous = () => {
+  activeView.value -= 1;
+}
+const uploadFile = () => {
+  file.value = avatar.value.files[0];
+  const reader = new FileReader();
+  reader.addEventListener('load', () => {
+    uploadingAvatar.value = true;
+  });
+  reader.readAsDataURL(file.value);
+}
+const handleIdentityChange = () => {
+  selectedIdentityDoc.value = identificationOptions.find(
+    (obj: any) => obj.key === identityForm.value.document.type
+  );
+}
+const saveIdentityForm = async() => {
+  v$.value.identityForm.$touch();
+  if (loading.value || v$.value.identityForm.$errors.length) {
+    return;
+  }
+  try {
+    loading.value = true;
+    await axios.post(
+      `/v1/partners/${partnerContext.value.partner.id}/shareholders/${props.id}/identity-verification`,
+      identityForm.value
+    );
+    toast.success('Shareholder Identity KYC completed');
+    activeView.value = 1;
+  } catch (err) {
+    const errorMessage = extractErrorMessage(
+      err,
+      null,
+      'Oops! An error occurred, please try again.'
+    );
+    toast.error(errorMessage);
+  } finally {
+    loading.value = false;
+  }
+}
+const saveAddressForm = async() => {
+  v$.value.addressForm.$touch();
+  if (loading.value || v$.value.addressForm.$errors.length) {
+    return;
+  }
+  if (!file.value) {
+    toast.error('Kindly select a file');
+    return;
+  }
+  try {
+    loading.value = true;
+    const formData = new FormData();
+    formData.append('file', file.value);
+    const response = await axios.post(
+      `/v1/upload/identity/files`,
+      formData
+    );
+    if (response.data?.files?.length) {
+      addressForm.value.document.files = [response.data.files[0].Location];
+    }
+    await axios.post(
+      `/v1/partners/${partnerContext.value.partner.id}/shareholders/${props.id}/address-verification`,
+      addressForm.value
+    );
+    toast.success('Shareholder Address KYC completed');
+    setTimeout(() => {
+      router.push({ name: 'dashboard.company-kyc' });
+    }, 200);
+  } catch (err) {
+    const errorMessage = extractErrorMessage(
+      err,
+      null,
+      'Oops! An error occurred, please try again.'
+    );
+    toast.error(errorMessage);
+  } finally {
+    loading.value = false;
+  }
+}
+const selectFile = ($event: File) => {
+  file.value = $event;
+}
+const removeFile = () => {
+  file.value = '';
+}
+
+setFormDefaults()
 </script>

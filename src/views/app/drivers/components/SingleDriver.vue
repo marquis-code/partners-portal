@@ -180,7 +180,7 @@
   </main>
 </template>
 
-<script lang="ts">
+<!-- <script lang="ts">
 import { defineComponent } from 'vue';
 
 export default defineComponent({
@@ -194,7 +194,26 @@ export default defineComponent({
     };
   }
 });
-</script>
+</script> -->
 
-<style>
-</style>
+<script setup lang="ts">
+import { ref, defineProps, defineEmits } from 'vue';
+
+defineProps<{
+  driverData: any
+}>()
+defineEmits(['driverUpdated', 'AssignVehicleToDriver'])
+const disabled = ref(true)
+
+// export default defineComponent({
+//   emits: ['driverUpdated', 'AssignVehicleToDriver'], // emitted when driver is changed or updated
+//   props: {
+//     driverData: Object
+//   },
+//   data() {
+//     return {
+//       disabled: true
+//     };
+//   }
+// });
+</script>

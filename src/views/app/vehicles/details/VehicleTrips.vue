@@ -17,7 +17,7 @@
   </div>
 </template>
 
-<script lang="ts">
+<!-- <script lang="ts">
 import {defineComponent} from "vue";
 import Spinner from "@/components/layout/Spinner.vue";
 import AppTable from "@/components/AppTable.vue";
@@ -90,8 +90,70 @@ export default defineComponent({
     })
   },
 })
+</script> -->
+
+<script setup lang="ts">
+import {ref, Ref, computed} from "vue";
+import Spinner from "@/components/layout/Spinner.vue";
+import AppTable from "@/components/AppTable.vue";
+import moment from 'moment';
+import { useStore } from "vuex";
+import {axiosInstance as axios} from '@/plugins/axios';
+import {useToast} from 'vue-toast-notification';
+import { useRoute } from 'vue-router';
+
+const route = useRoute()
+const toast = useToast()
+const store = useStore()
+const headers = [
+  { label: 'Date', key: 'date' },
+  { label: 'Start Point', key: 'pickup' },
+  { label: 'Destination', key: 'dropoff' },
+  { label: 'Route Code', key: 'routeCode' },
+  { label: 'Start Time', key: 'startTime' },
+  { label: 'End Time', key: 'endTime' },
+  { label: 'Amount', key: 'partnersRevenue' },
+]
+const loading = ref(false);
+const totalRecords = ref(null) as Ref<any>
+const tableData = ref([]) as Ref<any[]>;
+const errorLoading = ref(null) as Ref<any>
+
+const userSessionData:any = computed(() => store.getters['auth/userSessionData'])
+const vehicleData:any = computed(() => store.getters['vehicle/getVehicleData'])
+const isLoading:any = computed(() => store.getters['vehicle/getVehicleLoading'])
+
+const fetchTrips = () => {
+  loading.value = true;
+  // TODO: Support server side pagination
+  axios
+    .get(`/cost-revenue/v1/partners/${userSessionData.value.activeContext.partner.account_sid}/vehicles/${vehicleData.value.id}/revenues?metadata=true`)
+    .then((res) => {
+      const trips = transformedTrips(res.data.result) || [];
+      tableData.value = trips;
+      totalRecords.value = res.data.metadata?.total;
+    }).finally(() => {
+      loading.value = false;
+    });
+}
+const transformedTrips = (payload: Array<any>): any[] => {
+  const newTrips: any = []
+  payload.forEach(trip => {
+    newTrips.push({
+      startTime: moment(trip.metadata.startTime).format('LT'),
+      date: moment(trip.metadata.startTime).format('LL'),
+      pickup: trip.metadata.pickup,
+      dropoff: trip.metadata.dropoff,
+      createdAt: moment(trip.createdAt).format('LL'),
+      driver: trip.metadata.driver.fname + ' ' + trip.metadata.driver.lname,
+      routeCode: trip.metadata.routeCode,
+      partnersRevenue: trip.partnersRevenue,
+      endTime: moment(trip.metadata.endTime).format('LT'),
+      passengersCount: trip.passengersCount
+    });
+  });
+  return newTrips;
+}
+
+fetchTrips()
 </script>
-
-<style scoped>
-
-</style>

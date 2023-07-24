@@ -16,7 +16,7 @@
   </transition>
 </template>
 
-<script lang="ts">
+<!-- <script lang="ts">
 import { defineComponent } from 'vue';
 
 export default defineComponent({
@@ -24,6 +24,13 @@ export default defineComponent({
   name: 'OnboardingLayout',
   components: {}
 });
+</script> -->
+
+<script setup lang="ts">
+import { } from 'vue';
+
+// inheritAttrs: false,
+
 </script>
 
 <style lang="scss" scoped>
