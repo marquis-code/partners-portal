@@ -32,7 +32,7 @@
       <button
         type="button"
         class="text-black text-sm bg-gray-300 px-6 py-3 font-medium rounded-md"
-        @click="viewVehicleDetails(getVehicleFormData.id)"
+        @click="emit('next')"
       >
         Skip
       </button>
@@ -51,139 +51,24 @@
         "
         @click="submitFinalForm"
       >
-        {{ submittingFinalForm ? 'Saving' : 'Submit' }}
+        {{ submittingFinalForm ? 'Saving' : 'Next' }}
         <spinner class="ml-1" v-if="submittingFinalForm"></spinner>
       </button>
     </div>
   </form>
 </template>
 
-<!-- <script lang="ts">
-import { defineComponent } from 'vue';
-import MultipleImageUpload from '@/components/MultipleImageUpload.vue';
-import { mapGetters } from 'vuex';
-import { extractErrorMessage } from '@/utils/helper';
-import Spinner from '@/components/layout/Spinner.vue';
-export default defineComponent({
-  components: { MultipleImageUpload, Spinner },
-  computed: {
-    ...mapGetters({
-      vehicleFormData: 'vehicle/getVehicleData',
-      getVehicleFormData: 'vehicle/getVehicleFormData',
-      user: 'auth/user',
-      partnerContext: 'auth/activeContext'
-    })
-  },
-  methods: {
-    async selectFile($event: File, type: string) {
-      const multipleDocumentObjects = $event;
-      const multipleDocumentList = this.convertImageObjectToList(
-        multipleDocumentObjects
-      );
-      this.uploadTos3andGetDocumentUrlList(multipleDocumentList, type);
-    },
-    removeFiles(type: any) {
-      if (type === 'interior') {
-        this.interiorImages = [];
-      }
-      if (type === 'exterior') {
-        this.exteriorImages = [];
-      }
-    },
-    uploadTos3andGetDocumentUrlList(multipleImages: Array<File>, type: string) {
-      this.uploadingFile = true;
-      multipleImages.forEach(async (file) => {
-        try {
-          const formData = new FormData();
-          formData.append('file', file);
-          const response = await this.$axios.post(
-            `/v1/upload/identity/files`,
-            formData
-          );
-          if (response.data?.files?.length) {
-            if (type === 'interior') {
-              this.interiorImages.push(response.data.files[0].Location);
-            }
-            if (type === 'exterior') {
-              this.exteriorImages.push(response.data.files[0].Location);
-            }
-          }
-        } catch (error) {
-          this.$toast.warning(
-            'An error occured while uploading your file, please try again'
-          );
-        }
-      });
-      this.uploadingFile = false;
-      this.$toast.success(`${type} images uploaded`);
-    },
-    convertImageObjectToList(imageObject: any) {
-      const imageList = [];
-      for (const key in imageObject) {
-        if (imageObject[key].size) {
-          imageList.push(imageObject[key]);
-        }
-      }
-      return imageList;
-    },
-    viewVehicleDetails(id: number) {
-      this.$router.push({
-        name: 'vehicle.detail.info',
-        params: { vehicleId: id }
-      });
-    },
-    async submitFinalForm() {
-      this.submittingFinalForm = true;
-      try {
-        await this.$axios.post(
-          `/v1/partners/${this.partnerContext.partner.id}/vehicle/${this.getVehicleFormData.id}/vehicle-images`,
-          {
-            uploads: [...this.interiorImages]
-          }
-        );
-        await this.$axios.post(
-          `/v1/partners/${this.partnerContext.partner.id}/vehicle/${this.getVehicleFormData.id}/vehicle-images`,
-          {
-            uploads: [...this.exteriorImages]
-          }
-        );
-        this.viewVehicleDetails(this.getVehicleFormData.id);
-      } catch (error) {
-        const errorMessage = extractErrorMessage(
-          error,
-          null,
-          'Oops! An error occurred, please try again.'
-        );
-        if (errorMessage === '"uploads" must contain at least 1 items') {
-          this.$toast.error('All Vehicle Images must be uploaded');
-        } else {
-          this.$toast.error(errorMessage);
-        }
-      } finally {
-        this.submittingFinalForm = false;
-      }
-    }
-  },
-  data() {
-    return {
-      submittingFinalForm: false,
-      uploadingFile: false,
-      interiorImages: [] as Array<any>,
-      exteriorImages: [] as Array<any>
-    };
-  }
-});
-</script> -->
-
 <script setup lang="ts">
-import { ref, Ref, computed } from 'vue';
+import { ref, computed, defineEmits } from 'vue';
 import MultipleImageUpload from '@/components/MultipleImageUpload.vue';
 import { useStore } from 'vuex';
 import { extractErrorMessage } from '@/utils/helper';
 import Spinner from '@/components/layout/Spinner.vue';
 import router from '@/router';
 import {axiosInstance as axios} from '@/plugins/axios';
-import {useToast} from 'vue-toast-notification';
+import { useToast } from 'vue-toast-notification';
+
+const emit = defineEmits(['next', 'goBack'])
 
 const store = useStore()
 const toast = useToast()
@@ -248,12 +133,7 @@ const convertImageObjectToList = (imageObject: any) => {
   }
   return imageList;
 }
-const viewVehicleDetails = (id: number) => {
-  router.push({
-    name: 'vehicle.detail.info',
-    params: { vehicleId: id }
-  });
-}
+
 const submitFinalForm = async () => {
   submittingFinalForm.value = true;
   try {
@@ -269,7 +149,7 @@ const submitFinalForm = async () => {
         uploads: [...exteriorImages.value]
       }
     );
-    viewVehicleDetails(getVehicleFormData.value.id);
+    emit('next');
   } catch (error) {
     const errorMessage = extractErrorMessage(
       error,
