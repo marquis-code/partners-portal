@@ -139,7 +139,7 @@ const steps = [
   {component: markRaw(VehicleImages)},
   {component: markRaw(VehicleInspection)}
 ]
-const currentStep = ref(0)
+const currentStep = ref(3)
 // const currentStep = ref(3)
 
 const next = () => {

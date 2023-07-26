@@ -71,11 +71,17 @@
         </div>
 
       </section>
+      <div class="flex flex-col bg-[#F9FBFD] rounded-md p-5">
+        <h2 class="font-bold mb-2">Notice</h2>
+        <p class='text-sm'>When adding a vehicle, please ensure the inspection date is within 2 weeks of the vehicle's addition.
+Choose an inspection site from our pre-defined list, noting that each location can have a maximum of 25 inspections per day.
+Only active locations will be visible for selection.</p>
+      </div>
 
     <div class="flex justify-end items-center space-x-5 pt-5">
       <button
         type="button"
-        class="text-black text-sm bg-gray-300 px-6 py-3 font-medium rounded-md"
+        class="text-black text-sm bg-gray-300 px-6 py-3 font-medium rounded-lg"
         @click="emit('goBack')"
       >
         previous
