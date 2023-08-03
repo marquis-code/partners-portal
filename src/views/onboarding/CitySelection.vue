@@ -206,10 +206,9 @@ const savePartnerCities = async () => {
           )
         )
       ]);
+      await store.dispatch('auth/refreshActiveContext', user.value.id);
       toast.success('Partner account created');
-      router.push('/dashboard')
-      await router.push({ name: 'dashboard' });
-      // router.go();
+      router.push('/')
     } catch (e) {
       toast.error(extractErrorMessage(e));
     } finally {
