@@ -351,17 +351,15 @@ import { useRoute } from 'vue-router';
 import router from '@/router';
 import {axiosInstance as axios} from '@/plugins/axios';
 import {useToast} from 'vue-toast-notification';
+import {useCostConfig} from '@/composables/backend/earnings'
 
 const toast = useToast()
 const store = useStore()
 const route = useRoute()
+const { isFetchingCostRevenue, listRevenues, tableData, filter } = useCostConfig()
 const searchText = ref('')
-const isFetchingCostRevenue = ref(false)
 const errorLoading = ref(false)
-const filter = ref({
-  sortBy: '',
-  range: { start: null as null|Date, end: null as null|Date }
-})
+
 const downloadLoader = ref(false)
 const headers = [
   { label: 'Route code', key: 'routeCode' },
@@ -371,7 +369,6 @@ const headers = [
   { label: 'Vehicle', key: 'vehicle' },
   { label: 'Supply Cost (₦)', key: 'cost' },
 ]
-const tableData = ref([]) as Ref<any[]>
 const isFetchingAllEarnings = ref(false)
 const isFetchingSettlements = ref(false)
 const isFetchingNextPaydate = ref(false)
@@ -467,67 +464,7 @@ const downloadReport = () => {
 const init = async () => {
   await listRevenues();
 }
-const formatTableData = (data: any[]) => {
-  const result = [];
-  for (const e of data) {
-    const obj = {} as any;
-    const {
-      driver,
-      vehicle,
-      vehicleId,
-      pickup,
-      dropoff,
-      driverId,
-      routeCode,
-    } = e.metadata;
-    const {
-      partnersRevenue,
-      id,
-      tripId,
-      routeId,
-      createdAt
-    } = e;
 
-    obj.id = id;
-    obj.tripId = tripId;
-    obj.itinerary = moment(createdAt).format('hh:mm A');
-    obj.routeCode = routeCode;
-    obj.route = {
-      pickup,
-      destination: dropoff,
-      routeId,
-    };
-    obj.driver = {
-      name: `${driver?.fname} ${driver?.lname}`,
-      id: driverId,
-    };
-    obj.cost = partnersRevenue;
-    obj.vehicle = {
-      name: vehicle?.name,
-      id: vehicleId,
-    }
-
-    result.push(obj);
-  }
-  return result;
-}
-const listRevenues = async () => {
-  try {
-    isFetchingCostRevenue.value = true;
-    const response = await axios.get(
-      `/cost-revenue/v1/partners/${partnerContext.value.partner.account_sid}/revenues?from=${filter.value.range.start ? formatApiCallDate(filter.value.range.start) : null}&to=${filter.value.range.end ? formatApiCallDate(filter.value.range.end) : null}`
-    );
-    console.log(response);
-    if (response.status === 200) {
-      // sd
-      tableData.value = formatTableData(response.data?.result ?? []);
-    }
-  } catch (err) {
-    console.log(err);
-  } finally {
-    isFetchingCostRevenue.value = false;
-  }
-}
 const viewTableDetails = (e: {e: any}) => {
   console.log(e);
   router.push(`/earnings/cost-configuration/vehicle/${e}`);
