@@ -8,9 +8,10 @@
           <label class="text-xs font-medium text-grays-black-5"
             >Inspection Date</label
           >
-          <DatePicker class='mx-input'
+          <DatePicker
           placeholder="Choose a date"
-          v-model="v$.form.date.$model"
+          v-model:value="v$.form.date.$model"
+           :disabled-date="disabledBeforeTodayAndAfterAWeek"
         />
           <span
             class="text-sm font-light text-red-500"
@@ -24,12 +25,8 @@
           <label class="text-xs font-medium text-grays-black-5"
             >Inspection Time</label
           >
-          <input
-          class='mx-input'
-          format="hh:mm" type="time" value-type="format"
-          placeholder="Choose a time"
-          v-model="v$.form.time.$model"
-        />
+          <DatePicker v-model:value="v$.form.time.$model" value-type="format" format="hh:mm a" type="time" />
+
           <span
             class="text-sm font-light text-red-500"
             v-if="v$.form.date.$dirty && v$.form.date.required.$invalid"
@@ -116,7 +113,7 @@ Only active locations will be visible for selection.</p>
 import { ref, Ref, defineEmits, watch, computed } from 'vue';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
-import DatePicker from 'vue3-datepicker'
+// import DatePicker from 'vue3-datepicker'
 import { useStore } from 'vuex';
 import { extractErrorMessage } from '@/utils/helper';
 import { AxiosResponse } from 'axios';
@@ -124,8 +121,17 @@ import Spinner from '@/components/layout/Spinner.vue';
 import router from '@/router';
 import {axiosInstance as axios} from '@/plugins/axios';
 import {useToast} from 'vue-toast-notification';
+import DatePicker from 'vue-datepicker-next'
 import { useRoute } from 'vue-router';
 import { format } from 'date-fns';
+
+const disabledBeforeTodayAndAfterAWeek = (date:any) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const Days = 14
+
+  return date < today || date > new Date(today.getTime() + Days * 24 * 3600 * 1000);
+}
 
 const getVehicleFormData: any = computed(() => store.getters['vehicle/getVehicleFormData'])
 const partnerContext:any = computed(() => store.getters['auth/activeContext'])
@@ -217,16 +223,18 @@ form.value.vehicle_id = getVehicleFormData?.value?.id;
 </script>
 
 <style>
-.mx-input {
-  @apply text-xs border-none outline-none w-full rounded-md p-3 placeholder-gray-500 placeholder-opacity-25 ring-1 ring-gray-300 h-10
+@import url( '@/assets/scss/date.css')
+/* .mx-input {
+  @apply text-xs border-none outline-none w-full rounded-md p-3 placeholder-gray-500 relative placeholder-opacity-25 ring-1 ring-gray-300 h-10
 }
 .mx-datepicker{
   @apply w-full
-}
+} */
 </style>
 
 <style lang="scss" scoped>
 @use 'src/assets/scss/overrides/v-select';
+@use 'src/assets/scss/date.css';
 
 select {
   &:invalid,
