@@ -20,8 +20,8 @@
     </template>
   </page-action-header>
 </template>
-<div>
-  <div class="flex flex-col gap-2 bg-white rounded p-2">
+<div class="flex flex-col lg:flex-row gap-6">
+  <!-- <div class="flex flex-col gap-2 bg-white rounded p-2">
     <div class="flex justify-end gap-4 items-center py-2">
       <p>Filter by year:</p>
       <select v-model="filterBy" class="border rounded p-2">
@@ -55,6 +55,56 @@
       </template>
 
     </app-table>
+  </div> -->
+  <div class="flex flex-col gap-6 w-full max-w-[400px]">
+    <div class="bg-white rounded-lg border flex flex-col">
+      <div class="border-b p-2 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <select class="w-fit p-2 border rounded-lg">
+            <option v-for="n in year" :key="n" value="n">{{ n }}</option>
+          </select>
+          <select class="w-fit p-2 border rounded-lg">
+            <option v-for="n in months" :key="n" value="n">{{ n }}</option>
+          </select>
+        </div>
+        <button class="btn">Generate</button>
+      </div>
+      <div class="p-2 flex items-center gap-2">
+        <img src="@/assets/icons/search_gray.svg" alt="">
+        <input type="text" placeholder="Search" class="outline-none border-0 p-2">
+      </div>
+    </div>
+    <div class="flex flex-col gap-4">
+      <div class="p-3 flex items-end justify-between bg-white border rounded-lg">
+        <div class="flex items-start gap-2">
+          <img src="@/assets/icons/docs.svg" alt="">
+          <div class="flex flex-col gap-2">
+            <p class="text-[#101211] text-sm font-medium">document name</p>
+            <p class="text-sm text-[#8D918F]">3 page</p>
+          </div>
+        </div>
+        <p class="text-sm text-[#8D918F]">Format: <span class="font-medium text-[#101211]">PDF</span></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex-grow max-w-[700px] bg-white rounded-lg border flex flex-col">
+    <div class="border-b p-3 flex items-center justify-between gap-4">
+      <p class="text-sm text-[#09090F]">Pay slip generated for: <span class="font-medium">June 2023</span></p>
+      <button class="btn flex items-center gap-2" disabled>
+        <img src="@/assets/icons/download_white.svg" alt="">
+        Print pay slip
+      </button>
+    </div>
+    <div class="p-3 flex items-center justify-center h-[400px]">
+      <div class="w-fit h-fit flex flex-col">
+        <img src="@/assets/illustration/payslip/empty_doc.svg" alt="">
+        <div class="flex flex-col gap-2 text-center">
+          <p class="text-lg text-[#09090F] font-medium">Preview Pay Slip</p>
+          <p class="text-sm text-[#8D918F]">Click on ‘generate’ to preview pay slip</p>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 </page-layout>
@@ -81,6 +131,8 @@ const headers = [
 ]
 const filterBy = ref('')
 const filterData = ['2023', '2022', '2021', '2020', '2019', '2018', '2017', '2016', '2015']
+const year = ['2023', '2022', '2021']
+const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 const tableData = ref([]) as Ref<any[]>
 const loading = ref(false)
 
