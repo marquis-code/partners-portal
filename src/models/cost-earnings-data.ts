@@ -1,9 +1,9 @@
-export default interface TableEarnings { 
-  id: String,
-  routeCode: String,
+export default interface TableEarnings {
+  id: string,
+  routeCode: string,
   route: any,
-  itinerary: String,
+  itinerary: string,
   driver: any,
   vehicle: any,
-  cost: String,
-};
+  cost: string,
+}

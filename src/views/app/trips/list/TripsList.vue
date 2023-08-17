@@ -557,17 +557,12 @@ import {useRoute} from 'vue-router'
 import router from '@/router'
 import {axiosInstance as axios} from '@/plugins/axios';
 import {useToast} from 'vue-toast-notification';
+import {useTrips} from '@/composables/backend/trips'
 
 const toast = useToast()
 const route = useRoute()
 const store = useStore()
-const filters = ref({
-  status: 'active-trips',
-  search: '',
-  pageNumber: 1,
-  pageSize: 10,
-  range: { start: null as null|Date, end: null as null|Date }
-})
+const { loading, filters, tableData, totalRecords, fetchPartnerTripsFromRevenue } = useTrips()
 const activeAndUpcomingTripsHeaders = [
   { label: 'Route Code', key: 'routeCode' },
   { label: 'Route', key: 'route' },
@@ -592,9 +587,6 @@ const result = ref([]);
 const debounce = ref(null) as Ref<any>
 const downloadLoader = ref(false);
 const search = ref('');
-const loading = ref(false);
-const tableData = ref([]) as Ref<any[]>
-const totalRecords = ref(null) as Ref<any>
 const errorLoading = ref(false);
 const items = ref([]) as Ref<any[]>
 
@@ -613,9 +605,6 @@ const checkForExistingQuery = () => {
 }
 
 // watchers
-watch(() => filters.value.status, (value, oldValue) => {
-  filters.value.status = value;
-})
 
 watch(() => filters.value.pageNumber, (value, oldValue) => {
   fetchPartnerTripsFromRevenue()
@@ -709,71 +698,8 @@ const setStatusFilter = (value: string) => {
   fetchPartnerTripsFromRevenue();
   addToQuery(route, router, {status: value})
 }
-const fetchPartnerTripsFromRevenue = async () => {
-  loading.value = true;
-  const params = {
-    related: 'driver,vehicle',
-    status: filters.value.status,
-    metadata: true
-  };
-  if (params.status === 'completed-trips') {
-    axios
-      .get(
-        `/v1/partners/${partnerContext.value.partner.id}/${params.status}?metadata=${params.metadata}&page=${filters.value.pageNumber}&limit=${filters.value.pageSize}&search=${filters.value.search}&from=${filters.value.range.start ? formatApiCallDate(filters.value.range.start) : null}&to=${filters.value.range.end ? formatApiCallDate(filters.value.range.end) : null}`
-        // `cost-revenue/v1/partners/${this.partnerContext.partner.account_sid}/revenues`
-      )
-      .then((res) => {
-        const trips = transformActiveOrUpcomingTrips(res?.data?.data);
-        // const trips = this.transformedTrips(res.data.result);
-        tableData.value = trips;
-        totalRecords.value = res.data.metadata?.total;
-      })
-      .catch((err) => {
-        toast.error(err.response.data.message || 'An error occured');
-      })
-      .finally(() => {
-        loading.value = false;
-      });
-  } else {
-    axios
-      .get(
-        `/v1/partners/${partnerContext.value.partner.id}/${params.status}?metadata=${params.metadata}&page=${filters.value.pageNumber}&limit=${filters.value.pageSize}&search=${filters.value.search}&from=${filters.value.range.start ? formatApiCallDate(filters.value.range.start) : null}&to=${filters.value.range.end ? formatApiCallDate(filters.value.range.end) : null}`
-      )
-      .then((res) => {
-        const trips = transformActiveOrUpcomingTrips(res?.data?.data);
-        tableData.value = trips;
-        totalRecords.value = res?.data?.metadata?.total;
-      })
-      .catch((err) => {
-        toast.error(
-          err?.response?.data?.message || 'An error occured'
-        );
-      })
-      .finally(() => {
-        loading.value = false;
-      });
-  }
-}
 const getFormattedDate = (date: any) => {
   return moment(date).format('LL');
-}
-const transformActiveOrUpcomingTrips = (payload: Array<any>) => {
-  const newTrips: any = [];
-  payload.forEach((trip) => {
-    newTrips.push({
-      createdAt: moment(trip.trip_start_time).format('LL'),
-      driver: trip.driver.fname + ' ' + trip.driver.lname,
-      driverId: trip.driver.id,
-      routeCode: trip.route.route_code,
-      startTime: trip.start_trip ? moment(trip.trip_start_time).subtract(1, 'h').format('LT') : 'MARKED',
-      endTime: moment(trip.end_trip).format('h:mm a'),
-      passengersCount: trip.passengers_count,
-      revenue: trip.cost_of_supply,
-      id: trip.id,
-      route: trip.route
-    });
-  });
-  return newTrips;
 }
 
 checkForExistingQuery()

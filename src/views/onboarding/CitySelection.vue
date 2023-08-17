@@ -169,7 +169,7 @@ const city_ids = ref([]) as Ref<any[]>
 const contextOrg:any = computed(() => store.getters['auth/activeContext'])
 const user:any = computed(() => store.getters['auth/user'])
 
-onMounted(async() => {
+onMounted(async () => {
   await store.dispatch('auth/refreshActiveContext', user.value.id);
 })
 
@@ -206,10 +206,9 @@ const savePartnerCities = async () => {
           )
         )
       ]);
+      await store.dispatch('auth/refreshActiveContext', user.value.id);
       toast.success('Partner account created');
-      router.push('/dashboard')
-      await router.push({ name: 'dashboard' });
-      // router.go();
+      router.push('/')
     } catch (e) {
       toast.error(extractErrorMessage(e));
     } finally {

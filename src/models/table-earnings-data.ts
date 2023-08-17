@@ -1,10 +1,10 @@
-export default interface TableEarnings { 
-  id: String,
-  createdAt: String,
+export default interface TableEarnings {
+  id: string,
+  createdAt: string,
   route: any,
-  routeCode: String,
+  routeCode: string,
   driver: any,
   vehicle: any,
-  deductions: String,
-  netIncome: String,
-};
+  deductions: string,
+  netIncome: string,
+}

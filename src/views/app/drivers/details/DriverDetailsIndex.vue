@@ -710,7 +710,7 @@ const handleCloseConfirmRemoveModal = () => {
   showDropdown.value = false;
   confirmRemoveDriverModal.value = false;
 }
-const proceedToAssign = async() => {
+const proceedToAssign = async () => {
   handleCloseConfirmAssignModal();
   loading.value = true;
   await axios

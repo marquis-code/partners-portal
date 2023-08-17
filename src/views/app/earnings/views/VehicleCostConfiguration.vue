@@ -248,10 +248,10 @@ const route = ref({
   route_code: '',
 })
 
-const init = async() => {
+const init = async () => {
   await getVehicleInformation();
 }
-const getVehicleInformation = async() => {
+const getVehicleInformation = async () => {
   try {
     const params = $route.params;
     // console.log(params);

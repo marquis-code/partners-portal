@@ -602,17 +602,14 @@ import {useRoute} from 'vue-router'
 import {axiosInstance as axios} from '@/plugins/axios';
 import {useToast} from 'vue-toast-notification';
 import router from '@/router';
+import {useFetchDrivers} from '@/composables/backend/drivers'
 // import { vue3Debounce } from 'vue-debounce'
 
 const toast = useToast()
 const store = useStore()
 const route = useRoute()
-const filters = ref({
-  status: 'active',
-  search: '',
-  pageNumber: 1,
-  pageSize: 10
-})
+const { loading, filters, fetchDrivers, tableData, totalRecords } = useFetchDrivers()
+
 const downloadLoader = ref(false)
 const debounce = ref(null) as Ref<any>
 const showInfoModal = ref(false)
@@ -621,9 +618,7 @@ const showSuccessModal = ref(false)
 const selectedDriverId = ref(null) as Ref<any>
 const driverToRemoveId = ref(null) as Ref<any>
 const showDropdown = ref(false)
-const loading = ref(false)
 const modalLoading = ref(false)
-const tableData = ref([]) as Ref<any[]>
 const tableRecords = ref(null) as Ref<any>
 const errorLoading = ref(false)
 const headers = [
@@ -633,7 +628,6 @@ const headers = [
   { label: 'Phone Number', key: 'phone' },
   { label: 'Actions', key: 'actions' }
 ]
-const totalRecords = ref(null) as Ref<any>
 const items = ref([]) as Ref<any[]>
 
 const partnerContext:any = computed(() => store.getters['auth/activeContext'])
@@ -653,16 +647,6 @@ const filteredDrivers = computed(() => {
   });
   return searchResult;
 })
-
-// created () {
-//   const query = this.$route.query
-//   if (query.status) this.setStatusFilter(query.status as string)
-//   if (query.searchTerm) this.filters.search = query.searchTerm as string
-//   if (Object.keys(query).length === 0) this.fetchDrivers();
-// },
-// props: {
-//   rowClicked: Function
-// },
 
 watch(() => filters.value.pageNumber, () => {
   fetchDrivers()
@@ -739,27 +723,14 @@ const downloadReport = () => {
       downloadLoader.value = false;
     });
 }
-// const addToQuery = (obj:any) => {
-//   const oldQuery = route.query
-//   const newQuery = { ...oldQuery, ...obj };
-//   router.push({ query: newQuery });
-// }
-// const removeQueryParam = (queryNames:string[]) => {
-//   const queries = route.query
-//   const query = { ...queries };
-//   for (let i = 0; i < queryNames.length; i++) {
-//     const el = queryNames[i];
-//     delete query[el];
-//   }
-//   router.push({ query });
-// }
+
 const changePage = (pageNumber: any) => {
   filters.value.pageNumber = pageNumber;
 }
 const showPageSize = (pageSize: any) => {
   filters.value.pageSize = pageSize;
 }
-const proceed = async() => {
+const proceed = async () => {
   modalLoading.value = true;
   await axios
     .delete(
@@ -789,20 +760,6 @@ const setStatusFilter = (value: string) => {
   fetchDrivers();
   addToQuery(route, router, {status: value})
 }
-const fetchDrivers = () => {
-  loading.value = true;
-  axios
-    .get(
-      `/v1/partners/${userSessionData.value.activeContext.partner.account_sid}/drivers?status=${filters.value.status}&page=${filters.value.pageNumber}&limit=${filters.value.pageSize}&search=${filters.value.search}`
-    )
-    .then((res) => {
-      tableData.value = (formatApiFormData(res.data.data) as any) || [];
-      totalRecords.value = res.data.metadata?.total;
-    })
-    .finally(() => {
-      loading.value = false;
-    });
-}
 const handleDriver = (eachDriver: any) => {
   showDropdown.value = !showDropdown.value;
   selectedDriverId.value = eachDriver.id;
@@ -813,30 +770,7 @@ const editDriver = () => {
     params: { driverId: selectedDriverId.value }
   });
 }
-const formatApiFormData = (apiFormData: Array<any>) => {
-  const newTableData: any = [];
-  apiFormData.forEach((eachDriver) => {
-    newTableData.push({
-      id: eachDriver.driver.id,
-      name: eachDriver.driver.fname + ' ' + eachDriver.driver.lname,
-      fname: eachDriver.driver.fname,
-      lname: eachDriver.driver.lname,
-      phone: eachDriver.driver.phone,
-      email: eachDriver.driver.email,
-      routeVehicles: eachDriver?.routeVehicles || null,
-      avatar: eachDriver.driver.avatar,
-      active: eachDriver.driver.active,
-      deleted_at: eachDriver.driver.deleted_at,
-      created_at: eachDriver.driver.created_at,
-      dob: eachDriver.driver.dob,
-      residential_address: eachDriver.driver.residential_address,
-      license_number: eachDriver.driver.license_number,
-      expiry_date: eachDriver.driver.expiry_date,
-      files: eachDriver.driver.files
-    });
-  });
-  return newTableData;
-}
+
 const removeDriver = (id: any) => {
   driverToRemoveId.value = id;
   handleShowInfoModal();
