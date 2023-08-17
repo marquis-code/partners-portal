@@ -453,10 +453,12 @@ import router from '@/router';
 import {axiosInstance as axios} from '@/plugins/axios';
 import {useToast} from 'vue-toast-notification';
 import { useRoute } from 'vue-router';
+import {useVehicles} from '@/composables/backend/vehicles'
 
 const route = useRoute()
 const toast = useToast()
 const store = useStore()
+const { loading, filters, tableData, totalRecords, fetchVehicles } = useVehicles()
 const headers = [
   { label: 'Brand', key: 'brand' },
   { label: 'Model', key: 'name' },
@@ -466,19 +468,10 @@ const headers = [
   { label: 'Driver', key: 'driver' },
   { label: 'Has Tracker', key: 'tracker' },
 ]
-const filters = ref({
-  status: 'active',
-  search: '',
-  pageNumber: 1,
-  pageSize: 10
-});
 const downloadLoader = ref(false);
 const debounce = ref(null) as Ref<any>
 const serverTotal = ref(null) as Ref<any>
 const search = ref('');
-const loading = ref(false);
-const tableData = ref([]) as Ref<any[]>
-const totalRecords = ref(null) as Ref<any>
 const errorLoading = ref(false);
 const items = ref([]) as Ref<any[]>
 
@@ -573,28 +566,6 @@ const setStatusFilter = (value: string) => {
   filters.value.status = value;
   addToQuery(route, router, {status: value})
   fetchVehicles();
-}
-const fetchVehicles = () => {
-  loading.value = true;
-  const params = {
-    related: 'driver',
-    status: filters.value.status,
-    metadata: true
-  };
-  axios
-    .get(
-      `/v1/partner/${partnerContext.value.partner?.id}/vehicles?page=${filters.value.pageNumber}&limit=${filters.value.pageSize}&search=${filters.value.search}`,
-      {
-        params
-      }
-    )
-    .then((res) => {
-      tableData.value = res.data.data || [];
-      totalRecords.value = res.data.metadata?.total;
-    })
-    .finally(() => {
-      loading.value = false;
-    });
 }
 
 checkForExistingQuery()

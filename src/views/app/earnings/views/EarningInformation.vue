@@ -453,7 +453,6 @@ import EarningsDataCard from '@/views/app/earnings/components/EarningsDataCard.v
 import AppTable from '@/components/AppTable.vue';
 import moment from 'moment';
 import { useStore } from 'vuex';
-import TableEarnings from '@/models/table-earnings-data';
 import TripHistory from '@/components/TripHistory.vue';
 import ItemNavigator from '@/components/ItemNavigator.vue';
 import spinner from '@/components/loader/spinner.vue'
@@ -463,17 +462,14 @@ import { useRoute } from 'vue-router';
 import router from '@/router';
 import {axiosInstance as axios} from '@/plugins/axios';
 import {useToast} from 'vue-toast-notification';
+import { useEarningInfo } from '@/composables/backend/earnings'
 
 const toast = useToast()
 const store = useStore()
 const route = useRoute()
+const { filter, isFetchingEarnings, listRevenues, tableData } = useEarningInfo()
 const searchText = ref('');
-const isFetchingEarnings = ref(true);
 const errorLoading = ref(false);
-const filter = ref({
-  sortBy: '',
-  range: { start: null as null|Date, end: null as null|Date }
-})
 const downloadLoader = ref(false);
 const headers = [
   { label: 'Trip Date', key: 'tripStartTime' },
@@ -485,7 +481,6 @@ const headers = [
   { label: 'Deductions', key: 'deductions' },
   { label: 'Net Income', key: 'netIncome' },
 ]
-const tableData = ref([]) as Ref<TableEarnings[]>
 const isFetchingUnsettledEarnings = ref(false);
 const isFetchingSettlements = ref(false);
 const unsettledEarnings = ref({
@@ -577,69 +572,6 @@ const downloadReport = () => {
 const init = async () => {
   await getEarningsSummary();
   await listRevenues();
-}
-const formatTableData = (data: Array<any>) => {
-  const result = [];
-  for (const e of data) {
-    const obj = {} as any;
-    const {
-      driver,
-      vehicle,
-      vehicleId,
-      pickup,
-      dropoff,
-      driverId,
-      routeCode,
-      createdAt
-    } = e.metadata;
-    const {
-      partnersRevenue,
-      id,
-      tripId,
-      routeId,
-      tripStartTime
-    } = e;
-
-    obj.id = id;
-    obj.tripId = tripId;
-    obj.tripStartTime = moment(tripStartTime).format('DD MMMM YYYY');
-    obj.createdAt = moment(createdAt).format('DD MMMM YYYY');
-    obj.routeCode = routeCode;
-    obj.route = {
-      pickup,
-      destination: dropoff,
-      routeId,
-    };
-    obj.driver = {
-      name: `${driver?.fname} ${driver?.lname}`,
-      id: driverId,
-    };
-    obj.deductions = e.totalDeductedAmount;
-    obj.netIncome = partnersRevenue;
-    obj.vehicle = {
-      name: vehicle?.name,
-      id: vehicleId,
-    }
-
-    result.push(obj);
-  }
-  return result;
-}
-const listRevenues = async () => {
-  try {
-    isFetchingEarnings.value = true;
-    const response = await axios.get(
-      `/cost-revenue/v1/partners/${partnerContext.value.partner.account_sid}/revenues?from=${filter.value.range.start ? formatApiCallDate(filter.value.range.start) : null}&to=${filter.value.range.end ? formatApiCallDate(filter.value.range.end) : null}`
-    );
-    if (response.status === 200) {
-      // sd
-      tableData.value = formatTableData(response.data?.result ?? []);
-    }
-  } catch (err) {
-    console.log(err);
-  } finally {
-    isFetchingEarnings.value = false;
-  }
 }
 const viewTableDetails = (e: { e: any }) => {
   router.push(`/earnings/vehicle-information/${e}`);

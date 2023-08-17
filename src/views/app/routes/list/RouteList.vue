@@ -348,7 +348,6 @@ import AppTable from '@/components/AppTable.vue';
 import { useStore } from 'vuex';
 import PageLayout from '@/components/layout/PageLayout.vue';
 import TripHistory from '@/components/TripHistory.vue';
-import { extractErrorMessage } from '@/utils/helper';
 import Papa from 'papaparse'
 import spinner from '@/components/loader/spinner.vue'
 import moment from 'moment';
@@ -357,6 +356,7 @@ import { useRoute } from 'vue-router';
 import router from '@/router';
 import {axiosInstance as axios} from '@/plugins/axios';
 import {useToast} from 'vue-toast-notification';
+import { useRoutes } from '@/composables/backend/routes'
 
 const toast = useToast()
 const store = useStore()
@@ -364,6 +364,8 @@ const route = useRoute()
 const props = defineProps<{
   routeId: number|string
 }>()
+const { loading, fetchPartnerRoutes, filters, tableData, totalRecords } = useRoutes()
+
 const headers = [
   { label: 'Route Code', key: 'route_code' },
   { label: 'Route', key: 'route' },
@@ -372,18 +374,10 @@ const headers = [
   { label: 'Vehicle Assigned', key: 'vehicle' },
   { label: 'Cost of Supply', key: 'cost' }
 ]
-const filters = ref({
-  pageNumber: 1,
-  pageSize: 10,
-  search: ''
-})
 const downloadLoader = ref(false);
 const result = ref([]) as Ref<any[]>
 const search = ref('');
-const loading = ref(false);
 const debounce = ref(null) as Ref<any>
-const tableData = ref([]) as Ref<any[]>
-const totalRecords = ref(null) as Ref<any>
 const errorLoading = ref(false);
 const items = ref([]) as Ref<any[]>
 const trips = ref([]) as Ref<any[]>
@@ -462,54 +456,6 @@ const changePage = (pageNumber: any) => {
 }
 const showPageSize = (pageSize: any) => {
   filters.value.pageSize = pageSize;
-}
-const fetchPartnerRoutes = async () => {
-  loading.value = true;
-  try {
-    const response = await axios.get(
-      `/v1/partners/${partnerContext.value.partner.id}/routes?page=${filters.value.pageNumber}&limit=${filters.value.pageSize}&search=${filters.value.search}`
-    );
-    tableData.value = structureRouteFromResponse(response.data.data);
-    totalRecords.value = response.data.metadata?.total;
-  } catch (error) {
-    const errorMessage = extractErrorMessage(
-      error,
-      null,
-      'Oops! An error occurred, please try again.'
-    );
-    toast.error(errorMessage);
-  } finally {
-    loading.value = false;
-  }
-}
-const structureRouteFromResponse = (routeList: any[]) => {
-  const newRoute: any[] = routeList.map((route) => {
-    return {
-      route_code: route.route.route_code,
-      route: route?.route,
-      destination: route?.route.destination,
-      start_time: route.route_itinerary.trip_time,
-      driver_assigned: route?.driver?.fname + ' ' + route?.driver?.lname,
-      driver_id: route?.driver?.id,
-      vehicle_id: route.vehicle.id,
-      plate_number: route?.vehicle?.registration_number,
-      vehicle_name: route?.vehicle?.name,
-      vehicle_brand: route?.vehicle?.name,
-      vehicle:
-        '' +
-        route.vehicle.seats +
-        ' seater - ' +
-        route.vehicle.brand +
-        ' ' +
-        route.vehicle.name +
-        ' ' +
-        route.vehicle.registration_number,
-      cost: route.cost_of_supply,
-      routeId: '' + route.id,
-      route_id: route.id
-    };
-  });
-  return newRoute;
 }
 
 const checkForExistingFilters = () => {
