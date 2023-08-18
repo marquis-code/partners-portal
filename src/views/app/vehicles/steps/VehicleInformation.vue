@@ -2,15 +2,9 @@
   <form class="space-y-3 lg:space-y-7">
     <template v-if="!loading">
       <section
-        class="
-          lg:flex
-          justify-between
-          space-y-3
-          lg:space-y-0 lg:space-x-10
-          items-center
-        "
+        class="items-center justify-between space-y-3 lg:flex lg:space-y-0 lg:space-x-10"
       >
-        <div class="space-y-2 w-full">
+        <div class="w-full space-y-2">
           <label class="text-xs font-medium text-grays-black-5"
             >Vehicle brand</label
           >
@@ -35,7 +29,7 @@
             This field is required
           </span>
         </div>
-        <div class="space-y-2 w-full">
+        <div class="w-full space-y-2">
           <label class="text-xs font-medium text-grays-black-5"
             >Vehicle Model</label
           >
@@ -64,31 +58,16 @@
         </div>
       </section>
       <section
-        class="
-          lg:flex
-          justify-between
-          space-y-3
-          lg:space-y-0 lg:space-x-10
-          items-center
-        "
+        class="items-center justify-between space-y-3 lg:flex lg:space-y-0 lg:space-x-10"
       >
-        <div class="space-y-2 w-full">
+        <div class="w-full space-y-2">
           <label class="text-xs font-medium text-grays-black-5"
             >Vehicle year</label
           >
           <select
             :disabled="fetchingModels"
             v-model="v$.form.year.$model"
-            class="
-              text-xs
-              border-none
-              outline-none
-              w-full
-              rounded-md
-              p-3
-              placeholder-gray-500 placeholder-opacity-25
-              ring-1 ring-gray-300
-            "
+            class="w-full p-3 text-xs placeholder-gray-500 placeholder-opacity-25 border-none rounded-md outline-none ring-1 ring-gray-300"
           >
             <option value="" disabled hidden>Select your vehicle year</option>
             <option
@@ -107,22 +86,13 @@
           </span>
         </div>
         <!-- Capacity list -->
-        <div class="space-y-2 w-full">
+        <div class="w-full space-y-2">
           <label class="text-xs font-medium text-grays-black-5"
             >Passenger capacity</label
           >
           <select
             v-model="v$.form.seats.$model"
-            class="
-              text-xs
-              border-none
-              outline-none
-              w-full
-              rounded-md
-              p-3
-              placeholder-gray-500 placeholder-opacity-25
-              ring-1 ring-gray-300
-            "
+            class="w-full p-3 text-xs placeholder-gray-500 placeholder-opacity-25 border-none rounded-md outline-none ring-1 ring-gray-300"
           >
             <option value="" disabled hidden>
               Select from available Capacity
@@ -143,8 +113,8 @@
           </span>
         </div>
       </section>
-      <section class="lg:flex justify-start lg:space-x-10 items-start">
-        <div class="space-y-2 w-full lg:w-6/12">
+      <section class="items-start justify-start lg:flex lg:space-x-10">
+        <div class="w-full space-y-2 lg:w-6/12">
           <label class="text-xs font-medium text-grays-black-5"
             >City of operation</label
           >
@@ -170,12 +140,12 @@
             This field is required
           </span>
         </div>
-        <div class="space-y-2 w-full lg:w-6/12 pt-5 lg:pt-0">
-          <label class="text-xs font-medium text-grays-black-5 flex flex-row">
+        <div class="w-full pt-5 space-y-2 lg:w-6/12 lg:pt-0">
+          <label class="flex flex-row text-xs font-medium text-grays-black-5">
             Plate Number
-            <span class="tooltip ml-3">
+            <span class="ml-3 tooltip">
               <img src="@/assets/icons/info.svg" class="boarder-2" />
-              <span class="tooltiptext shadow-lg text-left"
+              <span class="text-left shadow-lg tooltiptext"
                 >example: <br />
                 ABC-123XY
               </span>
@@ -188,16 +158,7 @@
             maxlength="9"
             v-model="v$.form.registration_number.$model"
             @keyup="uppercase($event)"
-            class="
-              text-xs
-              border-none
-              outline-none
-              w-full
-              rounded-md
-              p-3
-              placeholder-gray-500 placeholder-opacity-25
-              ring-1 ring-gray-300
-            "
+            class="w-full p-3 text-xs placeholder-gray-500 placeholder-opacity-25 border-none rounded-md outline-none ring-1 ring-gray-300"
           />
           <span
             class="text-sm font-light text-red-500"
@@ -216,20 +177,11 @@
         </div>
       </section>
 
-      <div class="flex justify-end items-end">
+      <div class="flex items-end justify-end">
         <button
           type="button"
           @click.prevent="saveForm()"
-          class="
-            rounded-md
-            w-32
-            flex
-            justify-center
-            items-center
-            p-4
-            px-5
-            text-sm
-          "
+          class="flex items-center justify-center w-32 p-4 px-5 text-sm rounded-md "
           :disabled="v$.form.$invalid || processing"
           :class="
             v$.form.$invalid || processing
@@ -402,7 +354,8 @@ const saveForm = async () => {
       seats: form.value.seats,
       city_ids: form.value.city_ids,
       registration_number: form.value.registration_number,
-      partner_id: form.value.partner_id
+      partner_id: form.value.partner_id,
+      inventory_type: 'regular'
     };
     const response = await axios.post('/v1/vehicles', payload);
     await store.dispatch('vehicle/setVehicleFormData', response.data);
