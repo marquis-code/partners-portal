@@ -373,7 +373,7 @@ const saveForm = async () => {
 }
 
 const getVehiclesForBrand = async (brandId: any) => {
-  if (vehicleModelMap.has(brandId)) {
+  if (vehicleModelMap?.has(brandId)) {
     vehicleModels.value = vehicleModelMap.get(brandId);
   } else {
     try {
