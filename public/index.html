@@ -1,33 +1,44 @@
 <!DOCTYPE html>
 <html lang="">
-  <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-    <link rel="icon" href="<%= BASE_URL %>favicon.ico" />
-    <link
-      href="https://fonts.googleapis.com/icon?family=Material+Icons"
-      rel="stylesheet"
-    />
-    <title><%= htmlWebpackPlugin.options.title %></title>
-    <style>
-      .zsiq_theme1 .zsiq_flt_rel {
-        margin: -30px;
-        margin-bottom: 50px;
-      }
-    </style>
-  </head>
-  <body>
-    <noscript>
-      <strong
-        >We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work
+
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>
+    <%= htmlWebpackPlugin.options.title %>
+  </title>
+  <link rel="icon" href="<%= BASE_URL %>favicon.ico" />
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-1VJ3D1JFKG"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+    gtag('config', 'G-1VJ3D1JFKG');
+  </script>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+
+  <style>
+    .zsiq_theme1 .zsiq_flt_rel {
+      margin: -30px;
+      margin-bottom: 50px;
+    }
+  </style>
+</head>
+
+<body>
+  <noscript>
+    <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work
         properly without JavaScript enabled. Please enable it to
-        continue.</strong
-      >
-    </noscript>
-    <div id="sh-vp-portal"></div>
-    <script src="https://unpkg.com/vue3-google-map"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBAfieAIDL1vGbkQd74otnW2t0jkDjiPW0&libraries=places"></script>
-    <!-- built files will be auto injected -->
-  </body>
+        continue.</strong>
+  </noscript>
+  <div id="sh-vp-portal"></div>
+  <script src="https://unpkg.com/vue3-google-map"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBAfieAIDL1vGbkQd74otnW2t0jkDjiPW0&libraries=places"></script>
+  <!-- built files will be auto injected -->
+</body>
+
 </html>
