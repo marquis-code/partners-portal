@@ -31,7 +31,8 @@ module.exports = {
       }
     ],
     camelcase: "off",
-    'no-tabs': 'off'
+    'no-tabs': 'off',
+    "new-cap": ["error", { capIsNew: false }]
   },
   overrides: [
     {
