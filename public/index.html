@@ -12,6 +12,17 @@
   <link rel="icon" href="<%= BASE_URL %>favicon.ico" />
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-1VJ3D1JFKG"></script>
+  <!-- Twitter conversion tracking base code -->
+  <script>
+    !function (e, t, n, s, u, a) {
+      e.twq || (s = e.twq = function () {
+        s.exe ? s.exe.apply(s, arguments) : s.queue.push(arguments);
+      }, s.version = '1.1', s.queue = [], u = t.createElement(n), u.async = !0, u.src = 'https://static.ads-twitter.com/uwt.js',
+        a = t.getElementsByTagName(n)[0], a.parentNode.insertBefore(u, a))
+    }(window, document, 'script');
+    twq('config', 'o7u3i');
+  </script>
+  <!-- End Twitter conversion tracking base code -->
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag() { dataLayer.push(arguments); }
@@ -19,6 +30,13 @@
 
     gtag('config', 'G-1VJ3D1JFKG');
   </script>
+  <!-- Twitter conversion tracking event code -->
+  <script type="text/javascript">
+    // Insert Twitter Event ID
+    twq('event', 'tw-o7u3i-oggmi', {
+    });
+  </script>
+  <!-- End Twitter conversion tracking event code -->
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
 
   <style>
