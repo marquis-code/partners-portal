@@ -27,52 +27,48 @@
       </template>
       <div>
         <h1 class="font-bold text-[1.2rem]">Overview</h1>
-        <div class="
-        w-[100%]
-        mt-[20px]
-        grid gap-4 grid-cols-3 grid-rows-1
-        ">
+        <div class=" w-[100%] mt-[20px] grid grid-cols-1 md:grid-cols-2 gap-4 lg:grid-cols-3">
         <!-- All time earnings -->
-        <earnings-data-card
-          :is-routeable="false"
-          :bottom-desc="'Last Updated:'"
-          :bottom-desc-value="unsettledEarnings.lastUpdated"
-          :desc="'Earnings'"
-          :formater="Intl.NumberFormat('en-Us').format"
-          :currency="'₦'"
-          :value="unsettledEarnings.value"
-          :is-loading="isFetchingUnsettledEarnings"
-        >
-        <template #iconPlaceHolder>
-          <img src="@/assets/icons/earn-money.svg"/>
-        </template>
-      </earnings-data-card>
-      <!-- Settlement account -->
-      <earnings-data-card
-          :is-routeable="true"
-          :bottom-desc="settlement?.value ? 'Change account' : 'Add A Settlement Account'"
-          :link="'/settings/accounts'"
-          :desc=" settlement?.value ? `Settlement account (${settlement.accountName})` : '---'"
-          :value="(settlement.value as any)"
-          :is-loading="isFetchingUnsettledEarnings"
-        >
-        <template #iconPlaceHolder>
-          <img src="@/assets/icons/bank.svg"/>
-        </template>
-      </earnings-data-card>
-        <!-- Next payout -->
-        <earnings-data-card
-          :is-routeable="true"
-          :link="'/earnings/past-payout'"
-          :desc="nextPayDate.due"
-          :value="(nextPayDate.value as any)"
-          :is-loading="isFetchingUnsettledEarnings"
-          :bottom-desc="'View past payouts'"
-        >
-        <template #iconPlaceHolder>
-        <p class="text-[13px] text-[#6E717C]">Next Payout Date</p>
-        </template>
-      </earnings-data-card>
+          <earnings-data-card
+              :is-routeable="false"
+              :bottom-desc="'Last Updated:'"
+              :bottom-desc-value="unsettledEarnings.lastUpdated"
+              :desc="'Earnings'"
+              :formater="Intl.NumberFormat('en-Us').format"
+              :currency="'₦'"
+              :value="unsettledEarnings.value"
+              :is-loading="isFetchingUnsettledEarnings"
+            >
+            <template #iconPlaceHolder>
+              <img src="@/assets/icons/earn-money.svg"/>
+            </template>
+          </earnings-data-card>
+          <!-- Settlement account -->
+          <earnings-data-card
+              :is-routeable="true"
+              :bottom-desc="settlement?.value ? 'Change account' : 'Add A Settlement Account'"
+              :link="'/settings/accounts'"
+              :desc=" settlement?.value ? `Settlement account (${settlement.accountName})` : '---'"
+              :value="(settlement.value as any)"
+              :is-loading="isFetchingUnsettledEarnings"
+            >
+            <template #iconPlaceHolder>
+              <img src="@/assets/icons/bank.svg"/>
+            </template>
+          </earnings-data-card>
+            <!-- Next payout -->
+          <earnings-data-card
+              :is-routeable="true"
+              :link="'/earnings/past-payout'"
+              :desc="nextPayDate.due"
+              :value="(nextPayDate.value as any)"
+              :is-loading="isFetchingUnsettledEarnings"
+              :bottom-desc="'View past payouts'"
+            >
+            <template #iconPlaceHolder>
+            <p class="text-[13px] text-[#6E717C]">Next Payout Date</p>
+            </template>
+          </earnings-data-card>
         </div>
         <div class="w-[100%] h-[auto] bg-[#fff] mt-[2rem] p-[10px] relative rounded-tr-lg rounded-tl-lg">
           <div class="w-[100%] flex flex-col gap-4 md:flex-row justify-end">
