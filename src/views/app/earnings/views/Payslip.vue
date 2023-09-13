@@ -27,11 +27,13 @@
     <div class="bg-white rounded-lg border flex flex-col">
       <div class="border-b p-2 flex items-center justify-between">
         <div class="flex items-center gap-2">
-          <select :disabled="loading" v-model="selectedYear" class="w-fit p-2 border rounded-lg">
-            <option v-for="n in year" :key="n" :value="n">{{ n }}</option>
-          </select>
           <select :disabled="loading" v-model="selectedMonth" class="w-fit p-2 border rounded-lg">
             <option v-for="n,index in months" :key="n" :value="index+1">{{ n }}</option>
+          </select>
+          <select :disabled="loading" v-model="selectedYear" class="w-fit p-2 border rounded-lg">
+            <template v-for="n in 10" :key="n">
+              <option v-if="n + 2020 <= new Date().getFullYear()" :value="n + 2020">{{ n + 2020 }}</option>
+            </template>
           </select>
         </div>
         <button :disabled="!selectedMonth || !selectedYear || loading" class="btn !min-w-[100px]" @click="fetchPayslip">
@@ -39,13 +41,13 @@
           <spinner v-else />
         </button>
       </div>
-      <div class="p-2 flex items-center gap-2">
+      <!-- <div class="p-2 flex items-center gap-2">
         <img src="@/assets/icons/search_gray.svg" alt="">
-        <input type="text" placeholder="Search" class="outline-none border-0 p-2">
-      </div>
+        <input type="text" placeholder="Search" v-model="search" class="outline-none border-0 p-2">
+      </div> -->
     </div>
-    <div class="flex flex-col gap-4" v-if="generatedPdfs.length">
-      <div v-for="n in generatedPdfs" :key="n.name" @click="onPreviewPdf(n)"
+    <div class="flex flex-col gap-4" v-if="filteredPdf.length">
+      <div v-for="n in filteredPdf" :key="n.name" @click="onPreviewPdf(n)"
         class="p-3 flex items-end justify-between bg-white rounded-lg"
         :class=" (activePdf && n.pdf == activePdf!.pdf) ? 'border border-[#20E682]' : 'border'"
       >
@@ -59,9 +61,10 @@
         <p class="text-sm text-[#8D918F]">Format: <span class="font-medium text-[#101211]">PDF</span></p>
       </div>
     </div>
+    <p v-if="search.length && !filteredPdf.length" class="text-sm text-center text-[#09090F] font-medium">No result found</p>
   </div>
 
-  <div class="flex-grow max-w-[700px] bg-white rounded-lg border flex flex-col">
+  <div class="flex-grow max-w-[1000px] bg-white rounded-lg border flex flex-col">
     <div class="border-b p-3 flex items-center justify-between gap-4">
       <p class="text-sm text-[#09090F]">Pay slip generated for: <span v-if="activePdf" class="font-medium">{{ activePdf!.name || '' }}</span></p>
       <button class="btn shrink-0 flex items-center gap-2" @click="saveFile" :disabled="!activePdf">
@@ -78,8 +81,11 @@
         </div>
       </div>
     </div>
-    <div v-else class="h-[400px] max-h-[450px] overflow-auto">
-      <vue-pdf-embed :source="previewPdf" />
+    <div v-else class="w-full flex flex-col gap-2 ">
+      <p v-if="activePdf" class="text-sm text-right mr-4 mt-2">{{ activePdf.pages }} page(s)</p>
+      <div  class="overflow-auto h-[400px] max-h-[450px] px-4">
+        <vue-pdf-embed :source="previewPdf" />
+      </div>
     </div>
   </div>
 </div>
@@ -87,7 +93,7 @@
 </main>
 </template>
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref} from 'vue'
 import PageLayout from '@/components/layout/PageLayout.vue';
 import PageActionHeader from '@/components/PageActionHeader.vue'
 import router from '@/router';
@@ -97,7 +103,8 @@ import VuePdfEmbed from 'vue-pdf-embed'
 import { usePayslip } from '../composables/payslip';
 import spinner from '@/components/loader/spinner.vue'
 
-const { loading, fetchPayslip, selectedMonth, selectedYear, previewPdf, months, year, generatedPdfs, onPreviewPdf, activePdf, saveFile } = usePayslip()
+const { loading, fetchPayslip, selectedMonth, selectedYear, previewPdf, months, generatedPdfs, onPreviewPdf, activePdf, saveFile } = usePayslip()
+const search = ref('')
 
 const gotoEarning = () => {
   router.push('/earnings')
@@ -106,4 +113,29 @@ const gotoConfig = () => {
   router.push('/earnings/cost-configuration');
 }
 
+const filteredPdf = computed(() => {
+  return generatedPdfs.value.filter(el => el.name.toLowerCase().includes(search.value.toLowerCase()))
+})
+generatedPdfs.value = []
+activePdf.value = null
 </script>
+
+<style scoped>
+::-webkit-scrollbar {
+	width: 6px;
+	height: 6px;
+}
+
+::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+	background: #6E717C;
+	border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: #8A9099;
+}
+</style>
