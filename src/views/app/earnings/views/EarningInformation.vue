@@ -27,11 +27,7 @@
       </template>
       <div>
         <h1 class="font-bold text-[1.2rem]">Overview</h1>
-        <div class="
-        w-[100%]
-        mt-[20px]
-        grid gap-4 grid-cols-3 grid-rows-1
-        ">
+        <div class=" w-[100%] mt-[20px] grid grid-cols-1 md:grid-cols-2 gap-4 lg:grid-cols-3 ">
         <!-- All time earnings -->
         <earnings-data-card
           :is-routeable="false"
