@@ -118,6 +118,7 @@ const filteredPdf = computed(() => {
 })
 generatedPdfs.value = []
 activePdf.value = null
+previewPdf.value = null
 </script>
 
 <style scoped>

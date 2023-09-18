@@ -1,5 +1,5 @@
 <template>
-	<div id="payslip-pdf-content" class="flex flex-col gap-6 bg-white p-4">
+	<div id="payslip-pdf-content" style="width: 800px; height: 1300px;" class="flex flex-col gap-6 bg-white p-4">
 		<div class="flex items-center justify-between py-3 border-b">
 			<img src="@/assets/logo.png" class="max-w-[150px]" alt="">
 			<p class="text-sm text-[#667085]">Report for <span class="text-[#313533] font-medium">{{ `${months[Number(selectedMonth) - 1]}, ${selectedYear}` }}</span></p>
@@ -46,7 +46,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(n, i) in firstPageData" :key="i" class="text-xs text-[#09090F]" :class="i < firstPageData.length-1 ? 'border-b-2' : ''">
+            <tr v-for="(n, i) in firstPageData" :key="i" class="text-xs text-[#09090F] h-[100px]" :class="i < firstPageData.length-1 ? 'border-b-2' : ''">
               <td>{{ i+1 }}</td>
               <td>{{ moment(n.tripStartTime).format('Do MMM, YYYY') }}</td>
               <td>
@@ -55,13 +55,13 @@
                   <p>{{ n.metadata.vehicle.brand }} {{ n.metadata.vehicle.name }} ({{n.metadata.vehicle.registration_number  }})</p>
                 </div>
               </td>
-              <td>{{ n.metadata.pickup }}</td>
-              <td>{{ n.metadata.dropoff }}</td>
+              <td>{{ n.metadata.pickup.substring(0, 15) }}...</td>
+              <td>{{ n.metadata.dropoff.substring(0, 15) }}...</td>
               <td>{{ n.metadata.routeCode }}</td>
               <td>₦{{ n.finalPartnersRevenue }}</td>
               <td class="text-[#E13D45]">-₦{{ n.totalDeductedAmount }}</td>
               <td>{{ moment(n.tripStartTime).format('h:mm A') || 'N/A' }}</td>
-              <td>{{ moment(n.createdAt).format('Do MMM, YYYY') || 'N/A' }}</td>
+              <!-- <td>{{ moment(n.createdAt).format('Do MMM, YYYY') || 'N/A' }}</td> -->
             </tr>
           </tbody>
         </table>
@@ -79,16 +79,15 @@ import { useStore } from 'vuex'
 
 const store = useStore()
 const tableHeader = [
-  { text: 'S/N', width: '3' },
+  { text: 'S/N', width: '5' },
   { text: 'Trip date', width: '10' },
-  { text: 'Driver & Vehicle', width: '13' },
-  { text: 'Pick up', width: '13' },
-  { text: 'Drop off', width: '13' },
+  { text: 'Driver & Vehicle', width: '15' },
+  { text: 'Pick up', width: '15' },
+  { text: 'Drop off', width: '15' },
   { text: 'Route Code', width: '10' },
   { text: 'Amount earned', width: '10' },
   { text: 'Deduction', width: '10' },
-  { text: 'Start time', width: '8' },
-  { text: 'Created date', width: '10' }
+  { text: 'Start time', width: '10' },
 ]
 const { firstPageData, netRevenue, totalDeductions, totalRevenue, selectedMonth, selectedYear, months } = usePayslip()
 const userSessionData = computed(() => store.getters['auth/userSessionData'])
