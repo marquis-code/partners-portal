@@ -13,7 +13,7 @@
 			<p class="uppercase text-sm text-[#6E717C] font-medium">Performance report</p>
 			<div class="grid grid-cols-3 gap-4">
 				<div class="border rounded-lg p-4 pt-0 flex flex-col gap-2">
-					<p class="text-[#667085] text-lg font-medium">Total Revenue made</p>
+					<p class="text-[#667085] text-lg font-medium">Total Revenue</p>
 					<h1 class="text-4xl font-bold mb-3 text-[#0DAC5C]">{{ formatNaira(totalRevenue) }}</h1>
 				</div>
 				<div class="border rounded-lg p-4 pt-0 flex flex-col gap-2">
@@ -21,7 +21,7 @@
 					<h1 class="text-4xl font-bold mb-3 text-[#E13D45]">-{{ formatNaira(totalDeductions) }}</h1>
 				</div>
 				<div class="border rounded-lg p-4 pt-0 flex flex-col gap-2">
-					<p class="text-[#667085] text-lg font-medium">Total Net Revenue</p>
+					<p class="text-[#667085] text-lg font-medium">Net Revenue</p>
 					<h1 class="text-4xl font-bold mb-3 text-[#0DAC5C]">{{ formatNaira(netRevenue) }}</h1>
 				</div>
 			</div>
@@ -33,7 +33,7 @@
 		</div>
 
 		<div class="flex flex-col gap-4">
-			<p class="text-sm text-[#6E717C] font-medium">TRIPS THAT EARNED YOUR ACCRUED EARNINGS FOR THIS MONTH</p>
+			<p class="text-sm text-[#6E717C] font-medium capitalize">TRIPS THAT MAKES US THIS EVENING</p>
 			<div class="border-2  border-[#EAECF0] overflow-hidden rounded-lg">
         <table>
           <thead>

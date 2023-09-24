@@ -22,7 +22,7 @@
 </template>
 <pdfContent class="fixed top-[-1000000px] z-[-999]"/>
 <pdfOtherPages  class="fixed top-[-1000000px] z-[-999]" />
-<div class="flex flex-col lg:flex-row gap-6">
+<div class="flex flex-col lg:flex-row lg:items-start gap-6">
   <div class="flex flex-col gap-6 w-full max-w-[400px]">
     <div class="bg-white rounded-lg border flex flex-col">
       <div class="border-b p-2 flex items-center justify-between">
