@@ -30,9 +30,25 @@ const generatedPdfs = ref([]) as Ref<pdfType[]>
 const activePdf = ref() as Ref<pdfType|null>
 const generatedFileName = ref('')
 
-const convertPxToPt = (num:number) => {
-  if (num < 400) return num * 0.75
-  return (num * 0.75) - 100
+// const convertPxToPt = (num:number) => {
+//   if (num < 400) return num * 0.75
+//   return (num * 0.75) - 100
+// }
+
+const addOrUpdateGeneratedSlip = (newObject:pdfType) => {
+  let matchFound = false;
+
+  for (let i = 0; i < generatedPdfs.value.length; i++) {
+    if (generatedPdfs.value[i].name === newObject.name) {
+      generatedPdfs.value[i] = newObject;
+      matchFound = true;
+      break;
+    }
+  }
+
+  if (!matchFound) {
+    generatedPdfs.value.push(newObject);
+  }
 }
 
 const generatePreview = async (fileName:string, index:number) => {
@@ -73,7 +89,8 @@ const generatePreview = async (fileName:string, index:number) => {
       pdf.addImage(imageData, 'PNG', 40, 40, 500, 700);
     }
   }
-  generatedPdfs.value.push({name: fileName, pdf: pdf, pages: num_of_other_pages.value + 1})
+  // generatedPdfs.value.push({name: fileName, pdf: pdf, pages: num_of_other_pages.value + 1})
+  addOrUpdateGeneratedSlip({name: fileName, pdf: pdf, pages: num_of_other_pages.value + 1})
   loading.value = false
   if (index < slips.value.length - 1) {
     sortSlips(index + 1)
@@ -104,7 +121,6 @@ export const usePayslip = () => {
       const res = await axios.get(
         `/cost-revenue/v1/partners/${partnerContext.value.partner.account_sid}/payslips/${selectedYear.value}/${selectedMonth.value}?page=1&perPage=10`
       );
-      console.log(res)
       if (res?.data[0]?.revenues?.length) {
         slips.value = res.data
         sortSlips()
