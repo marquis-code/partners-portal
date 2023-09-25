@@ -33,7 +33,7 @@
 		</div>
 
 		<div class="flex flex-col gap-4">
-			<p class="text-sm text-[#6E717C] font-medium capitalize">TRIPS THAT MAKES US THIS EVENING</p>
+			<p class="text-sm text-[#6E717C] font-medium capitalize">TRIPS THAT MAKES US THIS EARNINGS</p>
 			<div class="border-2  border-[#EAECF0] overflow-hidden rounded-lg">
         <table>
           <thead>
