@@ -2,7 +2,7 @@
 	<div id="payslip-pdf-content" style="width: 800px; height: 1300px;" class="flex flex-col gap-6 bg-white p-4">
 		<div class="flex items-center justify-between py-3 border-b">
 			<img src="@/assets/logo.png" class="max-w-[150px]" alt="">
-			<p class="text-sm text-[#667085]">Report for <span class="text-[#313533] font-medium">{{ `${months[Number(selectedMonth) - 1]}, ${selectedYear}` }}</span></p>
+			<p class="text-sm text-[#667085]">Payslip for <span class="text-[#313533] font-medium">{{ `${months[Number(selectedMonth) - 1]}, ${selectedYear}` }}</span></p>
 		</div>
 		<div class="flex flex-col gap-2">
 			<h2 class="text-2xl text-[#101828] font-bold">{{ userSessionData?.user?.fname }} {{ userSessionData?.user?.lname}}</h2>
@@ -10,7 +10,7 @@
 		</div>
 
 		<div v-if="firstPageData.length" class="flex flex-col gap-4">
-			<p class="uppercase text-sm text-[#6E717C] font-medium">Performance report</p>
+			<p class="uppercase text-sm text-[#6E717C] font-medium">PAYSLIP BREAKDOWN</p>
 			<div class="grid grid-cols-3 gap-4">
 				<div class="border rounded-lg p-4 pt-0 flex flex-col gap-2">
 					<p class="text-[#667085] text-lg font-medium">Total Revenue</p>

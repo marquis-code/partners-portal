@@ -558,6 +558,8 @@ import router from '@/router'
 import {axiosInstance as axios} from '@/plugins/axios';
 import {useToast} from 'vue-toast-notification';
 import {useTrips} from '@/composables/backend/trips'
+import Swal from 'sweetalert2'
+import 'sweetalert2/src/sweetalert2.scss'
 
 const toast = useToast()
 const route = useRoute()
@@ -651,7 +653,7 @@ const downloadReport = () => {
       axios.get(
         `/v1/partners/${partnerContext.value.partner.id}/${filters.value.status}?metadata=true&page=${filters.value.pageNumber}&limit=${total}&search=${filters.value.search}&from=${filters.value.range.start ? formatApiCallDate(filters.value.range.start) : null}&to=${filters.value.range.end ? formatApiCallDate(filters.value.range.end) : null}`
       ).then((res) => {
-        if (res.data.data) {
+        if (res.data.data.length) {
           const x = res.data.data
           // console.log(x)
           const newArr = []
@@ -674,7 +676,13 @@ const downloadReport = () => {
           const csv = Papa.unparse(newArr);
           const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
           const url = URL.createObjectURL(blob);
-          downloadFile(url, 'downloaded-trips-report')
+          const fileName = ref(`${filters.value.status}-report`)
+          if (filters.value.range.start && filters.value.range.end) {
+            fileName.value = `${fileName.value}-for-${formatApiCallDate(filters.value.range.start)}-to-${formatApiCallDate(filters.value.range.end)}`
+          }
+          downloadFile(url, fileName.value)
+        } else {
+          Swal.fire({ title: 'Error!', text: 'No data to download', icon: 'error', confirmButtonColor: "#000000"})
         }
       })
     })
