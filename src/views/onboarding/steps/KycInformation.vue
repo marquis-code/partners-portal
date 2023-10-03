@@ -144,19 +144,14 @@
       <section class="flex justify-start flex-col space-y-5 items-start">
         <div class="space-y-2 w-full">
           <label class="text-xs font-medium text-grays-black-5">Address</label>
-          <input
+          <!-- <input
             v-model="v$.addressForm.document.full_address.$model"
-            class="
-              text-xs
-              border-none
-              outline-none
-              w-full
-              rounded-md
-              p-3
-              placeholder-gray-500 placeholder-opacity-25
-              ring-1 ring-gray-300
-            "
+            class=" text-xs border-none outline-none w-full rounded-md p-3 placeholder-gray-500 placeholder-opacity-25 ring-1 ring-gray-300"
             placeholder="Enter your address"
+          /> -->
+          <ordinaryAutoComplete
+            :inputValue="v$.addressForm.document.full_address.$model"
+            @autoCompleteAddress="(val:string) => v$.addressForm.document.full_address.$model = val"
           />
           <span
             class="text-sm font-light text-red-500"
@@ -168,6 +163,7 @@
             Please provide a valid address
           </span>
         </div>
+
         <div class="space-y-2 w-full relative">
           <label class="text-xs font-medium text-grays-black-5"
             >Upload document (Electricity bill, Waste bill, water bill
@@ -550,6 +546,7 @@ import router from '@/router';
 import {axiosInstance as axios} from '@/plugins/axios';
 import {useToast} from 'vue-toast-notification';
 import { useRoute } from 'vue-router';
+import ordinaryAutoComplete from '@/components/core/ordinaryAutoComplete.vue'
 
 const route = useRoute()
 const toast = useToast()

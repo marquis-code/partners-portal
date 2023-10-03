@@ -78,21 +78,17 @@
         <label class="text-xs font-medium text-grays-black-5"
           >Company address</label
         >
-        <input
+        <!-- <input
           type="text"
           v-model="v$.form.company_address.$model"
-          class="
-            text-xs
-            border-none
-            outline-none
-            w-full
-            rounded-md
-            p-3
-            placeholder-gray-500 placeholder-opacity-25
-            ring-1 ring-gray-300
-          "
+          class="text-xs border-none  outline-none w-full rounded-md p-3placeholder-gray-500 placeholder-opacity-25 ring-1 ring-gray-300"
           placeholder="Enter your work address"
-        />
+        /> -->
+        <ordinaryAutoComplete
+            placeHolder="Enter your work addresss"
+            :inputValue="v$.form.company_address.$model"
+            @autoCompleteAddress="(val:string) => v$.form.company_address.$model = val"
+          />
         <span
           class="text-sm font-light text-red-500"
           v-if="
@@ -466,6 +462,7 @@ import router from '@/router';
 import {axiosInstance as axios} from '@/plugins/axios';
 import {useToast} from 'vue-toast-notification';
 import { useRoute } from 'vue-router';
+import ordinaryAutoComplete from '@/components/core/ordinaryAutoComplete.vue'
 
 const emit = defineEmits(['companySignUpSuccessful'])
 const route = useRoute()

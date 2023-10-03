@@ -34,54 +34,6 @@
   </div>
 </template>
 
-<!-- <script lang="ts">
-import { defineComponent } from "vue";
-import { mapGetters } from "vuex";
-
-export default defineComponent({
-  name: "PageLayout",
-  props: {
-    pageTitle: String,
-    hasTabs: {
-      type: Boolean,
-      default: false,
-    },
-    hasBreadCrumbs: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  computed: {
-    ...mapGetters({
-      userSessionData: 'auth/userSessionData',
-    })
-  },
-  data () {
-    return { companyName: '' }
-  },
-  created () {
-    this.setCompany()
-  },
-  methods: {
-    setCompany() {
-      this.companyName = this.userSessionData.activeContext.partner.company_name.slice(0, 15)
-    },
-    async logout() {
-      // TODO: block UI with overlay while logout api is called
-      try {
-        window.$zoho.salesiq.reset();
-        await this.$axios.delete("/logout");
-      } catch (e) {
-        console.info("An error occurred while logging out");
-      } finally {
-        await this.$store.dispatch("auth/clearSessionData");
-        await this.$router.push("/login");
-      }
-    },
-  },
-});
-</script> -->
-
 <script setup lang="ts">
 import { ref, defineProps, withDefaults, computed } from "vue";
 import { useStore } from "vuex";
@@ -105,7 +57,12 @@ withDefaults(defineProps<Props>(), {
 
 const userSessionData = computed(() => store.getters['auth/userSessionData'])
 const setCompany = () => {
-  companyName.value = userSessionData.value.activeContext.partner.company_name.slice(0, 15)
+  const x = userSessionData.value.activeContext.partner.company_name
+  if (x.length > 15) {
+    companyName.value = `${x.slice(0, 15)}...`
+  } else {
+    companyName.value = x
+  }
 }
 
 const logout = async () => {

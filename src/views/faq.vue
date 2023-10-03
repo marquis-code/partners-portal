@@ -31,7 +31,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import router from '@/router'
 const items = ref([
   {
@@ -86,4 +86,8 @@ const toggleAccordion = (index: number) => {
 const goBack = () => {
   router.go(-1);
 }
+
+onMounted(() => {
+  toggleAccordion(0)
+})
 </script>
