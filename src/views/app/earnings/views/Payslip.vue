@@ -59,7 +59,7 @@
   <div v-else class="w-full flex flex-col gap-4">
     <div class="flex flex-col gap-2">
       <div class="bg-white p-3 flex items-center justify-between border-b">
-        <p class="text-xs text-[#6E717C] font-medium">PERFORMANCE REPORT</p>
+        <p class="text-xs text-[#6E717C] font-medium uppercase">Payslip for {{ generatedMonth }}, {{ generatedYear }}</p>
         <button :disabled="downloading" class="btn shrink-0" @click="printPayslip">
           <span v-if="!downloading" class="flex items-center gap-2 shrink-0">
             <img src="@/assets/icons/download_white.svg" alt="">
@@ -143,7 +143,7 @@
 </main>
 </template>
 <script setup lang="ts">
-import { onMounted} from 'vue'
+import { onMounted, watch} from 'vue'
 import PageLayout from '@/components/layout/PageLayout.vue';
 import PageActionHeader from '@/components/PageActionHeader.vue'
 import router from '@/router';
@@ -153,217 +153,18 @@ import { usePayslip } from '../composables/payslip';
 import spinner from '@/components/loader/spinner.vue'
 import DataTable from '@/components/core/dataTable.vue'
 import moment from 'moment'
-import { formatNaira } from '@/composables/utils';
+import { formatNaira, addToQuery } from '@/composables/utils';
+import { useRoute } from 'vue-router'
 
-const { loading, fetchPayslip, selectedMonth, selectedYear, months, paymentBreakdown, totalDeductions, totalRevenue, netRevenue, revenues, downloading, printPayslip, clearPaySlip } = usePayslip()
+const { loading, fetchPayslip, selectedMonth, selectedYear, months, paymentBreakdown, totalDeductions, totalRevenue, netRevenue, revenues, downloading, printPayslip, clearPaySlip, generatedMonth, generatedYear } = usePayslip()
 
+const route = useRoute()
 const gotoEarning = () => {
   router.push('/earnings')
 }
 const gotoConfig = () => {
   router.push('/earnings/cost-configuration');
 }
-
-// const arr = [
-//   {
-//     trip_date: 'date',
-//     driver: 'ismail',
-//     pickup: 'pickup',
-//     dropoff: 'dropoff',
-//     route_code: '9889',
-//     earning: '2000',
-//     deduction: '400',
-//     start_time: '8:00 am',
-//     payment_date: '24th May, 2018'
-//   },
-//   {
-//     trip_date: 'date',
-//     driver: 'ismail',
-//     pickup: 'pickup',
-//     dropoff: 'dropoff',
-//     route_code: '9889',
-//     earning: '2000',
-//     deduction: '400',
-//     start_time: '8:00 am',
-//     payment_date: '24th May, 2018'
-//   },
-//   {
-//     trip_date: 'date',
-//     driver: 'ismail',
-//     pickup: 'pickup',
-//     dropoff: 'dropoff',
-//     route_code: '9889',
-//     earning: '2000',
-//     deduction: '400',
-//     start_time: '8:00 am',
-//     payment_date: '24th May, 2018'
-//   },
-//   {
-//     trip_date: 'date',
-//     driver: 'ismail',
-//     pickup: 'pickup',
-//     dropoff: 'dropoff',
-//     route_code: '9889',
-//     earning: '2000',
-//     deduction: '400',
-//     start_time: '8:00 am',
-//     payment_date: '24th May, 2018'
-//   },
-//   {
-//     trip_date: 'date',
-//     driver: 'ismail',
-//     pickup: 'pickup',
-//     dropoff: 'dropoff',
-//     route_code: '9889',
-//     earning: '2000',
-//     deduction: '400',
-//     start_time: '8:00 am',
-//     payment_date: '24th May, 2018'
-//   },
-//   {
-//     trip_date: 'date',
-//     driver: 'ismail',
-//     pickup: 'pickup',
-//     dropoff: 'dropoff',
-//     route_code: '9889',
-//     earning: '2000',
-//     deduction: '400',
-//     start_time: '8:00 am',
-//     payment_date: '24th May, 2018'
-//   },
-//   {
-//     trip_date: 'date',
-//     driver: 'ismail',
-//     pickup: 'pickup',
-//     dropoff: 'dropoff',
-//     route_code: '9889',
-//     earning: '2000',
-//     deduction: '400',
-//     start_time: '8:00 am',
-//     payment_date: '24th May, 2018'
-//   },
-//   {
-//     trip_date: 'date',
-//     driver: 'ismail',
-//     pickup: 'pickup',
-//     dropoff: 'dropoff',
-//     route_code: '9889',
-//     earning: '2000',
-//     deduction: '400',
-//     start_time: '8:00 am',
-//     payment_date: '24th May, 2018'
-//   },
-//   {
-//     trip_date: 'date',
-//     driver: 'ismail',
-//     pickup: 'pickup',
-//     dropoff: 'dropoff',
-//     route_code: '9889',
-//     earning: '2000',
-//     deduction: '400',
-//     start_time: '8:00 am',
-//     payment_date: '24th May, 2018'
-//   },
-//   {
-//     trip_date: 'date',
-//     driver: 'ismail',
-//     pickup: 'pickup',
-//     dropoff: 'dropoff',
-//     route_code: '9889',
-//     earning: '2000',
-//     deduction: '400',
-//     start_time: '8:00 am',
-//     payment_date: '24th May, 2018'
-//   },
-//   {
-//     trip_date: 'date',
-//     driver: 'ismail',
-//     pickup: 'pickup',
-//     dropoff: 'dropoff',
-//     route_code: '9889',
-//     earning: '2000',
-//     deduction: '400',
-//     start_time: '8:00 am',
-//     payment_date: '24th May, 2018'
-//   },
-//   {
-//     trip_date: 'date',
-//     driver: 'ismail',
-//     pickup: 'pickup',
-//     dropoff: 'dropoff',
-//     route_code: '9889',
-//     earning: '2000',
-//     deduction: '400',
-//     start_time: '8:00 am',
-//     payment_date: '24th May, 2018'
-//   },
-//   {
-//     trip_date: 'date',
-//     driver: 'ismail',
-//     pickup: 'pickup',
-//     dropoff: 'dropoff',
-//     route_code: '9889',
-//     earning: '2000',
-//     deduction: '400',
-//     start_time: '8:00 am',
-//     payment_date: '24th May, 2018'
-//   },
-//   {
-//     trip_date: 'date',
-//     driver: 'ismail',
-//     pickup: 'pickup',
-//     dropoff: 'dropoff',
-//     route_code: '9889',
-//     earning: '2000',
-//     deduction: '400',
-//     start_time: '8:00 am',
-//     payment_date: '24th May, 2018'
-//   },
-//   {
-//     trip_date: 'date',
-//     driver: 'ismail',
-//     pickup: 'pickup',
-//     dropoff: 'dropoff',
-//     route_code: '9889',
-//     earning: '2000',
-//     deduction: '400',
-//     start_time: '8:00 am',
-//     payment_date: '24th May, 2018'
-//   },
-//   {
-//     trip_date: 'date',
-//     driver: 'ismail',
-//     pickup: 'pickup',
-//     dropoff: 'dropoff',
-//     route_code: '9889',
-//     earning: '2000',
-//     deduction: '400',
-//     start_time: '8:00 am',
-//     payment_date: '24th May, 2018'
-//   },
-//   {
-//     trip_date: 'date',
-//     driver: 'last',
-//     pickup: 'pickup',
-//     dropoff: 'dropoff',
-//     route_code: '9889',
-//     earning: '2000',
-//     deduction: '400',
-//     start_time: '8:00 am',
-//     payment_date: '24th May, 2018'
-//   },
-//   {
-//     trip_date: 'date',
-//     driver: 'last',
-//     pickup: 'pickup',
-//     dropoff: 'dropoff',
-//     route_code: '9889',
-//     earning: '2000',
-//     deduction: '400',
-//     start_time: '8:00 am',
-//     payment_date: '24th May, 2018'
-//   },
-// ]
 
 const tableHeaders = [
   { text: 'Trip date', width: '10', value: 'tripStartTime' },
@@ -377,8 +178,16 @@ const tableHeaders = [
   { text: 'Payment date', width: '13', value: 'paymentDate' },
 ]
 
+watch([selectedMonth, selectedYear], () => {
+  addToQuery(route, router, {month: selectedMonth.value, year: selectedYear.value})
+})
+
 onMounted(() => {
   clearPaySlip()
+  const q = route.query
+  if (q?.month) selectedMonth.value = Number(q.month)
+  if (q?.year) selectedYear.value = Number(q.year)
+  if (q.month && q.year) fetchPayslip()
 })
 </script>
 

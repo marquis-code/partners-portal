@@ -47,7 +47,6 @@
                 >First name</label
               >
               <input
-                readonly
                 type="text"
                 v-model="v$.form.fname.$model"
                 class="
@@ -235,7 +234,6 @@
                   >Date of birth</label
                 >
                 <input
-                  readonly
                   type="date"
                   v-model="v$.form.dob.$model"
                   class="
@@ -672,10 +670,10 @@ const validations = computed(() => ({
     email: { required, email },
     residential_address: { required },
     dob: { required },
-    age_of_business: { required },
+    age_of_business: { },
     doc_type: { required },
     doc_id: { required },
-    avatar: { required }
+    avatar: { }
   }
 }))
 const docId = ref(null) as Ref<any>
@@ -738,7 +736,7 @@ const updatePartnerInfo = async () => {
       dob: form.value.dob,
       avatar: form.value.avatar,
       document_type: 'drivers_license',
-      document_id: docId.value,
+      // document_id: docId.value,
       password: 'shuttlers'
     };
     await axios.patch(
