@@ -413,6 +413,7 @@
       </div>
     </app-modal>
   <!-- </page-layout> -->
+  <!-- :disabled="v$.form.$invalid || processing" -->
 </template>
 
 <!-- <script lang="ts">
@@ -648,7 +649,22 @@ interface Driver {
 const route = useRoute()
 const toast = useToast()
 const store = useStore()
-const validations = {
+// const validations = {
+//   form: {
+//     fname: { required },
+//     lname: { required },
+//     phone: { required },
+//     email: { required, email },
+//     residential_address: { required },
+//     dob: { required },
+//     age_of_business: { required },
+//     doc_type: { required },
+//     doc_id: { required },
+//     avatar: { required }
+//   }
+// }
+
+const validations = computed(() => ({
   form: {
     fname: { required },
     lname: { required },
@@ -661,7 +677,7 @@ const validations = {
     doc_id: { required },
     avatar: { required }
   }
-}
+}))
 const docId = ref(null) as Ref<any>
 const fetchingPartner = ref(false)
 const uploadingFile = ref(false)

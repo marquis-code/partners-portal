@@ -32,6 +32,23 @@
 			<p class="text-xl font-medium text-white mb-3">{{ formatNaira(netRevenue) }}</p>
 		</div>
 
+    <div class="p-4 flex flex-col gap-4 bg-[#000005] rounded-lg">
+      <p class="text-xs font-bold text-[#E5E9F2]">Payment Breakdown</p>
+      <div class="grid grid-cols-4 gap-4 text-[#C6C8C7] text-xs border-b pb-2">
+          <p>Date</p>
+          <p>Total Earnings</p>
+          <p>Total Deductions</p>
+          <p>Net Earnings</p>
+        </div>
+
+        <div v-for="(n,i) in paymentBreakdown" :key="i" class="grid grid-cols-4 gap-4 text-[#F9FBFA] text-xs font-bold">
+          <p>{{ moment(n.referenceTime).format('Do MMMM, YYYY') }}</p>
+          <p>{{ formatNaira(n.totalRevenue) }}</p>
+          <p>{{ formatNaira(n.totalDeduction) }}</p>
+          <p>{{formatNaira(n.netRevenue) }}</p>
+        </div>
+    </div>
+
 		<div class="flex flex-col gap-4">
 			<p class="text-sm text-[#6E717C] font-medium capitalize">TRIPS THAT MAKES US THIS EARNINGS</p>
 			<div class="border-2  border-[#EAECF0] overflow-hidden rounded-lg">
@@ -89,7 +106,7 @@ const tableHeader = [
   { text: 'Deduction', width: '10' },
   { text: 'Start time', width: '10' },
 ]
-const { firstPageData, netRevenue, totalDeductions, totalRevenue, selectedMonth, selectedYear, months } = usePayslip()
+const { firstPageData, netRevenue, totalDeductions, totalRevenue, selectedMonth, selectedYear, months, paymentBreakdown } = usePayslip()
 const userSessionData = computed(() => store.getters['auth/userSessionData'])
 </script>
 

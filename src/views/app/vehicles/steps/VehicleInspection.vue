@@ -76,13 +76,13 @@ Only active locations will be visible for selection.</p>
       </div>
 
     <div class="flex justify-end items-center space-x-5 pt-5">
-      <button
+      <!-- <button
         type="button"
         class="text-black text-sm bg-gray-300 px-6 py-3 font-medium rounded-lg"
         @click="emit('goBack')"
       >
         previous
-      </button>
+      </button> -->
       <button
         type="button"
         class="
