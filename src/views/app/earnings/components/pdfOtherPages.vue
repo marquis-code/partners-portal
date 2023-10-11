@@ -27,7 +27,7 @@
             <td>₦{{ n.finalPartnersRevenue }}</td>
             <td class="text-[#E13D45]">-₦{{ n.totalDeductedAmount }}</td>
             <td>{{ moment(n.tripStartTime).format('h:mm A') || 'N/A' }}</td>
-            <!-- <td>{{ moment(n.createdAt).format('Do MMM, YYYY') || 'N/A' }}</td> -->
+            <td>{{ moment(n.tripStartTime).format('Do MMM, YYYY') }}</td>
           </tr>
         </tbody>
       </table>
@@ -39,16 +39,18 @@
 import moment from 'moment';
 import { computed } from 'vue';
 import {usePayslip} from '../composables/payslip'
+
 const tableHeader = [
   { text: 'S/N', width: '5' },
   { text: 'Trip date', width: '10' },
-  { text: 'Driver & Vehicle', width: '15' },
-  { text: 'Pick up', width: '15' },
-  { text: 'Drop off', width: '15' },
+  { text: 'Driver & Vehicle', width: '13' },
+  { text: 'Pick up', width: '13' },
+  { text: 'Drop off', width: '13' },
   { text: 'Route Code', width: '10' },
-  { text: 'Amount earned', width: '10' },
-  { text: 'Deduction', width: '10' },
+  { text: 'Amount earned', width: '8' },
+  { text: 'Deduction', width: '8' },
   { text: 'Start time', width: '10' },
+  { text: 'Payment date', width: '10' },
 ]
 const { otherPagesData, num_of_other_pages, rowPerPage, first_page_row } = usePayslip()
 

@@ -39,6 +39,8 @@ const first_page_row = computed(() => {
 })
 const rowPerPage = ref(12)
 const generatedFileName = ref('')
+const generatedMonth = ref('')
+const generatedYear = ref(null) as Ref<number|null>
 
 const clearPaySlip = () => {
   totalPayslipData.netRevenue.value = 0
@@ -54,12 +56,13 @@ const clearPaySlip = () => {
 // }
 
 const printPayslip = async () => {
+  payslipData.value = [...totalPayslipData.revenues.value]
   downloading.value = true
   firstPageData.value = []; otherPagesData.value = []
   num_of_other_pages.value = 0
   const pdf = new JsPDF('p', 'pt', 'a4');
   if (payslipData.value.length <= first_page_row.value) {
-    console.log('first gen metod')
+    // console.log('first gen metod')
     firstPageData.value = payslipData.value
     await new Promise(resolve => setTimeout(resolve, 1000));
     const el:HTMLElement = document.querySelector('#payslip-pdf-content')!
@@ -107,7 +110,6 @@ const combineRevenues = (data:any[]) => {
     totalPayslipData.totalDeductions.value = totalPayslipData.totalDeductions.value + x?.totalDeduction
     totalPayslipData.revenues.value = x?.revenues?.length ? totalPayslipData.revenues.value.concat(x?.revenues) : totalPayslipData.revenues.value
   }
-  payslipData.value = [...totalPayslipData.revenues.value]
 }
 
 export const usePayslip = () => {
@@ -118,6 +120,8 @@ export const usePayslip = () => {
     clearPaySlip()
     try {
       loading.value = true
+      generatedMonth.value = months[Number(selectedMonth.value) - 1]
+      generatedYear.value = selectedYear.value
       generatedFileName.value = `${months[Number(selectedMonth.value) - 1]}-${selectedYear.value} Pay slip`
       const res = await axios.get(
         `/cost-revenue/v1/partners/${partnerContext.value.partner.account_sid}/payslips/${selectedYear.value}/${selectedMonth.value}?page=1&perPage=10`
@@ -142,5 +146,5 @@ export const usePayslip = () => {
     }
   }
 
-  return { loading, selectedMonth, selectedYear, previewPdf, fetchPayslip, payslipData, firstPageData, otherPagesData, months, num_of_other_pages, rowPerPage, first_page_row, ...totalPayslipData, downloading, printPayslip, clearPaySlip }
+  return { loading, selectedMonth, selectedYear, previewPdf, fetchPayslip, payslipData, firstPageData, otherPagesData, months, num_of_other_pages, rowPerPage, first_page_row, ...totalPayslipData, downloading, printPayslip, clearPaySlip, generatedMonth, generatedYear }
 }

@@ -88,8 +88,7 @@
                 >Company Address</label
               >
               <input
-                readonly
-                type="email"
+                type="text"
                 v-model="v$.form.company_address.$model"
                 class="
                   text-xs
@@ -384,7 +383,7 @@ const validations = {
     company_name: { required },
     rc_number: { required },
     company_address: { required },
-    company_type: { required, email }
+    company_type: { }
   }
 }
 const docId = ref(null) as Ref<any>
