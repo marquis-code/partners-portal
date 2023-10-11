@@ -148,7 +148,11 @@
               <label class="text-xs font-medium text-grays-black-5"
                 >Residential address</label
               >
-              <AddressAutocomplete @autoCompleteAddress="selectedAddress" />
+              <!-- <AddressAutocomplete @autoCompleteAddress="selectedAddress" /> -->
+              <ordinaryAutoComplete
+                :inputValue="v$.form.residential_address.$model"
+                @autoCompleteAddress="(val:string) => v$.form.residential_address.$model = val"
+              />
 
               <span
                 class="text-xs font-light text-red-500"
@@ -282,245 +286,6 @@
   </page-layout>
 </template>
 
-<!-- <script lang="ts">
-import ImageUpload from '@/components/ImageUpload.vue';
-import { defineComponent } from 'vue';
-import Datepicker from 'vue3-datepicker';
-import useVuelidate from '@vuelidate/core';
-import { email, required } from '@vuelidate/validators';
-import countryCodeEmoji from 'country-code-emoji';
-import { CountryCode, isValidPhoneNumber } from 'libphonenumber-js/mobile';
-import { mapGetters } from 'vuex';
-import { extractErrorMessage } from '@/utils/helper';
-import { format } from 'date-fns';
-import PageLayout from '@/components/layout/PageLayout.vue';
-import Spinner from '@/components/layout/Spinner.vue';
-import PageActionHeader from '@/components/PageActionHeader.vue';
-import AppModal from '@/components/Modals/AppModal.vue';
-import AddressAutocomplete from './components/AddressAutocomplete.vue';
-
-export default defineComponent({
-  name: 'AddDriver',
-  components: {
-    Datepicker,
-    ImageUpload,
-    PageLayout,
-    PageActionHeader,
-    AppModal,
-    Spinner,
-    AddressAutocomplete
-  },
-  created() {
-    this.setDefaultCountry();
-    this.fetchCountries();
-  },
-  data() {
-    return {
-      format,
-      uploadingFile: false,
-      uploadingProfile: false,
-      v$: useVuelidate(),
-      showModal: false,
-      profilePreview: '',
-      form: {
-        fname: '',
-        lname: '',
-        phone: '',
-        email: '',
-        residential_address: '',
-        dob: '',
-        license_number: '',
-        expiry_date: '',
-        files: [] as Array<string>,
-        avatar: '' as string,
-        country: ''
-      },
-      processing: false,
-      countries: [],
-      isPhoneValid: false
-    };
-  },
-  validations() {
-    return {
-      form: {
-        fname: { required },
-        lname: { required },
-        phone: { required },
-        email: { required, email },
-        residential_address: { required },
-        dob: { required },
-        license_number: { required },
-        expiry_date: { required },
-        files: { required },
-        avatar: { required }
-      }
-    };
-  },
-  computed: {
-    ...mapGetters({
-      userSessionData: 'auth/userSessionData',
-      user: 'auth/user'
-    })
-  },
-  methods: {
-    selectedAddress(value: any) {
-      this.form.residential_address = value;
-    },
-    setDefaultCountry() {
-      const code =
-        this.countries && this.countries.length
-          ? (this.countries[0] as any).code
-          : null;
-      if (code) {
-        this.form.country = code;
-      }
-    },
-    async fetchCountries() {
-      const response = await this.$axios.get(`v1/countries`);
-      this.countries = response.data || [];
-    },
-    validatePhoneNumber() {
-      this.isPhoneValid = isValidPhoneNumber(
-        this.form.phone.toString(),
-        this.form.country as CountryCode
-      );
-    },
-    countryCodeToEmoji(code: string) {
-      return countryCodeEmoji(code);
-    },
-    openModal() {
-      this.showModal = true;
-    },
-    closeModal() {
-      this.showModal = false;
-    },
-    async saveForm() {
-      this.v$.form.$touch();
-      if (this.processing || this.v$.form.$errors.length) {
-        return;
-      }
-      this.processing = true;
-      try {
-        const newDriverPayload = {
-          fname: this.form.fname,
-          lname: this.form.lname,
-          phone: this.form.phone,
-          email: this.form.email,
-          password: 'shuttlers',
-          avatar: this.form.avatar,
-          dob: this.form.dob,
-          residential_address: this.form.residential_address
-        };
-        await this.$axios.post('/v1/drivers', newDriverPayload).then((res) => {
-          return this.createPartnerDriver(res.data.id);
-        });
-      } catch (err) {
-        const errorMessage = extractErrorMessage(
-          err,
-          null,
-          'Oops! An error occurred, please try again.'
-        );
-        this.$toast.error(errorMessage);
-      } finally {
-        this.processing = false;
-      }
-    },
-    async createPartnerDriver(driverId: any) {
-      const expiryDate = this.form.expiry_date;
-      const partnerDriverPayload = {
-        registration_number: this.form.license_number,
-        expiry_date: format(expiryDate as any, 'yyyy-MM-dd HH:mm:ss') as any,
-        files: this.form.files,
-        driver_id: driverId.toString(),
-        document_type: 'drivers_license'
-      };
-      await this.$axios
-        .post(
-          `/v1/partners/${
-            this.userSessionData.activeContext.account_sid
-          }/drivers/${driverId.toString()}`,
-          partnerDriverPayload
-        )
-        .then((response) => {
-          this.openModal();
-          this.$router.push({
-            name: 'driver.detail.info',
-            params: { driverId: response.data.driver_id }
-          });
-          this.closeModal();
-        })
-        .catch((err) => {
-          const errorMessage = extractErrorMessage(
-            err,
-            null,
-            'Oops! An error occurred, please try again.'
-          );
-          this.$toast.error(errorMessage);
-        });
-    },
-
-    async fileSelected(selectedImage: any) {
-      this.uploadingFile = true;
-      await this.uploadTos3andGetDocumentUrl(selectedImage)
-        .then((res) => {
-          this.form.files.push(res);
-          this.$toast.success('Driver’s License was uploaded successfully');
-        })
-        .catch(() => {
-          this.uploadingFile = false;
-        })
-        .finally(() => {
-          this.uploadingFile = false;
-        });
-    },
-
-    async handleProfileUpload(e: any) {
-      const selectedProfile = e.target.files[0];
-      this.uploadingProfile = true;
-      await this.uploadTos3andGetDocumentUrl(selectedProfile)
-        .then((res) => {
-          this.form.avatar = res;
-          this.profilePreview = URL.createObjectURL(selectedProfile);
-          this.$toast.success('Profile picture was uploaded successfully');
-        })
-        .catch(() => {
-          this.profilePreview = '';
-        })
-        .finally(() => {
-          this.uploadingProfile = false;
-        });
-    },
-
-    async uploadTos3andGetDocumentUrl(file: any) {
-      try {
-        const formData = new FormData();
-        formData.append('file', file);
-        const response = await this.$axios.post(
-          `/v1/upload/identity/files`,
-          formData
-        );
-        if (response.data?.files?.length) {
-          return response.data.files[0].Location;
-        }
-      } catch (error) {
-        this.$toast.error(
-          'An error occured while uploading your file, please try again'
-        );
-        this.profilePreview = '';
-      }
-    }
-  },
-  watch: {
-    'form.phone'() {
-      this.validatePhoneNumber();
-    },
-    countries() {
-      this.setDefaultCountry();
-    }
-  }
-});
-</script> -->
-
 <script setup lang="ts">
 import ImageUpload from '@/components/ImageUpload.vue';
 import { ref, Ref, watch, computed } from 'vue';
@@ -540,8 +305,9 @@ import AddressAutocomplete from './components/AddressAutocomplete.vue';
 import {axiosInstance as axios} from '@/plugins/axios';
 import {useToast} from 'vue-toast-notification';
 import router from '@/router';
+import ordinaryAutoComplete from '@/components/core/ordinaryAutoComplete.vue'
 
-const validations = {
+const validations = computed(() => ({
   form: {
     fname: { required },
     lname: { required },
@@ -552,9 +318,10 @@ const validations = {
     license_number: { required },
     expiry_date: { required },
     files: { required },
-    avatar: { required }
+    avatar: { }
   }
-}
+}))
+
 const toast = useToast()
 const store = useStore()
 const uploadingFile = ref(false)
@@ -619,16 +386,16 @@ const saveForm = async () => {
   }
   processing.value = true;
   try {
-    const newDriverPayload = {
+    const newDriverPayload:any = {
       fname: form.value.fname,
       lname: form.value.lname,
       phone: form.value.phone,
       email: form.value.email,
       password: 'shuttlers',
-      avatar: form.value.avatar,
       dob: form.value.dob,
       residential_address: form.value.residential_address
     };
+    if (form.value.avatar) newDriverPayload.avatar = form.value.avatar
     await axios.post('/v1/drivers', newDriverPayload).then((res) => {
       return createPartnerDriver(res.data.id);
     });
