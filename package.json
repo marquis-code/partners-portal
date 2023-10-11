@@ -37,6 +37,7 @@
     "html2pdf.js": "^0.10.1",
     "jspdf": "^2.5.1",
     "jspdf-html2canvas": "^1.4.9",
+    "jwt-decode": "^3.1.2",
     "libphonenumber-js": "^1.10.13",
     "lodash": "^4.17.21",
     "mitt": "^3.0.0",

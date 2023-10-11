@@ -39,7 +39,6 @@ export default <StoreOptions<AuthState>>{
         try {
           const response = await dispatch('getPartnerMemberOrganizations', data.user.id);
           data.associatedOrganizations = response;
-          console.log(response)
         } catch (e) {
           console.info('No partners associated');
         }
