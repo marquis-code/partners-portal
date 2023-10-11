@@ -3,7 +3,7 @@
       <spinner></spinner>
     </div>
     <main class="md:w-9/12 p-5 lg:p-14 bg-white ring-1 ring-gray-100">
-      <div class="flex justify-center items-center flex-col space-y-2 pb-5">
+      <!-- <div class="flex justify-center items-center flex-col space-y-2 pb-5">
         <img
           v-if="profilePreview && !uploadingProfile"
           class="h-14 w-14 rounded-full object-cover"
@@ -29,7 +29,7 @@
             uploadingProfile ? 'Uploading...' : 'Click to upload image'
           }}</label
         >
-      </div>
+      </div> -->
       <div>
         <p class="text-sm text-gray-400 pb-3">Partners Information</p>
         <form class="space-y-3 lg:space-y-7">
@@ -47,7 +47,6 @@
                 >First name</label
               >
               <input
-                readonly
                 type="text"
                 v-model="v$.form.fname.$model"
                 class="
@@ -235,7 +234,6 @@
                   >Date of birth</label
                 >
                 <input
-                  readonly
                   type="date"
                   v-model="v$.form.dob.$model"
                   class="
@@ -413,6 +411,7 @@
       </div>
     </app-modal>
   <!-- </page-layout> -->
+  <!-- :disabled="v$.form.$invalid || processing" -->
 </template>
 
 <!-- <script lang="ts">
@@ -648,7 +647,22 @@ interface Driver {
 const route = useRoute()
 const toast = useToast()
 const store = useStore()
-const validations = {
+// const validations = {
+//   form: {
+//     fname: { required },
+//     lname: { required },
+//     phone: { required },
+//     email: { required, email },
+//     residential_address: { required },
+//     dob: { required },
+//     age_of_business: { required },
+//     doc_type: { required },
+//     doc_id: { required },
+//     avatar: { required }
+//   }
+// }
+
+const validations = computed(() => ({
   form: {
     fname: { required },
     lname: { required },
@@ -656,12 +670,12 @@ const validations = {
     email: { required, email },
     residential_address: { required },
     dob: { required },
-    age_of_business: { required },
+    age_of_business: { },
     doc_type: { required },
     doc_id: { required },
-    avatar: { required }
+    avatar: { }
   }
-}
+}))
 const docId = ref(null) as Ref<any>
 const fetchingPartner = ref(false)
 const uploadingFile = ref(false)
@@ -681,7 +695,7 @@ const getDriverData:any = computed(() => store.getters['driver/getDriverData'])
 const driverData:any = computed(() => store.getters['driver/getDriverData'])
 
 const setCurrentDetails = () => {
-  form.value.residential_address = partnerContext.value.onboardingState.address.address.slice(1, partnerContext.value.onboardingState.address.address.length - 1);
+  form.value.residential_address = partnerContext.value.onboardingState.address.address;
   form.value.fname = userSessionData.value.user.fname;
   form.value.lname = userSessionData.value.user.lname;
   form.value.phone = userSessionData.value.user.phone;
@@ -722,7 +736,7 @@ const updatePartnerInfo = async () => {
       dob: form.value.dob,
       avatar: form.value.avatar,
       document_type: 'drivers_license',
-      document_id: docId.value,
+      // document_id: docId.value,
       password: 'shuttlers'
     };
     await axios.patch(

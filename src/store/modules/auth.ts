@@ -39,7 +39,6 @@ export default <StoreOptions<AuthState>>{
         try {
           const response = await dispatch('getPartnerMemberOrganizations', data.user.id);
           data.associatedOrganizations = response;
-          console.log(response)
         } catch (e) {
           console.info('No partners associated');
         }
@@ -62,7 +61,7 @@ export default <StoreOptions<AuthState>>{
       }));
 
       await Promise.all(response.map(org => {
-        if(!org.partner.id) return [];
+        if (!org.partner.id) return [];
         return axiosInstance.get(`/v1/partners/${org.partner.id}/cities`).then(r => {
           org.supportedCities = [...(r.data.data || [])];
           return r.data;

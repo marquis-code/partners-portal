@@ -20,102 +20,193 @@
     </template>
   </page-action-header>
 </template>
-<div>
-  <div class="flex flex-col gap-2 bg-white rounded p-2">
-    <div class="flex justify-end gap-4 items-center py-2">
-      <p>Filter by year:</p>
-      <select v-model="filterBy" class="border rounded p-2">
-        <option value="">No filter</option>
-        <option v-for="n in filterData" :key="n" :value="n">{{ n }}</option>
-      </select>
+<pdfContent class="fixed top-[-1000000px] z-[-999]"/>
+<!-- <pdfContent class=""/> -->
+<pdfOtherPages  class="fixed top-[-1000000px] z-[-999]" />
+<div class="flex flex-col lg:items-start gap-6">
+  <div class="flex flex-col gap-6 w-full max-w-[400px]">
+    <div class="bg-white rounded-lg border flex flex-col">
+      <div class="p-2 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <select :disabled="loading" v-model="selectedMonth" class="w-fit p-2 border rounded-lg">
+            <option v-for="n,index in months" :key="n" :value="index+1">{{ n }}</option>
+          </select>
+          <select :disabled="loading" v-model="selectedYear" class="w-fit p-2 border rounded-lg">
+            <template v-for="n in 10" :key="n">
+              <option v-if="n + 2020 <= new Date().getFullYear()" :value="n + 2020">{{ n + 2020 }}</option>
+            </template>
+          </select>
+        </div>
+        <button :disabled="!selectedMonth || !selectedYear || loading" class="btn !min-w-[100px]" @click="fetchPayslip">
+          <span v-if="!loading">View</span>
+          <spinner v-else />
+        </button>
+      </div>
     </div>
-    <app-table
-      :loading="loading"
-      :error-loading="loading"
-      :items="filteredTableData"
-      :fields="headers"
-      @rowClicked="(e:any) => viewPaymentDetails(e)"
-      @page-change="loadPageChange"
-    >
+  </div>
 
-      <template v-slot:total_amount="{item}">
-        {{ Intl.NumberFormat('en-US').format(item.amount + item.totalDeduction)}}
-      </template>
-      <template v-slot:totalDeduction="{item}">
-        {{ Intl.NumberFormat('en-US').format(item.totalDeduction)}}
-      </template>
-      <template v-slot:amount="{item}">
-        {{ Intl.NumberFormat('en-US').format(item.amount)}}
-      </template>
-      <template v-slot:payoutDate="{item}">
-        {{ moment(item.payoutDate).format('MMM YYYY') }}
-      </template>
-      <template v-slot:status="{item}">
-        {{ item.status == '2' ? 'Settled' : item.status == '1' ? 'Pending Settlement' : item.status == '0' ? 'Pending Payout' : 'Failed' }}
-      </template>
+  <div v-if="!revenues.length" class="w-full max-w-[600px] bg-white rounded-lg border flex flex-col">
+    <div class="p-3 flex items-center justify-center h-[400px]">
+      <div class="w-fit h-fit flex flex-col">
+        <img src="@/assets/illustration/payslip/empty_doc.svg" class="max-w-[200px] mx-auto" alt="">
+        <div class="flex flex-col gap-2 text-center">
+          <p class="text-lg text-[#09090F] font-medium">Preview Pay Slip</p>
+          <p class="text-sm text-[#8D918F]">Click on ‘generate’ to preview pay slip</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div v-else class="w-full flex flex-col gap-4">
+    <div class="flex flex-col gap-2">
+      <div class="bg-white p-3 flex items-center justify-between border-b">
+        <p class="text-xs text-[#6E717C] font-medium uppercase">Payslip for {{ generatedMonth }}, {{ generatedYear }}</p>
+        <button :disabled="downloading" class="btn shrink-0" @click="printPayslip">
+          <span v-if="!downloading" class="flex items-center gap-2 shrink-0">
+            <img src="@/assets/icons/download_white.svg" alt="">
+            Download pay slip
+          </span>
+          <spinner v-else />
+        </button>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+        <div class="flex flex-col gap-1 p-4 border rounded bg-white">
+          <p class="text-xs text-[#667085] font-medium">Total Revenue made</p>
+          <h3 class="text-[#000005] text-2xl font-bold">{{formatNaira(totalRevenue)}}</h3>
+        </div>
+        <div class="flex flex-col gap-1 p-4 border rounded bg-white">
+          <p class="text-xs text-[#667085] font-medium">Total Deductions</p>
+          <h3 class="text-[#E13D45] text-2xl font-bold">-{{formatNaira(totalDeductions)}}</h3>
+        </div>
+        <div class="flex flex-col gap-1 p-4 border rounded bg-white">
+          <p class="text-xs text-[#667085] font-medium">Total Net Revenue</p>
+          <h3 class="text-[#000005] text-2xl font-bold">{{formatNaira(netRevenue)}}</h3>
+        </div>
+      </div>
+    </div>
+    <div v-if="paymentBreakdown.length" class="p-4 rounded-lg flex flex-col gap-5 bg-white border w-full max-w-fit overflow-auto">
+      <p class="text-xs font-bold text-[#444854]">Payment breakdown</p>
+      <div class="min-w-[500px] flex flex-col gap-3">
+        <div class="grid grid-cols-4 gap-4 text-xs text-[#667085]">
+          <p>Date</p>
+          <p>Total Earnings</p>
+          <p>Total Deductions</p>
+          <p>Net Earnings</p>
+        </div>
 
-    </app-table>
+        <div v-for="(n,i) in paymentBreakdown" :key="i" class="grid grid-cols-4 gap-4 text-xs font-bold text-[#101828]">
+          <p>{{ moment(n.referenceTime).format('Do MMMM, YYYY') }}</p>
+          <p>{{ formatNaira(n.totalRevenue) }}</p>
+          <p>{{ formatNaira(n.totalDeduction) }}</p>
+          <p>{{ formatNaira(n.netRevenue) }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-2 mt-5">
+      <p class="text-xs text-[#6E717C]">TRIPS THAT MAKE UP YOUR ACCRUED EARNING</p>
+      <DataTable :headers="tableHeaders" :table-data="revenues" :loading="loading" :frontend-pagination="true">
+        <template #item="{ item }">
+          <span v-if="item.tripStartTime" class="">
+            {{ moment(item.data.tripStartTime).format('Do MMMM, YYYY') }}
+          </span>
+          <div v-if="item.driver" class="flex flex-col">
+            <p class="font-bold text-[#09090F]">{{ item.data.metadata?.driver?.fname|| '' }} {{ item.data.metadata?.driver?.lname || '' }}</p>
+            <p>{{ item.data.metadata?.vehicle.brand }} {{ item.data.metadata?.vehicle?.name }} ({{ item.data.metadata?.vehicle?.registration_number }})</p>
+          </div>
+          <span v-if="item.pickup" class="">
+            {{ item.data?.metadata?.pickup }}
+          </span>
+          <span v-if="item.dropoff" class="">
+            {{ item.data?.metadata?.dropoff }}
+          </span>
+          <span v-if="item.route_code" class="">
+            {{ item.data?.metadata?.routeCode }}
+          </span>
+          <span v-if="item.startTime" class="">
+            {{ moment(item.data.tripStartTime).format('h:mm A') }}
+          </span>
+          <span v-if="item.paymentDate" class="">
+            {{ moment(item.data.tripStartTime).format('Do MMMM, YYYY') }}
+          </span>
+          <span v-if="item.finalPartnersRevenue" class="">
+            {{ formatNaira(item.data.finalPartnersRevenue) }}
+          </span>
+          <span v-if="item.totalDeductedAmount" class="text-[#E13D45]">
+            {{ formatNaira(item.data.totalDeductedAmount) }}
+          </span>
+        </template>
+      </DataTable>
+    </div>
   </div>
 </div>
 </page-layout>
 </main>
 </template>
 <script setup lang="ts">
-import {ref, computed, Ref} from 'vue'
+import { onMounted, watch} from 'vue'
 import PageLayout from '@/components/layout/PageLayout.vue';
 import PageActionHeader from '@/components/PageActionHeader.vue'
 import router from '@/router';
-import { useStore } from 'vuex';
-import {axiosInstance as axios} from '@/plugins/axios';
-import AppTable from '@/components/AppTable.vue';
-import moment from 'moment';
-import { formatNaira } from '@/composables/utils';
+import pdfContent from '../components/pdfContent.vue'
+import pdfOtherPages from '../components/pdfOtherPages.vue'
+import { usePayslip } from '../composables/payslip';
+import spinner from '@/components/loader/spinner.vue'
+import DataTable from '@/components/core/dataTable.vue'
+import moment from 'moment'
+import { formatNaira, addToQuery } from '@/composables/utils';
+import { useRoute } from 'vue-router'
 
-const store = useStore()
-const headers = [
-  { label: 'Payout Month', key: 'payoutDate' },
-  { label: 'Total Amount', key: 'total_amount' },
-  { label: 'Total Deduction', key: 'totalDeduction' },
-  { label: 'Net Income', key: 'amount' },
-  { label: 'Status', key: 'status' }
-]
-const filterBy = ref('')
-const filterData = ['2023', '2022', '2021', '2020', '2019', '2018', '2017', '2016', '2015']
-const tableData = ref([]) as Ref<any[]>
-const loading = ref(false)
+const { loading, fetchPayslip, selectedMonth, selectedYear, months, paymentBreakdown, totalDeductions, totalRevenue, netRevenue, revenues, downloading, printPayslip, clearPaySlip, generatedMonth, generatedYear } = usePayslip()
 
+const route = useRoute()
 const gotoEarning = () => {
   router.push('/earnings')
 }
 const gotoConfig = () => {
   router.push('/earnings/cost-configuration');
 }
-const viewPaymentDetails = (item:any) => {
-  console.log(item)
-  router.push(`/earnings/payslip/details/${item.id}`)
-}
-const partnerContext:any = computed(() => store.getters['auth/activeContext'])
-const filteredTableData = computed(() => {
-  return tableData.value.filter(el => el.payoutDate.includes(filterBy.value))
+
+const tableHeaders = [
+  { text: 'Trip date', width: '10', value: 'tripStartTime' },
+  { text: 'Driver & Vehicle', width: '14', value: 'driver' },
+  { text: 'Pickup', width: '14', value: 'pickup' },
+  { text: 'Drop off', width: '14', value: 'dropoff' },
+  { text: 'Route code', width: '7', value: 'route_code' },
+  { text: 'Amount Earned', width: '10', value: 'finalPartnersRevenue' },
+  { text: 'Deductions', width: '8', value: 'totalDeductedAmount' },
+  { text: 'Start time', width: '10', value: 'startTime' },
+  { text: 'Payment date', width: '13', value: 'paymentDate' },
+]
+
+watch([selectedMonth, selectedYear], () => {
+  addToQuery(route, router, {month: selectedMonth.value, year: selectedYear.value})
 })
-const getEarnings = async (page = 1) => {
-  loading.value = true
-  try {
-    const res = await axios.get(
-      `/cost-revenue/v1/earnings?isApproved=false&partnerId=${partnerContext.value.partner.account_sid}&status=pending-payout,pending-settlement,failed,settled&page=${page}&limit=20`
-    );
-    tableData.value = res.data.result
-    console.log(res)
-  } catch (err) {
-    console.log(err)
-  } finally {
-    loading.value = false
-  }
-}
 
-const loadPageChange = (page:number) => {
-  getEarnings(page)
-}
-getEarnings()
-
+onMounted(() => {
+  clearPaySlip()
+  const q = route.query
+  if (q?.month) selectedMonth.value = Number(q.month)
+  if (q?.year) selectedYear.value = Number(q.year)
+  if (q.month && q.year) fetchPayslip()
+})
 </script>
+
+<style scoped>
+::-webkit-scrollbar {
+	width: 6px;
+	height: 6px;
+}
+
+::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+	background: #6E717C;
+	border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: #8A9099;
+}
+</style>

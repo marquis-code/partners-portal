@@ -2,15 +2,9 @@
   <form class="space-y-3 lg:space-y-7">
     <template v-if="!loading">
       <section
-        class="
-          lg:flex
-          justify-between
-          space-y-3
-          lg:space-y-0 lg:space-x-10
-          items-center
-        "
+        class="items-center justify-between space-y-3 lg:flex lg:space-y-0 lg:space-x-10"
       >
-        <div class="space-y-2 w-full">
+        <div class="w-full space-y-2">
           <label class="text-xs font-medium text-grays-black-5"
             >Vehicle brand</label
           >
@@ -35,7 +29,7 @@
             This field is required
           </span>
         </div>
-        <div class="space-y-2 w-full">
+        <div class="w-full space-y-2">
           <label class="text-xs font-medium text-grays-black-5"
             >Vehicle Model</label
           >
@@ -64,31 +58,16 @@
         </div>
       </section>
       <section
-        class="
-          lg:flex
-          justify-between
-          space-y-3
-          lg:space-y-0 lg:space-x-10
-          items-center
-        "
+        class="items-center justify-between space-y-3 lg:flex lg:space-y-0 lg:space-x-10"
       >
-        <div class="space-y-2 w-full">
+        <div class="w-full space-y-2">
           <label class="text-xs font-medium text-grays-black-5"
             >Vehicle year</label
           >
           <select
             :disabled="fetchingModels"
             v-model="v$.form.year.$model"
-            class="
-              text-xs
-              border-none
-              outline-none
-              w-full
-              rounded-md
-              p-3
-              placeholder-gray-500 placeholder-opacity-25
-              ring-1 ring-gray-300
-            "
+            class="w-full p-3 text-xs placeholder-gray-500 placeholder-opacity-25 border-none rounded-md outline-none ring-1 ring-gray-300"
           >
             <option value="" disabled hidden>Select your vehicle year</option>
             <option
@@ -107,22 +86,13 @@
           </span>
         </div>
         <!-- Capacity list -->
-        <div class="space-y-2 w-full">
+        <div class="w-full space-y-2">
           <label class="text-xs font-medium text-grays-black-5"
             >Passenger capacity</label
           >
           <select
             v-model="v$.form.seats.$model"
-            class="
-              text-xs
-              border-none
-              outline-none
-              w-full
-              rounded-md
-              p-3
-              placeholder-gray-500 placeholder-opacity-25
-              ring-1 ring-gray-300
-            "
+            class="w-full p-3 text-xs placeholder-gray-500 placeholder-opacity-25 border-none rounded-md outline-none ring-1 ring-gray-300"
           >
             <option value="" disabled hidden>
               Select from available Capacity
@@ -143,8 +113,8 @@
           </span>
         </div>
       </section>
-      <section class="lg:flex justify-start lg:space-x-10 items-start">
-        <div class="space-y-2 w-full lg:w-6/12">
+      <section class="items-start justify-start lg:flex lg:space-x-10">
+        <div class="w-full space-y-2 lg:w-6/12">
           <label class="text-xs font-medium text-grays-black-5"
             >City of operation</label
           >
@@ -170,12 +140,12 @@
             This field is required
           </span>
         </div>
-        <div class="space-y-2 w-full lg:w-6/12 pt-5 lg:pt-0">
-          <label class="text-xs font-medium text-grays-black-5 flex flex-row">
+        <div class="w-full pt-5 space-y-2 lg:w-6/12 lg:pt-0">
+          <label class="flex flex-row text-xs font-medium text-grays-black-5">
             Plate Number
-            <span class="tooltip ml-3">
+            <span class="ml-3 tooltip">
               <img src="@/assets/icons/info.svg" class="boarder-2" />
-              <span class="tooltiptext shadow-lg text-left"
+              <span class="text-left shadow-lg tooltiptext"
                 >example: <br />
                 ABC-123XY
               </span>
@@ -188,16 +158,7 @@
             maxlength="9"
             v-model="v$.form.registration_number.$model"
             @keyup="uppercase($event)"
-            class="
-              text-xs
-              border-none
-              outline-none
-              w-full
-              rounded-md
-              p-3
-              placeholder-gray-500 placeholder-opacity-25
-              ring-1 ring-gray-300
-            "
+            class="w-full p-3 text-xs placeholder-gray-500 placeholder-opacity-25 border-none rounded-md outline-none ring-1 ring-gray-300"
           />
           <span
             class="text-sm font-light text-red-500"
@@ -216,20 +177,11 @@
         </div>
       </section>
 
-      <div class="flex justify-end items-end">
+      <div class="flex items-end justify-end">
         <button
           type="button"
           @click.prevent="saveForm()"
-          class="
-            rounded-md
-            w-32
-            flex
-            justify-center
-            items-center
-            p-4
-            px-5
-            text-sm
-          "
+          class="flex items-center justify-center w-32 p-4 px-5 text-sm rounded-md "
           :disabled="v$.form.$invalid || processing"
           :class="
             v$.form.$invalid || processing
@@ -252,204 +204,6 @@
     </template>
   </form>
 </template>
-
-<!-- <script lang="ts">
-import { defineComponent } from 'vue';
-import useVuelidate from '@vuelidate/core';
-import { required } from '@vuelidate/validators';
-import { mapGetters } from 'vuex';
-import { extractErrorMessage } from '@/utils/helper';
-import { AxiosResponse } from 'axios';
-import Spinner from '@/components/layout/Spinner.vue';
-export default defineComponent<any, any, any>({
-  name: 'VehicleInformationForm',
-  components: { Spinner },
-  emits: ['next'],
-  data() {
-    return {
-      v$: useVuelidate(),
-      validPlateNumber: false,
-      form: {
-        brand: '',
-        name: '',
-        // type: 'Sedan',
-        year: '',
-        seats: '',
-        city_ids: [],
-        registration_number: '',
-        partner_id: ''
-      },
-      dashAdded: false,
-      fetchingModels: false,
-      cities: [],
-      vehicleYears: [],
-      vehicleModels: [],
-      vehicleBrands: [],
-      vehicleModelMap: new Map(),
-      processing: false,
-      loading: false,
-      capacityList: []
-    };
-  },
-  watch: {
-    'form.registration_number'() {
-      if (this.checkPlateNumberFormat(this.form.registration_number)) {
-        this.validPlateNumber = true;
-      } else {
-        this.validPlateNumber = false;
-      }
-    }
-  },
-  validations() {
-    return {
-      form: {
-        brand: { required },
-        name: { required },
-        year: { required },
-        seats: { required },
-        city_ids: { required },
-        registration_number: { required },
-        partner_id: { required }
-      }
-    };
-  },
-  computed: {
-    ...mapGetters({
-      partnerContext: 'auth/activeContext',
-      user: 'auth/user'
-    })
-  },
-  created() {
-    this.fetchPageData();
-    this.form.partner_id = this.partnerContext?.partner?.id;
-  },
-  methods: {
-    selectThisCity(city: any) {
-      const cityId = city.city.id;
-      this.form.city_ids = [cityId];
-    },
-    uppercase($event: any) {
-      this.form.registration_number =
-        this.form.registration_number.toUpperCase();
-      this.getKeyStroke($event);
-    },
-    getKeyStroke($event: any) {
-      const pressedKey = $event.key;
-      if (
-        pressedKey === 'Backspace' &&
-        this.form.registration_number.length === 3
-      ) {
-        console.log('Do nothing');
-      } else if (this.form.registration_number.length === 3) {
-        this.form.registration_number += '-';
-        this.dashAdded = true;
-      } else {
-        console.log(0);
-      }
-    },
-    checkPlateNumberFormat(plateNumber: string): boolean {
-      if (/^[a-zA-Z]{3}-[0-9]{3}[a-zA-Z]{2}$/gi.test(plateNumber)) {
-        return true;
-      } else {
-        return false;
-      }
-    },
-    fetchPageData() {
-      this.loading = true;
-      this.vehicleYears = this.getYearsFrom('1980');
-      this.cities = this.partnerContext.supportedCities;
-      this.$axios
-        .get('/v1/vehicle-makes?limit=1000')
-        .then((r: AxiosResponse) => {
-          this.vehicleBrands = r.data.data || [];
-        })
-        .catch((e: any) => {
-          this.$toast.error(extractErrorMessage(e));
-        })
-        .finally(() => {
-          this.loading = false;
-        });
-    },
-    onCarModelChanged(carModel: any) {
-      this.form.name = carModel.name;
-      this.capacityList = carModel.capacity_list || [];
-      if (this.form.name) {
-        // TODO: Memoize
-        this.vehicleYears = this.getYearsFrom(`${carModel.start_year}`);
-      } else {
-        this.vehicleYears = [];
-        this.form.year = '';
-      }
-    },
-    getYearsFrom(year: string): number[] {
-      const date = new Date(Number(year), 0);
-      let iterationYear = date.getFullYear();
-      const iterationEndYear = new Date().getFullYear();
-      const dateRange = iterationEndYear - iterationYear;
-      const years = [];
-      for (let i = 0; i <= dateRange; i++) {
-        years[i] = iterationYear++;
-      }
-      return years;
-    },
-    async saveForm() {
-      this.v$.form.$touch();
-      if (!this.validPlateNumber) {
-        this.$toast.warning('Plate number must be in the right format');
-        return;
-      }
-      if (this.processing || this.v$.form.$errors.length) {
-        return;
-      }
-      this.processing = true;
-      try {
-        const payload = {
-          brand: this.form.brand,
-          name: this.form.name,
-          // type: 'Sedan',
-          year: this.form.year,
-          seats: this.form.seats,
-          city_ids: this.form.city_ids,
-          registration_number: this.form.registration_number,
-          partner_id: this.form.partner_id
-        };
-        const response = await this.$axios.post('/v1/vehicles', payload);
-        await this.$store.dispatch('vehicle/setVehicleFormData', response.data);
-        this.$emit('next');
-      } catch (err) {
-        const errorMessage = extractErrorMessage(
-          err,
-          null,
-          'Oops! An error occurred, please try again.'
-        );
-        this.$toast.error(errorMessage);
-      } finally {
-        this.processing = false;
-      }
-    },
-    async getVehiclesForBrand(brandId: any) {
-      if (this.vehicleModelMap.has(brandId)) {
-        this.vehicleModels = this.vehicleModelMap.get(brandId);
-      } else {
-        try {
-          const vehicleModelsResponse = await this.$axios.get(
-            `v1/vehicle-makes/${brandId}/vehicle-models?limit=1000`
-          );
-          this.vehicleModels = vehicleModelsResponse.data.data;
-        } catch (e) {
-          this.$toast.error(extractErrorMessage(e, null, 'An error occurred!'));
-        }
-      }
-    },
-    onCarBrandChanged(brand: any) {
-      this.form.brand = brand?.name || null;
-      if (brand) {
-        this.getVehiclesForBrand(brand.id);
-      }
-    }
-  }
-});
-</script> -->
 
 <script setup lang="ts">
 import { ref, Ref, defineEmits, watch, computed } from 'vue';
@@ -600,7 +354,8 @@ const saveForm = async () => {
       seats: form.value.seats,
       city_ids: form.value.city_ids,
       registration_number: form.value.registration_number,
-      partner_id: form.value.partner_id
+      partner_id: form.value.partner_id,
+      inventory_type: 'regular'
     };
     const response = await axios.post('/v1/vehicles', payload);
     await store.dispatch('vehicle/setVehicleFormData', response.data);
@@ -616,6 +371,7 @@ const saveForm = async () => {
     processing.value = false;
   }
 }
+
 const getVehiclesForBrand = async (brandId: any) => {
   if (vehicleModelMap.has(brandId)) {
     vehicleModels.value = vehicleModelMap.get(brandId);

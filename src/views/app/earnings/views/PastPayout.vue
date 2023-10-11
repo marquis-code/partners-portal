@@ -169,13 +169,13 @@ const isFetchingNextPaydate = ref(false);
 
 const partnerContext:any = computed(() => store.getters['auth/activeContext'])
 
-const init = async() => {
+const init = async () => {
   await getAllPayouts();
 }
 const gotoEarning = () => {
   router.push('/earnings');
 }
-const getAllPayouts = async() => {
+const getAllPayouts = async () => {
   try {
     isFetchingPayouts.value = true;
     const response = await axios.get(
