@@ -21,7 +21,6 @@
                 >Company Name</label
               >
               <input
-                readonly
                 type="text"
                 v-model="v$.form.company_name.$model"
                 class="
@@ -116,7 +115,7 @@
               >
               <input
                 readonly
-                type="email"
+                type="text"
                 v-model="v$.form.company_type.$model"
                 class="
                   text-xs
@@ -448,8 +447,16 @@ const updatePartnerCompanyInfo = async () => {
   }
   processing.value = true;
   try {
-    // console.log('I am here')
-    toast.success('Drivers details was successfully updated');
+    const payload = {
+      company_address: form.value.company_address,
+      company_name: form.value.company_name
+    };
+    await axios.patch(
+      `/v1/partners/${userSessionData.value.activeContext.partner.id}`,
+      payload
+    );
+    toast.success('Company details was successfully updated');
+    await store.dispatch('auth/refreshActiveContext', user.value.id);
   } catch (err) {
     console.log(err);
     const errorMessage = extractErrorMessage(
