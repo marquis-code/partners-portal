@@ -19,8 +19,10 @@ const { sign_user_in } = useSignInUserExternally()
 
 onMounted(async () => {
   const res = await sign_user_in((query.token as string).replace(/"/g, '').trim(), query.path as string)
+  console.log(res);
   if (res) {
     await store.dispatch('auth/authSuccess', res);
+    console.log('help me');
     router.push(query.path as string);
   }
 })

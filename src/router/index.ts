@@ -85,7 +85,11 @@ const routes: Array<RouteRecordRaw> = [
     path: '/redirect',
     name: 'redirect',
     component: Redirect,
-
+    meta: {
+      title: 'Redirect',
+      requiresAuth: false,
+      openPage: true
+    }
   },
   {
     path: '/faq',
