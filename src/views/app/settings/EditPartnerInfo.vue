@@ -630,6 +630,7 @@ import router from '@/router';
 import {axiosInstance as axios} from '@/plugins/axios';
 import {useToast} from 'vue-toast-notification';
 import { useRoute } from 'vue-router';
+import {AppInitializerService} from "@/services/app-initializer.service";
 
 interface Driver {
   fname?: string;
@@ -701,7 +702,8 @@ const setCurrentDetails = () => {
   form.value.phone = userSessionData.value.user.phone;
   form.value.email = userSessionData.value.user.email;
   form.value.doc_type = partnerContext.value.onboardingState.identity.document_type
-  form.value.dob = partnerContext.value.onboardingState.identity.dob;
+  // form.value.dob = partnerContext.value.onboardingState.identity.dob || userSessionData.value.user.dob;
+  form.value.dob = userSessionData.value.user.dob;
   form.value.doc_id = partnerContext.value.onboardingState.identity.document_id;
 }
 const handleFileRemoval = () => {
@@ -739,14 +741,20 @@ const updatePartnerInfo = async () => {
       // document_id: docId.value,
       password: 'shuttlers'
     };
+    // await axios.patch(
+    //   `/v1/partners/${userSessionData.value.activeContext.partner.account_sid}/drivers/${route.params.driverId}`, //  Endpoint to update driver
+    //   payload
+    // );
     await axios.patch(
-      `/v1/partners/${userSessionData.value.activeContext.partner.account_sid}/drivers/${route.params.driverId}`, //  Endpoint to update driver
+      `/v1/users/${user.value.id}`, //  Endpoint to update driver
       payload
     );
-    openModal();
-    router.push({ name: 'drivers.list' });
-    closeModal();
-    toast.success('Drivers details was successfully updated');
+    // openModal();
+    // router.push({ name: 'drivers.list' });
+    // closeModal();
+    toast.success('Partners details was successfully updated');
+    // await store.dispatch('auth/refreshActiveContext', user.value.id);
+    new AppInitializerService(router, store, axios).initializeUserSession()
   } catch (err) {
     console.log(err);
     const errorMessage = extractErrorMessage(
