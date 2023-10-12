@@ -47,6 +47,7 @@
                 >First name</label
               >
               <input
+                readonly
                 type="text"
                 v-model="v$.form.fname.$model"
                 class="
@@ -234,6 +235,7 @@
                   >Date of birth</label
                 >
                 <input
+                  readonly
                   type="date"
                   v-model="v$.form.dob.$model"
                   class="
@@ -378,7 +380,7 @@
                 px-5
                 text-sm
               "
-              :disabled="v$.form.$invalid || processing"
+              :disabled="true || v$.form.$invalid || processing"
               :class="
                 v$.form.$invalid || processing
                   ? 'cursor-not-allowed text-grays-black-5 bg-grays-black-7'
@@ -649,20 +651,6 @@ interface Driver {
 const route = useRoute()
 const toast = useToast()
 const store = useStore()
-// const validations = {
-//   form: {
-//     fname: { required },
-//     lname: { required },
-//     phone: { required },
-//     email: { required, email },
-//     residential_address: { required },
-//     dob: { required },
-//     age_of_business: { required },
-//     doc_type: { required },
-//     doc_id: { required },
-//     avatar: { required }
-//   }
-// }
 
 const validations = computed(() => ({
   form: {
@@ -738,22 +726,14 @@ const updatePartnerInfo = async () => {
       dob: form.value.dob,
       avatar: form.value.avatar,
       document_type: 'drivers_license',
-      // document_id: docId.value,
+      document_id: docId.value,
       password: 'shuttlers'
     };
-    // await axios.patch(
-    //   `/v1/partners/${userSessionData.value.activeContext.partner.account_sid}/drivers/${route.params.driverId}`, //  Endpoint to update driver
-    //   payload
-    // );
     await axios.patch(
-      `/v1/users/${user.value.id}`, //  Endpoint to update driver
+      `/v1/users/${user.value.id}`,
       payload
     );
-    // openModal();
-    // router.push({ name: 'drivers.list' });
-    // closeModal();
     toast.success('Partners details was successfully updated');
-    // await store.dispatch('auth/refreshActiveContext', user.value.id);
     new AppInitializerService(router, store, axios).initializeUserSession()
   } catch (err) {
     console.log(err);
