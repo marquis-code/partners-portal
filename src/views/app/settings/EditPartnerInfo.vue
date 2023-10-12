@@ -631,6 +631,7 @@ import {axiosInstance as axios} from '@/plugins/axios';
 import {useToast} from 'vue-toast-notification';
 import { useRoute } from 'vue-router';
 import {AppInitializerService} from "@/services/app-initializer.service";
+import moment from 'moment'
 
 interface Driver {
   fname?: string;
@@ -638,7 +639,7 @@ interface Driver {
   phone?: string;
   email?: string;
   residential_address?: string;
-  dob?: string;
+  dob?: any;
   age_of_business?: string;
   doc_type?: string;
   doc_id?: Array<string>;
@@ -702,8 +703,7 @@ const setCurrentDetails = () => {
   form.value.phone = userSessionData.value.user.phone;
   form.value.email = userSessionData.value.user.email;
   form.value.doc_type = partnerContext.value.onboardingState.identity.document_type
-  // form.value.dob = partnerContext.value.onboardingState.identity.dob || userSessionData.value.user.dob;
-  form.value.dob = userSessionData.value.user.dob;
+  form.value.dob = moment(userSessionData.value.user.dob).format('YYYY-MM-DD');
   form.value.doc_id = partnerContext.value.onboardingState.identity.document_id;
 }
 const handleFileRemoval = () => {
