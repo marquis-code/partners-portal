@@ -132,7 +132,7 @@
               />
               <span
                 class="text-xs font-light text-red-500"
-                v-if="v$.form.company_type.$dirty && v$.form.company_type.required.$invalid"
+                v-if="v$.form.company_type.$dirty"
               >
                 This field must be provided
               </span>
@@ -423,6 +423,7 @@ const setCurrentCompanyDetails = () => {
   form.value.rc_number = userSessionData.value.associatedOrganizations[0].partner.rc_number;
   form.value.company_address = userSessionData.value.associatedOrganizations[0].partner.company_address;
   form.value.company_type = userSessionData.value.associatedOrganizations[0].partner.company_type;
+  // form.value.company_type = 'hello';
 }
 const handleFileRemoval = () => {
   isUploaded.value = false;
