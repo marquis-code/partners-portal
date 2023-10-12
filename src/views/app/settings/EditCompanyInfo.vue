@@ -21,6 +21,7 @@
                 >Company Name</label
               >
               <input
+                readonly
                 type="text"
                 v-model="v$.form.company_name.$model"
                 class="
@@ -87,6 +88,7 @@
                 >Company Address</label
               >
               <input
+                readonly
                 type="text"
                 v-model="v$.form.company_address.$model"
                 class="
@@ -153,7 +155,7 @@
                 px-5
                 text-sm
               "
-              :disabled="v$.form.$invalid || processing"
+              :disabled="true || v$.form.$invalid || processing"
               :class="
                 v$.form.$invalid || processing
                   ? 'cursor-not-allowed text-grays-black-5 bg-grays-black-7'
