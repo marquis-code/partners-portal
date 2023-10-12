@@ -31,15 +31,11 @@ export default <StoreOptions<AuthState>>{
       await dispatch('initializeSession', <UserSessionModel>{ activeContext: sessionData?.activeContext, ...userSession});
     },
     async initializeSession ({dispatch}, data: UserSessionModel) {
-      // This method is called after a successful login with login data passed in as response
-      // and also when the app is refreshed with a valid user session data in the browser local storage
-
       if (data) {
         setAuthorization(data.token);
         try {
           const response = await dispatch('getPartnerMemberOrganizations', data.user.id);
           data.associatedOrganizations = response;
-          console.log(response)
         } catch (e) {
           console.info('No partners associated');
         }

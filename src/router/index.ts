@@ -8,6 +8,7 @@ import {AuthGuard} from "@/router/guards/auth.guard";
 import store from '@/store';
 import {OnboardingGuard} from "@/router/guards/onboarding.guard";
 import SplashIntro from "@/views/LandingPage/SplashIntro.vue";
+import Redirect from "@/views/LandingPage/redirect.vue";
 import Login from "@/views/LandingPage/Login.vue";
 import ForgotPassword from "@/views/LandingPage/ForgotPassword.vue";
 import ResetPassword from "@/views/LandingPage/ResetPassword.vue";
@@ -79,6 +80,16 @@ const routes: Array<RouteRecordRaw> = [
         }
       },
     ]
+  },
+  {
+    path: '/redirect',
+    name: 'redirect',
+    component: Redirect,
+    meta: {
+      title: 'Redirect',
+      requiresAuth: false,
+      openPage: true
+    }
   },
   {
     path: '/faq',
