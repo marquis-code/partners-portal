@@ -115,7 +115,7 @@
     >
       <div
         @click="$router.push({ name: 'settings.edit.partner' })"
-        class="flex flex-row items-center w-1/2 cursor-pointer"
+        class="flex flex-row items-center cursor-pointer w-full"
       >
         <img
           v-if="user.avatar"
@@ -129,11 +129,11 @@
           class="w-10 h-10 mr-2"
           :class="isSidebarFolded && 'text-center mr-0'"
         />
-        <div v-if="!isSidebarFolded && user" class="text-sm font-medium">
+        <div v-if="!isSidebarFolded && user" class="text-sm font-medium whitespace-nowrap w-[100px] text-left overflow-hidden text-ellipsis">
           {{ user.fname }}
         </div>
       </div>
-      <div></div>
+      <!-- <div></div> -->
       <div
         @click="logout"
         class="material-icons w-2/12 flex justify-end items-end cursor-pointer"
