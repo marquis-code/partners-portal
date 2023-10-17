@@ -48,8 +48,9 @@ const formatTableData = (data: Array<any>) => {
       name: `${driver?.fname} ${driver?.lname}`,
       id: driverId,
     };
+    obj.partnersRevenue = e.partnersRevenue;
     obj.deductions = e.totalDeductedAmount;
-    obj.netIncome = partnersRevenue;
+    obj.netIncome = e.finalPartnersRevenue;
     obj.vehicle = {
       name: vehicle?.name,
       id: vehicleId,
