@@ -474,6 +474,7 @@ const headers = [
   { label: 'Route Code', key: 'routeCode' },
   { label: 'Driver', key: 'driver' },
   { label: 'Vehicle', key: 'vehicle' },
+  { label: 'Total Earning', key: 'partnersRevenue' },
   { label: 'Deductions', key: 'deductions' },
   { label: 'Net Income', key: 'netIncome' },
 ]
