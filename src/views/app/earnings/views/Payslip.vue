@@ -1,5 +1,5 @@
 <template>
-<main>
+<main class="w-full lg:min-w-[1200px] xl:w-[100%]">
 <page-layout page-title="Earnings">
 <template #breadcrumbs>
   <page-action-header>
@@ -28,7 +28,7 @@
   <div v-if="!earnings.length" class="flex h-full min-h-[400px] items-center justify-center">
     <h3 class="text-[#09090F] text-xl font-medium">No Payslip Avaliable</h3>
   </div>
-  <div v-else class="flex flex-col lg:items-start lg:flex-row gap-6 w-full lg:min-w-[1000px]">
+  <div v-else class="flex flex-col lg:items-start lg:flex-row gap-6 w-[100%] ">
     <div class="flex flex-col gap-4 w-full max-w-[300px] shrink-0">
       <div v-for="n,i in earnings" :key="i" @click="fetchData(n)"
         class="p-3 flex items-end justify-between bg-white border rounded-lg cursor-pointer"
@@ -57,7 +57,7 @@
     </div>
 
     <template v-if="!fetching_revenues">
-      <div v-if="!revenues.length" class="w-full max-w-[600px] bg-white rounded-lg border flex flex-col">
+      <div v-if="!revenues.length" class="w-full border max-w-[600px] bg-white rounded-lg flex flex-col">
         <div class="p-3 flex items-center justify-center h-[400px]">
           <div class="w-fit h-fit flex flex-col">
             <img src="@/assets/illustration/payslip/empty_doc.svg" class="max-w-[200px] mx-auto" alt="">
@@ -68,7 +68,7 @@
           </div>
         </div>
       </div>
-      <div v-else class="w-[100%] flex flex-col flex-grow gap-4 lg:max-w-[600px]">
+      <div v-else class="w-full flex flex-col gap-4">
         <div class="flex flex-col gap-2">
           <div class="bg-white p-3 flex items-center justify-between border-b">
             <p class="text-xs text-[#6E717C] font-medium uppercase">Payslip for {{ generatedMonth }}, {{ generatedYear }}</p>
