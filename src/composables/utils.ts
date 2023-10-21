@@ -32,6 +32,7 @@ export function downloadFile (url:string, fileName:string) {
 }
 
 export const formatNaira = (amount:number) => {
+  if (amount === 0) return 0
   return amount.toLocaleString("en-NG", { style: "currency", currency: "NGN" });
 }
 
