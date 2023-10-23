@@ -176,7 +176,7 @@ import { formatNaira } from '@/composables/utils';
 import { useRoute } from 'vue-router'
 import boxLoader from '@/components/core/boxLoader.vue';
 
-const { loading, fetching_revenues, fetchEarnings, fetchData, earnings, selectedEarnings, earningMetadata, earningPage, paymentBreakdown, totalDeductions: totalDeduction, totalRevenue, netRevenue, revenues, downloading, printPayslip, clearPaySlip, generatedMonth, generatedYear, revenueMetadata, revenuePage } = usePayslip()
+const { loading, fetching_revenues, fetchEarnings, getPaymentDate, fetchData, earnings, selectedEarnings, earningMetadata, earningPage, paymentBreakdown, totalDeductions: totalDeduction, totalRevenue, netRevenue, revenues, downloading, printPayslip, clearPaySlip, generatedMonth, generatedYear, revenueMetadata, revenuePage } = usePayslip()
 
 const route = useRoute()
 const gotoEarning = () => {
@@ -206,10 +206,6 @@ const loadRevenuePage = (page:number) => {
 watch(earningPage, () => {
   fetchEarnings()
 })
-
-const getPaymentDate = (earningId:string) => {
-  return paymentBreakdown.value.filter(n => n.earningId === earningId)[0].paidAt
-}
 
 fetchEarnings()
 clearPaySlip()
