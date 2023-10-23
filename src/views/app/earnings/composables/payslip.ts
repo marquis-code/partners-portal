@@ -44,7 +44,7 @@ const otherPagesData = ref([]) as Ref<any[]>
 const num_of_other_pages = ref(0)
 // const first_page_row = ref(7)
 const first_page_row = computed(() => {
-  return 7 - (Math.ceil(totalPayslipData.paymentBreakdown.value.length / 2))
+  return 8 - (Math.ceil(totalPayslipData.paymentBreakdown.value.length / 2))
 })
 const rowPerPage = ref(12)
 const generatedFileName = ref('')
@@ -110,13 +110,13 @@ export const usePayslip = () => {
 
     try {
       const res = await axios.get(
-        `/cost-revenue/v1/revenues?page=1&perPage=10&earningIds=${earningIds.value.join(',')}&partnerId=${partnerContext.value.partner.account_sid}`
+        `/cost-revenue/v1/revenues?page=1&perPage=10&earningIds=${earningIds.value.join(',')}&partnerId=${partnerContext.value.partner.account_sid}&isSettled=true`
       );
       const data = res?.data
       if (data.result.length) {
         const total = data.metadata.total
         const resp = await axios.get(
-          `/cost-revenue/v1/revenues?page=1&perPage=${total}&earningIds=${earningIds.value.join(',')}&partnerId=${partnerContext.value.partner.account_sid}`
+          `/cost-revenue/v1/revenues?page=1&perPage=${total}&earningIds=${earningIds.value.join(',')}&partnerId=${partnerContext.value.partner.account_sid}&isSettled=true`
         );
         if (resp.data.result.length) {
           payslipData.value = resp.data.result
@@ -221,7 +221,7 @@ export const usePayslip = () => {
     }
     try {
       const res = await axios.get(
-        `/cost-revenue/v1/revenues?page=${totalPayslipData.revenuePage.value}&perPage=10&earningIds=${earningIds.value.join(',')}&partnerId=${partnerContext.value.partner.account_sid}`
+        `/cost-revenue/v1/revenues?page=${totalPayslipData.revenuePage.value}&perPage=10&earningIds=${earningIds.value.join(',')}&partnerId=${partnerContext.value.partner.account_sid}&isSettled=true`
       );
       const data = res?.data
       if (data.result.length) {
