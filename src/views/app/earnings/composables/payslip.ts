@@ -13,7 +13,7 @@ import {compress, compressAccurately} from 'image-conversion';
 // interface pdfType {name:string;pdf:JsPDF;pages:number}
 // interface slipType {revenues: any[]; totalRevenue: number; netRevenue: number; totalDeduction: number}
 interface metadataType {currentPage:number;pages:number;perPage:number;total:number}
-interface paymentBreakDown {netRevenue:number;totalRevenue: number; totalDeductions:number; referenceTime:string;}
+interface paymentBreakDown {netRevenue:number;totalRevenue: number; totalDeductions:number; referenceTime:string;paidAt:string; earningId:string;}
 
 const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 const loading = ref(false)

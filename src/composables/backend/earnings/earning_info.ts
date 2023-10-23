@@ -69,7 +69,7 @@ export const useEarningInfo = () => {
     try {
       isFetchingEarnings.value = true;
       const response = await axios.get(
-        `/cost-revenue/v1/partners/${partnerContext.value.partner.account_sid}/revenues?from=${filter.value.range.start ? formatApiCallDate(filter.value.range.start) : null}&to=${filter.value.range.end ? formatApiCallDate(filter.value.range.end) : null}`
+        `/cost-revenue/v1/partners/${partnerContext.value.partner.account_sid}/revenues?from=${filter.value.range.start ? formatApiCallDate(filter.value.range.start) : null}&to=${filter.value.range.end ? formatApiCallDate(filter.value.range.end) : null}&isSettled=false`
       );
       if (response.status === 200) {
         // sd
