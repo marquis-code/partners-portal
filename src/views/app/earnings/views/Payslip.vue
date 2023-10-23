@@ -106,7 +106,7 @@
             </div>
 
             <div v-for="(n,i) in paymentBreakdown" :key="i" class="grid grid-cols-4 gap-4 text-xs font-bold text-[#101828]">
-              <p>{{ moment(n.referenceTime).format('Do MMMM, YYYY') }}</p>
+              <p>{{ moment(n.paidAt).format('Do MMMM, YYYY') }}</p>
               <p>{{ formatNaira(n.totalRevenue) }}</p>
               <p>{{ formatNaira(n.totalDeductions) }}</p>
               <p>{{ formatNaira(n.netRevenue) }}</p>
@@ -140,7 +140,8 @@
                 {{ moment(item.data.tripStartTime).format('h:mm A') }}
               </span>
               <span v-if="item.paymentDate" class="">
-                {{ moment(item.data.tripStartTime).format('Do MMMM, YYYY') }}
+                <!-- {{ getPaymentDate(item.data.accruedEarningsId) }} -->
+                {{ moment(getPaymentDate(item.data.accruedEarningsId)).format('Do MMMM, YYYY') }}
               </span>
               <span v-if="item.finalPartnersRevenue" class="">
                 {{ formatNaira(item.data.finalPartnersRevenue) }}
@@ -205,6 +206,10 @@ const loadRevenuePage = (page:number) => {
 watch(earningPage, () => {
   fetchEarnings()
 })
+
+const getPaymentDate = (earningId:string) => {
+  return paymentBreakdown.value.filter(n => n.earningId === earningId)[0].paidAt
+}
 
 fetchEarnings()
 clearPaySlip()
