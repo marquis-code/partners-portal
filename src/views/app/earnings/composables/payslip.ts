@@ -241,7 +241,11 @@ export const usePayslip = () => {
       fetching_revenues.value = false
     }
   }
-  return { loading, fetching_revenues, previewPdf, fetchEarnings, fetchData, earnings, selectedEarnings, earningMetadata, earningPage, payslipData, firstPageData, otherPagesData, months, num_of_other_pages, rowPerPage, first_page_row, ...totalPayslipData, downloading, printPayslip, clearPaySlip, generatedMonth, generatedYear }
+
+  const getPaymentDate = (earningId:string) => {
+    return totalPayslipData.paymentBreakdown.value.filter(n => n.earningId === earningId)[0].paidAt
+  }
+  return { loading, fetching_revenues, previewPdf, fetchEarnings, fetchData, getPaymentDate, earnings, selectedEarnings, earningMetadata, earningPage, payslipData, firstPageData, otherPagesData, months, num_of_other_pages, rowPerPage, first_page_row, ...totalPayslipData, downloading, printPayslip, clearPaySlip, generatedMonth, generatedYear }
 }
 
 // const combineRevenues = (data:any[]) => {

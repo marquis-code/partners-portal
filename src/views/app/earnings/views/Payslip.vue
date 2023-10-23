@@ -30,6 +30,7 @@
   </div>
   <div v-else class="flex flex-col lg:items-start lg:flex-row gap-6 w-[100%] ">
     <div class="flex flex-col gap-4 w-full max-w-[300px] shrink-0">
+      <h3 class="text-lg font-medium text-black">Your Payslips</h3>
       <div v-for="n,i in earnings" :key="i" @click="fetchData(n)"
         class="p-3 flex items-end justify-between bg-white border rounded-lg cursor-pointer"
         :class="[selectedEarnings?.referenceTime === n.referenceTime ? 'border-[#15CD70]' : '']"
@@ -95,7 +96,7 @@
             </div>
           </div>
         </div>
-        <div v-if="paymentBreakdown.length" class="p-4 rounded-lg flex flex-col gap-5 bg-white border w-full max-w-fit overflow-auto">
+        <div v-if="paymentBreakdown.length" class="p-4 rounded-lg flex flex-col gap-5 bg-white border w-full overflow-auto">
           <p class="text-xs font-bold text-[#444854]">Payment breakdown</p>
           <div class="min-w-[500px] flex flex-col gap-3">
             <div class="grid grid-cols-4 gap-4 text-xs text-[#667085]">
@@ -176,7 +177,7 @@ import { formatNaira } from '@/composables/utils';
 import { useRoute } from 'vue-router'
 import boxLoader from '@/components/core/boxLoader.vue';
 
-const { loading, fetching_revenues, fetchEarnings, fetchData, earnings, selectedEarnings, earningMetadata, earningPage, paymentBreakdown, totalDeductions: totalDeduction, totalRevenue, netRevenue, revenues, downloading, printPayslip, clearPaySlip, generatedMonth, generatedYear, revenueMetadata, revenuePage } = usePayslip()
+const { loading, fetching_revenues, fetchEarnings, getPaymentDate, fetchData, earnings, selectedEarnings, earningMetadata, earningPage, paymentBreakdown, totalDeductions: totalDeduction, totalRevenue, netRevenue, revenues, downloading, printPayslip, clearPaySlip, generatedMonth, generatedYear, revenueMetadata, revenuePage } = usePayslip()
 
 const route = useRoute()
 const gotoEarning = () => {
@@ -206,10 +207,6 @@ const loadRevenuePage = (page:number) => {
 watch(earningPage, () => {
   fetchEarnings()
 })
-
-const getPaymentDate = (earningId:string) => {
-  return paymentBreakdown.value.filter(n => n.earningId === earningId)[0].paidAt
-}
 
 fetchEarnings()
 clearPaySlip()
