@@ -149,7 +149,6 @@
       </section>
     </form>
 
-    
     <form v-if="activeView === 1">
       <section class="flex justify-start flex-col space-y-5 items-start">
         <div class="space-y-2 w-full">
