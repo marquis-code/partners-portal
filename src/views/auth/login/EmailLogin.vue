@@ -72,7 +72,7 @@
         class="flex justify-center items-center w-full p-3 rounded-md border-none outline-none text-sm mt-8"
       >
         {{ processing ? 'Loading' : 'Login' }}
-        <spinner v-if="processing" class="w-5 ml-2 mx-0"></spinner>
+        <spinner v-if="processing" class="!ml-2 !w-fit !mx-0"></spinner>
         <img v-if="!processing" class="ml-2" src="@/assets/images/arrow.svg" />
       </button>
 

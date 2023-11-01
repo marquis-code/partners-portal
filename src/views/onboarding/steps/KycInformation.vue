@@ -113,7 +113,7 @@
           <label class="text-xs font-medium text-grays-black-5"
             >Date Of Birth</label
           >
-          <datepicker
+          <!-- <datepicker
             class="
               text-xs
               border-none
@@ -126,7 +126,16 @@
             "
             placeholder="Choose a date"
             v-model="(v$.identityForm.document.dob as any).$model"
-          />
+          /> -->
+          <v-date-picker  v-model="(v$.identityForm.document.dob as any).$model">
+            <template  v-slot="{ inputEvents }">
+              <div v-on="inputEvents" class="w-full ring-1 ring-gray-300 rounded-md outline-none text-xs py-3 px-4"
+                :class="[(v$.identityForm.document.dob as any).$model ? '' : 'text-gray-500/25']"
+              >
+                {{ (v$.identityForm.document.dob as any).$model ? formatDate((v$.identityForm.document.dob as any).$model) : 'Choose a date'}}
+              </div>
+            </template>
+          </v-date-picker>
           <span
             class="text-sm font-light text-red-500"
             v-if="
@@ -547,6 +556,7 @@ import {axiosInstance as axios} from '@/plugins/axios';
 import {useToast} from 'vue-toast-notification';
 import { useRoute } from 'vue-router';
 import ordinaryAutoComplete from '@/components/core/ordinaryAutoComplete.vue'
+import {formatDate} from '@/composables/utils'
 
 const route = useRoute()
 const toast = useToast()
