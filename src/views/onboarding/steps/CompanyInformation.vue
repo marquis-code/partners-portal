@@ -164,14 +164,14 @@
           v-model="(v$.form.experience_start_date as any).$model"
         /> -->
         <v-date-picker  v-model="(v$.form.experience_start_date as any).$model">
-            <template  v-slot="{ inputEvents }">
-              <div v-on="inputEvents" class="w-full ring-1 ring-gray-300 rounded-md outline-none text-xs py-3 px-4"
-                :class="[(v$.form.experience_start_date as any).$model ? '' : 'text-gray-500/25']"
-              >
-                {{ (v$.form.experience_start_date as any).$model ? formatDate((v$.form.experience_start_date as any).$model) : 'Choose a date'}}
-              </div>
-            </template>
-          </v-date-picker>
+          <template  v-slot="{ inputEvents }">
+            <div v-on="inputEvents" class="w-full ring-1 ring-gray-300 rounded-md outline-none text-xs py-3 px-4"
+              :class="[(v$.form.experience_start_date as any).$model ? '' : 'text-gray-500/25']"
+            >
+              {{ (v$.form.experience_start_date as any).$model ? formatDate((v$.form.experience_start_date as any).$model) : 'Choose a date'}}
+            </div>
+          </template>
+        </v-date-picker>
         <span
           class="text-sm font-light text-red-500"
           v-if="
