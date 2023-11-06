@@ -2,7 +2,7 @@ name: Build and trigger deploy
 
 on:
   push:
-    branches: [ "test","staging", "master" ]
+    branches: [ "test","staging", "main" ]
 
 jobs:
   build:
