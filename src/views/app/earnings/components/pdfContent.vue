@@ -32,7 +32,7 @@
 			<p class="text-xl font-medium text-white mb-3">{{ formatNaira(netRevenue) }}</p>
 		</div> -->
 
-    <div class="p-4 pb-6 flex flex-col gap-4 bg-[#000005] rounded-lg">
+    <div v-if="paymentBreakdown.length" class="p-4 pb-6 flex flex-col gap-4 bg-[#000005] rounded-lg">
       <p class="text-xs font-bold text-[#E5E9F2]">Payment Breakdown</p>
       <div class="grid grid-cols-4 gap-4 text-[#C6C8C7] text-xs border-b pb-2">
           <p>Date</p>
@@ -42,9 +42,9 @@
         </div>
 
         <div v-for="(n,i) in paymentBreakdown" :key="i" class="grid grid-cols-4 gap-4 text-[#F9FBFA] text-xs font-bold">
-          <p>{{ moment(n.referenceTime).format('Do MMMM, YYYY') }}</p>
+          <p>{{ moment(n.paidAt).format('Do MMMM, YYYY') }}</p>
           <p>{{ formatNaira(n.totalRevenue) }}</p>
-          <p>{{ formatNaira(n.totalDeduction) }}</p>
+          <p>{{ formatNaira(n.totalDeductions) }}</p>
           <p>{{formatNaira(n.netRevenue) }}</p>
         </div>
     </div>
@@ -78,7 +78,7 @@
               <td>₦{{ n.finalPartnersRevenue }}</td>
               <td class="text-[#E13D45]">-₦{{ n.totalDeductedAmount }}</td>
               <td>{{ moment(n.tripStartTime).format('h:mm A') || 'N/A' }}</td>
-              <td>{{ moment(n.tripStartTime).format('Do MMM, YYYY') }}</td>
+              <td>{{ moment(getPaymentDate(n.accruedEarningsId)).format('Do MMM, YYYY') }}</td>
             </tr>
           </tbody>
         </table>
@@ -107,7 +107,7 @@ const tableHeader = [
   { text: 'Start time', width: '10' },
   { text: 'Payment date', width: '10' },
 ]
-const { firstPageData, netRevenue, totalDeductions, totalRevenue, selectedMonth, selectedYear, months, paymentBreakdown, generatedMonth, generatedYear } = usePayslip()
+const { firstPageData, netRevenue, totalDeductions, totalRevenue, paymentBreakdown, generatedMonth, generatedYear, getPaymentDate } = usePayslip()
 const userSessionData = computed(() => store.getters['auth/userSessionData'])
 </script>
 

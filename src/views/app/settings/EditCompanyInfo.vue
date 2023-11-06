@@ -88,6 +88,7 @@
                 >Company Address</label
               >
               <input
+                readonly
                 type="text"
                 v-model="v$.form.company_address.$model"
                 class="
@@ -116,7 +117,7 @@
               >
               <input
                 readonly
-                type="email"
+                type="text"
                 v-model="v$.form.company_type.$model"
                 class="
                   text-xs
@@ -133,7 +134,7 @@
               />
               <span
                 class="text-xs font-light text-red-500"
-                v-if="v$.form.company_type.$dirty && v$.form.company_type.required.$invalid"
+                v-if="v$.form.company_type.$dirty"
               >
                 This field must be provided
               </span>
@@ -154,7 +155,7 @@
                 px-5
                 text-sm
               "
-              :disabled="v$.form.$invalid || processing"
+              :disabled="true || v$.form.$invalid || processing"
               :class="
                 v$.form.$invalid || processing
                   ? 'cursor-not-allowed text-grays-black-5 bg-grays-black-7'
@@ -424,6 +425,7 @@ const setCurrentCompanyDetails = () => {
   form.value.rc_number = userSessionData.value.associatedOrganizations[0].partner.rc_number;
   form.value.company_address = userSessionData.value.associatedOrganizations[0].partner.company_address;
   form.value.company_type = userSessionData.value.associatedOrganizations[0].partner.company_type;
+  // form.value.company_type = 'hello';
 }
 const handleFileRemoval = () => {
   isUploaded.value = false;
@@ -448,8 +450,16 @@ const updatePartnerCompanyInfo = async () => {
   }
   processing.value = true;
   try {
-    // console.log('I am here')
-    toast.success('Drivers details was successfully updated');
+    const payload = {
+      company_address: form.value.company_address,
+      company_name: form.value.company_name
+    };
+    await axios.patch(
+      `/v1/partners/${userSessionData.value.activeContext.partner.id}`,
+      payload
+    );
+    toast.success('Company details was successfully updated');
+    await store.dispatch('auth/refreshActiveContext', user.value.id);
   } catch (err) {
     console.log(err);
     const errorMessage = extractErrorMessage(

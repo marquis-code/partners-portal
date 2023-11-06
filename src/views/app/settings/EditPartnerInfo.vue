@@ -47,6 +47,7 @@
                 >First name</label
               >
               <input
+                readonly
                 type="text"
                 v-model="v$.form.fname.$model"
                 class="
@@ -234,6 +235,7 @@
                   >Date of birth</label
                 >
                 <input
+                  readonly
                   type="date"
                   v-model="v$.form.dob.$model"
                   class="
@@ -378,7 +380,7 @@
                 px-5
                 text-sm
               "
-              :disabled="v$.form.$invalid || processing"
+              :disabled="true || v$.form.$invalid || processing"
               :class="
                 v$.form.$invalid || processing
                   ? 'cursor-not-allowed text-grays-black-5 bg-grays-black-7'
@@ -630,6 +632,8 @@ import router from '@/router';
 import {axiosInstance as axios} from '@/plugins/axios';
 import {useToast} from 'vue-toast-notification';
 import { useRoute } from 'vue-router';
+import {AppInitializerService} from "@/services/app-initializer.service";
+import moment from 'moment'
 
 interface Driver {
   fname?: string;
@@ -637,7 +641,7 @@ interface Driver {
   phone?: string;
   email?: string;
   residential_address?: string;
-  dob?: string;
+  dob?: any;
   age_of_business?: string;
   doc_type?: string;
   doc_id?: Array<string>;
@@ -647,20 +651,6 @@ interface Driver {
 const route = useRoute()
 const toast = useToast()
 const store = useStore()
-// const validations = {
-//   form: {
-//     fname: { required },
-//     lname: { required },
-//     phone: { required },
-//     email: { required, email },
-//     residential_address: { required },
-//     dob: { required },
-//     age_of_business: { required },
-//     doc_type: { required },
-//     doc_id: { required },
-//     avatar: { required }
-//   }
-// }
 
 const validations = computed(() => ({
   form: {
@@ -701,7 +691,7 @@ const setCurrentDetails = () => {
   form.value.phone = userSessionData.value.user.phone;
   form.value.email = userSessionData.value.user.email;
   form.value.doc_type = partnerContext.value.onboardingState.identity.document_type
-  form.value.dob = partnerContext.value.onboardingState.identity.dob;
+  form.value.dob = moment(userSessionData.value.user.dob).format('YYYY-MM-DD');
   form.value.doc_id = partnerContext.value.onboardingState.identity.document_id;
 }
 const handleFileRemoval = () => {
@@ -736,17 +726,15 @@ const updatePartnerInfo = async () => {
       dob: form.value.dob,
       avatar: form.value.avatar,
       document_type: 'drivers_license',
-      // document_id: docId.value,
+      document_id: docId.value,
       password: 'shuttlers'
     };
     await axios.patch(
-      `/v1/partners/${userSessionData.value.activeContext.partner.account_sid}/drivers/${route.params.driverId}`, //  Endpoint to update driver
+      `/v1/users/${user.value.id}`,
       payload
     );
-    openModal();
-    router.push({ name: 'drivers.list' });
-    closeModal();
-    toast.success('Drivers details was successfully updated');
+    toast.success('Partners details was successfully updated');
+    new AppInitializerService(router, store, axios).initializeUserSession()
   } catch (err) {
     console.log(err);
     const errorMessage = extractErrorMessage(

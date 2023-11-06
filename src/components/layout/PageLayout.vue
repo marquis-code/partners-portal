@@ -43,7 +43,6 @@ import {useSidebar} from '@/composables/sidebar'
 
 const { openSidebar } = useSidebar()
 const store = useStore()
-const companyName = ref('')
 export interface Props {
   pageTitle: string
   hasTabs?: boolean
@@ -56,14 +55,15 @@ withDefaults(defineProps<Props>(), {
 })
 
 const userSessionData = computed(() => store.getters['auth/userSessionData'])
-const setCompany = () => {
+
+const companyName = computed(() => {
   const x = userSessionData.value.activeContext.partner.company_name
   if (x.length > 15) {
-    companyName.value = `${x.slice(0, 15)}...`
+    return `${x.slice(0, 15)}...`
   } else {
-    companyName.value = x
+    return x
   }
-}
+})
 
 const logout = async () => {
   // TODO: block UI with overlay while logout api is called
@@ -78,7 +78,6 @@ const logout = async () => {
   }
 }
 
-setCompany()
 </script>
 
 <style scoped>

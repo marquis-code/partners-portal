@@ -51,7 +51,7 @@ export class AppInitializerService {
     );
   }
 
-  private async initializeUserSession (): Promise<void> {
+  public async initializeUserSession (): Promise<void> {
     const sessionDataString = localStorage.getItem(USER_SESSION_KEY);
     if (sessionDataString) {
       console.info('Session initialized');
@@ -62,7 +62,7 @@ export class AppInitializerService {
           const userResponse: LoginResponse = await this.axios.get(`v1/users/profile`).then(res => res.data);
           if (userResponse && userResponse.id) {
             userResponse.token = sessionData.token;
-            await this.store.dispatch('auth/authSuccess', <LoginResponse>{...sessionData.user, token: userResponse.token});
+            await this.store.dispatch('auth/authSuccess', <LoginResponse>{...userResponse, token: userResponse.token});
           } else {
             await this.store.dispatch('auth/clearSessionData', sessionData);
           }
