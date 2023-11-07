@@ -4,6 +4,8 @@ import { useStore } from 'vuex';
 import { extractErrorMessage } from '@/utils/helper';
 import moment from 'moment';
 import {useToast} from 'vue-toast-notification';
+import Swal from 'sweetalert2'
+import 'sweetalert2/src/sweetalert2.scss'
 
 const toast = useToast()
 const loadingStats = ref(false);
@@ -154,31 +156,34 @@ export const useDashboard = () => {
   }
   const fetchDashboardSummary = async (period = '') => {
     loadingStats.value = true;
-    const response = await axios.get(
-      `/v1/partners/${partnerContext.value.partner.id}/summaries?period=${period}`
-    );
-    //  Total driver check
-    partnerStats.value.partnerDriverCount = response.data.total_drivers;
-    if (partnerStats.value.partnerDriverCount > 0) {
-      partnerStats.value.hasADriver = true;
-      doneCount.value += 1;
-    }
-    // Total vehicle check
-    partnerStats.value.partnerVehicleCount = response.data.total_vehicles;
-    if (partnerStats.value.partnerVehicleCount > 0) {
-      partnerStats.value.hasAVehicle = true;
-      doneCount.value += 1;
-    }
-    // Company document check
-    partnerStats.value.hasUploadedCompanyDoc =
-      response.data.companyDocs?.length;
-    if (partnerStats.value.hasUploadedCompanyDoc) doneCount.value += 1;
+    try {
+      const response = await axios.get(
+        `/v1/partners/${partnerContext.value.partner.id}/summaries?period=${period}`
+      );
+      //  Total driver check
+      partnerStats.value.partnerDriverCount = response.data.total_drivers;
+      if (partnerStats.value.partnerDriverCount > 0) {
+        partnerStats.value.hasADriver = true;
+        doneCount.value += 1;
+      }
+      // Total vehicle check
+      partnerStats.value.partnerVehicleCount = response.data.total_vehicles;
+      if (partnerStats.value.partnerVehicleCount > 0) {
+        partnerStats.value.hasAVehicle = true;
+        doneCount.value += 1;
+      }
+      // Company document check
+      partnerStats.value.hasUploadedCompanyDoc = response.data.companyDocs?.length;
+      if (partnerStats.value.hasUploadedCompanyDoc) doneCount.value += 1;
 
-    partnerStats.value.partnerUpcomingTrips =
-      response.data.total_upcoming_trips;
-    partnerStats.value.partnerCompletedTrips =
-      response.data.total_completed_trips;
-    loadingStats.value = false;
+      partnerStats.value.partnerUpcomingTrips = response.data.total_upcoming_trips;
+      partnerStats.value.partnerCompletedTrips = response.data.total_completed_trips;
+    } catch (error) {
+      const errorMessage = extractErrorMessage(error, null, 'Oops! An error occurred, please try again.');
+      Swal.fire({ title: 'Error!', text: errorMessage || 'An error occured', icon: 'error', confirmButtonColor: "#000000"})
+    } finally {
+      loadingStats.value = false
+    }
   }
 
   return {
