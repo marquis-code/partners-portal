@@ -407,8 +407,6 @@ const {
   fetchDashboardSummary,
   getBarChartTripsData,
   getOverallRatings,
-  getPartnerAccruedEarnings,
-  getPartnerEarning,
   checkIdentityStatuses,
   checkIfAllTodosAreDone,
   checkIfSettlementAccountHasBeenProvided,
@@ -442,9 +440,7 @@ const setTableStates = async () => {
   checkIdentityStatuses();
   await fetchDashboardSummary();
   await checkIfSettlementAccountHasBeenProvided();
-  await getPartnerAccruedEarnings();
   await getOverallRatings();
-  await getPartnerEarning();
   checkIfAllTodosAreDone();
   getBarChartTripsData();
   setPartnerType()
