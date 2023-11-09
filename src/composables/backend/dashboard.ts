@@ -58,22 +58,6 @@ export const useDashboard = () => {
       toast.warning(errorMessage);
     }
   }
-  const getPartnerEarning = async () => {
-    try {
-      const response = await axios.get(
-        `cost-revenue/v1/partners/${partnerContext.value.partner.account_sid}/earnings-summary`
-      );
-      partnerStats.value.partnerAccruedEarnings =
-        response.data.unsettledEarnings.amount;
-    } catch (error) {
-      const errorMessage = extractErrorMessage(
-        error,
-        null,
-        'An error occured while fetching your earnings'
-      );
-      toast.warning(errorMessage);
-    }
-  }
   const checkIfAllTodosAreDone = () => {
     if (
       partnerStats.value.hasCompletedIdentityVerification === 'completed' &&
@@ -95,21 +79,6 @@ export const useDashboard = () => {
       );
       partnerStats.value.ratingCount = response.data.count;
       partnerStats.value.ratingOverTen = response.data.rating;
-    } catch (error) {
-      const errorMessage = extractErrorMessage(
-        error,
-        null,
-        'Oops! An error occurred, please try again.'
-      );
-      toast.error(errorMessage);
-    }
-  }
-  const getPartnerAccruedEarnings = async () => {
-    try {
-      const response = await axios.get(
-        `/cost-revenue/v1/partners/${partnerContext.value.partner.account_sid}/earnings-summary`
-      );
-      partnerStats.value.partnerAccruedEarnings = response.data.amount;
     } catch (error) {
       const errorMessage = extractErrorMessage(
         error,
@@ -178,6 +147,7 @@ export const useDashboard = () => {
 
       partnerStats.value.partnerUpcomingTrips = response.data.total_upcoming_trips;
       partnerStats.value.partnerCompletedTrips = response.data.total_completed_trips;
+      partnerStats.value.partnerAccruedEarnings = response.data.earningsSummary?.unsettledEarnings?.amount || 0
     } catch (error) {
       const errorMessage = extractErrorMessage(error, null, 'Oops! An error occurred, please try again.');
       Swal.fire({ title: 'Error!', text: errorMessage || 'An error occured', icon: 'error', confirmButtonColor: "#000000"})
@@ -194,8 +164,6 @@ export const useDashboard = () => {
     partnerType,
     period,
     getBarChartTripsData,
-    getPartnerAccruedEarnings,
-    getPartnerEarning,
     checkIdentityStatuses,
     checkIfAllTodosAreDone,
     getOverallRatings,
