@@ -126,7 +126,7 @@
       >
         <chart></chart>
       </section>
-      <pie-chart
+      <pie-chart v-if="render"
         :upcomingTripsCount="partnerStats.partnerUpcomingTrips || 0"
         :completedTripsCount="partnerStats.partnerCompletedTrips || 0"
       ></pie-chart>
@@ -404,6 +404,7 @@ const {
   doneCount,
   isTodoComplete,
   partnerType,
+  render,
   fetchDashboardSummary,
   getBarChartTripsData,
   getOverallRatings,
