@@ -35,14 +35,14 @@
     <div v-if="paymentBreakdown.length" class="p-4 pb-6 flex flex-col gap-4 bg-[#000005] rounded-lg">
       <p class="text-xs font-bold text-[#E5E9F2]">Payment Breakdown</p>
       <div class="grid grid-cols-4 gap-4 text-[#C6C8C7] text-xs border-b pb-2">
-          <p>Date</p>
+          <p>Payment Date</p>
           <p>Total Earnings</p>
           <p>Total Deductions</p>
           <p>Net Earnings</p>
         </div>
 
         <div v-for="(n,i) in paymentBreakdown" :key="i" class="grid grid-cols-4 gap-4 text-[#F9FBFA] text-xs font-bold">
-          <p>{{ moment(n.paidAt).format('Do MMMM, YYYY') }}</p>
+          <p>{{ n?.paidAt ? moment(n.paidAt).format('Do MMMM, YYYY') : '' }}</p>
           <p>{{ formatNaira(n.totalRevenue) }}</p>
           <p>{{ formatNaira(n.totalDeductions) }}</p>
           <p>{{formatNaira(n.netRevenue) }}</p>
