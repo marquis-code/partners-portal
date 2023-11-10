@@ -30,6 +30,7 @@ const doneCount = ref(0);
 const isTodoComplete = ref(false);
 const partnerType = ref('');
 const period = ref('');
+const render = ref(true)
 
 export const useDashboard = () => {
   const store = useStore()
@@ -145,15 +146,23 @@ export const useDashboard = () => {
       partnerStats.value.hasUploadedCompanyDoc = response.data.companyDocs?.length;
       if (partnerStats.value.hasUploadedCompanyDoc) doneCount.value += 1;
 
-      partnerStats.value.partnerUpcomingTrips = response.data.total_upcoming_trips;
+      partnerStats.value.partnerUpcomingTrips = (response.data.total_upcoming_trips || 0) + (response.data.total_active_trips || 0);
       partnerStats.value.partnerCompletedTrips = response.data.total_completed_trips;
       partnerStats.value.partnerAccruedEarnings = response.data.earningsSummary?.unsettledEarnings?.amount || 0
+      reRenderChart()
     } catch (error) {
       const errorMessage = extractErrorMessage(error, null, 'Oops! An error occurred, please try again.');
       Swal.fire({ title: 'Error!', text: errorMessage || 'An error occured', icon: 'error', confirmButtonColor: "#000000"})
     } finally {
       loadingStats.value = false
     }
+  }
+
+  const reRenderChart = () => {
+    render.value = false
+    setTimeout(() => {
+      render.value = true
+    }, 500);
   }
 
   return {
@@ -169,6 +178,7 @@ export const useDashboard = () => {
     getOverallRatings,
     setPartnerType,
     checkIfSettlementAccountHasBeenProvided,
-    fetchDashboardSummary
+    fetchDashboardSummary,
+    render
   }
 }
