@@ -29,8 +29,8 @@
     <h3 class="text-[#09090F] text-xl font-medium">No Payslip Avaliable</h3>
   </div>
   <div v-else class="flex flex-col lg:items-start lg:flex-row gap-6 w-[100%] ">
-    <div class="flex flex-col gap-4 w-full max-w-[300px] shrink-0">
-      <h3 class="text-lg font-medium text-black">Your Payslips</h3>
+    <div class="flex flex-col gap-2 w-full max-w-[300px] shrink-0">
+      <h3 class="text-lg font-medium text-black mb-2">Your Payslips</h3>
       <div v-for="n,i in earnings" :key="i" @click="fetchData(n)"
         class="p-3 flex items-end justify-between bg-white border rounded-lg cursor-pointer"
         :class="[selectedEarnings?.referenceTime === n.referenceTime ? 'border-[#15CD70]' : '']"
@@ -39,18 +39,18 @@
           <img src="@/assets/icons/docs.svg" alt="">
           <div class="flex flex-col gap-2">
             <p class="text-[#101211] text-sm font-medium">{{ moment(n.referenceTime).format('MMMM, YYYY') }} Pay slip</p>
-            <p class="text-sm text-[#8D918F]">pages</p>
+            <!-- <p class="text-sm text-[#8D918F]">pages</p> -->
           </div>
         </div>
-        <p class="text-sm text-[#8D918F]">Format: <span class="font-medium text-[#101211]">PDF</span></p>
+        <!-- <p class="text-sm text-[#8D918F]">Format: <span class="font-medium text-[#101211]">PDF</span></p> -->
       </div>
       <div class="flex items-center justify-between mt-4">
         <button class="paginate-button" :disabled="earningPage === 1" @click="earningPage--">
           <img src="@/assets/icons/pagination/arrow_left.svg" alt="">
           Previous
         </button>
-
-        <button class="paginate-button" :disabled="earningPage >= earningMetadata.currentPage" @click="earningPage++">
+        <span>{{ earningPage }} of {{ earningMetadata.pages }}</span>
+        <button class="paginate-button" :disabled="earningPage >= earningMetadata.total" @click="earningPage++">
           <img src="@/assets/icons/pagination/arrow_right.svg" alt="">
           Next
         </button>
@@ -100,14 +100,14 @@
           <p class="text-xs font-bold text-[#444854]">Payment breakdown</p>
           <div class="min-w-[500px] flex flex-col gap-3">
             <div class="grid grid-cols-4 gap-4 text-xs text-[#667085]">
-              <p>Date</p>
+              <p>Payment Date</p>
               <p>Total Earnings</p>
               <p>Total Deductions</p>
               <p>Net Earnings</p>
             </div>
 
             <div v-for="(n,i) in paymentBreakdown" :key="i" class="grid grid-cols-4 gap-4 text-xs font-bold text-[#101828]">
-              <p>{{ moment(n.paidAt).format('Do MMMM, YYYY') }}</p>
+              <p>{{ n?.paidAt ? moment(n.paidAt).format('Do MMMM, YYYY') : '' }}</p>
               <p>{{ formatNaira(n.totalRevenue) }}</p>
               <p>{{ formatNaira(n.totalDeductions) }}</p>
               <p>{{ formatNaira(n.netRevenue) }}</p>
