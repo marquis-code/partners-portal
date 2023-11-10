@@ -27,7 +27,7 @@
             <td>₦{{ n.finalPartnersRevenue }}</td>
             <td class="text-[#E13D45]">-₦{{ n.totalDeductedAmount }}</td>
             <td>{{ moment(n.tripStartTime).format('h:mm A') || 'N/A' }}</td>
-            <td>{{ moment(getPaymentDate(n.accruedEarningsId)).format('Do MMM, YYYY') }}</td>
+            <!-- <td>{{ moment(getPaymentDate(n.accruedEarningsId)).format('Do MMM, YYYY') }}</td> -->
           </tr>
         </tbody>
       </table>
@@ -50,7 +50,7 @@ const tableHeader = [
   { text: 'Amount earned', width: '8' },
   { text: 'Deduction', width: '8' },
   { text: 'Start time', width: '10' },
-  { text: 'Payment date', width: '10' },
+  // { text: 'Payment date', width: '10' },
 ]
 const { otherPagesData, num_of_other_pages, rowPerPage, first_page_row, getPaymentDate } = usePayslip()
 
