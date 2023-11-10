@@ -99,15 +99,15 @@
         <div v-if="paymentBreakdown.length" class="p-4 rounded-lg flex flex-col gap-5 bg-white border w-full overflow-auto">
           <p class="text-xs font-bold text-[#444854]">Payment breakdown</p>
           <div class="min-w-[500px] flex flex-col gap-3">
-            <div class="grid grid-cols-4 gap-4 text-xs text-[#667085]">
-              <p>Payment Date</p>
+            <div class="grid grid-cols-3 gap-4 text-xs text-[#667085]">
+              <!-- <p>Payment Date</p> -->
               <p>Total Earnings</p>
               <p>Total Deductions</p>
               <p>Net Earnings</p>
             </div>
 
-            <div v-for="(n,i) in paymentBreakdown" :key="i" class="grid grid-cols-4 gap-4 text-xs font-bold text-[#101828]">
-              <p>{{ n?.paidAt ? moment(n.paidAt).format('Do MMMM, YYYY') : '' }}</p>
+            <div v-for="(n,i) in paymentBreakdown" :key="i" class="grid grid-cols-3 gap-4 text-xs font-bold text-[#101828]">
+              <!-- <p>{{ n?.paidAt ? moment(n.paidAt).format('Do MMMM, YYYY') : '' }}</p> -->
               <p>{{ formatNaira(n.totalRevenue) }}</p>
               <p>{{ formatNaira(n.totalDeductions) }}</p>
               <p>{{ formatNaira(n.netRevenue) }}</p>
@@ -196,7 +196,7 @@ const tableHeaders = [
   { text: 'Amount Earned', width: '10', value: 'finalPartnersRevenue' },
   { text: 'Deductions', width: '8', value: 'totalDeductedAmount' },
   { text: 'Start time', width: '10', value: 'startTime' },
-  { text: 'Payment date', width: '13', value: 'paymentDate' },
+  // { text: 'Payment date', width: '13', value: 'paymentDate' },
 ]
 
 const loadRevenuePage = (page:number) => {
