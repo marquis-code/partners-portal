@@ -175,7 +175,7 @@ const fetchPageData = () => {
       console.log(vehicleInspectionSites.value);
     })
     .catch((e: any) => {
-      toast.error(extractErrorMessage(e));
+      toast.error(extractErrorMessage(e), { position: 'top-right' });
     })
     .finally(() => {
       fetchingSites.value = false;
@@ -211,7 +211,7 @@ const saveForm = async () => {
       null,
       'Oops! An error occurred, please try again.'
     );
-    toast.error(errorMessage);
+    toast.error(errorMessage, { position: 'top-right' });
   } finally {
     processing.value = false;
   }

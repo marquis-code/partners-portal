@@ -117,12 +117,12 @@ const uploadTos3andGetDocumentUrlList = (multipleImages: Array<File>, type: stri
       }
     } catch (error) {
       toast.warning(
-        'An error occured while uploading your file, please try again'
+        'An error occured while uploading your file, please try again', { position: 'top-right' }
       );
     }
   });
   uploadingFile.value = false;
-  toast.success(`${type} images uploaded`);
+  toast.success(`${type} images uploaded`, { position: 'top-right' });
 }
 const convertImageObjectToList = (imageObject: any) => {
   const imageList = [];
@@ -157,9 +157,9 @@ const submitFinalForm = async () => {
       'Oops! An error occurred, please try again.'
     );
     if (errorMessage === '"uploads" must contain at least 1 items') {
-      toast.error('All Vehicle Images must be uploaded');
+      toast.error('All Vehicle Images must be uploaded', { position: 'top-right' });
     } else {
-      toast.error(errorMessage);
+      toast.error(errorMessage, { position: 'top-right' });
     }
   } finally {
     submittingFinalForm.value = false;

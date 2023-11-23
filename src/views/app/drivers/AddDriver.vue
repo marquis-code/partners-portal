@@ -405,7 +405,7 @@ const saveForm = async () => {
       null,
       'Oops! An error occurred, please try again.'
     );
-    toast.error(errorMessage);
+    toast.error(errorMessage, { position: 'top-right' });
   } finally {
     processing.value = false;
   }
@@ -440,7 +440,7 @@ const createPartnerDriver = async (driverId: any) => {
         null,
         'Oops! An error occurred, please try again.'
       );
-      toast.error(errorMessage);
+      toast.error(errorMessage, { position: 'top-right' });
     });
 }
 const fileSelected = async (selectedImage: any) => {
@@ -448,7 +448,7 @@ const fileSelected = async (selectedImage: any) => {
   await uploadTos3andGetDocumentUrl(selectedImage)
     .then((res) => {
       form.value.files.push(res);
-      toast.success('Driver’s License was uploaded successfully');
+      toast.success('Driver’s License was uploaded successfully', { position: 'top-right' });
     })
     .catch(() => {
       uploadingFile.value = false;
@@ -464,7 +464,7 @@ const handleProfileUpload = async (e: any) => {
     .then((res) => {
       form.value.avatar = res;
       profilePreview.value = URL.createObjectURL(selectedProfile);
-      toast.success('Profile picture was uploaded successfully');
+      toast.success('Profile picture was uploaded successfully', { position: 'top-right' });
     })
     .catch(() => {
       profilePreview.value = '';
@@ -486,7 +486,7 @@ const uploadTos3andGetDocumentUrl = async (file: any) => {
     }
   } catch (error) {
     toast.error(
-      'An error occured while uploading your file, please try again'
+      'An error occured while uploading your file, please try again', { position: 'top-right' }
     );
     profilePreview.value = '';
   }

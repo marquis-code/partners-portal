@@ -304,7 +304,7 @@ export default defineComponent({
           null,
           'Oops! An error occurred, please try again.'
         );
-        this.$toast.error(errorMessage);
+        this.$toast.error(errorMessage, { position: 'top-right' });
       } finally {
         this.loading = false;
       }
@@ -437,14 +437,14 @@ const downloadReport = () => {
           downloadFile(url, 'downloaded-trips-report')
         } else {
           toast.error(
-            'No data to download'
+            'No data to download', { position: 'top-right' }
           );
         }
       })
     })
     .catch((err) => {
       toast.error(
-        err?.response?.data?.message || 'An error occured'
+        err?.response?.data?.message || 'An error occured', { position: 'top-right' }
       );
     })
     .finally(() => {

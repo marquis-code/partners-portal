@@ -353,7 +353,7 @@ export default defineComponent<any, any, any>({
           null,
           'Oops! An error occurred, please try again.'
         );
-        this.$toast.error(errorMessage);
+        this.$toast.error(errorMessage, { position: 'top-right' });
       } finally {
         this.processing = false;
       }
@@ -436,7 +436,7 @@ const isLoading:any = computed(() => store.getters['vehicle/getVehicleLoading'])
 const getVehicleData = () => {
   store.dispatch('vehicle/getVehicleInfo')
     .catch((e: any) => {
-      toast.error(extractErrorMessage(e));
+      toast.error(extractErrorMessage(e), { position: 'top-right' });
     });
 }
 const viewVehicleDetails = (id : number) => {
@@ -466,7 +466,7 @@ const fetchPageData = () => {
     vehicleBrands.value = r.data.data || [];
   })
     .catch((e: any) => {
-      toast.error(extractErrorMessage(e));
+      toast.error(extractErrorMessage(e), { position: 'top-right' });
     })
     .finally(() => {
       loading.value = false;
@@ -511,14 +511,14 @@ const saveForm = async () => {
     setTimeout(() => {
       viewVehicleDetails(vehicleData.value.id);
     }, 300)
-    toast.success('Vehicle Information Update');
+    toast.success('Vehicle Information Update', { position: 'top-right' });
   } catch (err) {
     const errorMessage = extractErrorMessage(
       err,
       null,
       'Oops! An error occurred, please try again.'
     );
-    toast.error(errorMessage);
+    toast.error(errorMessage, { position: 'top-right' });
   } finally {
     processing.value = false;
   }
@@ -531,7 +531,7 @@ const getVehiclesForBrand = async (brandId: any) => {
       const vehicleModelsResponse = await axios.get(`v1/vehicle-makes/${brandId}/vehicle-models`);
       vehicleModels.value = vehicleModelsResponse.data.data;
     } catch (e) {
-      toast.error(extractErrorMessage(e, null, 'An error occurred!'));
+      toast.error(extractErrorMessage(e, null, 'An error occurred!'), { position: 'top-right' });
     }
   }
 }

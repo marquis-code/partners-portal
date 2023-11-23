@@ -694,13 +694,13 @@ const selectThisDocument = async ($event: any, type: string) => {
   if (type === 'IncorporationCertificate') {
     incorporationCertificateUrl.value = [];
     incorporationCertificateUrl.value.push(fileUrl);
-    toast.success(`Incorporation Certificate uploaded`);
+    toast.success(`Incorporation Certificate uploaded`, { position: 'top-right' });
     uploadingInc.value = false;
   }
   if (type === 'Mermorandum') {
     mermorandumUrl.value = [];
     mermorandumUrl.value.push(fileUrl);
-    toast.success(`Mermorandum of association uploaded`);
+    toast.success(`Mermorandum of association uploaded`, { position: 'top-right' });
     uploadingMem.value = false;
   }
 }
@@ -720,7 +720,7 @@ const uploadTos3andGetDocumentUrl = async (file:any) => {
     }
   } catch (error) {
     toast.warning(
-      'An error occured while uploading your file, please try again'
+      'An error occured while uploading your file, please try again', { position: 'top-right' }
     );
   } finally {
     console.log('uploading');
@@ -751,11 +751,11 @@ const saveCompanyDocuments = async () => {
       `/v1/partners/${partnerContext.value.partner.id}/corporate-documents`,
       {...memPayload}
     );
-    toast.success("Company documents uploaded");
+    toast.success("Company documents uploaded", { position: 'top-right' });
     loading.value = false;
     step.value += 1;
   } catch (error) {
-    toast.warning("An error occured, Please try again");
+    toast.warning("An error occured, Please try again", { position: 'top-right' });
   } finally {
     loading.value = false;
   }
@@ -767,7 +767,7 @@ const checkIfDocuumentsHaveBeenProvided = async () => {
       step.value = 1;
     }
   } catch (error) {
-    toast.warning('An error occured, Please refresh this page ')
+    toast.warning('An error occured, Please refresh this page ', { position: 'top-right' })
   }
 }
 const checkIfShareHoldersHaveBeenProvided = async () => {
@@ -782,7 +782,7 @@ const checkIfShareHoldersHaveBeenProvided = async () => {
       await checkIfDocuumentsHaveBeenProvided()
     }
   } catch (error) {
-    toast.warning('An error occured, Please refresh this page ')
+    toast.warning('An error occured, Please refresh this page ', { position: 'top-right' })
   } finally {
     checkLoading.value = false
   }
@@ -807,9 +807,9 @@ const SaveStakeHolders = async () => {
       }
       step.value += 1;
     } catch (error) {
-      toast.warning('An error occured');
+      toast.warning('An error occured', { position: 'top-right' });
     }
-    toast.success('Partners saved');
+    toast.success('Partners saved', { position: 'top-right' });
   } else {
     return 0
   }
@@ -819,7 +819,7 @@ const checkStakeSum = () => {
     return init + stake.share_amount;
   }, 0)
   if (totalSum !== 100) {
-    toast.warning('The sum of all share must be 100%')
+    toast.warning('The sum of all share must be 100%', { position: 'top-right' })
     return false;
   } else {
     return true;

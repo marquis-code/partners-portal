@@ -207,15 +207,15 @@ const savePartnerCities = async () => {
         )
       ]);
       await store.dispatch('auth/refreshActiveContext', user.value.id);
-      toast.success('Partner account created');
+      toast.success('Partner account created', { position: 'top-right' });
       router.push('/')
     } catch (e) {
-      toast.error(extractErrorMessage(e));
+      toast.error(extractErrorMessage(e), { position: 'top-right' });
     } finally {
       loading.value = false;
     }
   } else {
-    toast.error('Please select at least one city of operation');
+    toast.error('Please select at least one city of operation', { position: 'top-right' });
   }
 }
 const removeCity = (index:number) => {

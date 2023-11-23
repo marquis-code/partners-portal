@@ -567,7 +567,7 @@ export default defineComponent({
           null,
           'Oops! An error occurred, please try again.'
         );
-        this.$toast.error(errorMessage);
+        this.$toast.error(errorMessage, { position: 'top-right' });
       } finally {
         this.processing = false;
       }
@@ -733,7 +733,7 @@ const updatePartnerInfo = async () => {
       `/v1/users/${user.value.id}`,
       payload
     );
-    toast.success('Partners details was successfully updated');
+    toast.success('Partners details was successfully updated', { position: 'top-right' });
     new AppInitializerService(router, store, axios).initializeUserSession()
   } catch (err) {
     console.log(err);
@@ -742,7 +742,7 @@ const updatePartnerInfo = async () => {
       null,
       'Oops! An error occurred, please try again.'
     );
-    toast.error(errorMessage);
+    toast.error(errorMessage, { position: 'top-right' });
   } finally {
     processing.value = false;
   }
@@ -759,10 +759,10 @@ const handleProfileUpload = async (e: any) => {
     .then((res) => {
       form.value.avatar = res;
       profilePreview.value = URL.createObjectURL(selectedProfile);
-      toast.success('Profile picture was uploaded successfully');
+      toast.success('Profile picture was uploaded successfully', { position: 'top-right' });
     })
     .catch(() => {
-      toast.error('Something went wrong while uploading profile');
+      toast.error('Something went wrong while uploading profile', { position: 'top-right' });
     })
     .finally(() => {
       uploadingProfile.value = false;
@@ -782,7 +782,7 @@ const uploadTos3andGetDocumentUrl = async (file: any) => {
     }
   } catch (error) {
     toast.warning(
-      'An error occured while uploading your file, please try again'
+      'An error occured while uploading your file, please try again', { position: 'top-right' }
     );
   } finally {
     uploadingFile.value = false;

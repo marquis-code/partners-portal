@@ -161,13 +161,13 @@ const uploadFiles = (event: any) => {
 const checkAllFilesSize = (objectContainingFiles: any) => {
   for (const key in objectContainingFiles) {
     if (!isFileSizeOk(objectContainingFiles[key].size)) {
-      toast.warning('Each file you select must be less than 10MB')
+      toast.warning('Each file you select must be less than 5MB', { position: 'top-right' })
     }
   }
 }
 
 const isFileSizeOk = (fileSizeInBytes: number): boolean => {
-  if (fileSizeInBytes > 10000000) {
+  if (fileSizeInBytes > 5000000) {
     return false;
   } else return true;
 }

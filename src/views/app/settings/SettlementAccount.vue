@@ -274,7 +274,7 @@ export default defineComponent({
           null,
           'Oops! An error occurred, please try again.'
         );
-        this.$toast.error(errorMessage);
+        this.$toast.error(errorMessage, { position: 'top-right' });
       } finally {
         this.fetchingAccounts = false;
       }
@@ -301,7 +301,7 @@ export default defineComponent({
           null,
           'Oops! An error occurred, please try again.'
         );
-        this.$toast.error(errorMessage);
+        this.$toast.error(errorMessage, { position: 'top-right' });
       } finally {
         this.loading = false;
       }
@@ -338,7 +338,7 @@ export default defineComponent({
           null,
           'Oops! An error occurred, please try again.'
         );
-        this.$toast.error(errorMessage);
+        this.$toast.error(errorMessage, { position: 'top-right' });
       } finally {
         this.loading = false;
       }
@@ -438,7 +438,7 @@ const fetchSettlementAccounts = async () => {
       null,
       'Oops! An error occurred, please try again.'
     );
-    toast.error(errorMessage);
+    toast.error(errorMessage, { position: 'top-right' });
   } finally {
     fetchingAccounts.value = false;
   }
@@ -465,7 +465,7 @@ const assignAsDefault = async () => {
       null,
       'Oops! An error occurred, please try again.'
     );
-    toast.error(errorMessage);
+    toast.error(errorMessage, { position: 'top-right' });
   } finally {
     loading.value = false;
   }
@@ -502,7 +502,7 @@ const removeThisAccount = async () => {
       null,
       'Oops! An error occurred, please try again.'
     );
-    toast.error(errorMessage);
+    toast.error(errorMessage, { position: 'top-right' });
   } finally {
     loading.value = false;
   }

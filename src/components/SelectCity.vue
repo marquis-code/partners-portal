@@ -116,7 +116,7 @@ const selectThisCity = (event:any) => {
     if (!selectedThisCityBefore(event.target.value)) {
       const newAddition = props.cities[event.target.value];
       selectedCities.value.push(newAddition);
-    } else toast.warning('You cannot select a city twice');
+    } else toast.warning('You cannot select a city twice', { position: 'top-right' });
   } else {
     const newAddition = props.cities[event.target.value];
     selectedCities.value.push(newAddition);

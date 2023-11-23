@@ -64,7 +64,7 @@ export const useRoutes = () => {
         null,
         'Oops! An error occurred, please try again.'
       );
-      toast.error(errorMessage);
+      toast.error(errorMessage, { position: 'top-right' });
     } finally {
       loading.value = false;
     }

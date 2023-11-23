@@ -549,7 +549,7 @@ const downloadReport = () => {
     })
     .catch((err) => {
       toast.error(
-        err?.response?.data?.message || 'An error occured'
+        err?.response?.data?.message || 'An error occured', { position: 'top-right' }
       );
     })
     .finally(() => {

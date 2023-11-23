@@ -540,7 +540,7 @@ export default defineComponent({
             null,
             'Oops! An error occurred, please try again.'
           );
-          this.$toast.error(errorMessage);
+          this.$toast.error(errorMessage, { position: 'top-right' });
         })
         .finally(() => {
           this.fetchingDriver = false;
@@ -591,7 +591,7 @@ export default defineComponent({
           null,
           'Oops! An error occurred, please try again.'
         );
-        this.$toast.error(errorMessage);
+        this.$toast.error(errorMessage, { position: 'top-right' });
       } finally {
         this.processing = false;
       }
@@ -757,7 +757,7 @@ const loadDriver = () => {
         null,
         'Oops! An error occurred, please try again.'
       );
-      toast.error(errorMessage);
+      toast.error(errorMessage, { position: 'top-right' });
     })
     .finally(() => {
       fetchingDriver.value = false;
@@ -801,14 +801,14 @@ const updateDriver = async () => {
     openModal();
     router.push({ name: 'driver.detail.info' });
     closeModal();
-    toast.success('Drivers details was successfully updated');
+    toast.success('Drivers details was successfully updated', { position: 'top-right' });
   } catch (err) {
     const errorMessage = extractErrorMessage(
       err,
       null,
       'Oops! An error occurred, please try again.'
     );
-    toast.error(errorMessage);
+    toast.error(errorMessage, { position: 'top-right' });
   } finally {
     processing.value = false;
   }
@@ -826,10 +826,10 @@ const handleProfileUpload = async (e: any) => {
     .then((res) => {
       form.value.avatar = res;
       profilePreview.value = URL.createObjectURL(selectedProfile);
-      toast.success('Profile picture was uploaded successfully');
+      toast.success('Profile picture was uploaded successfully', { position: 'top-right' });
     })
     .catch(() => {
-      toast.error('Something went wrong while uploading profile');
+      toast.error('Something went wrong while uploading profile', { position: 'top-right' });
     })
     .finally(() => {
       uploadingProfile.value = false;
@@ -849,7 +849,7 @@ const uploadTos3andGetDocumentUrl = async (file: any) => {
     }
   } catch (error) {
     toast.warning(
-      'An error occured while uploading your file, please try again'
+      'An error occured while uploading your file, please try again', { position: 'top-right' }
     );
   } finally {
     uploadingFile.value = false;

@@ -58,7 +58,7 @@ const isLoading:any = computed(() => store.getters['vehicle/getVehicleLoading'])
 const getVehicleData = () => {
   store.dispatch('vehicle/getVehicleInfo')
     .catch((e) => {
-      toast.error(extractErrorMessage(e));
+      toast.error(extractErrorMessage(e), { position: 'top-right' });
     });
 }
 </script>

@@ -735,11 +735,11 @@ const updateThisDocument = async () => {
       `/v1/partners/${docToUpdate.value.partner_id}/vehicle-documents/${docToUpdate.value.id}`,
       { ...payload }
     );
-    toast.success(`${docToUpdate.value.document_type} updated`);
+    toast.success(`${docToUpdate.value.document_type} updated`, { position: 'top-right' });
     showDocumentUpdateModal.value = false;
     fetchAllDocuments();
   } catch (error) {
-    toast.warning('Unable to update this document, Please try again');
+    toast.warning('Unable to update this document, Please try again', { position: 'top-right' });
   } finally {
     savingForm.value = false;
   }
@@ -762,11 +762,11 @@ const addThisNewDocument = async () => {
         vehicle_documents: [payload]
       }
     );
-    toast.success(`${docToUpdate.value.document_type} updated`);
+    toast.success(`${docToUpdate.value.document_type} updated`, { position: 'top-right' });
     showDocumentAddingModal.value = false;
     fetchAllDocuments();
   } catch (error) {
-    toast.warning('Unable to update this document, Please try again');
+    toast.warning('Unable to update this document, Please try again', { position: 'top-right' });
   } finally {
     savingForm.value = false;
   }
@@ -788,7 +788,7 @@ const uploadTos3andGetDocumentUrl = async (file: string | Blob): Promise<any> =>
     }
   } catch (error) {
     toast.warning(
-      'An error occured while uploading your file, please try again'
+      'An error occured while uploading your file, please try again', { position: 'top-right' }
     );
   }
 }
@@ -802,7 +802,7 @@ const selectThisNewDocument = async ($event: any) => {
   }
   docToUpdate.value.files = fileUrl;
   toast.success(
-    `${docToUpdate.value.document_type} has been uploaded`
+    `${docToUpdate.value.document_type} has been uploaded`, { position: 'top-right' }
   );
 }
 const removeExistingDoc = () => {
@@ -913,7 +913,7 @@ const addYetToBeAddedDocument = async ($event: any) => {
     docToAdd.value.files = '';
   }
   docToAdd.value.files = fileUrl;
-  toast.success(`${docToAdd.value.document_type} uploaded`);
+  toast.success(`${docToAdd.value.document_type} uploaded`, { position: 'top-right' });
 }
 const removeYetToBeAddedDocument = () => {
   docToAdd.value.files = '';

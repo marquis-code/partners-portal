@@ -97,7 +97,7 @@ export default {
             null,
             'Oops! An error occurred, please try again.'
           );
-          this.$toast.error(errorMessage);
+          this.$toast.error(errorMessage, { position: 'top-right' });
         })
         .finally(() => {
           this.loading = false;
@@ -142,7 +142,7 @@ const fetchTrip = async () => {
         null,
         'Oops! An error occurred, please try again.'
       );
-      toast.error(errorMessage);
+      toast.error(errorMessage, { position: 'top-right' });
     })
     .finally(() => {
       loading.value = false;
