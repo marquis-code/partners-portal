@@ -247,7 +247,7 @@ const submitForm = async () => {
         });
       }
     } else {
-      toast.error('Login failed!');
+      toast.error('Login failed!', { position: 'top-right' });
     }
   } catch (e) {
     const errorMessage = extractErrorMessage(
@@ -255,7 +255,7 @@ const submitForm = async () => {
       null,
       'Oops! An error occurred, please try again.'
     );
-    toast.error(errorMessage);
+    toast.error(errorMessage, { position: 'top-right' });
   } finally {
     processing.value = false;
   }

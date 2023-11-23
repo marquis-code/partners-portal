@@ -29,7 +29,7 @@
       >
         <img src="@/assets/images/upload.svg" />
         <p class="text-sm text-green-400">Click to upload</p>
-        <p class="text-xs text-gray-400">or drag and drop</p>
+        <p class="text-xs text-gray-400">or drag and drop (5mb maximum)</p>
       </div>
     </div>
     <!-- This shows when a file has been uploaded -->
@@ -207,11 +207,11 @@ const uploadFile = (event: any) => {
     emit('fileSelected', selectedFile.value)
     // this.$emit('fileSelected', this.selectedFile);
   } else {
-    toast.warning('File must be less than 10 MB');
+    toast.warning('File must be less than 5 MB', { position: 'top-right' });
   }
 }
 const isFileSizeOk = (fileSizeInBytes: number): boolean => {
-  if (fileSizeInBytes > 10000000) {
+  if (fileSizeInBytes > 5000000) {
     return false;
   } else {
     return true;
