@@ -586,8 +586,7 @@ const assignDriverToThisVehicle = async () => {
     nextAssignStep();
   } catch (error: any) {
     toast.warning(
-      error.response.data.message ||
-        'Error occurred while assigning this driver'
+      error.response.data.message || 'Error occurred while assigning this driver', { position: 'top-right' }
     );
   } finally {
     assigningDriver.value = false;
@@ -607,7 +606,7 @@ const unassignDriverToThisVehicle = async () => {
   } catch (error: any) {
     toast.warning(
       error.response.data.message ||
-        'Error occurred while assigning this driver'
+        'Error occurred while assigning this driver', { position: 'top-right' }
     );
   } finally {
     unassigningDriver.value = false;
@@ -617,7 +616,7 @@ const updateVehicleInfo = async (vehicleId: number) => {
   try {
     const response = await axios.get(`/v1/vehicles/${vehicleId}`);
     await store.dispatch('vehicle/setVehicleData', response.data);
-    toast.success('Vehicle Informaion ');
+    toast.success('Vehicle Informaion ', { position: 'top-right' });
   } finally {
     console.log('done');
   }
@@ -650,7 +649,7 @@ const fetchVehiclePartnerDrivers = () => {
     })
     .catch((err) => {
       console.log(err);
-      toast.warning('Error occured while fetching your drivers');
+      toast.warning('Error occured while fetching your drivers', { position: 'top-right' });
     })
     .finally(() => {
       fetchingVehiclePartnersDriver.value = false;

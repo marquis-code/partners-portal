@@ -124,7 +124,7 @@ const getBarChartTripsData = async () => {
       null,
       'An error occured while fetching your trips history'
     );
-    toast.warning(errorMessage);
+    toast.warning(errorMessage, { position: 'top-right' });
   } finally {
     loading.value = false;
   }

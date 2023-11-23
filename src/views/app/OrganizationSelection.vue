@@ -158,7 +158,7 @@ const getPartnerMembers = () => {
 }
 const selected = (index: number, partner: PartnerOrganization) => {
   if (partner.role !== 'owner' && !partner.supportedCities) {
-    toast.info('This profile setup is yet to be completed');
+    toast.info('This profile setup is yet to be completed', { position: 'top-right' });
     return;
   }
   store.dispatch('auth/setActiveContext', partner);

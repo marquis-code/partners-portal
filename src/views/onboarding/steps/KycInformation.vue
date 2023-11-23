@@ -462,7 +462,7 @@ export default defineComponent<any, any, any>({
           null,
           'Oops! An error occurred, please try again.'
         );
-        this.$toast.error(errorMessage);
+        this.$toast.error(errorMessage, { position: 'top-right' });
       } finally {
         this.loading = false;
       }
@@ -507,7 +507,7 @@ export default defineComponent<any, any, any>({
           null,
           'Oops! An error occurred, please try again.'
         );
-        this.$toast.error(errorMessage);
+        this.$toast.error(errorMessage, { position: 'top-right' });
       } finally {
         this.loading = false;
       }
@@ -718,7 +718,7 @@ const saveIdentityForm = async () => {
       null,
       'Oops! An error occurred, please try again.'
     );
-    toast.error(errorMessage);
+    toast.error(errorMessage, { position: 'top-right' });
   } finally {
     loading.value = false;
   }
@@ -729,7 +729,7 @@ const saveAddressForm = async () => {
     return;
   }
   if (!file.value) {
-    toast.error('Kindly select a file');
+    toast.error('Kindly select a file', { position: 'top-right' });
     return;
   }
   try {
@@ -763,7 +763,7 @@ const saveAddressForm = async () => {
       null,
       'Oops! An error occurred, please try again.'
     );
-    toast.error(errorMessage);
+    toast.error(errorMessage, { position: 'top-right' });
   } finally {
     loading.value = false;
   }

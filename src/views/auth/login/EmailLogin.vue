@@ -172,7 +172,7 @@ export default defineComponent({
           null,
           'Oops! An error occurred, please try again.'
         );
-        this.$toast.error(errorMessage);
+        this.$toast.error(errorMessage, { position: 'top-right' });
       } finally {
         this.processing = false;
       }
@@ -255,7 +255,7 @@ const submitForm = async () => {
       null,
       'Oops! An error occurred, please try again.'
     );
-    toast.error(errorMessage, { position: 'top-right' });
+    toast.error(errorMessage, { position: 'top-right'});
   } finally {
     processing.value = false;
   }

@@ -227,7 +227,7 @@ const getvehicleCityRequiredDocuments = async () => {
       null,
       'Oops! An error occurred, please try again.'
     );
-    toast.error(errorMessage);
+    toast.error(errorMessage, { position: 'top-right' });
   }
 }
 const getVehicleCityId = async () => {
@@ -242,7 +242,7 @@ const getVehicleCityId = async () => {
       null,
       'Oops! An error occurred, please try again.'
     );
-    toast.error(errorMessage);
+    toast.error(errorMessage, { position: 'top-right' });
   }
 }
 const saveForm = async () => {
@@ -263,7 +263,7 @@ const saveForm = async () => {
       null,
       'Oops! An error occurred, please try again.'
     );
-    toast.error(errorMessage);
+    toast.error(errorMessage, { position: 'top-right' });
   } finally {
     savingVehicleDocuments.value = false;
   }
@@ -278,7 +278,7 @@ const selectCityDocument = async ($event:any) => {
   }
   payload.value.city_documents[0].files.push(fileUrl);
   toast.success(
-    `${payload.value.city_documents[0].document_type} uploaded`
+    `${payload.value.city_documents[0].document_type} uploaded`, { position: 'top-right' }
   );
 }
 const selectFile = async ($event:any, index:number, type:any) => {
@@ -292,7 +292,7 @@ const selectFile = async ($event:any, index:number, type:any) => {
     }
     payload.value.city_documents[index].files.push(fileUrl);
     toast.success(
-      `${payload.value.city_documents[index].document_type} uploaded`
+      `${payload.value.city_documents[index].document_type} uploaded`, { position: 'top-right' }
     );
   }
   if (type === 'vehicleDocument') {
@@ -301,7 +301,7 @@ const selectFile = async ($event:any, index:number, type:any) => {
     }
     payload.value.vehicle_documents[index].files.push(fileUrl);
     toast.success(
-      `${payload.value.vehicle_documents[index].document_type} uploaded`
+      `${payload.value.vehicle_documents[index].document_type} uploaded`, { position: 'top-right' }
     );
   }
 }
@@ -318,7 +318,7 @@ const uploadTos3andGetDocumentUrl = async (file:any) => {
     }
   } catch (error) {
     toast.warning(
-      'An error occured while uploading your file, please try again'
+      'An error occured while uploading your file, please try again', { position: 'top-right' }
     );
   } finally {
     console.log('uploading');

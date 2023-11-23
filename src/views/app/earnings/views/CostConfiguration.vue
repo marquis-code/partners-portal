@@ -449,12 +449,12 @@ const downloadReport = () => {
         const url = URL.createObjectURL(blob);
         downloadFile(url, 'downloaded-cost_configuration-report')
       } else {
-        toast.error('No data to download');
+        toast.error('No data to download', { position: 'top-right' });
       }
     })
     .catch((err) => {
       toast.error(
-        err?.response?.data?.message || 'An error occured'
+        err?.response?.data?.message || 'An error occured', { position: 'top-right' }
       );
     })
     .finally(() => {

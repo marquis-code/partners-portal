@@ -172,7 +172,7 @@ export default defineComponent({
           })
           .catch((err) => {
             const errorMessage = extractErrorMessage(err, null, 'Oops! An error occurred, please try again.');
-            this.$toast.error(errorMessage);
+            this.$toast.error(errorMessage, { position: 'top-right' });
           })
           .finally(() => (this.loading = false));
       } else {
@@ -324,11 +324,11 @@ const login = () => {
       })
       .catch((err) => {
         const errorMessage = extractErrorMessage(err, null, 'Oops! An error occurred, please try again.');
-        toast.error(errorMessage);
+        toast.error(errorMessage, { position: 'top-right' });
       })
       .finally(() => (loading.value = false));
   } else {
-    toast.error('Please enter a valid OTP');
+    toast.error('Please enter a valid OTP', { position: 'top-right' });
   }
 }
 const proceed = () => {

@@ -434,7 +434,7 @@ export default defineComponent<any, any, any>({
           null,
           'Oops! An error occurred, please try again.'
         );
-        this.$toast.error(errorMessage);
+        this.$toast.error(errorMessage, { position: 'top-right' });
       }
     },
     async checkIfAddressKYCHasBeenDone() {
@@ -447,7 +447,7 @@ export default defineComponent<any, any, any>({
           null,
           'Oops! An error occurred, please try again.'
         );
-        this.$toast.error(errorMessage);
+        this.$toast.error(errorMessage, { position: 'top-right' });
       }
     },
     async setFormDefaults() {
@@ -472,7 +472,7 @@ export default defineComponent<any, any, any>({
           null,
           'Oops! An error occurred, please try again.'
         );
-        this.$toast.error(errorMessage);
+        this.$toast.error(errorMessage, { position: 'top-right' });
       }
     },
     previous() {
@@ -510,7 +510,7 @@ export default defineComponent<any, any, any>({
           null,
           'Oops! An error occurred, please try again.'
         );
-        this.$toast.error(errorMessage);
+        this.$toast.error(errorMessage, { position: 'top-right' });
       } finally {
         this.loading = false;
       }
@@ -549,7 +549,7 @@ export default defineComponent<any, any, any>({
           null,
           'Oops! An error occurred, please try again.'
         );
-        this.$toast.error(errorMessage);
+        this.$toast.error(errorMessage, { position: 'top-right' });
       } finally {
         this.loading = false;
       }
@@ -699,7 +699,7 @@ const checkIfIdentityKYCHasBeenDone = async () => {
       null,
       'Oops! An error occurred, please try again.'
     );
-    toast.error(errorMessage);
+    toast.error(errorMessage, { position: 'top-right' });
   }
 }
 const checkIfAddressKYCHasBeenDone = async () => {
@@ -712,7 +712,7 @@ const checkIfAddressKYCHasBeenDone = async () => {
       null,
       'Oops! An error occurred, please try again.'
     );
-    toast.error(errorMessage);
+    toast.error(errorMessage, { position: 'top-right' });
   }
 }
 const setFormDefaults = async () => {
@@ -737,7 +737,7 @@ const setFormDefaults = async () => {
       null,
       'Oops! An error occurred, please try again.'
     );
-    toast.error(errorMessage);
+    toast.error(errorMessage, { position: 'top-right' });
   }
 }
 const previous = () => {
@@ -767,7 +767,7 @@ const saveIdentityForm = async () => {
       `/v1/partners/${partnerContext.value.partner.id}/shareholders/${props.id}/identity-verification`,
       identityForm.value
     );
-    toast.success('Shareholder Identity KYC completed');
+    toast.success('Shareholder Identity KYC completed', { position: 'top-right' });
     activeView.value = 1;
   } catch (err) {
     const errorMessage = extractErrorMessage(
@@ -775,7 +775,7 @@ const saveIdentityForm = async () => {
       null,
       'Oops! An error occurred, please try again.'
     );
-    toast.error(errorMessage);
+    toast.error(errorMessage, { position: 'top-right' });
   } finally {
     loading.value = false;
   }
@@ -786,7 +786,7 @@ const saveAddressForm = async () => {
     return;
   }
   if (!file.value) {
-    toast.error('Kindly select a file');
+    toast.error('Kindly select a file', { position: 'top-right' });
     return;
   }
   try {
@@ -804,7 +804,7 @@ const saveAddressForm = async () => {
       `/v1/partners/${partnerContext.value.partner.id}/shareholders/${props.id}/address-verification`,
       addressForm.value
     );
-    toast.success('Shareholder Address KYC completed');
+    toast.success('Shareholder Address KYC completed', { position: 'top-right' });
     setTimeout(() => {
       router.push({ name: 'dashboard.company-kyc' });
     }, 200);
@@ -814,7 +814,7 @@ const saveAddressForm = async () => {
       null,
       'Oops! An error occurred, please try again.'
     );
-    toast.error(errorMessage);
+    toast.error(errorMessage, { position: 'top-right' });
   } finally {
     loading.value = false;
   }

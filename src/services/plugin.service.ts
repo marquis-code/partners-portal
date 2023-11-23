@@ -4,7 +4,7 @@ import {App, Plugin} from "@vue/runtime-core";
 import vSelect from "vue-select";
 
 const PLUGINS: Array<Plugin> = [
-  // ToastPlugin,
+  ToastPlugin,
   ShModalPlugin
 ];
 
@@ -17,9 +17,6 @@ class PluginService {
   }
 
   registerPlugins (app: App<Element>) {
-    app.use(ToastPlugin, {
-      position: 'top'
-    })
     this.plugins.forEach(plugin => {
       app.use(plugin);
     });
