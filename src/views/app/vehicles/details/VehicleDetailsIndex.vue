@@ -6,6 +6,15 @@
         : 'Vehicle Information'
     "
   >
+    <template #breadcrumbs>
+      <div v-if="vehicleData && !isLoading && !loading" class="flex items-center space-x-3 py-3 ml-[28px]">
+        <router-link :to="'/vehicles'"  class="text-gray-400 text-sm hover:text-gray-900">Vehicles</router-link>
+        <img src="@/assets/images/breadcrumbs.svg" />
+        <p class="text-gray-900 text-sm">
+          {{ vehicleData.brand }} {{ vehicleData.name }}
+        </p>
+      </div>
+    </template>
     <template #actionsPane>
       <page-action-header>
         <template #action>

@@ -567,9 +567,11 @@ import { useRoute } from 'vue-router';
 import { useStore } from 'vuex';
 
 const phoneNumber = (value: string) => {
-  return /^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$/.test(
-    value
-  );
+  // return /^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$/.test(
+  //   value
+  // );
+  if (value.length === 11 || value.length === 10) return true
+  return false
 };
 const validName = (value: string) => {
   return /^[a-zA-Z]+(([ -][a-zA-Z])?[a-zA-Z]*)*$/.test(value);
@@ -594,7 +596,7 @@ const validations = {
     phone: {
       required,
       phoneNumber,
-      minLength: minLength(11)
+      minLength: minLength(10)
     },
     password: {
       required,
