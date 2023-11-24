@@ -307,7 +307,7 @@ const fetchPageData = () => {
       vehicleBrands.value = r.data.data || [];
     })
     .catch((e: any) => {
-      toast.error(extractErrorMessage(e));
+      toast.error(extractErrorMessage(e), { position: 'top-right' });
     })
     .finally(() => {
       loading.value = false;
@@ -338,7 +338,7 @@ const getYearsFrom = (year: string): number[] => {
 const saveForm = async () => {
   v$.value.form.$touch();
   if (!validPlateNumber.value) {
-    toast.warning('Plate number must be in the right format');
+    toast.warning('Plate number must be in the right format', { position: 'top-right' });
     return;
   }
   if (processing.value || v$.value.form.$errors.length) {
@@ -366,7 +366,7 @@ const saveForm = async () => {
       null,
       'Oops! An error occurred, please try again.'
     );
-    toast.error(errorMessage);
+    toast.error(errorMessage, { position: 'top-right' });
   } finally {
     processing.value = false;
   }
@@ -382,7 +382,7 @@ const getVehiclesForBrand = async (brandId: any) => {
       );
       vehicleModels.value = vehicleModelsResponse.data.data;
     } catch (e) {
-      toast.error(extractErrorMessage(e, null, 'An error occurred!'));
+      toast.error(extractErrorMessage(e, null, 'An error occurred!'), { position: 'top-right' });
     }
   }
 }

@@ -61,7 +61,7 @@ export const useTrips = () => {
           totalRecords.value = res.data.metadata?.total;
         })
         .catch((err) => {
-          toast.error(err.response.data.message || 'An error occured');
+          toast.error(err.response.data.message || 'An error occured', { position: 'top-right' });
         })
         .finally(() => {
           loading.value = false;
@@ -78,7 +78,7 @@ export const useTrips = () => {
         })
         .catch((err) => {
           toast.error(
-            err?.response?.data?.message || 'An error occured'
+            err?.response?.data?.message || 'An error occured', { position: 'top-right' }
           );
         })
         .finally(() => {

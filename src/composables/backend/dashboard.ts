@@ -56,7 +56,7 @@ export const useDashboard = () => {
         null,
         'An error occured while fetching your trips history'
       );
-      toast.warning(errorMessage);
+      toast.warning(errorMessage, { position: 'top-right' });
     }
   }
   const checkIfAllTodosAreDone = () => {
@@ -86,7 +86,7 @@ export const useDashboard = () => {
         null,
         'Oops! An error occurred, please try again.'
       );
-      toast.error(errorMessage);
+      toast.error(errorMessage, { position: 'top-right' });
     }
   }
   const checkIdentityStatuses = () => {
@@ -121,7 +121,7 @@ export const useDashboard = () => {
         null,
         'Oops! An error occurred, please try again.'
       );
-      toast.error(errorMessage);
+      toast.error(errorMessage, { position: 'top-right' });
     }
   }
   const fetchDashboardSummary = async (period = '') => {

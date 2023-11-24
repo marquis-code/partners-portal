@@ -62,7 +62,7 @@ const isLoading:any = computed(() => store.getters['driver/getDriverLoading'])
 
 const getDriverData = () => {
   store.dispatch('driver/getDriverInfo').catch((e) => {
-    toast.error(extractErrorMessage(e));
+    toast.error(extractErrorMessage(e), { position: 'top-right' });
   });
 }
 </script>

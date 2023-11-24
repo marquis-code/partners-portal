@@ -208,7 +208,7 @@ const uploadFile = (event: any) => {
     emit('fileSelected', selectedFile.value)
     // this.$emit('fileSelected', this.selectedFile);
   } else {
-    toast.warning('File must be less than 10 MB');
+    toast.warning('File must be less than 10 MB', { position: 'top-right' });
   }
 }
 

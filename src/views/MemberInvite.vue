@@ -77,7 +77,7 @@ const fetchPartnerInvitationData = () => {
         id: '',
         company_name: 'John doe limited',
       }]
-      toast.error(extractErrorMessage(err))
+      toast.error(extractErrorMessage(err), { position: 'top-right' })
     }).finally(() => {
       loadingPageData.value = false;
     });
@@ -90,7 +90,7 @@ const rejectInvitation = () => {
       // TODO: handle redirection after confirming design workflow
     })
     .catch((err: any) => {
-      toast.error(extractErrorMessage(err))
+      toast.error(extractErrorMessage(err), { position: 'top-right' })
     })
     .finally(() => {
       processingDecision.value = false;
@@ -104,7 +104,7 @@ const acceptInvitation = () => {
       // TODO: handle redirection after confirming design workflow
     })
     .catch((err: any) => {
-      toast.error(extractErrorMessage(err))
+      toast.error(extractErrorMessage(err), { position: 'top-right' })
     })
     .finally(() => {
       processingDecision.value = false;

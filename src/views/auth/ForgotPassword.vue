@@ -309,7 +309,7 @@ const sendPasswordResetEmail = () => {
           err,
           null,
           'Oops! An error occurred, please try again.'
-        )
+        ), { position: 'top-right' }
       );
     })
     .finally(() => (processing.value = false));
