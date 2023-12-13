@@ -15,7 +15,7 @@ import {AppInitializerService} from "@/services/app-initializer.service";
 import VueGoogleMaps from '@fawmi/vue-google-maps';
 import './utils/zoho';
 import VCalendar from 'v-calendar';
-import 'v-calendar/dist/style.css';
+import 'v-calendar/dist/style.css'
 
 new AppInitializerService(router, store, axiosInstance).initialize()
   .finally(() => {
