@@ -214,11 +214,20 @@
                 <label class="text-xs font-medium text-grays-black-5"
                   >Expiry date
                 </label>
-                <datepicker
+                <!-- <datepicker
                   v-model="(v$.form.expiry_date as any).$model"
                   class="text-xs border-none outline-none w-full rounded-md p-3 placeholder-gray-500 placeholder-opacity-25 ring-1 ring-gray-300"
                   placeholder="Select expiry date"
-                />
+                /> -->
+                <v-date-picker  v-model="(v$.form.expiry_date as any).$model">
+                  <template  v-slot="{ inputEvents }">
+                    <div v-on="inputEvents" class="w-full ring-1 ring-gray-300 rounded-md outline-none text-xs py-3 px-4"
+                      :class="[(v$.form.expiry_date as any).$model ? '' : 'text-gray-500/25']"
+                    >
+                      {{ (v$.form.expiry_date as any).$model ? formatDate((v$.form.expiry_date as any).$model) : 'Select expiry date'}}
+                    </div>
+                  </template>
+                </v-date-picker>
                 <span
                   class="text-xs font-light text-red-500"
                   v-if="
@@ -306,6 +315,7 @@ import {axiosInstance as axios} from '@/plugins/axios';
 import {useToast} from 'vue-toast-notification';
 import router from '@/router';
 import ordinaryAutoComplete from '@/components/core/ordinaryAutoComplete.vue'
+import {formatDate} from '@/composables/utils'
 
 const validations = computed(() => ({
   form: {
@@ -393,7 +403,8 @@ const saveForm = async () => {
       email: form.value.email,
       password: 'shuttlers',
       dob: form.value.dob,
-      residential_address: form.value.residential_address
+      residential_address: form.value.residential_address,
+      is_partner_driver: true
     };
     if (form.value.avatar) newDriverPayload.avatar = form.value.avatar
     await axios.post('/v1/drivers', newDriverPayload).then((res) => {
