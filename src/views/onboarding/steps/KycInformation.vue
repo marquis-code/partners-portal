@@ -40,10 +40,12 @@
         "
       >
         <div class="space-y-2 w-full">
-          <label class="text-xs font-medium text-grays-black-5"
+          <label for="identification" class="text-xs font-medium text-grays-black-5"
             >Means of Identification</label
           >
           <select
+            name="identification"
+            id="identification"
             class="
               text-sm
               border-none
@@ -78,10 +80,12 @@
         </div>
         <!-- {{ selectedDocument }} -->
         <div class="space-y-2 w-full">
-          <label class="text-xs font-medium text-grays-black-5">{{
+          <label :for="getDocumentLabel" class="text-xs font-medium text-grays-black-5">{{
             getDocumentLabel
           }}</label>
           <input
+            :name="getDocumentLabel"
+            :id="getDocumentLabel"
             type="text"
             pattern="[a-zA-Z0-9]+"
             v-model="v$.identityForm.document.document_id.$model"
@@ -110,7 +114,7 @@
       </section>
       <section class="flex justify-start space-x-10 items-start pt-5">
         <div class="space-y-2 w-full lg:w-6/12 md:pr-5">
-          <label class="text-xs font-medium text-grays-black-5"
+          <label for="dob" class="text-xs font-medium text-grays-black-5"
             >Date Of Birth</label
           >
           <!-- <datepicker
@@ -127,7 +131,7 @@
             placeholder="Choose a date"
             v-model="(v$.identityForm.document.dob as any).$model"
           /> -->
-          <v-date-picker  v-model="(v$.identityForm.document.dob as any).$model">
+          <v-date-picker id="dob" v-model="(v$.identityForm.document.dob as any).$model">
             <template  v-slot="{ inputEvents }">
               <div v-on="inputEvents" class="w-full ring-1 ring-gray-300 rounded-md outline-none text-xs py-3 px-4"
                 :class="[(v$.identityForm.document.dob as any).$model ? '' : 'text-gray-500/25']"
